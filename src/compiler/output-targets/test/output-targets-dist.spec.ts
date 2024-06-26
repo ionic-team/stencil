@@ -1,8 +1,9 @@
 // @ts-nocheck
-import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
+
+import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 
 describe.skip('outputTarget, dist', () => {
   jest.setTimeout(20000);
@@ -41,13 +42,8 @@ describe.skip('outputTarget, dist', () => {
         }) export class CmpA {}`,
       [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.ios.css')]: `cmp-a { color: blue; }`,
       [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.md.css')]: `cmp-a { color: green; }`,
-      [path.join(
-        root,
-        'User',
-        'testing',
-        'src',
-        'global.ts'
-      )]: `export default function() { console.log('my global'); }`,
+      [path.join(root, 'User', 'testing', 'src', 'global.ts')]:
+        `export default function() { console.log('my global'); }`,
     });
     await compiler.fs.commit();
 

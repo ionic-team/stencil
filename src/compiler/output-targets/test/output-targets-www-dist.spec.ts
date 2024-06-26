@@ -1,9 +1,10 @@
 // @ts-nocheck
-import type * as d from '@stencil/core/declarations';
-import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
+import type * as d from '@stencil/core/declarations';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
+
+import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 
 describe.skip('outputTarget, www / dist / docs', () => {
   jest.setTimeout(20000);
@@ -48,14 +49,8 @@ describe.skip('outputTarget, www / dist / docs', () => {
       }`,
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
       [path.join(config.sys.getClientPath('polyfills/index.js'))]: `/* polyfills */`,
-      [path.join(
-        root,
-        'User',
-        'testing',
-        'src',
-        'components',
-        'cmp-a.tsx'
-      )]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]:
+        `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
     await compiler.fs.commit();
 

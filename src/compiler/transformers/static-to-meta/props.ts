@@ -1,6 +1,7 @@
+import ts from 'typescript';
+
 import type * as d from '../../../declarations';
 import { getStaticValue, isInternal } from '../transform-utils';
-import ts from 'typescript';
 
 /**
  * Parse a list of {@link ts.ClassElement} objects representing static props

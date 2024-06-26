@@ -1,15 +1,16 @@
-import type * as d from '../../../declarations';
-import { writeLazyModule } from './write-lazy-entry-module';
 import {
   formatComponentRuntimeMeta,
-  stringifyRuntimeData,
-  hasDependency,
-  rollupToStencilSourceMap,
   getSourceMappingUrlForEndOfFile,
+  hasDependency,
+  join,
+  rollupToStencilSourceMap,
+  stringifyRuntimeData,
 } from '@utils';
-import { optimizeModule } from '../../optimize/optimize-module';
-import { join } from 'path';
 import type { SourceMap as RollupSourceMap } from 'rollup';
+
+import type * as d from '../../../declarations';
+import { optimizeModule } from '../../optimize/optimize-module';
+import { writeLazyModule } from './write-lazy-entry-module';
 
 export const generateLazyModules = async (
   config: d.ValidatedConfig,
@@ -20,13 +21,13 @@ export const generateLazyModules = async (
   results: d.RollupResult[],
   sourceTarget: d.SourceTarget,
   isBrowserBuild: boolean,
-  sufix: string
+  sufix: string,
 ): Promise<d.BundleModule[]> => {
   if (!Array.isArray(destinations) || destinations.length === 0) {
     return [];
   }
-  const shouldMinify = config.minifyJs && isBrowserBuild;
-  const rollupResults = results.filter((r) => r.type === 'chunk') as d.RollupChunkResult[];
+  const shouldMinify = !!(config.minifyJs && isBrowserBuild);
+  const rollupResults = results.filter((r): r is d.RollupChunkResult => r.type === 'chunk');
   const entryComponentsResults = rollupResults.filter((rollupResult) => rollupResult.isComponent);
   const chunkResults = rollupResults.filter((rollupResult) => !rollupResult.isComponent && !rollupResult.isEntry);
 
@@ -42,12 +43,12 @@ export const generateLazyModules = async (
         sourceTarget,
         shouldMinify,
         isBrowserBuild,
-        sufix
+        sufix,
       );
-    })
+    }),
   );
 
-  if (!!config.extras?.experimentalImportInjection && !isBrowserBuild) {
+  if ((!!config.extras.experimentalImportInjection || !!config.extras.enableImportInjection) && !isBrowserBuild) {
     addStaticImports(rollupResults, bundleModules);
   }
 
@@ -62,9 +63,9 @@ export const generateLazyModules = async (
         destinations,
         sourceTarget,
         shouldMinify,
-        isBrowserBuild
+        isBrowserBuild,
       );
-    })
+    }),
   );
 
   const lazyRuntimeData = formatLazyBundlesRuntimeMeta(bundleModules);
@@ -81,21 +82,21 @@ export const generateLazyModules = async (
         lazyRuntimeData,
         sourceTarget,
         shouldMinify,
-        isBrowserBuild
+        isBrowserBuild,
       );
-    })
+    }),
   );
 
   await Promise.all(
     results
-      .filter((r) => r.type === 'asset')
+      .filter((r): r is d.RollupAssetResult => r.type === 'asset')
       .map((r: d.RollupAssetResult) => {
         return Promise.all(
           destinations.map((dest) => {
             return compilerCtx.fs.writeFile(join(dest, r.fileName), r.content);
-          })
+          }),
         );
-      })
+      }),
   );
 
   return bundleModules;
@@ -122,7 +123,7 @@ const addStaticImports = (rollupChunkResults: d.RollupChunkResult[], bundleModul
           switch(bundleId) {
               ${bundleModules.map((mod) => generateCjs(mod.output.bundleId)).join('')}
           }
-      }`
+      }`,
     );
   });
 };
@@ -189,7 +190,7 @@ const generateLazyEntryModule = async (
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
   isBrowserBuild: boolean,
-  sufix: string
+  sufix: string,
 ): Promise<d.BundleModule> => {
   const entryModule = buildCtx.entryModules.find((entryModule) => entryModule.entryKey === rollupResult.entryKey);
   const shouldHash = config.hashFileNames && isBrowserBuild;
@@ -203,7 +204,7 @@ const generateLazyEntryModule = async (
     false,
     isBrowserBuild,
     rollupResult.code,
-    rollupResult.map
+    rollupResult.map,
   );
 
   const output = await writeLazyModule(
@@ -215,7 +216,7 @@ const generateLazyEntryModule = async (
     shouldHash,
     code,
     sourceMap,
-    sufix
+    sufix,
   );
 
   return {
@@ -235,7 +236,7 @@ const writeLazyChunk = async (
   destinations: string[],
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
-  isBrowserBuild: boolean
+  isBrowserBuild: boolean,
 ) => {
   const { code, sourceMap } = await convertChunk(
     config,
@@ -246,7 +247,7 @@ const writeLazyChunk = async (
     rollupResult.isCore,
     isBrowserBuild,
     rollupResult.code,
-    rollupResult.map
+    rollupResult.map,
   );
 
   await Promise.all(
@@ -258,7 +259,7 @@ const writeLazyChunk = async (
         compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
       }
       compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
-    })
+    }),
   );
 };
 
@@ -272,7 +273,7 @@ const writeLazyEntry = async (
   lazyRuntimeData: string,
   sourceTarget: d.SourceTarget,
   shouldMinify: boolean,
-  isBrowserBuild: boolean
+  isBrowserBuild: boolean,
 ): Promise<void> => {
   if (isBrowserBuild && ['loader'].includes(rollupResult.entryKey)) {
     return;
@@ -287,7 +288,7 @@ const writeLazyEntry = async (
     false,
     isBrowserBuild,
     inputCode,
-    rollupResult.map
+    rollupResult.map,
   );
 
   await Promise.all(
@@ -299,22 +300,47 @@ const writeLazyEntry = async (
         compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType });
       }
       return compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType });
-    })
+    }),
   );
 };
 
+/**
+ * Sorts, formats, and stringifies the bundles for a lazy build of a Stencil project.
+ *
+ * @param bundleModules The modules for the Stencil lazy build emitted from Rollup.
+ * @returns A stringified representation of the lazy bundles.
+ */
 const formatLazyBundlesRuntimeMeta = (bundleModules: d.BundleModule[]): string => {
   const sortedBundles = bundleModules.slice().sort(sortBundleModules);
   const lazyBundles = sortedBundles.map(formatLazyRuntimeBundle);
   return stringifyRuntimeData(lazyBundles);
 };
 
+/**
+ * Formats a bundle module into a tuple of bundle ID and component metadata for use at runtime.
+ *
+ * @param bundleModule The bundle module to format.
+ * @returns A tuple of bundle ID and component metadata.
+ */
 const formatLazyRuntimeBundle = (bundleModule: d.BundleModule): d.LazyBundleRuntimeData => {
   const bundleId = bundleModule.output.bundleId;
   const bundleCmps = bundleModule.cmps.slice().sort(sortBundleComponents);
   return [bundleId, bundleCmps.map((cmp) => formatComponentRuntimeMeta(cmp, true))];
 };
 
+/**
+ * Sorts bundle modules by the number of dependents, dependencies, and containing component tags.
+ * Dependencies/dependents may also include components that are statically slotted into other components.
+ * The order of the bundle modules is important because it determines the order in which the bundles are loaded
+ * and subsequently the order that their respective components are defined and connected (i.e. via the `connectedCallback`)
+ * at runtime.
+ *
+ * This must be a valid {@link https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/sort#comparefn | compareFn}
+ *
+ * @param a The first argument to compare.
+ * @param b The second argument to compare.
+ * @returns A number indicating whether the first argument is less than/greater than/equal to the second argument.
+ */
 export const sortBundleModules = (a: d.BundleModule, b: d.BundleModule): -1 | 1 | 0 => {
   const aDependents = a.cmps.reduce((dependents, cmp) => {
     dependents.push(...cmp.dependents);
@@ -406,13 +432,13 @@ const convertChunk = async (
   isCore: boolean,
   isBrowserBuild: boolean,
   code: string,
-  rollupSrcMap: RollupSourceMap
+  rollupSrcMap: RollupSourceMap,
 ) => {
   let sourceMap = rollupToStencilSourceMap(rollupSrcMap);
   const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
   const optimizeResults = await optimizeModule(config, compilerCtx, {
     input: code,
-    sourceMap: sourceMap,
+    sourceMap,
     isCore,
     sourceTarget,
     inlineHelpers,
@@ -422,6 +448,9 @@ const convertChunk = async (
 
   if (typeof optimizeResults.output === 'string') {
     code = optimizeResults.output;
+  }
+
+  if (optimizeResults.sourceMap) {
     sourceMap = optimizeResults.sourceMap;
   }
   return { code, sourceMap };

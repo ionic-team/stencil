@@ -1,11 +1,12 @@
-import type * as d from '../../declarations';
 import { buildError } from '@utils';
-import { NodeResolveModule } from './node-resolve-module';
 import fs from 'graceful-fs';
 import path from 'path';
-import satisfies from 'semver/functions/satisfies';
-import major from 'semver/functions/major';
 import semverLte from 'semver/functions/lte';
+import major from 'semver/functions/major';
+import satisfies from 'semver/functions/satisfies';
+
+import type * as d from '../../declarations';
+import { NodeResolveModule } from './node-resolve-module';
 
 /**
  * The version range that we support for a given package. The strings should be
@@ -43,7 +44,10 @@ export class NodeLazyRequire implements d.LazyRequire {
    * @param nodeResolveModule an object which wraps up module resolution functionality
    * @param lazyDependencies the dependency requirements we want to enforce here
    */
-  constructor(private nodeResolveModule: NodeResolveModule, private lazyDependencies: LazyDependencies) {}
+  constructor(
+    private nodeResolveModule: NodeResolveModule,
+    private lazyDependencies: LazyDependencies,
+  ) {}
 
   /**
    * Ensure that a dependency within our supported range is installed in the

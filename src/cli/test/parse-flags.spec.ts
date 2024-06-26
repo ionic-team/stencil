@@ -1,7 +1,17 @@
-import { LogLevel } from '../../declarations';
-import { BOOLEAN_CLI_ARGS, STRING_CLI_ARGS, NUMBER_CLI_ARGS } from '../config-flags';
-import { parseEqualsArg, parseFlags } from '../parse-flags';
 import { toDashCase } from '@utils';
+
+import { LogLevel } from '../../declarations';
+import {
+  BOOLEAN_CLI_FLAGS,
+  BOOLEAN_STRING_CLI_FLAGS,
+  BooleanStringCLIFlag,
+  ConfigFlags,
+  NUMBER_CLI_FLAGS,
+  STRING_ARRAY_CLI_FLAGS,
+  STRING_CLI_FLAGS,
+  StringArrayCLIFlag,
+} from '../config-flags';
+import { Empty, parseEqualsArg, parseFlags } from '../parse-flags';
 
 describe('parseFlags', () => {
   it('should get known and unknown args', () => {
@@ -53,7 +63,7 @@ describe('parseFlags', () => {
    * will result in a value like `[true, true]` being set on ConfigFlags, which
    * will cause these tests to start failing.
    */
-  describe.each(BOOLEAN_CLI_ARGS)('should parse boolean flag %s', (cliArg) => {
+  describe.each(BOOLEAN_CLI_FLAGS)('should parse boolean flag %s', (cliArg) => {
     it('should parse arg', () => {
       const flags = parseFlags([`--${cliArg}`]);
       expect(flags.knownArgs).toEqual([`--${cliArg}`]);
@@ -74,14 +84,20 @@ describe('parseFlags', () => {
       expect(flags[cliArg]).toBe(false);
     });
 
-    it('should set value to null if not present', () => {
+    it('should not set value if not present', () => {
       const flags = parseFlags([]);
       expect(flags.knownArgs).toEqual([]);
-      expect(flags[cliArg]).toBe(null);
+      expect(flags[cliArg]).toBe(undefined);
+    });
+
+    it.each([true, false])(`should set the value with --${cliArg}=%p`, (value) => {
+      const flags = parseFlags([`--${cliArg}=${value}`]);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`, String(value)]);
+      expect(flags[cliArg]).toBe(value);
     });
   });
 
-  describe.each(STRING_CLI_ARGS)('should parse string flag %s', (cliArg) => {
+  describe.each(STRING_CLI_FLAGS)('should parse string flag %s', (cliArg) => {
     it(`should parse "--${cliArg} value"`, () => {
       const flags = parseFlags([`--${cliArg}`, 'test-value']);
       expect(flags.knownArgs).toEqual([`--${cliArg}`, 'test-value']);
@@ -111,7 +127,7 @@ describe('parseFlags', () => {
     });
   });
 
-  it.each(NUMBER_CLI_ARGS)('should parse number flag %s', (cliArg) => {
+  it.each(NUMBER_CLI_FLAGS)('should parse number flag %s', (cliArg) => {
     const flags = parseFlags([`--${cliArg}`, '42']);
     expect(flags.knownArgs).toEqual([`--${cliArg}`, '42']);
     expect(flags.unknownArgs).toEqual([]);
@@ -122,6 +138,45 @@ describe('parseFlags', () => {
     const args = ['--config', '/config-1.js', '--config', '/config-2.js'];
     const flags = parseFlags(args);
     expect(flags.config).toBe('/config-2.js');
+  });
+
+  describe.each(BOOLEAN_STRING_CLI_FLAGS)('boolean-string flag - %s', (cliArg: BooleanStringCLIFlag) => {
+    it('parses a boolean-string flag as a boolean with no arg', () => {
+      const args = [`--${cliArg}`];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe(true);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`]);
+    });
+
+    it(`parses a boolean-string flag as a falsy boolean with "no" arg - --no-${cliArg}`, () => {
+      const args = [`--no-${cliArg}`];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe(false);
+      expect(flags.knownArgs).toEqual([`--no-${cliArg}`]);
+    });
+
+    it(`parses a boolean-string flag as a falsy boolean with "no" arg - --no${
+      cliArg.charAt(0).toUpperCase() + cliArg.slice(1)
+    }`, () => {
+      const negativeFlag = '--no' + cliArg.charAt(0).toUpperCase() + cliArg.slice(1);
+      const flags = parseFlags([negativeFlag]);
+      expect(flags.headless).toBe(false);
+      expect(flags.knownArgs).toEqual([negativeFlag]);
+    });
+
+    it('parses a boolean-string flag as a string with a string arg', () => {
+      const args = [`--${cliArg}`, 'new'];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe('new');
+      expect(flags.knownArgs).toEqual(['--headless', 'new']);
+    });
+
+    it('parses a boolean-string flag as a string with a string arg using equality', () => {
+      const args = [`--${cliArg}=new`];
+      const flags = parseFlags(args);
+      expect(flags.headless).toBe('new');
+      expect(flags.knownArgs).toEqual([`--${cliArg}`, 'new']);
+    });
   });
 
   describe.each<LogLevel>(['info', 'warn', 'error', 'debug'])('logLevel %s', (level) => {
@@ -193,7 +248,7 @@ describe('parseFlags', () => {
 
     it('should not parse --max-workers', () => {
       const flags = parseFlags([]);
-      expect(flags.maxWorkers).toBe(null);
+      expect(flags.maxWorkers).toBe(undefined);
     });
   });
 
@@ -223,11 +278,47 @@ describe('parseFlags', () => {
       it('should parse -c /my-config.js', () => {
         const flags = parseFlags(['-c', '/my-config.js']);
         expect(flags.config).toBe('/my-config.js');
+        expect(flags.knownArgs).toEqual(['--config', '/my-config.js']);
       });
 
       it('should parse -c=/my-config.js', () => {
         const flags = parseFlags(['-c=/my-config.js']);
         expect(flags.config).toBe('/my-config.js');
+        expect(flags.knownArgs).toEqual(['--config', '/my-config.js']);
+      });
+    });
+
+    describe('Jest aliases', () => {
+      it.each([
+        ['w', 'maxWorkers', '4'],
+        ['t', 'testNamePattern', 'testname'],
+      ])('should support the string Jest alias %p for %p', (alias, fullArgument, value) => {
+        const flags = parseFlags([`-${alias}`, value]);
+        expect(flags.knownArgs).toEqual([`--${fullArgument}`, value]);
+        expect(flags.unknownArgs).toHaveLength(0);
+      });
+
+      it.each([
+        ['w', 'maxWorkers', '4'],
+        ['t', 'testNamePattern', 'testname'],
+      ])('should support the string Jest alias %p for %p in an AliasEqualsArg', (alias, fullArgument, value) => {
+        const flags = parseFlags([`-${alias}=${value}`]);
+        expect(flags.knownArgs).toEqual([`--${fullArgument}`, value]);
+        expect(flags.unknownArgs).toHaveLength(0);
+      });
+
+      it.each<[string, keyof ConfigFlags]>([
+        ['b', 'bail'],
+        ['e', 'expand'],
+        ['o', 'onlyChanged'],
+        ['f', 'onlyFailures'],
+        ['i', 'runInBand'],
+        ['u', 'updateSnapshot'],
+      ])('should support the boolean Jest alias %p for %p', (alias, fullArgument) => {
+        const flags = parseFlags([`-${alias}`]);
+        expect(flags.knownArgs).toEqual([`--${fullArgument}`]);
+        expect(flags[fullArgument]).toBe(true);
+        expect(flags.unknownArgs).toHaveLength(0);
       });
     });
   });
@@ -245,12 +336,136 @@ describe('parseFlags', () => {
       ['--fooBar=baz', '--fooBar', 'baz'],
       ['--foo-bar=4', '--foo-bar', '4'],
       ['--fooBar=twenty=3*4', '--fooBar', 'twenty=3*4'],
-      ['--fooBar', '--fooBar', ''],
-      ['--foo-bar', '--foo-bar', ''],
+      ['--fooBar', '--fooBar', Empty],
+      ['--foo-bar', '--foo-bar', Empty],
+      ['--foo-bar=""', '--foo-bar', '""'],
     ])('should parse %s correctly', (testArg, expectedArg, expectedValue) => {
       const [arg, value] = parseEqualsArg(testArg);
       expect(arg).toBe(expectedArg);
-      expect(value).toBe(expectedValue);
+      expect(value).toEqual(expectedValue);
+    });
+  });
+
+  describe.each(STRING_ARRAY_CLI_FLAGS)('should parse string flag %s', (cliArg: StringArrayCLIFlag) => {
+    it(`should parse single value: "--${cliArg} test-value"`, () => {
+      const flags = parseFlags([`--${cliArg}`, 'test-value']);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`, 'test-value']);
+      expect(flags.unknownArgs).toEqual([]);
+      expect(flags[cliArg]).toEqual(['test-value']);
+    });
+
+    it(`should parse multiple values: "--${cliArg} test-value"`, () => {
+      const flags = parseFlags([`--${cliArg}`, 'test-value', `--${cliArg}`, 'second-test-value']);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`, 'test-value', `--${cliArg}`, 'second-test-value']);
+      expect(flags.unknownArgs).toEqual([]);
+      expect(flags[cliArg]).toEqual(['test-value', 'second-test-value']);
+    });
+
+    it(`should parse "--${cliArg}=value"`, () => {
+      const flags = parseFlags([`--${cliArg}=path/to/file.js`]);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`, 'path/to/file.js']);
+      expect(flags.unknownArgs).toEqual([]);
+      expect(flags[cliArg]).toEqual(['path/to/file.js']);
+    });
+
+    it(`should parse multiple values: "--${cliArg}=test-value"`, () => {
+      const flags = parseFlags([`--${cliArg}=test-value`, `--${cliArg}=second-test-value`]);
+      expect(flags.knownArgs).toEqual([`--${cliArg}`, 'test-value', `--${cliArg}`, 'second-test-value']);
+      expect(flags.unknownArgs).toEqual([]);
+      expect(flags[cliArg]).toEqual(['test-value', 'second-test-value']);
+    });
+
+    it(`should parse "--${toDashCase(cliArg)} value"`, () => {
+      const flags = parseFlags([`--${toDashCase(cliArg)}`, 'path/to/file.js']);
+      expect(flags.knownArgs).toEqual([`--${toDashCase(cliArg)}`, 'path/to/file.js']);
+      expect(flags.unknownArgs).toEqual([]);
+      expect(flags[cliArg]).toEqual(['path/to/file.js']);
+    });
+
+    it(`should parse multiple values: "--${toDashCase(cliArg)} test-value"`, () => {
+      const flags = parseFlags([
+        `--${toDashCase(cliArg)}`,
+        'test-value',
+        `--${toDashCase(cliArg)}`,
+        'second-test-value',
+      ]);
+      expect(flags.knownArgs).toEqual([
+        `--${toDashCase(cliArg)}`,
+        'test-value',
+        `--${toDashCase(cliArg)}`,
+        'second-test-value',
+      ]);
+      expect(flags.unknownArgs).toEqual([]);
+      expect(flags[cliArg]).toEqual(['test-value', 'second-test-value']);
+    });
+
+    it(`should parse "--${toDashCase(cliArg)}=value"`, () => {
+      const flags = parseFlags([`--${toDashCase(cliArg)}=path/to/file.js`]);
+      expect(flags.knownArgs).toEqual([`--${toDashCase(cliArg)}`, 'path/to/file.js']);
+      expect(flags.unknownArgs).toEqual([]);
+      expect(flags[cliArg]).toEqual(['path/to/file.js']);
+    });
+
+    it(`should parse multiple values: "--${toDashCase(cliArg)}=test-value"`, () => {
+      const flags = parseFlags([`--${toDashCase(cliArg)}=test-value`, `--${toDashCase(cliArg)}=second-test-value`]);
+      expect(flags.knownArgs).toEqual([
+        `--${toDashCase(cliArg)}`,
+        'test-value',
+        `--${toDashCase(cliArg)}`,
+        'second-test-value',
+      ]);
+      expect(flags.unknownArgs).toEqual([]);
+      expect(flags[cliArg]).toEqual(['test-value', 'second-test-value']);
+    });
+  });
+
+  describe('error reporting', () => {
+    it('should throw if you pass no argument to a string flag', () => {
+      expect(() => {
+        parseFlags(['--cacheDirectory', '--someOtherFlag']);
+      }).toThrow('when parsing CLI flag "--cacheDirectory": expected a string argument but received nothing');
+    });
+
+    it('should throw if you pass no argument to a string array flag', () => {
+      expect(() => {
+        parseFlags(['--reporters', '--someOtherFlag']);
+      }).toThrow('when parsing CLI flag "--reporters": expected a string argument but received nothing');
+    });
+
+    it('should throw if you pass no argument to a number flag', () => {
+      expect(() => {
+        parseFlags(['--port', '--someOtherFlag']);
+      }).toThrow('when parsing CLI flag "--port": expected a number argument but received nothing');
+    });
+
+    it('should throw if you pass a non-number argument to a number flag', () => {
+      expect(() => {
+        parseFlags(['--port', 'stringy']);
+      }).toThrow('when parsing CLI flag "--port": expected a number but received "stringy"');
+    });
+
+    it('should throw if you pass a bad number argument to a number flag', () => {
+      expect(() => {
+        parseFlags(['--port=NaN']);
+      }).toThrow('when parsing CLI flag "--port": expected a number but received "NaN"');
+    });
+
+    it('should throw if you pass no argument to a string/number flag', () => {
+      expect(() => {
+        parseFlags(['--maxWorkers']);
+      }).toThrow('when parsing CLI flag "--maxWorkers": expected a string or a number but received nothing');
+    });
+
+    it('should throw if you pass an invalid log level for --logLevel', () => {
+      expect(() => {
+        parseFlags(['--logLevel', 'potato']);
+      }).toThrow('when parsing CLI flag "--logLevel": expected to receive a valid log level but received "potato"');
+    });
+
+    it('should throw if you pass no argument to --logLevel', () => {
+      expect(() => {
+        parseFlags(['--logLevel']);
+      }).toThrow('when parsing CLI flag "--logLevel": expected to receive a valid log level but received nothing');
     });
   });
 });

@@ -1,4 +1,9 @@
 import type * as d from '@stencil/core/declarations';
+import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
+import { buildError, normalizePath } from '@utils';
+import path from 'path';
+
+import { FsReadOptions } from '../../sys/in-memory-fs';
 import {
   getCssImports,
   isCssNodeModule,
@@ -6,21 +11,18 @@ import {
   parseCssImports,
   replaceImportDeclarations,
 } from '../css-imports';
-import { mockBuildCtx, mockConfig, mockCompilerCtx } from '@stencil/core/testing';
-import { buildError, normalizePath } from '@utils';
-import path from 'path';
 
 describe('css-imports', () => {
   const root = path.resolve('/');
   let compilerCtx: d.CompilerCtx;
   let buildCtx: d.BuildCtx;
-  let config: d.Config;
-  let readFileMock: jest.SpyInstance<Promise<string>, [string, d.FsReadOptions?]>;
+  let config: d.ValidatedConfig;
+  let readFileMock: jest.SpyInstance<Promise<string>, [string, FsReadOptions?]>;
 
   beforeEach(() => {
+    config = mockValidatedConfig();
     compilerCtx = mockCompilerCtx(config);
     buildCtx = mockBuildCtx(config, compilerCtx);
-    config = mockConfig();
     readFileMock = jest.spyOn(compilerCtx.fs, 'readFile');
   });
 
@@ -354,7 +356,7 @@ describe('css-imports', () => {
           filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')),
           srcImport: `@import '~@ionic/core/dist/ionic/ionic.css';`,
           updatedImport: `@import "${normalizePath(
-            path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')
+            path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css'),
           )}";`,
           url: `~@ionic/core/dist/ionic/ionic.css`,
         },
@@ -411,7 +413,7 @@ describe('css-imports', () => {
           filePath: normalizePath(path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')),
           srcImport: `@import '~@ionic/core/dist/ionic/ionic.css';`,
           updatedImport: `@import "${normalizePath(
-            path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css')
+            path.join(root, 'node_modules', '@ionic', 'core', 'dist', 'ionic', 'ionic.css'),
           )}";`,
           url: `~@ionic/core/dist/ionic/ionic.css`,
         },
@@ -483,7 +485,7 @@ describe('css-imports', () => {
         mainFilePath,
         mainFilePath,
         files[mainFilePath],
-        []
+        [],
       );
       // CSS from child and grandchild are merged in
       expect(result.styleText).toBe('div { display: flex } :host { color: red; }');

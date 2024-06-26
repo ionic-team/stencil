@@ -1,8 +1,8 @@
 import type * as d from '../declarations';
+import { printCheckVersionResults, startCheckVersion } from './check-version';
 import type { CoreCompiler } from './load-compiler';
-import { runPrerenderTask } from './task-prerender';
-import { startCheckVersion, printCheckVersionResults } from './check-version';
 import { startupCompilerLog } from './logs';
+import { runPrerenderTask } from './task-prerender';
 import { taskWatch } from './task-watch';
 import { telemetryBuildFinishedAction } from './telemetry/telemetry';
 
@@ -36,7 +36,7 @@ export const taskBuild = async (coreCompiler: CoreCompiler, config: d.ValidatedC
         config,
         results.hydrateAppFilePath,
         results.componentGraph,
-        null
+        undefined,
       );
       config.logger.printDiagnostics(prerenderDiagnostics);
 

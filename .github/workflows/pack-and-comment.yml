@@ -1,0 +1,83 @@
+name: Pack and Comment
+# for each PR this workflow builds and then packs a Stencil tarball and then
+# posts a comment on the PR with a link to download the tarball, as well as an
+# example command for installing the tarball in a project.
+
+on:
+  pull_request_target:
+    branches:
+      - '**'
+
+jobs:
+  pack:
+    name: Pack and Comment
+    runs-on: 'ubuntu-22.04'
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        with:
+          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
+          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
+          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
+          persist-credentials: false
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
+
+      - name: Core Build
+        run: npm run build -- --ci
+        shell: bash
+
+      - name: Set Version
+        run: npm version --no-git-tag-version $(./bin/stencil version)
+        shell: bash
+
+      - name: Run npm pack
+        id: pack
+        # --quiet makes the only output the name of the .tgz
+        run: |
+          FILENAME=$(npm pack --quiet)
+          echo "FILENAME=$FILENAME" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@65462800fd760344b1a7b4382951275a0abb4808 # v4.3.3
+        id: upload-tarball
+        with:
+          name: ${{ steps.pack.outputs.filename }}
+          path: ${{ steps.pack.outputs.filename }}
+
+        # for syntax information, see https://github.com/peter-evans/create-or-update-comment#setting-the-comment-body-from-a-file
+      - name: Set comment body
+        id: set-comment-body
+        # GitHub - "Warning: Make sure the delimiter you're using is randomly generated and unique for each run.
+        # For more information, see https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions#understanding-the-risk-of-script-injections"
+        shell: bash
+        run: |
+          EOF=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          ARTIFACT_URL=${{ steps.upload-tarball.outputs.artifact-url }}
+          FILENAME=${{ steps.pack.outputs.filename }}
+          echo "body<<$EOF" >> $GITHUB_OUTPUT
+          echo "### PR built and packed!" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "Download the tarball here: <$ARTIFACT_URL>" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "If your browser saves files to \`~/Downloads\` you can install it like so:" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "unzip -d ~/Downloads ~/Downloads/$FILENAME.zip && npm install ~/Downloads/$FILENAME" >> $GITHUB_OUTPUT
+          echo "\`\`\`" >> $GITHUB_OUTPUT
+          echo "$EOF" >> $GITHUB_OUTPUT
+
+      - name: Find Comment
+        uses: peter-evans/find-comment@3eae4d37986fb5a8592848f6a574fdf654e61f9e # v3.1.0
+        id: fc
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '### PR built and packed!'
+
+      - name: Create or update comment
+        uses: peter-evans/create-or-update-comment@71345be0265236311c031f5c7866368bd1eff043 # v4.0.0
+        with:
+          comment-id: ${{ steps.fc.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          body: ${{ steps.set-comment-body.outputs.body }}
+          edit-mode: replace

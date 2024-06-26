@@ -1,30 +1,21 @@
-import type * as d from '../../declarations';
-import { createLogger } from './logger/console-logger';
-import { createSystem } from './stencil-sys';
-import { setPlatformPath } from '../sys/modules/path';
+import { createNodeLogger } from '@sys-api-node';
+
 import { createConfigFlags } from '../../cli/config-flags';
+import type * as d from '../../declarations';
+import { validateConfig } from '../config/validate-config';
 
+/**
+ * Given a user-supplied config, get a validated config which can be used to
+ * start building a Stencil project.
+ *
+ * @param userConfig a configuration object
+ * @returns a validated config object with stricter typing
+ */
 export const getConfig = (userConfig: d.Config): d.ValidatedConfig => {
-  const logger = userConfig.logger ?? createLogger();
-  const config: d.ValidatedConfig = {
-    ...userConfig,
-    flags: createConfigFlags(userConfig.flags ?? {}),
-    logger,
-    outputTargets: userConfig.outputTargets ?? [],
-    sys: userConfig.sys ?? createSystem({ logger }),
-    testing: userConfig ?? {},
-  };
-
-  setPlatformPath(config.sys.platformPath);
-
-  if (config.flags.debug || config.flags.verbose) {
-    config.logLevel = 'debug';
-  } else if (config.flags.logLevel) {
-    config.logLevel = config.flags.logLevel;
-  } else if (typeof config.logLevel !== 'string') {
-    config.logLevel = 'info';
-  }
-  config.logger.setLevel(config.logLevel);
+  userConfig.logger = userConfig.logger ?? createNodeLogger();
+  const flags = createConfigFlags(userConfig.flags ?? {});
+  userConfig.flags = flags;
+  const config: d.ValidatedConfig = validateConfig(userConfig, {}).config;
 
   return config;
 };

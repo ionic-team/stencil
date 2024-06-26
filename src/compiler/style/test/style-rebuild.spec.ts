@@ -1,9 +1,10 @@
 /* eslint-disable jest/no-test-prefixes, jest/no-commented-out-tests, jest/expect-expect -- this file needs to be brought up to date at some point */
 // TODO(STENCIL-487): Investigate reviving this test file
-import type * as d from '@stencil/core/declarations';
 import { createCompiler } from '@stencil/core/compiler';
+import type * as d from '@stencil/core/declarations';
 import { mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
 import path from 'path';
+
 import { validateConfig } from '../../config/validate-config';
 
 xdescribe('component-styles', () => {
@@ -31,7 +32,7 @@ xdescribe('component-styles', () => {
           "target": "es2017"
         }
       }
-    `
+    `,
     );
 
     const { config } = validateConfig(
@@ -39,7 +40,7 @@ xdescribe('component-styles', () => {
         rootDir: '/',
         tsconfig: '/tsconfig.json',
       },
-      mockLoadConfigInit()
+      mockLoadConfigInit(),
     );
     config.sys = sys;
     compiler = await createCompiler(config);
@@ -85,7 +86,7 @@ xdescribe('component-styles', () => {
   it('should build one component w/ out inline style, and re-compile when adding inline styles', async () => {
     await compiler.sys.writeFile(
       path.join(root, 'src', 'cmp-a.tsx'),
-      `@Component({ tag: 'cmp-a' }) export class CmpA {}`
+      `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     );
     const watcher = await compiler.createWatcher();
     // compiler.config.watch = true;

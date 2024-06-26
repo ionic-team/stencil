@@ -1,10 +1,9 @@
+import { buildError, isGlob, isOutputTargetCopy, join, normalizePath } from '@utils';
+import { minimatch } from 'minimatch';
+
 import type * as d from '../../../declarations';
-import { buildError, isGlob, normalizePath } from '@utils';
 import { canSkipAssetsCopy, getComponentAssetsCopyTasks } from './assets-copy-tasks';
 import { getDestAbsPath, getSrcAbsPath } from './local-copy-tasks';
-import { isOutputTargetCopy } from '../output-utils';
-import { join } from 'path';
-import minimatch from 'minimatch';
 
 export const outputCopy = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetCopy);
@@ -47,7 +46,7 @@ const getCopyTasks = (
   config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   o: d.OutputTargetCopy,
-  changedFiles: string[]
+  changedFiles: string[],
 ) => {
   if (!Array.isArray(o.copy)) {
     return [];

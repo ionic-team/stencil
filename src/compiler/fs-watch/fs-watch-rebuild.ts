@@ -1,7 +1,7 @@
-import type * as d from '../../declarations';
+import { isOutputTargetDocsJson, isOutputTargetDocsVscode, isOutputTargetStats, isString, unique } from '@utils';
 import { basename } from 'path';
-import { isString, unique } from '@utils';
-import { isOutputTargetDocsJson, isOutputTargetStats, isOutputTargetDocsVscode } from '../output-targets/output-utils';
+
+import type * as d from '../../declarations';
 
 export const filesChanged = (buildCtx: d.BuildCtx) => {
   // files changed include updated, added and deleted
@@ -22,9 +22,14 @@ const unaryBasename = (filePath: string): string => basename(filePath);
  * Get the file extension for a path
  *
  * @param filePath a path
- * @returns the file extension (well, characters after the last `'.'`)
+ * @returns the file extension (well, characters after the last `'.'`) or
+ * `null` if no extension exists.
  */
-const getExt = (filePath: string): string => filePath.split('.').pop().toLowerCase();
+const getExt = (filePath: string): string | null => {
+  const fileParts = filePath.split('.');
+
+  return fileParts.length > 1 ? fileParts.pop()!.toLowerCase() : null;
+};
 
 /**
  * Script extensions which we want to be able to recognize
@@ -37,7 +42,11 @@ const SCRIPT_EXT = ['ts', 'tsx', 'js', 'jsx'];
  * @param filePath a file extension
  * @returns whether the filepath has a script extension or not
  */
-export const hasScriptExt = (filePath: string): boolean => SCRIPT_EXT.includes(getExt(filePath));
+export const hasScriptExt = (filePath: string): boolean => {
+  const ext = getExt(filePath);
+
+  return ext ? SCRIPT_EXT.includes(ext) : false;
+};
 
 const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
 
@@ -47,7 +56,11 @@ const STYLE_EXT = ['css', 'scss', 'sass', 'pcss', 'styl', 'stylus', 'less'];
  * @param filePath a file extension to check
  * @returns whether the filepath has a style extension or not
  */
-export const hasStyleExt = (filePath: string): boolean => STYLE_EXT.includes(getExt(filePath));
+export const hasStyleExt = (filePath: string): boolean => {
+  const ext = getExt(filePath);
+
+  return ext ? STYLE_EXT.includes(ext) : false;
+};
 
 /**
  * Get all scripts from a build context that were added
@@ -90,7 +103,7 @@ export const hasStyleChanges = (buildCtx: d.BuildCtx): boolean => buildCtx.files
  * @param buildCtx the build context
  * @returns whether or not HTML files were changed
  */
-export const hasHtmlChanges = (config: d.Config, buildCtx: d.BuildCtx): boolean => {
+export const hasHtmlChanges = (config: d.ValidatedConfig, buildCtx: d.BuildCtx): boolean => {
   const anyHtmlChanged = buildCtx.filesChanged.some((f) => f.toLowerCase().endsWith('.html'));
 
   if (anyHtmlChanged) {
@@ -121,7 +134,7 @@ export const updateCacheFromRebuild = (compilerCtx: d.CompilerCtx, buildCtx: d.B
   });
 };
 
-export const isWatchIgnorePath = (config: d.Config, path: string) => {
+export const isWatchIgnorePath = (config: d.ValidatedConfig, path: string) => {
   if (isString(path)) {
     const isWatchIgnore = (config.watchIgnoredRegex as RegExp[]).some((reg) => reg.test(path));
     if (isWatchIgnore) {

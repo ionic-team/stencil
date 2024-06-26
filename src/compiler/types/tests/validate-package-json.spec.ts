@@ -1,16 +1,15 @@
 import type * as d from '@stencil/core/declarations';
-import { mockBuildCtx, mockCompilerCtx, mockConfig } from '@stencil/core/testing';
-import * as v from '../validate-build-package-json';
+import { mockBuildCtx, mockCompilerCtx, mockValidatedConfig } from '@stencil/core/testing';
+import { normalizePath } from '@utils';
 import path from 'path';
-import { DIST_COLLECTION, DIST_CUSTOM_ELEMENTS, DIST_CUSTOM_ELEMENTS_BUNDLE } from '../../output-targets/output-utils';
-import { normalizePath } from '../../../utils/normalize-path';
+
+import * as v from '../validate-build-package-json';
 
 describe('validate-package-json', () => {
-  let config: d.Config;
+  let config: d.ValidatedConfig;
   let compilerCtx: d.CompilerCtx;
   let buildCtx: d.BuildCtx;
   let collectionOutputTarget: d.OutputTargetDistCollection;
-  let typesOutputTarget: d.OutputTargetDistTypes;
   const root = path.resolve('/');
 
   beforeEach(async () => {
@@ -19,14 +18,9 @@ describe('validate-package-json', () => {
       dir: '/dist',
       collectionDir: '/dist/collection',
     };
-    typesOutputTarget = {
-      type: 'dist-types',
-      dir: '/dist',
-      typesDir: '/dist/types',
-    };
 
     const namespace = 'SomeNamespace';
-    config = mockConfig({
+    config = mockValidatedConfig({
       devMode: false,
       fsNamespace: namespace.toLowerCase(),
       namespace,
@@ -83,107 +77,6 @@ describe('validate-package-json', () => {
     });
   });
 
-  describe('module', () => {
-    it('validate dist module', async () => {
-      config.outputTargets = [];
-      compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
-      buildCtx.packageJson.module = 'dist/index.js';
-      await v.validateModule(config, compilerCtx, buildCtx);
-      expect(buildCtx.diagnostics).toHaveLength(0);
-    });
-
-    it('validate custom elements bundle module', async () => {
-      config.outputTargets = [
-        {
-          type: DIST_CUSTOM_ELEMENTS_BUNDLE,
-          dir: path.join(root, 'custom-elements'),
-        },
-      ];
-      compilerCtx.fs.writeFile(path.join(root, 'dist', 'index.js'), '');
-      buildCtx.packageJson.module = 'custom-elements/index.js';
-      await v.validateModule(config, compilerCtx, buildCtx);
-      expect(buildCtx.diagnostics).toHaveLength(0);
-    });
-
-    it('validates a valid custom elements module', async () => {
-      config.outputTargets = [
-        {
-          type: DIST_CUSTOM_ELEMENTS,
-          dir: path.join(root, 'dist', 'components'),
-        },
-      ];
-      buildCtx.packageJson.module = 'dist/components/index.js';
-      await v.validateModule(config, compilerCtx, buildCtx);
-      expect(buildCtx.diagnostics).toHaveLength(0);
-    });
-
-    it('errors on an invalid custom elements module', async () => {
-      config.outputTargets = [
-        {
-          type: DIST_CUSTOM_ELEMENTS,
-          dir: path.join(root, 'dist', 'components'),
-        },
-      ];
-      buildCtx.packageJson.module = 'dist/index.js';
-      await v.validateModule(config, compilerCtx, buildCtx);
-      expect(buildCtx.diagnostics).toHaveLength(1);
-      const [diagnostic] = buildCtx.diagnostics;
-      expect(diagnostic.level).toBe('warn');
-      expect(diagnostic.messageText).toBe(
-        `package.json "module" property is set to "dist/index.js". It's recommended to set the "module" property to: ./dist/components/index.js`
-      );
-    });
-
-    it('missing dist module', async () => {
-      config.outputTargets = [];
-      await v.validateModule(config, compilerCtx, buildCtx);
-      expect(buildCtx.diagnostics).toHaveLength(1);
-      const [diagnostic] = buildCtx.diagnostics;
-      expect(diagnostic.level).toBe('warn');
-      expect(diagnostic.messageText).toBe('package.json "module" property is required when generating a distribution.');
-    });
-
-    it.each<{
-      ot: d.OutputTarget;
-      path: string;
-    }>([
-      {
-        ot: {
-          type: DIST_CUSTOM_ELEMENTS_BUNDLE,
-          dir: path.join(root, 'custom-elements'),
-        },
-        path: 'custom-elements/index.js',
-      },
-      {
-        ot: {
-          type: DIST_CUSTOM_ELEMENTS,
-          dir: path.join(root, 'dist', 'components'),
-        },
-        path: 'dist/components/index.js',
-      },
-      {
-        ot: {
-          type: DIST_COLLECTION,
-          dir: path.join(root, 'dist'),
-          collectionDir: 'dist/collection',
-        },
-        path: 'dist/index.js',
-      },
-    ])('errors on missing module w/ $ot.type, suggests $path', async ({ ot, path }) => {
-      config.outputTargets = [ot];
-      buildCtx.packageJson.module = undefined;
-      await v.validateModule(config, compilerCtx, buildCtx);
-      expect(buildCtx.diagnostics).toHaveLength(1);
-      const [diagnostic] = buildCtx.diagnostics;
-      expect(diagnostic.level).toBe('warn');
-      expect(diagnostic.messageText).toBe(
-        `package.json "module" property is required when generating a distribution. It's recommended to set the "module" property to: ${normalizePath(
-          path
-        )}`
-      );
-    });
-  });
-
   describe('main', () => {
     it('main cannot be the old loader', async () => {
       compilerCtx.fs.writeFile(path.join(root, 'dist', 'somenamespace.js'), '');
@@ -206,37 +99,34 @@ describe('validate-package-json', () => {
     });
   });
 
-  describe('types', () => {
-    it('validate types', async () => {
-      compilerCtx.fs.writeFile(path.join(root, 'dist', 'types', 'components.d.ts'), '');
-      buildCtx.packageJson.types = 'dist/types/components.d.ts';
-      await v.validateTypes(config, compilerCtx, buildCtx, typesOutputTarget);
-      expect(buildCtx.diagnostics).toHaveLength(0);
-    });
-
-    it('not d.ts file', async () => {
-      compilerCtx.fs.writeFile(path.join(root, 'dist', 'types', 'components.d.ts'), '');
-      buildCtx.packageJson.types = 'dist/types/components.ts';
-      v.validateTypes(config, compilerCtx, buildCtx, typesOutputTarget);
-      expect(buildCtx.diagnostics).toHaveLength(1);
-    });
-
-    it('missing types file', async () => {
-      buildCtx.packageJson.types = 'dist/types/components.d.ts';
-      await v.validateTypes(config, compilerCtx, buildCtx, typesOutputTarget);
-      expect(buildCtx.diagnostics).toHaveLength(1);
-    });
-
-    it('missing types', async () => {
-      v.validateTypes(config, compilerCtx, buildCtx, typesOutputTarget);
-      expect(buildCtx.diagnostics).toHaveLength(1);
-    });
-  });
-
   describe('collection', () => {
-    it('should error when missing collection property', async () => {
+    it('should produce a warning when missing collection property', async () => {
       v.validateCollection(config, compilerCtx, buildCtx, collectionOutputTarget);
+
       expect(buildCtx.diagnostics[0].messageText).toMatch(/package.json "collection" property is required/);
+      expect(buildCtx.diagnostics[0].level).toBe('warn');
+    });
+
+    it('should produce a warning if the supplied path does not match the recommended path', () => {
+      buildCtx.packageJson.collection = 'bad/path';
+
+      v.validateCollection(config, compilerCtx, buildCtx, collectionOutputTarget);
+
+      expect(buildCtx.diagnostics[0].messageText).toBe(
+        `package.json "collection" property is required when generating a distribution and must be set to: ${normalizePath(
+          'dist/collection/collection-manifest.json',
+          false,
+        )}`,
+      );
+      expect(buildCtx.diagnostics[0].level).toBe('warn');
+    });
+
+    it('should not produce a warning if the normalized paths are the same', () => {
+      buildCtx.packageJson.collection = './dist/collection/collection-manifest.json';
+
+      v.validateCollection(config, compilerCtx, buildCtx, collectionOutputTarget);
+
+      expect(buildCtx.diagnostics.length).toEqual(0);
     });
   });
 });

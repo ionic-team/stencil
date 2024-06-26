@@ -1,7 +1,7 @@
 import type * as d from '../../../declarations';
+import * as Util from '../../../utils/util';
 import { generateMethodTypes } from '../generate-method-types';
 import * as StencilTypes from '../stencil-types';
-import * as Util from '../../../utils/util';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubComponentCompilerMethod } from './ComponentCompilerMethod.stub';
 import { stubTypesImportData } from './TypesImportData.stub';
@@ -21,8 +21,8 @@ describe('generate-method-types', () => {
           _typeReferences: d.ComponentCompilerTypeReferences,
           _typeImportData: d.TypesImportData,
           _sourceFilePath: string,
-          initialType: string
-        ) => initialType
+          initialType: string,
+        ) => initialType,
       );
 
       getTextDocsSpy = jest.spyOn(Util, 'getTextDocs');
@@ -97,8 +97,8 @@ describe('generate-method-types', () => {
         name: 'myOtherMethod',
         internal: true,
         complexType: {
-          parameters: [{ tags: [], text: '' }],
-          references: { Bar: { location: 'local', path: './other-resources' } },
+          parameters: [{ name: 'age', type: 'Bar', docs: '' }],
+          references: { Bar: { location: 'local', id: 'placeholder_id', path: './other-resources' } },
           return: 'Promise<boolean>',
           signature: '(age: Bar) => Promise<boolean>',
         },

@@ -1,23 +1,23 @@
+import { constrainTimeouts, type MockWindow } from '@stencil/core/mock-doc';
+
 import type * as d from '../../declarations';
-import { constrainTimeouts } from '@stencil/core/mock-doc';
-import { renderCatchError } from './render-utils';
 import { runtimeLogging } from './runtime-log';
 
 export function initializeWindow(
-  win: Window & typeof globalThis,
+  win: MockWindow,
   doc: Document,
   opts: d.HydrateDocumentOptions,
-  results: d.HydrateResults
+  results: d.HydrateResults,
 ) {
-  try {
-    win.location.href = opts.url;
-  } catch (e) {
-    renderCatchError(results, e);
+  if (typeof opts.url === 'string') {
+    try {
+      win.location.href = opts.url;
+    } catch (e) {}
   }
 
   if (typeof opts.userAgent === 'string') {
     try {
-      (win.navigator as any).userAgent = opts.userAgent;
+      win.navigator.userAgent = opts.userAgent;
     } catch (e) {}
   }
   if (typeof opts.cookie === 'string') {

@@ -1,12 +1,13 @@
+import { isOutputTargetDocsReadme } from '@utils';
+
 import type * as d from '../../../declarations';
 import { generateReadme } from './output-docs';
-import { isOutputTargetDocsReadme } from '../../output-targets/output-utils';
 
 export const generateReadmeDocs = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   docsData: d.JsonDocs,
-  outputTargets: d.OutputTarget[]
+  outputTargets: d.OutputTarget[],
 ) => {
   const readmeOutputTargets = outputTargets.filter(isOutputTargetDocsReadme);
   if (readmeOutputTargets.length === 0) {
@@ -20,7 +21,7 @@ export const generateReadmeDocs = async (
   await Promise.all(
     docsData.components.map((cmpData) => {
       return generateReadme(config, compilerCtx, readmeOutputTargets, cmpData, docsData.components);
-    })
+    }),
   );
 };
 

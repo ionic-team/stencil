@@ -1,8 +1,9 @@
 import type * as d from '@stencil/core/declarations';
-import { mockLogger, mockCompilerSystem, mockLoadConfigInit } from '@stencil/core/testing';
+import { mockCompilerSystem, mockLoadConfigInit, mockLogger } from '@stencil/core/testing';
+import { DOCS_CUSTOM, DOCS_JSON, DOCS_README, DOCS_VSCODE } from '@utils';
+
 import { createConfigFlags } from '../../../cli/config-flags';
 import { isWatchIgnorePath } from '../../fs-watch/fs-watch-rebuild';
-import { DOCS_JSON, DOCS_CUSTOM, DOCS_README, DOCS_VSCODE } from '../../output-targets/output-utils';
 import { validateConfig } from '../validate-config';
 
 describe('validation', () => {
@@ -19,6 +20,26 @@ describe('validation', () => {
       namespace: 'Testing',
     };
     bootstrapConfig = mockLoadConfigInit();
+  });
+
+  describe('caching', () => {
+    it('should cache the validated config between calls if the same config is passed back in', () => {
+      const { config } = validateConfig(userConfig, {});
+      const { config: secondRound } = validateConfig(config, {});
+      // we should have object identity
+      expect(config === secondRound).toBe(true);
+      // objects should be deepEqual as well
+      expect(config).toEqual(secondRound);
+    });
+
+    it('should bust the cache if a different config is supplied than the cached one', () => {
+      // validate once, caching that result
+      const { config } = validateConfig(userConfig, {});
+      // pass a new initial configuration
+      const { config: secondRound } = validateConfig({ ...userConfig }, {});
+      // shouldn't have object equality with the earlier one
+      expect(config === secondRound).toBe(false);
+    });
   });
 
   describe('flags', () => {
@@ -79,6 +100,19 @@ describe('validation', () => {
     it('default allowInlineScripts true', () => {
       const { config } = validateConfig(userConfig, bootstrapConfig);
       expect(config.allowInlineScripts).toBe(true);
+    });
+  });
+
+  describe('transformAliasedImportPaths', () => {
+    it.each([true, false])('set transformAliasedImportPaths %p', (bool) => {
+      userConfig.transformAliasedImportPaths = bool;
+      const { config } = validateConfig(userConfig, bootstrapConfig);
+      expect(config.transformAliasedImportPaths).toBe(bool);
+    });
+
+    it('defaults `transformAliasedImportPaths` to true', () => {
+      const { config } = validateConfig(userConfig, bootstrapConfig);
+      expect(config.transformAliasedImportPaths).toBe(true);
     });
   });
 
@@ -301,7 +335,7 @@ describe('validation', () => {
     (targetType) => {
       const { config } = validateConfig(userConfig, bootstrapConfig);
       expect(config.outputTargets.some((o) => o.type === targetType)).toBe(false);
-    }
+    },
   );
 
   it('should set devInspector false', () => {
@@ -344,19 +378,6 @@ describe('validation', () => {
     expect(validated.diagnostics).toHaveLength(1);
   });
 
-  it('should warn when dist-custom-elements-bundle is found', () => {
-    userConfig.outputTargets = [
-      {
-        type: 'dist-custom-elements-bundle',
-      },
-    ];
-    const validated = validateConfig(userConfig, bootstrapConfig);
-    expect(validated.diagnostics).toHaveLength(1);
-    expect(validated.diagnostics[0].messageText).toBe(
-      'dist-custom-elements-bundle is deprecated and will be removed in a future major version release. Use "dist-custom-elements" instead. If "dist-custom-elements" does not meet your needs, please add a comment to https://github.com/ionic-team/stencil/issues/3136.'
-    );
-  });
-
   it('should default outputTargets with www', () => {
     const { config } = validateConfig(userConfig, bootstrapConfig);
     expect(config.outputTargets.some((o) => o.type === 'www')).toBe(true);
@@ -366,15 +387,47 @@ describe('validation', () => {
     const { config } = validateConfig(userConfig, bootstrapConfig);
     expect(config.extras.appendChildSlotFix).toBe(false);
     expect(config.extras.cloneNodeFix).toBe(false);
-    expect(config.extras.cssVarsShim).toBe(false);
-    expect(config.extras.dynamicImportShim).toBe(false);
     expect(config.extras.lifecycleDOMEvents).toBe(false);
-    expect(config.extras.safari10).toBe(false);
     expect(config.extras.scriptDataOpts).toBe(false);
-    expect(config.extras.shadowDomShim).toBe(false);
     expect(config.extras.slotChildNodesFix).toBe(false);
     expect(config.extras.initializeNextTick).toBe(false);
     expect(config.extras.tagNameTransform).toBe(false);
+    expect(config.extras.scopedSlotTextContentFix).toBe(false);
+  });
+
+  it('should set slot config based on `experimentalSlotFixes`', () => {
+    userConfig.extras = {};
+    userConfig.extras.experimentalSlotFixes = true;
+    const { config } = validateConfig(userConfig, bootstrapConfig);
+    expect(config.extras.appendChildSlotFix).toBe(true);
+    expect(config.extras.cloneNodeFix).toBe(true);
+    expect(config.extras.slotChildNodesFix).toBe(true);
+    expect(config.extras.scopedSlotTextContentFix).toBe(true);
+  });
+
+  it('should override slot fix config based on `experimentalSlotFixes`', () => {
+    // This test is to verify the flags get overwritten correctly even if an
+    // invalid config is ingested. Hence, the `any` cast
+    userConfig.extras = {
+      appendChildSlotFix: false,
+      slotChildNodesFix: false,
+      cloneNodeFix: false,
+      scopedSlotTextContentFix: false,
+      experimentalSlotFixes: true,
+    } as any;
+    const { config } = validateConfig(userConfig, bootstrapConfig);
+    expect(config.extras.appendChildSlotFix).toBe(true);
+    expect(config.extras.cloneNodeFix).toBe(true);
+    expect(config.extras.slotChildNodesFix).toBe(true);
+    expect(config.extras.scopedSlotTextContentFix).toBe(true);
+  });
+
+  it('should set extras experimentalScopedSlotChanges `true` if set in user config', () => {
+    userConfig.extras = {
+      experimentalScopedSlotChanges: true,
+    };
+    const { config } = validateConfig(userConfig, bootstrapConfig);
+    expect(config.extras.experimentalScopedSlotChanges).toBe(true);
   });
 
   it('should set taskQueue "async" by default', () => {
@@ -429,9 +482,9 @@ describe('validation', () => {
       expect(config.sourceMap).toBe(false);
     });
 
-    it('defaults the field to false when not set in the config', () => {
+    it('defaults the field to true when not set in the config', () => {
       const { config } = validateConfig(userConfig, bootstrapConfig);
-      expect(config.sourceMap).toBe(false);
+      expect(config.sourceMap).toBe(true);
     });
   });
 
@@ -454,5 +507,24 @@ describe('validation', () => {
       const { config } = validateConfig(userConfig, bootstrapConfig);
       expect(config.buildDist).toBe(config.buildEs5);
     });
+  });
+
+  describe('validatePrimaryPackageOutputTarget', () => {
+    it('should default to false', () => {
+      const { config } = validateConfig(userConfig, bootstrapConfig);
+
+      expect(config.validatePrimaryPackageOutputTarget).toBe(false);
+    });
+
+    it.each([true, false])(
+      'should set validatePrimaryPackageOutputTarget to %p',
+      (validatePrimaryPackageOutputTarget) => {
+        userConfig.validatePrimaryPackageOutputTarget = validatePrimaryPackageOutputTarget;
+
+        const { config } = validateConfig(userConfig, bootstrapConfig);
+
+        expect(config.validatePrimaryPackageOutputTarget).toBe(validatePrimaryPackageOutputTarget);
+      },
+    );
   });
 });

@@ -1,21 +1,21 @@
+import { start } from '@stencil/core/dev-server';
 import type {
-  CompilerBuildResults,
   Compiler,
+  CompilerBuildResults,
   CompilerWatcher,
   DevServer,
   E2EProcessEnv,
-  ValidatedConfig,
   OutputTargetWww,
   Testing,
   TestingRunOptions,
+  ValidatedConfig,
 } from '@stencil/core/internal';
-import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 import { hasError } from '@utils';
-import { runJest } from './jest/jest-runner';
-import { runJestScreenshot } from './jest/jest-screenshot';
-import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
-import { start } from '@stencil/core/dev-server';
 import type * as puppeteer from 'puppeteer';
+
+import { getRunner, getScreenshot } from './jest/jest-stencil-connector';
+import { startPuppeteerBrowser } from './puppeteer/puppeteer-browser';
+import { getAppScriptUrl, getAppStyleUrl } from './testing-utils';
 
 export const createTesting = async (config: ValidatedConfig): Promise<Testing> => {
   config = setupTestingConfig(config);
@@ -23,25 +23,32 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
   const { createCompiler } = require('../compiler/stencil.js');
   const compiler: Compiler = await createCompiler(config);
 
-  let devServer: DevServer;
-  let puppeteerBrowser: puppeteer.Browser;
+  let devServer: DevServer | null;
+  let puppeteerBrowser: puppeteer.Browser | null;
 
-  const run = async (opts: TestingRunOptions = {}) => {
+  /**
+   * Initiate running spec and/or end-to-end tests with Stencil
+   * @param opts running options to apply when
+   * @returns true if all tests passed. Returns false if any tests failed or an error occurred during the test
+   * setup/running process
+   */
+  const run = async (opts: TestingRunOptions = {}): Promise<boolean> => {
     let doScreenshots = false;
     let passed = false;
     let env: E2EProcessEnv;
-    let compilerWatcher: CompilerWatcher = null;
+    let compilerWatcher: CompilerWatcher | null = null;
     const msg: string[] = [];
 
     try {
       if (!opts.spec && !opts.e2e) {
         config.logger.error(
-          `Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`
+          `Testing requires either the --spec or --e2e command line flags, or both. For example, to run unit tests, use the command: stencil test --spec`,
         );
         return false;
       }
 
-      env = process.env;
+      // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
+      env = process.env as E2EProcessEnv;
 
       if (opts.e2e) {
         msg.push('e2e');
@@ -58,6 +65,9 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
       doScreenshots = !!(opts.e2e && opts.screenshot);
       if (doScreenshots) {
         env.__STENCIL_SCREENSHOT__ = 'true';
+        if (config.testing.screenshotTimeout != null) {
+          env.__STENCIL_SCREENSHOT_TIMEOUT_MS__ = config.testing.screenshotTimeout.toString();
+        }
 
         if (opts.updateScreenshot) {
           config.logger.info(config.logger.magenta(`updating master screenshots`));
@@ -70,7 +80,7 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
         // e2e tests only
         // do a build, start a dev server
         // and spin up a puppeteer browser
-        let buildTask: Promise<CompilerBuildResults> = null;
+        let buildTask: Promise<CompilerBuildResults> | null = null;
 
         (config.outputTargets as OutputTargetWww[]).forEach((outputTarget) => {
           outputTarget.empty = false;
@@ -83,13 +93,14 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
 
         if (doBuild) {
           if (compilerWatcher) {
+            const watcher = compilerWatcher;
             buildTask = new Promise((resolve) => {
-              const removeListener = compilerWatcher.on('buildFinish', (buildResults) => {
+              const removeListener = watcher.on('buildFinish', (buildResults) => {
                 removeListener();
                 resolve(buildResults);
               });
             });
-            compilerWatcher.start();
+            watcher.start();
           } else {
             buildTask = compiler.build();
           }
@@ -124,7 +135,7 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
 
           const styleUrl = getAppStyleUrl(config, devServer.browserUrl);
           if (styleUrl) {
-            env.__STENCIL_APP_STYLE_URL__ = getAppStyleUrl(config, devServer.browserUrl);
+            env.__STENCIL_APP_STYLE_URL__ = styleUrl;
             config.logger.debug(`e2e app style url: ${env.__STENCIL_APP_STYLE_URL__}`);
           }
         }
@@ -136,8 +147,10 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
 
     try {
       if (doScreenshots) {
+        const runJestScreenshot = getScreenshot();
         passed = await runJestScreenshot(config, env);
       } else {
+        const runJest = getRunner();
         passed = await runJest(config, env);
       }
       config.logger.info('');
@@ -151,12 +164,20 @@ export const createTesting = async (config: ValidatedConfig): Promise<Testing> =
     return passed;
   };
 
+  /**
+   * As the name suggests, this destroys things! In particular it will call the
+   * `destroy` method on `config.sys` (if present) and it will also "null out"
+   * `config` for GC purposes.
+   */
   const destroy = async () => {
     const closingTime: Promise<any>[] = []; // you don't have to go home but you can't stay here
     if (config) {
       if (config.sys && config.sys.destroy) {
         closingTime.push(config.sys.destroy());
       }
+      // we're doing this for a good reason! we want to ensure that there's not
+      // a reference to the config object so it can be GC'ed
+      // @ts-ignore
       config = null;
     }
 

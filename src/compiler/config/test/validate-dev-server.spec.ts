@@ -1,9 +1,10 @@
+import { mockLoadConfigInit } from '@stencil/core/testing';
+import path from 'path';
+
+import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
 import type * as d from '../../../declarations';
 import { normalizePath } from '../../../utils';
 import { validateConfig } from '../validate-config';
-import path from 'path';
-import { ConfigFlags, createConfigFlags } from '../../../cli/config-flags';
-import { mockLoadConfigInit } from '@stencil/core/testing';
 
 describe('validateDevServer', () => {
   const root = path.resolve('/');
@@ -34,7 +35,7 @@ describe('validateDevServer', () => {
       inputConfig.devServer = { ...inputDevServerConfig, address };
       const { config } = validateConfig(inputConfig, mockLoadConfigInit());
       expect(config.devServer.address).toBe('localhost');
-    }
+    },
   );
 
   it('should set address', () => {
@@ -118,13 +119,20 @@ describe('validateDevServer', () => {
       inputConfig.devServer = { ...inputDevServerConfig, address, port: 1234 };
       const { config } = validateConfig(inputConfig, mockLoadConfigInit());
       expect(config.devServer.port).toBe(1234);
-    }
+    },
   );
 
   it('should not set default port if null', () => {
-    inputConfig.devServer = { ...inputDevServerConfig, port: null };
+    // we intentionally set the value to `null` for the purposes of this test, hence the type assertion
+    inputConfig.devServer = { ...inputDevServerConfig, port: null as unknown as number };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.port).toBe(null);
+  });
+
+  it('sets the port to 3333 if the port is undefined', () => {
+    inputConfig.devServer = { ...inputDevServerConfig, port: undefined };
+    const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+    expect(config.devServer.port).toBe(3333);
   });
 
   it.each(['localhost:20/', 'localhost:20'])('should set port from address %p if no port prop', (address) => {
@@ -157,18 +165,35 @@ describe('validateDevServer', () => {
   it('should default historyApiFallback', () => {
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
-    expect(config.devServer.historyApiFallback.index).toBe('index.html');
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
+  });
+
+  it.each([1, []])('should default historyApiFallback when an invalid value (%s) is provided', (badValue) => {
+    // this test explicitly checks for a bad value in the stencil.config file, hence the type assertion
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: badValue as any };
+    const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+    expect(config.devServer.historyApiFallback).toBeDefined();
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
   });
 
   it('should set historyApiFallback', () => {
     inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: {} };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBeDefined();
-    expect(config.devServer.historyApiFallback.index).toBe('index.html');
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
+  });
+
+  it('should sets the historyApiFallback when undefined is provided', () => {
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: undefined };
+    const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+    expect(config.devServer.historyApiFallback).toBeDefined();
+    expect(config.devServer.historyApiFallback!.disableDotRule).toBe(false);
+    expect(config.devServer.historyApiFallback!.index).toBe('index.html');
   });
 
   it('should disable historyApiFallback', () => {
-    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: null };
+    // we intentionally set the value to `null` for the purposes of this test, hence the type assertion
+    inputConfig.devServer = { ...inputDevServerConfig, historyApiFallback: null as unknown as d.HistoryApiFallback };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.historyApiFallback).toBe(null);
   });
@@ -196,7 +221,8 @@ describe('validateDevServer', () => {
   });
 
   it('should set openBrowser from flag', () => {
-    inputConfig.flags.open = false;
+    // the flags field should have been set up in the `beforeEach` block for this test, hence the bang operator
+    inputConfig.flags!.open = false;
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.openBrowser).toBe(false);
   });
@@ -249,5 +275,33 @@ describe('validateDevServer', () => {
     inputConfig.flags = { ...flags, ssr: true };
     const { config } = validateConfig(inputConfig, mockLoadConfigInit());
     expect(config.devServer.prerenderConfig).toBe(wwwOutputTarget.prerenderConfig);
+  });
+
+  describe('pingRoute', () => {
+    it('should default to /ping', () => {
+      // Ensure the pingRoute is not set in the inputConfig so we know we're testing the
+      // default value added during validation
+      delete inputConfig.devServer.pingRoute;
+      const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+      expect(config.devServer.pingRoute).toBe('/ping');
+    });
+
+    it('should set user defined pingRoute', () => {
+      inputConfig.devServer = { ...inputDevServerConfig, pingRoute: '/my-ping' };
+      const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+      expect(config.devServer.pingRoute).toBe('/my-ping');
+    });
+
+    it('should prefix pingRoute with a "/"', () => {
+      inputConfig.devServer = { ...inputDevServerConfig, pingRoute: 'my-ping' };
+      const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+      expect(config.devServer.pingRoute).toBe('/my-ping');
+    });
+
+    it('should clear ping route if set to null', () => {
+      inputConfig.devServer = { ...inputDevServerConfig, pingRoute: null };
+      const { config } = validateConfig(inputConfig, mockLoadConfigInit());
+      expect(config.devServer.pingRoute).toBe(null);
+    });
   });
 });

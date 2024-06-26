@@ -1,7 +1,8 @@
-import type * as d from '../../declarations';
-import { isAbsolute, join } from 'path';
-import { isBoolean } from '@utils';
+import { isBoolean, join } from '@utils';
+import { isAbsolute } from 'path';
+
 import type { ConfigFlags } from '../../cli/config-flags';
+import type * as d from '../../declarations';
 
 export const getAbsolutePath = (config: d.ValidatedConfig, dir: string) => {
   if (!isAbsolute(dir)) {
@@ -28,7 +29,7 @@ export const setBooleanConfig = <K extends keyof d.Config>(
   config: d.UnvalidatedConfig,
   configName: (K & keyof ConfigFlags) | K,
   flagName: keyof ConfigFlags | null,
-  defaultValue: d.Config[K]
+  defaultValue: d.Config[K],
 ) => {
   if (flagName) {
     const flagValue = config.flags?.[flagName];

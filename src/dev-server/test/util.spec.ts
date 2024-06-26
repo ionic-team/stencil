@@ -1,4 +1,6 @@
 import type * as d from '@stencil/core/declarations';
+
+import { DEV_SERVER_URL } from '../dev-server-constants';
 import {
   getBrowserUrl,
   getDevServerClientUrl,
@@ -6,7 +8,6 @@ import {
   isExtensionLessPath,
   isSsrStaticDataPath,
 } from '../dev-server-utils';
-import { DEV_SERVER_URL } from '../dev-server-constants';
 
 describe('dev-server, util', () => {
   it('should get url with custom base url and pathname', () => {

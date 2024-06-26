@@ -1,6 +1,6 @@
 import { cloneAttributes } from './attribute';
+import { getStyleElementText, MockCSSStyleSheet, setStyleElementText } from './css-style-sheet';
 import { createCustomElement } from './custom-element-registry';
-import { MockCSSStyleSheet, getStyleElementText, setStyleElementText } from './css-style-sheet';
 import { MockDocumentFragment } from './document-fragment';
 import { MockElement, MockHTMLElement } from './node';
 
@@ -49,6 +49,9 @@ export function createElement(ownerDocument: any, tagName: string): any {
 
     case 'title':
       return new MockTitleElement(ownerDocument);
+
+    case 'ul':
+      return new MockUListElement(ownerDocument);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -88,7 +91,7 @@ export function createElementNS(ownerDocument: any, namespaceURI: string, tagNam
         return new MockSVGElement(ownerDocument, tagName);
     }
   } else {
-    return new MockElement(ownerDocument, tagName);
+    return new MockElement(ownerDocument, tagName, namespaceURI);
   }
 }
 
@@ -120,7 +123,7 @@ patchPropAttributes(
   },
   {
     type: 'submit',
-  }
+  },
 );
 
 export class MockImageElement extends MockHTMLElement {
@@ -198,7 +201,7 @@ patchPropAttributes(
   },
   {
     type: 'text',
-  }
+  },
 );
 
 export class MockFormElement extends MockHTMLElement {
@@ -377,6 +380,8 @@ export class MockStyleElement extends MockHTMLElement {
   }
 }
 export class MockSVGElement extends MockElement {
+  override __namespaceURI = 'http://www.w3.org/2000/svg';
+
   // SVGElement properties and methods
   get ownerSVGElement(): SVGSVGElement {
     return null;
@@ -491,47 +496,65 @@ export class MockTitleElement extends MockHTMLElement {
   }
 }
 
+export class MockUListElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'ul');
+  }
+}
+
+type CanvasContext = '2d' | 'webgl' | 'webgl2' | 'bitmaprenderer';
+export class CanvasRenderingContext {
+  context: CanvasContext;
+  contextAttributes: WebGLContextAttributes;
+  constructor(context: CanvasContext, contextAttributes?: WebGLContextAttributes) {
+    this.context = context;
+    this.contextAttributes = contextAttributes;
+  }
+  fillRect() {
+    return;
+  }
+  clearRect() {}
+  getImageData(_: number, __: number, w: number, h: number) {
+    return {
+      data: new Array(w * h * 4),
+    };
+  }
+  toDataURL() {
+    return 'data:,'; // blank image
+  }
+  putImageData() {}
+  createImageData(): ImageData {
+    return {} as ImageData;
+  }
+  setTransform() {}
+  drawImage() {}
+  save() {}
+  fillText() {}
+  restore() {}
+  beginPath() {}
+  moveTo() {}
+  lineTo() {}
+  closePath() {}
+  stroke() {}
+  translate() {}
+  scale() {}
+  rotate() {}
+  arc() {}
+  fill() {}
+  measureText() {
+    return { width: 0 };
+  }
+  transform() {}
+  rect() {}
+  clip() {}
+}
+
 export class MockCanvasElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'canvas');
   }
-  getContext() {
-    return {
-      fillRect() {
-        return;
-      },
-      clearRect() {},
-      getImageData: function (_: number, __: number, w: number, h: number) {
-        return {
-          data: new Array(w * h * 4),
-        };
-      },
-      putImageData() {},
-      createImageData: function (): any[] {
-        return [];
-      },
-      setTransform() {},
-      drawImage() {},
-      save() {},
-      fillText() {},
-      restore() {},
-      beginPath() {},
-      moveTo() {},
-      lineTo() {},
-      closePath() {},
-      stroke() {},
-      translate() {},
-      scale() {},
-      rotate() {},
-      arc() {},
-      fill() {},
-      measureText() {
-        return { width: 0 };
-      },
-      transform() {},
-      rect() {},
-      clip() {},
-    };
+  getContext(context: CanvasContext, contextAttributes?: WebGLContextAttributes): CanvasRenderingContext {
+    return new CanvasRenderingContext(context, contextAttributes);
   }
 }
 

@@ -1,12 +1,13 @@
-import type * as d from '../../declarations';
 import { catchError } from '@utils';
+
+import type * as d from '../../declarations';
 
 export const crawlAnchorsForNextUrls = (
   prerenderConfig: d.PrerenderConfig,
   diagnostics: d.Diagnostic[],
   baseUrl: URL,
   currentUrl: URL,
-  parsedAnchors: d.HydrateAnchorElement[]
+  parsedAnchors: d.HydrateAnchorElement[],
 ) => {
   if (!Array.isArray(parsedAnchors) || parsedAnchors.length === 0) {
     return [];

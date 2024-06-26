@@ -1,8 +1,9 @@
-import type * as d from '../../declarations';
-import { connectedCallback, insertVdomAnnotations } from '@runtime';
-import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
-import { proxyHostElement } from './proxy-host-element';
 import { globalScripts } from '@app-globals';
+import { addHostEventListeners, doc, getHostRef, loadModule, plt, registerHost } from '@platform';
+import { connectedCallback, insertVdomAnnotations } from '@runtime';
+
+import type * as d from '../../declarations';
+import { proxyHostElement } from './proxy-host-element';
 
 export function hydrateApp(
   win: Window & typeof globalThis,
@@ -12,9 +13,9 @@ export function hydrateApp(
     win: Window,
     opts: d.HydrateFactoryOptions,
     results: d.HydrateResults,
-    resolve: (results: d.HydrateResults) => void
+    resolve: (results: d.HydrateResults) => void,
   ) => void,
-  resolve: (results: d.HydrateResults) => void
+  resolve: (results: d.HydrateResults) => void,
 ) {
   const connectedElements = new Set<any>();
   const createdElements = new Set<HTMLElement>();
@@ -27,7 +28,7 @@ export function hydrateApp(
   let ranCompleted = false;
 
   function hydratedComplete() {
-    global.clearTimeout(tmrId);
+    globalThis.clearTimeout(tmrId);
     createdElements.clear();
     connectedElements.clear();
 
@@ -78,7 +79,7 @@ export function hydrateApp(
               $tagName$: elm.nodeName.toLowerCase(),
               $flags$: null,
             },
-            null
+            null,
           ) as d.ComponentConstructor;
 
           if (Cstr != null && Cstr.cmpMeta != null) {
@@ -90,7 +91,7 @@ export function hydrateApp(
             registerHost(elm, Cstr.cmpMeta);
 
             // proxy the host element with the component's metadata
-            proxyHostElement(elm, Cstr.cmpMeta);
+            proxyHostElement(elm, Cstr.cmpMeta, opts);
           }
         }
       }
@@ -142,12 +143,12 @@ export function hydrateApp(
 
     win.document.createElementNS = function patchedCreateElement(namespaceURI: string, tagName: string) {
       const elm = orgDocumentCreateElementNS.call(win.document, namespaceURI, tagName);
-      patchElement(elm);
+      patchElement(elm as d.HostElement);
       return elm;
-    };
+    } as (typeof window)['document']['createElementNS'];
 
-    // ensure we use nodejs's native setTimeout, not the mocked hydrate app scoped one
-    tmrId = global.setTimeout(timeoutExceeded, opts.timeout);
+    // ensure we use NodeJS's native setTimeout, not the mocked hydrate app scoped one
+    tmrId = globalThis.setTimeout(timeoutExceeded, opts.timeout);
 
     plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', doc.baseURI).href;
 
@@ -166,7 +167,7 @@ async function hydrateComponent(
   results: d.HydrateResults,
   tagName: string,
   elm: d.HostElement,
-  waitingElements: Set<HTMLElement>
+  waitingElements: Set<HTMLElement>,
 ) {
   tagName = tagName.toLowerCase();
   const Cstr = loadModule(
@@ -174,7 +175,7 @@ async function hydrateComponent(
       $tagName$: tagName,
       $flags$: null,
     },
-    null
+    null,
   ) as d.ComponentConstructor;
 
   if (Cstr != null) {
@@ -182,6 +183,9 @@ async function hydrateComponent(
 
     if (cmpMeta != null) {
       waitingElements.add(elm);
+      const hostRef = getHostRef(this);
+      addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
+
       try {
         connectedCallback(elm);
         await elm.componentOnReady();
@@ -262,8 +266,8 @@ function renderCatchError(opts: d.HydrateFactoryOptions, results: d.HydrateResul
     type: 'build',
     header: 'Hydrate Error',
     messageText: '',
-    relFilePath: null,
-    absFilePath: null,
+    relFilePath: undefined,
+    absFilePath: undefined,
     lines: [],
   };
 

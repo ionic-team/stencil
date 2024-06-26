@@ -1,8 +1,9 @@
 // @ts-nocheck
-import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 import { Compiler, Config } from '@stencil/core/compiler';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
+
+import { expectFilesDoNotExist, expectFilesExist } from '../../../testing/testing-utils';
 
 describe.skip('outputTarget, www', () => {
   jest.setTimeout(20000);
@@ -21,14 +22,8 @@ describe.skip('outputTarget, www', () => {
 
     await compiler.fs.writeFiles({
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
-      [path.join(
-        root,
-        'User',
-        'testing',
-        'src',
-        'components',
-        'cmp-a.tsx'
-      )]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]:
+        `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
     await compiler.fs.commit();
 

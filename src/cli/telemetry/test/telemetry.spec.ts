@@ -1,12 +1,13 @@
-import type * as d from '../../../declarations';
-import * as telemetry from '../telemetry';
-import * as shouldTrack from '../shouldTrack';
-import { createSystem } from '../../../compiler/sys/stencil-sys';
-import { mockValidatedConfig } from '@stencil/core/testing';
 import * as coreCompiler from '@stencil/core/compiler';
-import { anonymizeConfigForTelemetry } from '../telemetry';
-import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
+import { mockValidatedConfig } from '@stencil/core/testing';
+import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '@utils';
+
 import { createConfigFlags } from '../../../cli/config-flags';
+import { createSystem } from '../../../compiler/sys/stencil-sys';
+import type * as d from '../../../declarations';
+import * as shouldTrack from '../shouldTrack';
+import * as telemetry from '../telemetry';
+import { anonymizeConfigForTelemetry } from '../telemetry';
 
 describe('telemetryBuildFinishedAction', () => {
   let config: d.ValidatedConfig;
@@ -26,7 +27,7 @@ describe('telemetryBuildFinishedAction', () => {
     spyShouldTrack.mockReturnValue(
       new Promise((resolve) => {
         resolve(true);
-      })
+      }),
     );
 
     const results = {
@@ -59,7 +60,7 @@ describe('telemetryAction', () => {
     spyShouldTrack.mockReturnValue(
       new Promise((resolve) => {
         resolve(true);
-      })
+      }),
     );
 
     await telemetry.telemetryAction(sys, config, coreCompiler, () => {});
@@ -73,7 +74,7 @@ describe('telemetryAction', () => {
     spyShouldTrack.mockReturnValue(
       new Promise((resolve) => {
         resolve(true);
-      })
+      }),
     );
 
     await telemetry.telemetryAction(sys, config, coreCompiler, async () => {
@@ -225,7 +226,7 @@ describe('anonymizeConfigForTelemetry', () => {
     config = mockValidatedConfig({ sys });
   });
 
-  it.each([
+  it.each<keyof d.ValidatedConfig>([
     'rootDir',
     'fsNamespace',
     'packageJsonFilePath',
@@ -246,14 +247,20 @@ describe('anonymizeConfigForTelemetry', () => {
     expect(anonymizedConfig.outputTargets).toEqual([]);
   });
 
-  it.each(['sys', 'logger', 'devServer', 'tsCompilerOptions'])(
-    "should remove objects under prop '%s'",
-    (prop: keyof d.ValidatedConfig) => {
-      const anonymizedConfig = anonymizeConfigForTelemetry({ ...config, [prop]: {}, outputTargets: [] });
-      expect(anonymizedConfig.hasOwnProperty(prop)).toBe(false);
-      expect(anonymizedConfig.outputTargets).toEqual([]);
-    }
-  );
+  it.each<keyof d.ValidatedConfig>([
+    'commonjs',
+    'devServer',
+    'env',
+    'logger',
+    'rollupConfig',
+    'sys',
+    'testing',
+    'tsCompilerOptions',
+  ])("should remove objects under prop '%s'", (prop: keyof d.ValidatedConfig) => {
+    const anonymizedConfig = anonymizeConfigForTelemetry({ ...config, [prop]: {}, outputTargets: [] });
+    expect(anonymizedConfig.hasOwnProperty(prop)).toBe(false);
+    expect(anonymizedConfig.outputTargets).toEqual([]);
+  });
 
   it('should retain outputTarget props on the keep list', () => {
     const anonymizedConfig = anonymizeConfigForTelemetry({
@@ -261,7 +268,7 @@ describe('anonymizeConfigForTelemetry', () => {
       outputTargets: [
         { type: WWW, baseUrl: 'https://example.com' },
         { type: DIST_HYDRATE_SCRIPT, external: ['beep', 'boop'], dir: 'shoud/go/away' },
-        { type: DIST_CUSTOM_ELEMENTS, autoDefineCustomElements: false },
+        { type: DIST_CUSTOM_ELEMENTS },
         { type: DIST_CUSTOM_ELEMENTS, generateTypeDeclarations: true },
         { type: DIST, typesDir: 'my-types' },
       ],
@@ -270,7 +277,7 @@ describe('anonymizeConfigForTelemetry', () => {
     expect(anonymizedConfig.outputTargets).toEqual([
       { type: WWW, baseUrl: 'omitted' },
       { type: DIST_HYDRATE_SCRIPT, external: ['beep', 'boop'], dir: 'omitted' },
-      { type: DIST_CUSTOM_ELEMENTS, autoDefineCustomElements: false },
+      { type: DIST_CUSTOM_ELEMENTS },
       { type: DIST_CUSTOM_ELEMENTS, generateTypeDeclarations: true },
       { type: DIST, typesDir: 'omitted' },
     ]);

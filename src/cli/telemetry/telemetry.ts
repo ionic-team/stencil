@@ -1,9 +1,10 @@
-import { tryFn, hasDebug, readJson, hasVerbose, uuidv4 } from './helpers';
-import { shouldTrack } from './shouldTrack';
+import { isOutputTargetHydrate, WWW } from '@utils';
+
 import type * as d from '../../declarations';
 import { readConfig, updateConfig, writeConfig } from '../ionic-config';
 import { CoreCompiler } from '../load-compiler';
-import { isOutputTargetHydrate, WWW } from '../../compiler/output-targets/output-utils';
+import { hasDebug, hasVerbose, readJson, tryFn, uuidv4 } from './helpers';
+import { shouldTrack } from './shouldTrack';
 
 /**
  * Used to within taskBuild to provide the component_count property.
@@ -17,15 +18,15 @@ export async function telemetryBuildFinishedAction(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
   coreCompiler: CoreCompiler,
-  result: d.CompilerBuildResults
+  result: d.CompilerBuildResults,
 ) {
-  const tracking = await shouldTrack(config, sys, config.flags.ci);
+  const tracking = await shouldTrack(config, sys, !!config.flags.ci);
 
   if (!tracking) {
     return;
   }
 
-  const component_count = Object.keys(result.componentGraph).length;
+  const component_count = result.componentGraph ? Object.keys(result.componentGraph).length : undefined;
 
   const data = await prepareData(coreCompiler, config, sys, result.duration, component_count);
 
@@ -47,7 +48,7 @@ export async function telemetryAction(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
   coreCompiler: CoreCompiler,
-  action?: d.TelemetryCallback
+  action?: d.TelemetryCallback,
 ) {
   const tracking = await shouldTrack(config, sys, !!config.flags.ci);
 
@@ -93,12 +94,12 @@ export async function telemetryAction(
  */
 export function hasAppTarget(config: d.ValidatedConfig): boolean {
   return config.outputTargets.some(
-    (target) => target.type === WWW && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/'))
+    (target) => target.type === WWW && (!!target.serviceWorker || (!!target.baseUrl && target.baseUrl !== '/')),
   );
 }
 
 export function isUsingYarn(sys: d.CompilerSystem) {
-  return sys.getEnvironmentVar('npm_execpath')?.includes('yarn') || false;
+  return sys.getEnvironmentVar?.('npm_execpath')?.includes('yarn') || false;
 }
 
 /**
@@ -128,8 +129,8 @@ export const prepareData = async (
   coreCompiler: CoreCompiler,
   config: d.ValidatedConfig,
   sys: d.CompilerSystem,
-  duration_ms: number,
-  component_count: number = undefined
+  duration_ms: number | undefined,
+  component_count: number | undefined = undefined,
 ): Promise<d.TrackableData> => {
   const { typescript, rollup } = coreCompiler.versions || { typescript: 'unknown', rollup: 'unknown' };
   const { packages, packagesNoVersions } = await getInstalledPackages(sys, config);
@@ -137,33 +138,33 @@ export const prepareData = async (
   const yarn = isUsingYarn(sys);
   const stencil = coreCompiler.version || 'unknown';
   const system = `${sys.name} ${sys.version}`;
-  const os_name = sys.details.platform;
-  const os_version = sys.details.release;
-  const cpu_model = sys.details.cpuModel;
+  const os_name = sys.details?.platform;
+  const os_version = sys.details?.release;
+  const cpu_model = sys.details?.cpuModel;
   const build = coreCompiler.buildId || 'unknown';
   const has_app_pwa_config = hasAppTarget(config);
   const anonymizedConfig = anonymizeConfigForTelemetry(config);
 
   return {
-    yarn,
-    duration_ms,
+    arguments: config.flags.args,
+    build,
     component_count,
-    targets,
+    config: anonymizedConfig,
+    cpu_model,
+    duration_ms,
+    has_app_pwa_config,
+    os_name,
+    os_version,
     packages,
     packages_no_versions: packagesNoVersions,
-    arguments: config.flags.args,
-    task: config.flags.task,
+    rollup,
     stencil,
     system,
     system_major: getMajorVersion(system),
-    os_name,
-    os_version,
-    cpu_model,
-    build,
+    targets,
+    task: config.flags.task,
     typescript,
-    rollup,
-    has_app_pwa_config,
-    config: anonymizedConfig,
+    yarn,
   };
 };
 
@@ -197,7 +198,16 @@ const CONFIG_PROPS_TO_ANONYMIZE: ReadonlyArray<ConfigStringKeys> = [
 // Props we delete entirely from the config for telemetry
 //
 // TODO(STENCIL-469): Investigate improving anonymization for tsCompilerOptions and devServer
-const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = ['sys', 'logger', 'tsCompilerOptions', 'devServer'];
+const CONFIG_PROPS_TO_DELETE: ReadonlyArray<keyof d.Config> = [
+  'commonjs',
+  'devServer',
+  'env',
+  'logger',
+  'rollupConfig',
+  'sys',
+  'testing',
+  'tsCompilerOptions',
+];
 
 /**
  * Anonymize the config for telemetry, replacing potentially revealing config props
@@ -231,7 +241,7 @@ export const anonymizeConfigForTelemetry = (config: d.ValidatedConfig): d.Config
           return value;
         }
         return 'omitted';
-      })
+      }),
     );
 
     // this prop has to be handled separately because it is an array
@@ -264,7 +274,7 @@ export const anonymizeConfigForTelemetry = (config: d.ValidatedConfig): d.Config
  */
 async function getInstalledPackages(
   sys: d.CompilerSystem,
-  config: d.ValidatedConfig
+  config: d.ValidatedConfig,
 ): Promise<{ packages: string[]; packagesNoVersions: string[] }> {
   let packages: string[] = [];
   let packagesNoVersions: string[] = [];
@@ -274,7 +284,11 @@ async function getInstalledPackages(
     // Read package.json and package-lock.json
     const appRootDir = sys.getCurrentDirectory();
 
-    const packageJson: d.PackageJsonData = await tryFn(readJson, sys, sys.resolvePath(appRootDir + '/package.json'));
+    const packageJson: d.PackageJsonData | null = await tryFn(
+      readJson,
+      sys,
+      sys.resolvePath(appRootDir + '/package.json'),
+    );
 
     // They don't have a package.json for some reason? Eject button.
     if (!packageJson) {
@@ -289,7 +303,7 @@ async function getInstalledPackages(
     // Collect packages only in the stencil, ionic, or capacitor org's:
     // https://www.npmjs.com/org/stencil
     const ionicPackages = rawPackages.filter(
-      ([k]) => k.startsWith('@stencil/') || k.startsWith('@ionic/') || k.startsWith('@capacitor/')
+      ([k]) => k.startsWith('@stencil/') || k.startsWith('@ionic/') || k.startsWith('@capacitor/'),
     );
 
     try {
@@ -333,12 +347,12 @@ async function npmPackages(sys: d.CompilerSystem, ionicPackages: [string, string
 async function yarnPackages(sys: d.CompilerSystem, ionicPackages: [string, string][]): Promise<string[]> {
   const appRootDir = sys.getCurrentDirectory();
   const yarnLock = sys.readFileSync(sys.resolvePath(appRootDir + '/yarn.lock'));
-  const yarnLockYml = sys.parseYarnLockFile(yarnLock);
+  const yarnLockYml = sys.parseYarnLockFile?.(yarnLock);
 
   return ionicPackages.map(([k, v]) => {
     const identifiedVersion = `${k}@${v}`;
-    let version = yarnLockYml.object[identifiedVersion]?.version;
-    version = version.includes('undefined') ? sanitizeDeclaredVersion(identifiedVersion) : version;
+    let version = yarnLockYml?.object[identifiedVersion]?.version;
+    version = version && version.includes('undefined') ? sanitizeDeclaredVersion(identifiedVersion) : version;
     return `${k}@${version}`;
   });
 }
@@ -366,7 +380,7 @@ export async function sendMetric(
   sys: d.CompilerSystem,
   config: d.ValidatedConfig,
   name: string,
-  value: d.TrackableData
+  value: d.TrackableData,
 ): Promise<void> {
   const session_id = await getTelemetryToken(sys);
 
@@ -410,6 +424,10 @@ async function sendTelemetry(sys: d.CompilerSystem, config: d.ValidatedConfig, d
       metrics: [data],
       sent_at: now,
     };
+
+    if (!sys.fetch) {
+      throw new Error('No fetch implementation available');
+    }
 
     // This request is only made if telemetry is on.
     const response = await sys.fetch('https://api.ionicjs.com/events/metrics', {

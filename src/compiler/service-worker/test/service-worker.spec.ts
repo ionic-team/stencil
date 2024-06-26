@@ -1,7 +1,7 @@
 // @ts-nocheck
 // TODO(STENCIL-462): investigate getting this file to pass (remove ts-nocheck)
-import type * as d from '@stencil/core/declarations';
 import { Compiler, Config } from '@stencil/core/compiler';
+import type * as d from '@stencil/core/declarations';
 import { mockConfig } from '@stencil/core/testing';
 import path from 'path';
 
@@ -33,7 +33,7 @@ describe.skip('service worker', () => {
       path.join(root, 'src', 'components', 'cmp-a', 'cmp-a.tsx'),
       `
       @Component({ tag: 'cmp-a' }) export class CmpA { render() { return <p>cmp-a</p>; } }
-    `
+    `,
     );
     await compiler.fs.commit();
 

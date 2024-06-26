@@ -1,7 +1,7 @@
 import type * as d from '../../../declarations';
+import * as Util from '../../../utils/util';
 import { generatePropTypes } from '../generate-prop-types';
 import * as StencilTypes from '../stencil-types';
-import * as Util from '../../../utils/util';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
 import { stubComponentCompilerProperty } from './ComponentCompilerProperty.stub';
 import { stubComponentCompilerVirtualProperty } from './ComponentCompilerVirtualProperty.stub';
@@ -22,8 +22,8 @@ describe('generate-prop-types', () => {
           _typeReferences: d.ComponentCompilerTypeReferences,
           _typeImportData: d.TypesImportData,
           _sourceFilePath: string,
-          initialType: string
-        ) => initialType
+          initialType: string,
+        ) => initialType,
       );
 
       getTextDocsSpy = jest.spyOn(Util, 'getTextDocs');

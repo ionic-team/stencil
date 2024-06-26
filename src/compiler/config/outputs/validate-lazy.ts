@@ -1,8 +1,7 @@
+import { DIST_LAZY, isBoolean, isOutputTargetDistLazy, join } from '@utils';
+
 import type * as d from '../../../declarations';
-import { DIST_LAZY, isOutputTargetDistLazy } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
-import { isBoolean } from '@utils';
-import { join } from 'path';
 
 export const validateLazy = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]) => {
   return userOutputs.filter(isOutputTargetDistLazy).map((o) => {

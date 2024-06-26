@@ -1,12 +1,12 @@
+import { addDocBlock, GENERATED_DTS, getComponentsDtsSrcFilePath, normalizePath, relative, resolve } from '@utils';
+import { isAbsolute } from 'path';
+
 import type * as d from '../../declarations';
-import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
 import { generateComponentTypes } from './generate-component-types';
 import { generateEventDetailTypes } from './generate-event-detail-types';
-import { GENERATED_DTS, getComponentsDtsSrcFilePath } from '../output-targets/output-utils';
-import { isAbsolute, relative, resolve } from 'path';
-import { normalizePath } from '@utils';
-import { updateReferenceTypeImports } from './update-import-refs';
 import { updateStencilTypesImports } from './stencil-types';
+import { COMPONENTS_DTS_HEADER, sortImportNames } from './types-utils';
+import { updateReferenceTypeImports } from './update-import-refs';
 
 /**
  * Generates and writes a `components.d.ts` file to disk. This file may be written to the `src` directory of a project,
@@ -18,10 +18,10 @@ import { updateStencilTypesImports } from './stencil-types';
  * @returns `true` if the type declaration file written to disk has changed, `false` otherwise
  */
 export const generateAppTypes = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  destination: string
+  destination: string,
 ): Promise<boolean> => {
   // only gather components that are still root ts files we've found and have component metadata
   // the compilerCtx cache may still have files that may have been deleted/renamed
@@ -39,11 +39,11 @@ export const generateAppTypes = async (
     componentTypesFileContent = updateStencilTypesImports(
       destination,
       componentsDtsFilePath,
-      componentTypesFileContent
+      componentTypesFileContent,
     );
   }
 
-  const writeResults = await compilerCtx.fs.writeFile(componentsDtsFilePath, componentTypesFileContent, {
+  const writeResults = await compilerCtx.fs.writeFile(normalizePath(componentsDtsFilePath), componentTypesFileContent, {
     immediateWrite: true,
   });
   const hasComponentsDtsChanged = writeResults.changedContent;
@@ -64,7 +64,11 @@ export const generateAppTypes = async (
  * @param areTypesInternal determines if non-exported type definitions are being generated or not
  * @returns the contents of the `components.d.ts` file
  */
-const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areTypesInternal: boolean): string => {
+const generateComponentTypesFile = (
+  config: d.ValidatedConfig,
+  buildCtx: d.BuildCtx,
+  areTypesInternal: boolean,
+): string => {
   let typeImportData: d.TypesImportData = {};
   const c: string[] = [];
   const allTypes = new Map<string, number>();
@@ -78,7 +82,7 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
      * data structure for each Stencil component in series, therefore the memory footprint of this entity will likely
      * grow as more components (with additional types) are processed.
      */
-    typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath);
+    typeImportData = updateReferenceTypeImports(typeImportData, allTypes, cmp, cmp.sourceFilePath, config);
     if (cmp.events.length > 0) {
       /**
        * Only generate event detail types for components that have events.
@@ -91,29 +95,30 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
   c.push(COMPONENTS_DTS_HEADER);
   c.push(`import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";`);
 
-  // write the import statements for our type declaration file
-  c.push(
-    ...Object.keys(typeImportData).map((filePath) => {
-      const typeData = typeImportData[filePath];
-      let importFilePath: string;
-      if (isAbsolute(filePath)) {
-        importFilePath = normalizePath('./' + relative(config.srcDir, filePath)).replace(/\.(tsx|ts)$/, '');
-      } else {
-        importFilePath = filePath;
-      }
+  // Map event type metadata to partial expressions (omitting import/export keywords)
+  // e.g. { TestEvent } from '../path/to/event/test-event.interface';
+  const expressions = Object.keys(typeImportData).map((filePath) => {
+    const typeData = typeImportData[filePath];
 
-      return `import { ${typeData
-        .sort(sortImportNames)
-        .map((td) => {
-          if (td.localName === td.importName) {
-            return `${td.importName}`;
-          } else {
-            return `${td.localName} as ${td.importName}`;
-          }
-        })
-        .join(`, `)} } from "${importFilePath}";`;
-    })
-  );
+    let importFilePath = filePath;
+    if (isAbsolute(filePath)) {
+      importFilePath = normalizePath('./' + relative(config.srcDir, filePath)).replace(/\.(tsx|ts)$/, '');
+    }
+
+    return `{ ${typeData
+      .sort(sortImportNames)
+      .map((td) => {
+        if (td.originalName === td.importName) {
+          return `${td.originalName}`;
+        } else {
+          return `${td.originalName} as ${td.importName}`;
+        }
+      })
+      .join(`, `)} } from "${importFilePath}";`;
+  });
+
+  // Write all import and export statements for event types
+  c.push(...expressions.map((ref) => `import ${ref}`), ...expressions.map((ref) => `export ${ref}`));
 
   c.push(`export namespace Components {`);
   c.push(...modules.map((m) => `${m.component}`));
@@ -125,34 +130,44 @@ const generateComponentTypesFile = (config: d.Config, buildCtx: d.BuildCtx, areT
 
   c.push(...modules.map((m) => m.element));
 
-  c.push(`        interface HTMLElementTagNameMap {`);
-  c.push(...modules.map((m) => `                "${m.tagName}": ${m.htmlElementName};`));
-  c.push(`        }`);
+  c.push(`    interface HTMLElementTagNameMap {`);
+  c.push(...modules.map((m) => `        "${m.tagName}": ${m.htmlElementName};`));
+  c.push(`    }`);
 
   c.push(`}`);
 
   c.push(`declare namespace LocalJSX {`);
-  c.push(...modules.map((m) => `  ${m.jsx}`));
+  c.push(
+    ...modules.map((m) => {
+      const docs = components.find((c) => c.tagName === m.tagName).docs;
+      return addDocBlock(m.jsx, docs, 4);
+    }),
+  );
 
-  c.push(`        interface IntrinsicElements {`);
-  c.push(...modules.map((m) => `              "${m.tagName}": ${m.tagNameAsPascal};`));
-  c.push(`        }`);
+  c.push(`    interface IntrinsicElements {`);
+  c.push(...modules.map((m) => `        "${m.tagName}": ${m.tagNameAsPascal};`));
+  c.push(`    }`);
 
   c.push(`}`);
 
   c.push(`export { LocalJSX as JSX };`);
 
   c.push(`declare module "@stencil/core" {`);
-  c.push(`        export namespace JSX {`);
-  c.push(`                interface IntrinsicElements {`);
+  c.push(`    export namespace JSX {`);
+  c.push(`        interface IntrinsicElements {`);
   c.push(
-    ...modules.map(
-      (m) =>
-        `                        "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`
-    )
+    ...modules.map((m) => {
+      const docs = components.find((c) => c.tagName === m.tagName).docs;
+
+      return addDocBlock(
+        `            "${m.tagName}": LocalJSX.${m.tagNameAsPascal} & JSXBase.HTMLAttributes<${m.htmlElementName}>;`,
+        docs,
+        12,
+      );
+    }),
   );
-  c.push(`                }`);
   c.push(`        }`);
+  c.push(`    }`);
   c.push(`}`);
 
   return c.join(`\n`) + `\n`;

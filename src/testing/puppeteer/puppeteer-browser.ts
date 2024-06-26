@@ -1,22 +1,34 @@
+import * as d from '@stencil/core/declarations';
 import type { E2EProcessEnv, ValidatedConfig } from '@stencil/core/internal';
 import type * as puppeteer from 'puppeteer';
+import semverMajor from 'semver/functions/major';
 
 export async function startPuppeteerBrowser(config: ValidatedConfig) {
   if (!config.flags.e2e) {
     return null;
   }
 
-  const env: E2EProcessEnv = process.env;
+  // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
+  const env: E2EProcessEnv = process.env as E2EProcessEnv;
   const puppeteerDep = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
 
   const puppeteerModulePath = config.sys.lazyRequire.getModulePath(config.rootDir, puppeteerDep);
+  const puppeteerPackageJsonPath = config.sys.platformPath.join(puppeteerModulePath, 'package.json');
   const puppeteer = config.sys.lazyRequire.require(config.rootDir, puppeteerModulePath);
   env.__STENCIL_PUPPETEER_MODULE__ = puppeteerModulePath;
+
+  try {
+    const puppeteerManifest = config.sys.readFileSync(puppeteerPackageJsonPath, 'utf8');
+    const puppeteerPkgJson: d.PackageJsonData = JSON.parse(puppeteerManifest);
+    env.__STENCIL_PUPPETEER_VERSION__ = semverMajor(puppeteerPkgJson.version);
+  } catch (e: unknown) {
+    console.error(`An error occurred determining the version of Puppeteer installed:\n${e}`);
+    env.__STENCIL_PUPPETEER_VERSION__ = undefined;
+  }
+
   env.__STENCIL_BROWSER_WAIT_UNTIL = config.testing.browserWaitUntil;
 
   if (config.flags.devtools) {
-    config.testing.browserDevtools = true;
-    config.testing.browserHeadless = false;
     env.__STENCIL_E2E_DEVTOOLS__ = 'true';
   }
 
@@ -73,7 +85,9 @@ export async function connectBrowser() {
   // a web socket is because jest probably has us
   // in a different thread, this is also why this
   // uses process.env for data
-  const env: E2EProcessEnv = process.env;
+  //
+  // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
+  const env: E2EProcessEnv = process.env as E2EProcessEnv;
 
   const wsEndpoint = env.__STENCIL_BROWSER_WS_ENDPOINT__;
   if (!wsEndpoint) {
