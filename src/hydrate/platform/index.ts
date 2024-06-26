@@ -56,7 +56,7 @@ export const win = window;
 export const doc = win.document;
 
 export const readTask = (cb: Function) => {
-  process.nextTick(() => {
+  nextTick(() => {
     try {
       cb();
     } catch (e) {
@@ -66,7 +66,7 @@ export const readTask = (cb: Function) => {
 };
 
 export const writeTask = (cb: Function) => {
-  process.nextTick(() => {
+  nextTick(() => {
     try {
       cb();
     } catch (e) {
