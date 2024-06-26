@@ -70,7 +70,18 @@ export const taskGenerate = async (config: ValidatedConfig): Promise<void> => {
 
   const writtenFiles = await Promise.all(
     filesToGenerate.map((file) =>
-      getBoilerplateAndWriteFile(config, componentName, extensionsToGenerate.includes('css'), file, cssExtension),
+      getBoilerplateAndWriteFile(
+        config,
+        componentName,
+        (
+          extensionsToGenerate.includes('css') ||
+          extensionsToGenerate.includes('sass') ||
+          extensionsToGenerate.includes('scss') ||
+          extensionsToGenerate.includes('less')
+        ),
+        file,
+        cssExtension
+      ),
     ),
   ).catch((error) => config.logger.error(error));
 
@@ -118,7 +129,7 @@ const chooseSassExtension = async () => {
   const { prompt } = await import('prompts');
   return (
     await prompt({
-      name: 'filesToGenerate',
+      name: 'sassFormat',
       type: 'select',
       message:
         'Which Sass format would you like to use? (More info: https://sass-lang.com/documentation/syntax/#the-indented-syntax)',
@@ -127,7 +138,7 @@ const chooseSassExtension = async () => {
         { value: 'scss', title: '*.scss Format' },
       ],
     })
-  ).filesToGenerate;
+  ).sassFormat;
 };
 
 /**
@@ -231,7 +242,10 @@ export const getBoilerplateByExtension = (
     case 'tsx':
       return getComponentBoilerplate(tagName, withCss, styleExtension);
 
-    case styleExtension:
+    case 'css':
+    case 'less':
+    case 'sass':
+    case 'scss':
       return getStyleUrlBoilerplate(styleExtension);
 
     case 'spec.tsx':
