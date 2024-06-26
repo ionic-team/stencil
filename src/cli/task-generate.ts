@@ -43,14 +43,20 @@ export const taskGenerate = async (config: ValidatedConfig): Promise<void> => {
     config.logger.error(tagError);
     return config.sys.exit(1);
   }
-  const filesToGenerateExt = await chooseFilesToGenerate();
-  if (undefined === filesToGenerateExt) {
+
+  let cssExtension: GeneratableStylingExtension = 'css';
+  if (!!config.plugins.find((plugin) => plugin.name === 'sass')) {
+    cssExtension = await chooseSassExtension();
+  } else if (!!config.plugins.find((plugin) => plugin.name === 'less')) {
+    cssExtension = 'less';
+  }
+  const filesToGenerateExt = await chooseFilesToGenerate(cssExtension);
+  if (!filesToGenerateExt) {
     // in some shells (e.g. Windows PowerShell), hitting Ctrl+C results in a TypeError printed to the console.
     // explicitly return here to avoid printing the error message.
     return;
   }
-  const extensionsToGenerate: GenerableExtension[] = ['tsx', ...filesToGenerateExt];
-
+  const extensionsToGenerate: GeneratableExtension[] = ['tsx', ...filesToGenerateExt];
   const testFolder = extensionsToGenerate.some(isTest) ? 'test' : '';
 
   const outDir = join(absoluteSrcDir, 'components', dir, componentName);
@@ -64,7 +70,16 @@ export const taskGenerate = async (config: ValidatedConfig): Promise<void> => {
 
   const writtenFiles = await Promise.all(
     filesToGenerate.map((file) =>
-      getBoilerplateAndWriteFile(config, componentName, extensionsToGenerate.includes('css'), file),
+      getBoilerplateAndWriteFile(
+        config,
+        componentName,
+        extensionsToGenerate.includes('css') ||
+          extensionsToGenerate.includes('sass') ||
+          extensionsToGenerate.includes('scss') ||
+          extensionsToGenerate.includes('less'),
+        file,
+        cssExtension,
+      ),
     ),
   ).catch((error) => config.logger.error(error));
 
@@ -88,10 +103,11 @@ export const taskGenerate = async (config: ValidatedConfig): Promise<void> => {
 /**
  * Show a checkbox prompt to select the files to be generated.
  *
- * @returns a read-only array of `GenerableExtension`, the extensions that the user has decided
+ * @param cssExtension the extension of the CSS file to be generated
+ * @returns a read-only array of `GeneratableExtension`, the extensions that the user has decided
  * to generate
  */
-const chooseFilesToGenerate = async (): Promise<ReadonlyArray<GenerableExtension>> => {
+const chooseFilesToGenerate = async (cssExtension: string): Promise<ReadonlyArray<GeneratableExtension>> => {
   const { prompt } = await import('prompts');
   return (
     await prompt({
@@ -99,12 +115,28 @@ const chooseFilesToGenerate = async (): Promise<ReadonlyArray<GenerableExtension
       type: 'multiselect',
       message: 'Which additional files do you want to generate?',
       choices: [
-        { value: 'css', title: 'Stylesheet (.css)', selected: true },
+        { value: cssExtension, title: `Stylesheet (.${cssExtension})`, selected: true },
         { value: 'spec.tsx', title: 'Spec Test  (.spec.tsx)', selected: true },
         { value: 'e2e.ts', title: 'E2E Test (.e2e.ts)', selected: true },
       ],
     })
   ).filesToGenerate;
+};
+
+const chooseSassExtension = async () => {
+  const { prompt } = await import('prompts');
+  return (
+    await prompt({
+      name: 'sassFormat',
+      type: 'select',
+      message:
+        'Which Sass format would you like to use? (More info: https://sass-lang.com/documentation/syntax/#the-indented-syntax)',
+      choices: [
+        { value: 'sass', title: `*.sass Format`, selected: true },
+        { value: 'scss', title: '*.scss Format' },
+      ],
+    })
+  ).sassFormat;
 };
 
 /**
@@ -119,7 +151,7 @@ const chooseFilesToGenerate = async (): Promise<ReadonlyArray<GenerableExtension
  * @returns the full filepath to the component (with a possible `test` directory
  * added)
  */
-const getFilepathForFile = (filePath: string, componentName: string, extension: GenerableExtension): string =>
+const getFilepathForFile = (filePath: string, componentName: string, extension: GeneratableExtension): string =>
   isTest(extension)
     ? normalizePath(join(filePath, 'test', `${componentName}.${extension}`))
     : normalizePath(join(filePath, `${componentName}.${extension}`));
@@ -131,6 +163,7 @@ const getFilepathForFile = (filePath: string, componentName: string, extension: 
  * @param componentName the component name (user-supplied)
  * @param withCss       are we generating CSS?
  * @param file          the file we want to write
+ * @param styleExtension extension used for styles
  * @returns a `Promise<string>` which holds the full filepath we've written to,
  * used to print out a little summary of our activity to the user.
  */
@@ -139,8 +172,9 @@ const getBoilerplateAndWriteFile = async (
   componentName: string,
   withCss: boolean,
   file: BoilerplateFile,
+  styleExtension: GeneratableStylingExtension,
 ): Promise<string> => {
-  const boilerplate = getBoilerplateByExtension(componentName, file.extension, withCss);
+  const boilerplate = getBoilerplateByExtension(componentName, file.extension, withCss, styleExtension);
   await config.sys.writeFile(normalizePath(file.path), boilerplate);
   return file.path;
 };
@@ -183,7 +217,7 @@ const checkForOverwrite = async (files: readonly BoilerplateFile[], config: Vali
  * @param extension the extension we want to check
  * @returns a boolean indicating whether or not its a test
  */
-const isTest = (extension: GenerableExtension): boolean => {
+const isTest = (extension: GeneratableExtension): boolean => {
   return extension === 'e2e.ts' || extension === 'spec.tsx';
 };
 
@@ -193,15 +227,24 @@ const isTest = (extension: GenerableExtension): boolean => {
  * @param tagName the name of the component we're generating
  * @param extension the file extension we want boilerplate for (.css, tsx, etc)
  * @param withCss a boolean indicating whether we're generating a CSS file
+ * @param styleExtension extension used for styles
  * @returns a string container the file boilerplate for the supplied extension
  */
-export const getBoilerplateByExtension = (tagName: string, extension: GenerableExtension, withCss: boolean): string => {
+export const getBoilerplateByExtension = (
+  tagName: string,
+  extension: GeneratableExtension,
+  withCss: boolean,
+  styleExtension: GeneratableStylingExtension,
+): string => {
   switch (extension) {
     case 'tsx':
-      return getComponentBoilerplate(tagName, withCss);
+      return getComponentBoilerplate(tagName, withCss, styleExtension);
 
     case 'css':
-      return getStyleUrlBoilerplate();
+    case 'less':
+    case 'sass':
+    case 'scss':
+      return getStyleUrlBoilerplate(styleExtension);
 
     case 'spec.tsx':
       return getSpecTestBoilerplate(tagName);
@@ -218,13 +261,18 @@ export const getBoilerplateByExtension = (tagName: string, extension: GenerableE
  * Get the boilerplate for a file containing the definition of a component
  * @param tagName the name of the tag to give the component
  * @param hasStyle designates if the component has an external stylesheet or not
+ * @param styleExtension extension used for styles
  * @returns the contents of a file that defines a component
  */
-const getComponentBoilerplate = (tagName: string, hasStyle: boolean): string => {
+const getComponentBoilerplate = (
+  tagName: string,
+  hasStyle: boolean,
+  styleExtension: GeneratableStylingExtension,
+): string => {
   const decorator = [`{`];
   decorator.push(`  tag: '${tagName}',`);
   if (hasStyle) {
-    decorator.push(`  styleUrl: '${tagName}.css',`);
+    decorator.push(`  styleUrl: '${tagName}.${styleExtension}',`);
   }
   decorator.push(`  shadow: true,`);
   decorator.push(`}`);
@@ -233,7 +281,6 @@ const getComponentBoilerplate = (tagName: string, hasStyle: boolean): string => 
 
 @Component(${decorator.join('\n')})
 export class ${toPascalCase(tagName)} {
-
   render() {
     return (
       <Host>
@@ -241,17 +288,21 @@ export class ${toPascalCase(tagName)} {
       </Host>
     );
   }
-
 }
 `;
 };
 
 /**
  * Get the boilerplate for style for a generated component
+ * @param ext extension used for styles
  * @returns a boilerplate CSS block
  */
-const getStyleUrlBoilerplate = (): string =>
-  `:host {
+const getStyleUrlBoilerplate = (ext: GeneratableExtension): string =>
+  ext === 'sass'
+    ? `:host
+  display: block
+`
+    : `:host {
   display: block;
 }
 `;
@@ -312,14 +363,19 @@ const toPascalCase = (str: string): string =>
 /**
  * Extensions available to generate.
  */
-export type GenerableExtension = 'tsx' | 'css' | 'spec.tsx' | 'e2e.ts';
+export type GeneratableExtension = 'tsx' | 'spec.tsx' | 'e2e.ts' | GeneratableStylingExtension;
+
+/**
+ * Extensions available to generate.
+ */
+export type GeneratableStylingExtension = 'css' | 'sass' | 'scss' | 'less';
 
 /**
  * A little interface to wrap up the info we need to pass around for generating
  * and writing boilerplate.
  */
 export interface BoilerplateFile {
-  extension: GenerableExtension;
+  extension: GeneratableExtension;
   /**
    * The full path to the file we want to generate.
    */
