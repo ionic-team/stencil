@@ -391,7 +391,7 @@ export interface RollupSourceMap {
   mappings: string;
   names: string[];
   sources: string[];
-  sourcesContent: string[];
+  sourcesContent?: string[];
   version: number;
   toString(): string;
   toUrl(): string;

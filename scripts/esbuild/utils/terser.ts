@@ -30,7 +30,9 @@ export async function bundleTerser(opts: BuildOptions): Promise<[content: string
 
   const { output } = await rollupBuild.generate({
     format: 'es',
-    preferConst: true,
+    generatedCode: {
+      constBindings: true,
+    },
     strict: false,
   });
 

@@ -30,7 +30,7 @@ export const resolveRemoteModuleIdSync = (
 const resolveRemotePackageJsonSync = (config: d.Config, inMemoryFs: InMemoryFileSystem, moduleId: string) => {
   if (inMemoryFs) {
     const filePath = normalizePath(
-      config.sys.getLocalModulePath({ rootDir: config.rootDir, moduleId, path: 'package.json' }),
+      config.sys?.getLocalModulePath({ rootDir: config.rootDir!, moduleId, path: 'package.json' }),
     );
     const pkgJson = inMemoryFs.readFileSync(filePath);
     if (typeof pkgJson === 'string') {

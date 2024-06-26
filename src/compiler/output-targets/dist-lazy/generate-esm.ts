@@ -21,7 +21,9 @@ export const generateEsm = async (
       format: 'es',
       entryFileNames: '[name].js',
       assetFileNames: '[name]-[hash][extname]',
-      preferConst: true,
+      generatedCode: {
+        constBindings: true,
+      },
       sourcemap: config.sourceMap,
     };
     const outputTargetType = esmOutputs[0].type;

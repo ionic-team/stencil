@@ -21,7 +21,9 @@ export const generateCjs = async (
       format: 'cjs',
       entryFileNames: '[name].cjs.js',
       assetFileNames: '[name]-[hash][extname]',
-      preferConst: true,
+      generatedCode: {
+        constBindings: true,
+      },
       sourcemap: config.sourceMap,
     };
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);

@@ -186,8 +186,10 @@ const buildWorker = async (
       footer: '})();',
       intro: getWorkerIntro(workerMsgId, config.devMode),
       esModule: false,
-      preferConst: true,
       externalLiveBindings: false,
+      generatedCode: {
+        constBindings: true,
+      }
     });
     const entryPoint = output.output[0];
     if (entryPoint.imports.length > 0) {
