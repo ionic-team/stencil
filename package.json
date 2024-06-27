@@ -25,14 +25,16 @@
   "exports": {
     ".": {
       "import": "./internal/stencil-core/index.js",
-      "require": "./internal/stencil-core/index.cjs"
+      "require": "./internal/stencil-core/index.cjs",
+      "types": "./internal/stencil-core/index.d.ts"
     },
     "./cli": {
       "import": "./cli/index.js",
       "require": "./cli/index.cjs"
     },
     "./internal": {
-      "import": "./internal/index.js"
+      "import": "./internal/index.js",
+      "types": "./internal/index.d.ts"
     },
     "./internal/client": {
       "import": "./internal/client/index.js"
@@ -45,14 +47,22 @@
     },
     "./internal/app-data": {
       "import": "./internal/app-data/index.js",
-      "require": "./internal/app-data/index.cjs"
+      "require": "./internal/app-data/index.cjs",
+      "types": "./internal/app-data/index.d.ts"
+    },
+    "./mock-doc": {
+      "import": "./mock-doc/index.js",
+      "require": "./mock-doc/index.cjs",
+      "types": "./mock-doc/index.d.ts"
     },
     "./mock-doc": {
       "import": "./mock-doc/index.js",
       "require": "./mock-doc/index.cjs"
     },
     "./compiler": {
-      "import": "./compiler/stencil.js"
+      "import": "./compiler/stencil.js",
+      "require": "./compiler/stencil.js",
+      "types": "./compiler/stencil.d.ts"
     },
     "./compiler/*": {
       "import": "./compiler/*"
