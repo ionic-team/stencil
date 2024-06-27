@@ -24,12 +24,12 @@ export function streamToString(html: string | any, option?: SerializeDocumentOpt
   return renderToString(html, option, true);
 }
 
+export function renderToString(html: string | any, options?: SerializeDocumentOptions): Promise<HydrateResults>;
 export function renderToString(
   html: string | any,
   options: SerializeDocumentOptions | undefined,
   asStream: true,
 ): Readable;
-export function renderToString(html: string | any, options?: SerializeDocumentOptions): Promise<HydrateResults>;
 export function renderToString(
   html: string | any,
   options?: SerializeDocumentOptions,
@@ -56,12 +56,12 @@ export function renderToString(
   return hydrateDocument(html, opts, asStream);
 }
 
+export function hydrateDocument(doc: any | string, options?: HydrateDocumentOptions): Promise<HydrateResults>;
 export function hydrateDocument(
   doc: any | string,
   options: HydrateDocumentOptions | undefined,
   asStream?: boolean,
 ): Readable;
-export function hydrateDocument(doc: any | string, options?: HydrateDocumentOptions): Promise<HydrateResults>;
 export function hydrateDocument(
   doc: any | string,
   options?: HydrateDocumentOptions,
