@@ -55,10 +55,6 @@
       "require": "./mock-doc/index.cjs",
       "types": "./mock-doc/index.d.ts"
     },
-    "./mock-doc": {
-      "import": "./mock-doc/index.js",
-      "require": "./mock-doc/index.cjs"
-    },
     "./compiler": {
       "import": "./compiler/stencil.js",
       "require": "./compiler/stencil.js",
