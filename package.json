@@ -62,6 +62,15 @@
     },
     "./compiler/*": {
       "import": "./compiler/*"
+    },
+    "./sys/node": {
+      "import": "./sys/node/index.js",
+      "require": "./sys/node/index.js",
+      "types": "./sys/node/index.d.ts"
+    },
+    "./sys/node/*": {
+      "import": "./sys/node/*",
+      "require": "./sys/node/*"
     }
   },
   "scripts": {
