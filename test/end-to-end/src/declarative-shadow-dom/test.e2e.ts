@@ -44,9 +44,9 @@ describe('renderToString', () => {
     const { html } = await renderToString(`<car-list cars=${JSON.stringify([vento, beetle])}></car-list>`, {
       prettyHtml: true,
       fullDocument: false,
-    })
+    });
     expect(html).toMatchSnapshot();
-  })
+  });
 
   it('resolves to a Promise<HydrateResults> by default', async () => {
     const renderedString = renderToString('<div>Hello World</div>');
