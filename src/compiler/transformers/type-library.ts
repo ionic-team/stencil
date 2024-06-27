@@ -31,9 +31,12 @@ export function addToLibrary(
 ): string {
   pathToTypeModule = relative(process.cwd(), pathToTypeModule);
 
-  // for now we don't make any attempt to include types in node_modules
+  // Create a stub path for types that are in node_modules,
+  // this allows us to have a unique ID for types that are from
+  // external packages so we can leverage the original type name when
+  // dealing with type aliases.
   if (pathToTypeModule.startsWith('node_modules')) {
-    return '';
+    return 'node_modules::' + typeName;
   }
 
   const id = getTypeId(pathToTypeModule, typeName);
