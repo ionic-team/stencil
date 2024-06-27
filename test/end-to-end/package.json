@@ -6,7 +6,7 @@
   "types": "dist/types/components.d.ts",
   "collection": " dist/collection/collection-manifest.json",
   "scripts": {
-    "build": "node ../../bin/stencil build --docs",
+    "build": "node ../../bin/stencil build --config ./stencil.build.config.ts --docs",
     "start": "node ../../bin/stencil build --debug --watch --dev --serve",
     "test": "node ../../bin/stencil test --ci --e2e --spec --screenshot --debug",
     "test.dist": "npm run build && node test-end-to-end-dist.js && node test-end-to-end-hydrate.js",

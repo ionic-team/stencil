@@ -29,6 +29,7 @@ async function readableToString(readable: Readable) {
 type HydrateModule = typeof import('../../hydrate');
 let renderToString: HydrateModule['renderToString'];
 let streamToString: HydrateModule['streamToString'];
+let hydrateDocument: HydrateModule['hydrateDocument'];
 
 describe('renderToString', () => {
   beforeAll(async () => {
@@ -36,6 +37,19 @@ describe('renderToString', () => {
     const mod = await import('../../hydrate');
     renderToString = mod.renderToString;
     streamToString = mod.streamToString;
+    hydrateDocument = mod.hydrateDocument;
+  });
+
+  it('resolves to a Promise<HydrateResults> by default', async () => {
+    const renderedString = renderToString('<div>Hello World</div>');
+    expect(typeof renderedString.then).toBe('function');
+    // this is a type assertion to verify that the promise resolves to a HydrateResults object
+    renderedString.then((result) => result.html);
+
+    const renderedDocument = hydrateDocument('<div>Hello World</div>');
+    expect(typeof renderedDocument.then).toBe('function');
+    // this is a type assertion to verify that the promise resolves to a HydrateResults object
+    renderedDocument.then((result) => result.html);
   });
 
   it('can render a simple dom node', async () => {
