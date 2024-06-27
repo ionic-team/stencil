@@ -1,3 +1,16 @@
+## 🍈 [4.19.1](https://github.com/ionic-team/stencil/compare/v4.19.0...v4.19.1) (2024-06-27)
+
+
+### Bug Fixes
+
+* **changelog:** wording ([27109d2](https://github.com/ionic-team/stencil/commit/27109d29b92d4e92e3299cd474869d4c83ca7fe6))
+* **compiler:** account for package imports in aliasing ([#5862](https://github.com/ionic-team/stencil/issues/5862)) ([02b41d3](https://github.com/ionic-team/stencil/commit/02b41d3e64dfb7a2960ad32968e991fef159c137))
+* **compiler:** try to create web worker with the workerPath before falling back to blob ([#3513](https://github.com/ionic-team/stencil/issues/3513)) ([c84dd32](https://github.com/ionic-team/stencil/commit/c84dd32499e8d0f092579e1c0317537a4ae341ac))
+* **hydrate:** change type resolve order ([#5863](https://github.com/ionic-team/stencil/issues/5863)) ([42b1ff2](https://github.com/ionic-team/stencil/commit/42b1ff23405cf27670b335e3b95d9dceb65578ae))
+* **internal:** add cli sub package to export map ([ad95222](https://github.com/ionic-team/stencil/commit/ad95222bbd7a6421ac518cce24f3fd59102d4774))
+
+
+
 # 🏄 [4.19.0](https://github.com/ionic-team/stencil/compare/v4.18.3...v4.19.0) (2024-06-26)
 
 
