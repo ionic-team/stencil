@@ -6,4 +6,4 @@ import { config as baseConfig } from './stencil.config';
  * when the project hasn't been built.
  */
 baseConfig.tsconfig = './tsconfig.build.json';
-export const config = baseConfig
+export const config = baseConfig;
