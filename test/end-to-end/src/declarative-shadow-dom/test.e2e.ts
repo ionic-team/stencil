@@ -44,13 +44,13 @@ describe('renderToString', () => {
     const renderedString = renderToString('<div>Hello World</div>');
     expect(typeof renderedString.then).toBe('function');
     // this is a type assertion to verify that the promise resolves to a HydrateResults object
-    renderedString.then((result) => result.html)
+    renderedString.then((result) => result.html);
 
     const renderedDocument = hydrateDocument('<div>Hello World</div>');
     expect(typeof renderedDocument.then).toBe('function');
     // this is a type assertion to verify that the promise resolves to a HydrateResults object
-    renderedDocument.then((result) => result.html)
-  })
+    renderedDocument.then((result) => result.html);
+  });
 
   it('can render a simple dom node', async () => {
     const { html } = await renderToString('<div>Hello World</div>');
