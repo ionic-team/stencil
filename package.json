@@ -37,10 +37,12 @@
       "types": "./internal/index.d.ts"
     },
     "./internal/client": {
-      "import": "./internal/client/index.js"
+      "import": "./internal/client/index.js",
+      "require": "./internal/client/index.js"
     },
     "./internal/testing": {
-      "import": "./internal/testing/index.js"
+      "import": "./internal/testing/index.js",
+      "require": "./internal/testing/index.js"
     },
     "./internal/testing/*": {
       "import": "./internal/testing/*"
@@ -61,7 +63,8 @@
       "types": "./compiler/stencil.d.ts"
     },
     "./compiler/*": {
-      "import": "./compiler/*"
+      "import": "./compiler/*",
+      "types": "./compiler/*"
     },
     "./sys/node": {
       "import": "./sys/node/index.js",
