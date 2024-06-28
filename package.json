@@ -71,6 +71,15 @@
     "./sys/node/*": {
       "import": "./sys/node/*",
       "require": "./sys/node/*"
+    },
+    "./testing": {
+      "import": "./testing/index.js",
+      "types": "./testing/index.d.ts",
+      "require": "./testing/index.js"
+    },
+    "./testing/*": {
+      "import": "./testing/*",
+      "require": "./testing/*"
     }
   },
   "scripts": {
