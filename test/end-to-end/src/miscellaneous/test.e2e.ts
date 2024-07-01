@@ -2,6 +2,10 @@ import { type E2EPage, newE2EPage } from '@stencil/core/testing';
 
 let page: E2EPage;
 
+function checkSorted(arr: string[]) {
+  return arr.every((value, index, array) => index === 0 || value >= array[index - 1]);
+}
+
 describe('do not throw page already closed if page was defined in before(All) hook', () => {
   beforeAll(async () => {
     page = await newE2EPage();
@@ -38,8 +42,6 @@ describe('sorts hydrated component styles', () => {
       .split('\n')
       .map((c) => c.slice(0, c.indexOf('{')))
       .find((c) => c.includes('app-root'));
-    expect(classSelector).toBe(
-      'another-car-detail,another-car-list,app-root,build-data,car-detail,car-list,cmp-a,cmp-b,cmp-c,cmp-dsd,cmp-server-vs-client,dom-api,dom-interaction,dom-visible,element-cmp,empty-cmp,empty-cmp-shadow,env-data,event-cmp,import-assets,listen-cmp,method-cmp,path-alias-cmp,prerender-cmp,prop-cmp,scoped-car-detail,scoped-car-list,slot-cmp,slot-cmp-container,slot-parent-cmp,state-cmp',
-    );
+    expect(checkSorted(classSelector.split(','))).toBeTruthy();
   });
 });

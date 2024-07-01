@@ -205,4 +205,52 @@ describe('renderToString', () => {
     const button = await page.find('cmp-server-vs-client');
     expect(button.shadowRoot.querySelector('div')).toEqualText('Server vs Client? Winner: Client');
   });
+
+  it('can hydrate components with event listeners', async () => {
+    const { html } = await renderToString(
+      `
+      <dsd-listen-cmp>Hello World</dsd-listen-cmp>
+      <car-list cars=${JSON.stringify([vento, beetle])}></car-list>
+    `,
+      {
+        serializeShadowRoot: true,
+        fullDocument: false,
+      },
+    );
+
+    /**
+     * renders the component with listener with proper vdom annotation, e.g.
+     * ```html
+     * <dsd-listen-cmp class="sc-dsd-listen-cmp-h" custom-hydrate-flag="" s-id="1">
+     *   <template shadowrootmode="open">
+     *     <style sty-id="sc-dsd-listen-cmp">
+     *       .sc-dsd-listen-cmp-h{display:block}
+     *     </style>
+     *     <slot c-id="1.0.0.0" class="sc-dsd-listen-cmp"></slot>
+     *   </template>
+     *   <!--r.1-->
+     *   Hello World
+     * </dsd-listen-cmp>
+     * ```
+     */
+
+    expect(html).toContain(
+      `<dsd-listen-cmp class=\"sc-dsd-listen-cmp-h\" custom-hydrate-flag=\"\" s-id=\"1\"><template shadowrootmode=\"open\"><style sty-id=\"sc-dsd-listen-cmp\">/*!@:host*/.sc-dsd-listen-cmp-h{display:block}</style><slot class=\"sc-dsd-listen-cmp\" c-id=\"1.0.0.0\"></slot></template><!--r.1-->Hello World</dsd-listen-cmp>`,
+    );
+
+    /**
+     * renders second component with proper vdom annotation, e.g.:
+     * ```html
+     * <car-detail c-id="2.4.2.0" class="sc-car-list" custom-hydrate-flag="" s-id="4">
+     *   <!--r.4-->
+     *   <section c-id="4.0.0.0" class="sc-car-list">
+     *     <!--t.4.1.1.0-->
+     *     2023 VW Beetle
+     *   </section>
+     * </car-detail>
+     */
+    expect(html).toContain(
+      `<car-detail class=\"sc-car-list\" custom-hydrate-flag=\"\" c-id=\"2.4.2.0\" s-id=\"4\"><!--r.4--><section class=\"sc-car-list\" c-id=\"4.0.0.0\"><!--t.4.1.1.0-->2023 VW Beetle</section></car-detail>`,
+    );
+  });
 });

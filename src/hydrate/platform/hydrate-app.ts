@@ -120,7 +120,7 @@ export function hydrateApp(
 
           // add it to our Set so we know it's already being connected
           connectedElements.add(elm);
-          return hydrateComponent(win, results, elm.nodeName, elm, waitingElements);
+          return hydrateComponent.call(elm, win, results, elm.nodeName, elm, waitingElements);
         }
       }
 
@@ -163,6 +163,7 @@ export function hydrateApp(
 }
 
 async function hydrateComponent(
+  this: HTMLElement,
   win: Window & typeof globalThis,
   results: d.HydrateResults,
   tagName: string,

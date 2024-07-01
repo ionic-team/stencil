@@ -49,6 +49,8 @@ export namespace Components {
     }
     interface DomVisible {
     }
+    interface DsdListenCmp {
+    }
     interface ElementCmp {
     }
     interface EmptyCmp {
@@ -257,6 +259,12 @@ declare global {
         prototype: HTMLDomVisibleElement;
         new (): HTMLDomVisibleElement;
     };
+    interface HTMLDsdListenCmpElement extends Components.DsdListenCmp, HTMLStencilElement {
+    }
+    var HTMLDsdListenCmpElement: {
+        prototype: HTMLDsdListenCmpElement;
+        new (): HTMLDsdListenCmpElement;
+    };
     interface HTMLElementCmpElement extends Components.ElementCmp, HTMLStencilElement {
     }
     var HTMLElementCmpElement: {
@@ -401,6 +409,7 @@ declare global {
         "dom-api": HTMLDomApiElement;
         "dom-interaction": HTMLDomInteractionElement;
         "dom-visible": HTMLDomVisibleElement;
+        "dsd-listen-cmp": HTMLDsdListenCmpElement;
         "element-cmp": HTMLElementCmpElement;
         "empty-cmp": HTMLEmptyCmpElement;
         "empty-cmp-shadow": HTMLEmptyCmpShadowElement;
@@ -463,6 +472,8 @@ declare namespace LocalJSX {
     interface DomInteraction {
     }
     interface DomVisible {
+    }
+    interface DsdListenCmp {
     }
     interface ElementCmp {
     }
@@ -532,6 +543,7 @@ declare namespace LocalJSX {
         "dom-api": DomApi;
         "dom-interaction": DomInteraction;
         "dom-visible": DomVisible;
+        "dsd-listen-cmp": DsdListenCmp;
         "element-cmp": ElementCmp;
         "empty-cmp": EmptyCmp;
         "empty-cmp-shadow": EmptyCmpShadow;
@@ -575,6 +587,7 @@ declare module "@stencil/core" {
             "dom-api": LocalJSX.DomApi & JSXBase.HTMLAttributes<HTMLDomApiElement>;
             "dom-interaction": LocalJSX.DomInteraction & JSXBase.HTMLAttributes<HTMLDomInteractionElement>;
             "dom-visible": LocalJSX.DomVisible & JSXBase.HTMLAttributes<HTMLDomVisibleElement>;
+            "dsd-listen-cmp": LocalJSX.DsdListenCmp & JSXBase.HTMLAttributes<HTMLDsdListenCmpElement>;
             "element-cmp": LocalJSX.ElementCmp & JSXBase.HTMLAttributes<HTMLElementCmpElement>;
             "empty-cmp": LocalJSX.EmptyCmp & JSXBase.HTMLAttributes<HTMLEmptyCmpElement>;
             "empty-cmp-shadow": LocalJSX.EmptyCmpShadow & JSXBase.HTMLAttributes<HTMLEmptyCmpShadowElement>;
