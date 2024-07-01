@@ -108,6 +108,16 @@ export namespace Components {
          */
         "mode"?: any;
     }
+    interface ScopedCarDetail {
+        "car": CarData;
+    }
+    /**
+     * Component that helps display a list of cars
+     */
+    interface ScopedCarList {
+        "cars": CarData[];
+        "selected": CarData;
+    }
     interface SlotCmp {
     }
     interface SlotCmpContainer {
@@ -129,6 +139,10 @@ export interface CarListCustomEvent<T> extends CustomEvent<T> {
 export interface EventCmpCustomEvent<T> extends CustomEvent<T> {
     detail: T;
     target: HTMLEventCmpElement;
+}
+export interface ScopedCarListCustomEvent<T> extends CustomEvent<T> {
+    detail: T;
+    target: HTMLScopedCarListElement;
 }
 declare global {
     interface HTMLAnotherCarDetailElement extends Components.AnotherCarDetail, HTMLStencilElement {
@@ -322,6 +336,32 @@ declare global {
         prototype: HTMLPropCmpElement;
         new (): HTMLPropCmpElement;
     };
+    interface HTMLScopedCarDetailElement extends Components.ScopedCarDetail, HTMLStencilElement {
+    }
+    var HTMLScopedCarDetailElement: {
+        prototype: HTMLScopedCarDetailElement;
+        new (): HTMLScopedCarDetailElement;
+    };
+    interface HTMLScopedCarListElementEventMap {
+        "carSelected": CarData;
+    }
+    /**
+     * Component that helps display a list of cars
+     */
+    interface HTMLScopedCarListElement extends Components.ScopedCarList, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLScopedCarListElementEventMap>(type: K, listener: (this: HTMLScopedCarListElement, ev: ScopedCarListCustomEvent<HTMLScopedCarListElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLScopedCarListElementEventMap>(type: K, listener: (this: HTMLScopedCarListElement, ev: ScopedCarListCustomEvent<HTMLScopedCarListElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
+    }
+    var HTMLScopedCarListElement: {
+        prototype: HTMLScopedCarListElement;
+        new (): HTMLScopedCarListElement;
+    };
     interface HTMLSlotCmpElement extends Components.SlotCmp, HTMLStencilElement {
     }
     var HTMLSlotCmpElement: {
@@ -372,6 +412,8 @@ declare global {
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prerender-cmp": HTMLPrerenderCmpElement;
         "prop-cmp": HTMLPropCmpElement;
+        "scoped-car-detail": HTMLScopedCarDetailElement;
+        "scoped-car-list": HTMLScopedCarListElement;
         "slot-cmp": HTMLSlotCmpElement;
         "slot-cmp-container": HTMLSlotCmpContainerElement;
         "slot-parent-cmp": HTMLSlotParentCmpElement;
@@ -455,6 +497,17 @@ declare namespace LocalJSX {
          */
         "mode"?: any;
     }
+    interface ScopedCarDetail {
+        "car"?: CarData;
+    }
+    /**
+     * Component that helps display a list of cars
+     */
+    interface ScopedCarList {
+        "cars"?: CarData[];
+        "onCarSelected"?: (event: ScopedCarListCustomEvent<CarData>) => void;
+        "selected"?: CarData;
+    }
     interface SlotCmp {
     }
     interface SlotCmpContainer {
@@ -490,6 +543,8 @@ declare namespace LocalJSX {
         "path-alias-cmp": PathAliasCmp;
         "prerender-cmp": PrerenderCmp;
         "prop-cmp": PropCmp;
+        "scoped-car-detail": ScopedCarDetail;
+        "scoped-car-list": ScopedCarList;
         "slot-cmp": SlotCmp;
         "slot-cmp-container": SlotCmpContainer;
         "slot-parent-cmp": SlotParentCmp;
@@ -531,6 +586,11 @@ declare module "@stencil/core" {
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;
+            "scoped-car-detail": LocalJSX.ScopedCarDetail & JSXBase.HTMLAttributes<HTMLScopedCarDetailElement>;
+            /**
+             * Component that helps display a list of cars
+             */
+            "scoped-car-list": LocalJSX.ScopedCarList & JSXBase.HTMLAttributes<HTMLScopedCarListElement>;
             "slot-cmp": LocalJSX.SlotCmp & JSXBase.HTMLAttributes<HTMLSlotCmpElement>;
             "slot-cmp-container": LocalJSX.SlotCmpContainer & JSXBase.HTMLAttributes<HTMLSlotCmpContainerElement>;
             "slot-parent-cmp": LocalJSX.SlotParentCmp & JSXBase.HTMLAttributes<HTMLSlotParentCmpElement>;

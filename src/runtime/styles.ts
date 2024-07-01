@@ -47,13 +47,7 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
  * @param mode an optional current mode
  * @returns the scope ID for the component of interest
  */
-export const addStyle = (
-  styleContainerNode: Element | Document | ShadowRoot,
-  cmpMeta: d.ComponentRuntimeMeta,
-  mode?: string,
-) => {
-  const styleContainerDocument = styleContainerNode as Document;
-  const styleContainerShadowRoot = styleContainerNode as ShadowRoot;
+export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMeta, mode?: string) => {
   const scopeId = getScopeId(cmpMeta, mode);
   const style = styles.get(scopeId);
 
@@ -66,7 +60,7 @@ export const addStyle = (
 
   if (style) {
     if (typeof style === 'string') {
-      styleContainerNode = styleContainerDocument.head || (styleContainerNode as HTMLElement);
+      styleContainerNode = styleContainerNode.head || (styleContainerNode as HTMLElement);
       let appliedStyles = rootAppliedStyles.get(styleContainerNode);
       let styleElm;
       if (!appliedStyles) {
@@ -75,7 +69,7 @@ export const addStyle = (
       if (!appliedStyles.has(scopeId)) {
         if (
           BUILD.hydrateClientSide &&
-          styleContainerShadowRoot.host &&
+          styleContainerNode.host &&
           (styleElm = styleContainerNode.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`))
         ) {
           // This is only happening on native shadow-dom, do not needs CSS var shim
@@ -106,8 +100,8 @@ export const addStyle = (
           appliedStyles.add(scopeId);
         }
       }
-    } else if (BUILD.constructableCSS && !styleContainerDocument.adoptedStyleSheets.includes(style)) {
-      styleContainerDocument.adoptedStyleSheets = [...styleContainerDocument.adoptedStyleSheets, style];
+    } else if (BUILD.constructableCSS && !styleContainerNode.adoptedStyleSheets.includes(style)) {
+      styleContainerNode.adoptedStyleSheets = [...styleContainerNode.adoptedStyleSheets, style];
     }
   }
   return scopeId;
