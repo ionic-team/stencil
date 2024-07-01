@@ -141,18 +141,18 @@ describe('renderToString', () => {
     });
     expect(html).toMatchSnapshot();
     expect(html).toContain(
-      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.2.2.0" s-id="2"><!--r.2--><section c-id="2.0.0.0"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
+      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.2.2.0" s-id="2"><!--r.2--><section class="sc-car-list" c-id="2.0.0.0"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
     );
     expect(html).toContain(
-      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.4.2.0" s-id="3"><!--r.3--><section c-id="3.0.0.0"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
+      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.4.2.0" s-id="3"><!--r.3--><section class="sc-car-list" c-id="3.0.0.0"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
     );
   });
 
   it('can render a scoped component within a shadow component (sync)', async () => {
     const input = `<car-list cars=${JSON.stringify([vento, beetle])}></car-list>`;
     const expectedResults = [
-      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.2.2.0" s-id="2"><!--r.2--><section c-id="2.0.0.0"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
-      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.4.2.0" s-id="3"><!--r.3--><section c-id="3.0.0.0"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
+      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.2.2.0" s-id="2"><!--r.2--><section class="sc-car-list" c-id="2.0.0.0"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
+      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.4.2.0" s-id="3"><!--r.3--><section class="sc-car-list" c-id="3.0.0.0"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
     ] as const;
     const opts = {
       serializeShadowRoot: true,
