@@ -4,8 +4,8 @@
 ### Bug Fixes
 
 * **hydrate:** partially revert [#5838](https://github.com/ionic-team/stencil/issues/5838) ([#5876](https://github.com/ionic-team/stencil/issues/5876)) ([dfbc340](https://github.com/ionic-team/stencil/commit/dfbc34007a818eef418e2f312a9dd7a0fef81af6))
-* **hydrate:** support server side rendering of components with listener ([#5877](https://github.com/ionic-team/stencil/issues/5877)) ([2c5b7f8](https://github.com/ionic-team/stencil/commit/2c5b7f8ecb9e999e3c584b3a1af5a317f035ae4d))
-* **testing:** add testing sub module to export map ([#5873](https://github.com/ionic-team/stencil/issues/5873)) ([bb2e04f](https://github.com/ionic-team/stencil/commit/bb2e04f488280f12c2db91510d4bb2171e4493e1))
+* **hydrate:** support server side rendering of components with listener ([#5877](https://github.com/ionic-team/stencil/issues/5877)) ([2c5b7f8](https://github.com/ionic-team/stencil/commit/2c5b7f8ecb9e999e3c584b3a1af5a317f035ae4d)), fixes [#5869](https://github.com/ionic-team/stencil/issues/5869)
+* **testing:** add testing sub module to export map ([#5873](https://github.com/ionic-team/stencil/issues/5873)) ([bb2e04f](https://github.com/ionic-team/stencil/commit/bb2e04f488280f12c2db91510d4bb2171e4493e1)), fixes [#5871](https://github.com/ionic-team/stencil/issues/5871) and [#5868](https://github.com/ionic-team/stencil/issues/5868)
 
 
 
