@@ -130,7 +130,7 @@ async function render(win: MockWindow, opts: HydrateFactoryOptions, results: Hyd
   }
 
   initializeWindow(win, win.document, opts, results);
-  const beforeHydrateFn = typeof opts.beforeHydrate === 'function' ? opts.beforeHydrate(win.document) : NOOP;
+  const beforeHydrateFn = typeof opts.beforeHydrate === 'function' ? opts.beforeHydrate : NOOP;
   try {
     await Promise.resolve(beforeHydrateFn(win.document));
     return new Promise<HydrateResults>((resolve) => hydrateFactory(win, opts, results, afterHydrate, resolve));
@@ -162,7 +162,7 @@ async function afterHydrate(
   results: HydrateResults,
   resolve: (results: HydrateResults) => void,
 ) {
-  const afterHydrateFn = typeof opts.afterHydrate === 'function' ? opts.afterHydrate(win.document) : NOOP;
+  const afterHydrateFn = typeof opts.afterHydrate === 'function' ? opts.afterHydrate : NOOP;
   try {
     await Promise.resolve(afterHydrateFn(win.document));
     return resolve(finalizeHydrate(win, win.document, opts, results));
