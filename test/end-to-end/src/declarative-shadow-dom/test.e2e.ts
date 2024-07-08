@@ -253,4 +253,18 @@ describe('renderToString', () => {
       `<car-detail class=\"sc-car-list\" custom-hydrate-flag=\"\" c-id=\"2.4.2.0\" s-id=\"4\"><!--r.4--><section class=\"sc-car-list\" c-id=\"4.0.0.0\"><!--t.4.1.1.0-->2023 VW Beetle</section></car-detail>`,
     );
   });
+
+  it('calls beforeHydrate and afterHydrate function hooks', async () => {
+    const beforeHydrate = jest.fn((doc) => (doc.querySelector('div').textContent = 'Hello Universe'));
+    const afterHydrate = jest.fn();
+
+    const { html } = await renderToString('<div>Hello World</div>', {
+      beforeHydrate,
+      afterHydrate,
+    });
+
+    expect(beforeHydrate).toHaveBeenCalledTimes(1);
+    expect(afterHydrate).toHaveBeenCalledTimes(1);
+    expect(html).toContain('<body><div>Hello Universe</div></body>');
+  });
 });
