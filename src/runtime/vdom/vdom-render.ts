@@ -614,7 +614,8 @@ export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode, isInitialRe
       if (
         // The component gets hydrated and no VDOM has been initialized.
         // Here the comparison can't happen as $name$ property is not set for `leftNode`.
-        '$nodeId$' in leftVNode && isInitialRender &&
+        '$nodeId$' in leftVNode &&
+        isInitialRender &&
         // `leftNode` is not from type HTMLComment which would cause many
         // hydration comments to be removed
         leftVNode.$elm$.nodeType !== 8
