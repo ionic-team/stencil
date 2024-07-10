@@ -610,6 +610,19 @@ export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode, isInitialRe
   // need to have the same element tag, and same key to be the same
   if (leftVNode.$tag$ === rightVNode.$tag$) {
     if (BUILD.slotRelocation && leftVNode.$tag$ === 'slot') {
+      // We are not considering the same node if:
+      if (
+        // The component gets hydrated and no VDOM has been initialized.
+        // Here the comparison can't happen as $name$ property is not set for `leftNode`.
+        '$nodeId$' in leftVNode &&
+        isInitialRender &&
+        // `leftNode` is not from type HTMLComment which would cause many
+        // hydration comments to be removed
+        leftVNode.$elm$.nodeType !== 8
+      ) {
+        return false;
+      }
+
       return leftVNode.$name$ === rightVNode.$name$;
     }
     // this will be set if JSX tags in the build have `key` attrs set on them
