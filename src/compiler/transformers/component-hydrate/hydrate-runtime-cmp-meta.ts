@@ -21,8 +21,7 @@ export const addHydrateRuntimeCmpMeta = (classMembers: ts.ClassElement[], cmp: d
     cmpMeta.$flags$ |= CMP_FLAGS.needsShadowDomShim;
   }
   const staticMember = createStaticGetter('cmpMeta', convertValueToLiteral(cmpMeta));
-  const commentOriginalSelector = cmp.encapsulation === 'shadow';
-  addStaticStyleGetterWithinClass(classMembers, cmp, commentOriginalSelector);
+  addStaticStyleGetterWithinClass(classMembers, cmp);
 
   classMembers.push(staticMember);
 };

@@ -229,7 +229,14 @@ function* streamToHtml(
 
     if (EMPTY_ELEMENTS.has(tagName) === false) {
       const shadowRoot = (node as HTMLElement).shadowRoot;
-      if (opts.serializeShadowRoot && shadowRoot != null) {
+      if (shadowRoot != null) {
+        /**
+         * if user doesn't desire to serialize shadow root, skip over it
+         */
+        if (!opts.serializeShadowRoot) {
+          return;
+        }
+
         output.indent = output.indent + (opts.indentSpaces ?? 0);
 
         yield* streamToHtml(shadowRoot, opts, output);

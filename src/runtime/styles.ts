@@ -84,11 +84,26 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
             styleElm.setAttribute('nonce', nonce);
           }
 
-          if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {
+          if ((BUILD.hydrateServerSide || BUILD.hotModuleReplacement) && (cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation)) {
             styleElm.setAttribute(HYDRATED_STYLE_ID, scopeId);
           }
 
-          styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+          /**
+           * only attach style tag to <head /> section if:
+           */
+          const injectStyle = (
+            /**
+             * we render a scoped component
+             */
+            (cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) ||
+            /**
+             * we are using shadow dom and render the style tag within the shadowRoot
+             */
+            ((cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) && styleContainerNode.nodeName !== 'HEAD')
+          );
+          if (injectStyle) {
+            styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+          }
         }
 
         // Add styles for `slot-fb` elements if we're using slots outside the Shadow DOM

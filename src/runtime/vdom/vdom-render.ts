@@ -105,7 +105,13 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       updateElement(null, newVNode, isSvgMode);
     }
 
-    if ((BUILD.shadowDom || BUILD.scoped) && isDef(scopeId) && elm['s-si'] !== scopeId) {
+    /**
+     * walk up the DOM tree and check if we are in a shadow root because if we are within
+     * a shadow root DOM we don't need to attach scoped class names to the element
+     */
+    const rootNode = elm.getRootNode() as HTMLElement;
+    const isElementWithinShadowRoot = !rootNode.querySelector('body');
+    if (!isElementWithinShadowRoot && BUILD.scoped && isDef(scopeId) && elm['s-si'] !== scopeId) {
       // if there is a scopeId and this is the initial render
       // then let's add the scopeId as a css class
       elm.classList.add((elm['s-si'] = scopeId));

@@ -162,7 +162,7 @@ export const initializeComponent = async (
           BUILD.shadowDomShim &&
           cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim
         ) {
-          style = await import('@utils/shadow-css').then((m) => m.scopeCss(style, scopeId, false));
+          style = await import('@utils/shadow-css').then((m) => m.scopeCss(style, scopeId));
         }
 
         registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
