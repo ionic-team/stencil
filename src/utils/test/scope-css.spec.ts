@@ -15,8 +15,8 @@ import { convertScopedToShadow } from '../../runtime/styles';
 import { scopeCss } from '../shadow-css';
 
 describe('ShadowCss', function () {
-  function s(cssText: string, scopeId: string, commentOriginalSelector = false) {
-    const shim = scopeCss(cssText, scopeId, commentOriginalSelector);
+  function s(cssText: string, scopeId: string) {
+    const shim = scopeCss(cssText, scopeId);
 
     const nlRegexp = /\n/g;
     return normalizeCSS(shim.replace(nlRegexp, ''));
@@ -24,21 +24,6 @@ describe('ShadowCss', function () {
 
   it('should handle empty string', () => {
     expect(s('', 'a')).toEqual('');
-  });
-
-  it('should handle empty string, commented org selector', () => {
-    expect(s('', 'a', true)).toEqual('');
-  });
-
-  it('div', () => {
-    const r = s('div {}', 'sc-ion-tag', true);
-    expect(r).toEqual('/*!@div*/div.sc-ion-tag {}');
-  });
-
-  it('should add an attribute to every rule, commented org selector', () => {
-    const css = 'one {color: red;}two {color: red;}';
-    const expected = '/*!@one*/one.a {color:red;}/*!@two*/two.a {color:red;}';
-    expect(s(css, 'a', true)).toEqual(expected);
   });
 
   it('should add an attribute to every rule', () => {
@@ -71,22 +56,10 @@ describe('ShadowCss', function () {
     expect(s(css, 'a')).toEqual(expected);
   });
 
-  it('should handle media rules, commentOriginalSelector', () => {
-    const css = '@media screen and (max-width:800px, max-height:100%) {div {font-size:50px;}}';
-    const expected = '@media screen and (max-width:800px, max-height:100%) {/*!@div*/div.a {font-size:50px;}}';
-    expect(s(css, 'a', true)).toEqual(expected);
-  });
-
   it('should handle page rules', () => {
     const css = '@page {div {font-size:50px;}}';
     const expected = '@page {div.a {font-size:50px;}}';
     expect(s(css, 'a')).toEqual(expected);
-  });
-
-  it('should handle page rules, commentOriginalSelector', () => {
-    const css = '@page {div {font-size:50px;}}';
-    const expected = '@page {/*!@div*/div.a {font-size:50px;}}';
-    expect(s(css, 'a', true)).toEqual(expected);
   });
 
   it('should handle document rules', () => {
@@ -111,11 +84,6 @@ describe('ShadowCss', function () {
   it('should handle keyframes rules', () => {
     const css = '@keyframes foo {0% {transform:translate(-50%) scaleX(0);}}';
     expect(s(css, 'a')).toEqual(css);
-  });
-
-  it('should handle keyframes rules, commentOriginalSelector', () => {
-    const css = '@keyframes foo {0% {transform:translate(-50%) scaleX(0);}}';
-    expect(s(css, 'a', true)).toEqual(css);
   });
 
   it('should handle -webkit-keyframes rules', () => {
@@ -153,9 +121,6 @@ describe('ShadowCss', function () {
   });
 
   describe(':host', () => {
-    it('should handle no context, commentOriginalSelector', () => {
-      expect(s(':host {}', 'a', true)).toEqual('/*!@:host*/.a-h {}');
-    });
 
     it('should handle no context', () => {
       expect(s(':host {}', 'a')).toEqual('.a-h {}');
@@ -174,11 +139,6 @@ describe('ShadowCss', function () {
       expect(s(':host([a=b]) {}', 'a')).toEqual('[a="b"].a-h {}');
     });
 
-    it('should handle multiple tag selectors, commenting the original selector', () => {
-      expect(s(':host(ul,li) {}', 'a', true)).toEqual('/*!@:host(ul,li)*/ul.a-h, li.a-h {}');
-      expect(s(':host(ul,li) > .z {}', 'a', true)).toEqual('/*!@:host(ul,li) > .z*/ul.a-h > .z.a, li.a-h > .z.a {}');
-    });
-
     it('should handle multiple tag selectors', () => {
       expect(s(':host(ul,li) {}', 'a')).toEqual('ul.a-h, li.a-h {}');
       expect(s(':host(ul,li) > .z {}', 'a')).toEqual('ul.a-h > .z.a, li.a-h > .z.a {}');
@@ -191,10 +151,6 @@ describe('ShadowCss', function () {
 
     it('should handle multiple attribute selectors', () => {
       expect(s(':host([a="b"],[c=d]) {}', 'a')).toEqual('[a="b"].a-h, [c="d"].a-h {}');
-    });
-
-    it('should handle multiple attribute selectors, commentOriginalSelector', () => {
-      expect(s(':host([a="b"],[c=d]) {}', 'a', true)).toEqual('/*!@:host([a="b"],[c=d])*/[a="b"].a-h, [c="d"].a-h {}');
     });
 
     it('should handle pseudo selectors', () => {
@@ -215,13 +171,6 @@ describe('ShadowCss', function () {
   });
 
   describe(':host-context', () => {
-    it('should handle tag selector, commentOriginalSelector', () => {
-      expect(s(':host-context(div) {}', 'a', true)).toEqual('/*!@:host-context(div)*/div.a-h, div .a-h {}');
-      expect(s(':host-context(ul) > .y {}', 'a', true)).toEqual(
-        '/*!@:host-context(ul) > .y*/ul.a-h > .y.a, ul .a-h > .y.a {}',
-      );
-    });
-
     it('should handle tag selector', () => {
       expect(s(':host-context(div) {}', 'a')).toEqual('div.a-h, div .a-h {}');
       expect(s(':host-context(ul) > .y {}', 'a')).toEqual('ul.a-h > .y.a, ul .a-h > .y.a {}');
@@ -247,11 +196,6 @@ describe('ShadowCss', function () {
   });
 
   describe('::slotted', () => {
-    it('should handle *, commentOriginalSelector', () => {
-      const r = s('::slotted(*) {}', 'sc-ion-tag', true);
-      expect(r).toEqual('/*!@::slotted(*)*/.sc-ion-tag-s > * {}');
-    });
-
     it('should handle *', () => {
       const r = s('::slotted(*) {}', 'sc-ion-tag');
       expect(r).toEqual('.sc-ion-tag-s > * {}');
@@ -306,21 +250,9 @@ describe('ShadowCss', function () {
       expect(r).toEqual('.sc-ion-tag-s > * {}, .sc-ion-tag-s > * {}, .sc-ion-tag-s > * {}');
     });
 
-    it('same selectors, commentOriginalSelector', () => {
-      const r = s('::slotted(*) {}, ::slotted(*) {}, ::slotted(*) {}', 'sc-ion-tag', true);
-      expect(r).toEqual(
-        '/*!@::slotted(*)*/.sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}/*!@, ::slotted(*)*/.sc-ion-tag, .sc-ion-tag-s > * {}',
-      );
-    });
-
     it('should combine parent selector when comma', () => {
       const r = s('.a .b, .c ::slotted(*) {}', 'sc-ion-tag');
       expect(r).toEqual('.a.sc-ion-tag .b.sc-ion-tag, .c.sc-ion-tag-s > *, .c .sc-ion-tag-s > * {}');
-    });
-
-    it('should handle multiple selector, commentOriginalSelector', () => {
-      const r = s('::slotted(ul), ::slotted(li) {}', 'sc-ion-tag', true);
-      expect(r).toEqual('/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}');
     });
 
     it('should not replace the selector in a `@supports` rule', () => {

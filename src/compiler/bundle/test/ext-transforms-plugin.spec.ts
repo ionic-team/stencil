@@ -63,7 +63,7 @@ describe('extTransformsPlugin', () => {
 
     const writeFileSpy = jest.spyOn(compilerCtx.fs, 'writeFile');
     return {
-      plugin: extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
+      plugin: extTransformsPlugin(config, compilerCtx, buildCtx),
       config,
       compilerCtx,
       buildCtx,
@@ -100,42 +100,6 @@ describe('extTransformsPlugin', () => {
       expect(normalizePath(path)).toBe('./dist/collectionDir/foo.css');
 
       expect(css).toBe(':host { text: pink; }');
-    });
-
-    describe('passing `commentOriginalSelector` to `transformCssToEsm`', () => {
-      it.each([
-        [false, 'tag=my-component&encapsulation=scoped'],
-        [true, 'tag=my-component&encapsulation=shadow'],
-        [false, 'tag=my-component'],
-      ])('should pass true if %p and hydrate', async (expectation, queryParams) => {
-        const { plugin, transformCssToEsmSpy } = setup({ platform: 'hydrate' });
-        // @ts-ignore the Rollup plugins expect to be called in a Rollup context
-        await plugin.transform('asdf', `/some/stubbed/path/foo.css?${queryParams}`);
-        expect(transformCssToEsmSpy.mock.calls[0][0].commentOriginalSelector).toBe(expectation);
-      });
-
-      it('should pass false if shadow, hydrate, but using HMR in dev watch mode', async () => {
-        const { plugin, transformCssToEsmSpy, config } = setup({ platform: 'hydrate' });
-
-        config.flags.watch = true;
-        config.flags.dev = true;
-        config.flags.serve = true;
-        config.devServer = { reloadStrategy: 'hmr' };
-
-        // @ts-ignore the Rollup plugins expect to be called in a Rollup context
-        await plugin.transform('asdf', '/some/stubbed/path/foo.css?tag=my-component&encapsulation=shadow');
-        expect(transformCssToEsmSpy.mock.calls[0][0].commentOriginalSelector).toBe(false);
-      });
-
-      it.each(['tag=my-component&encapsulation=scoped', 'tag=my-component&encapsulation=shadow', 'tag=my-component'])(
-        'should pass false if %p without hydrate',
-        async (queryParams) => {
-          const { plugin, transformCssToEsmSpy } = setup();
-          // @ts-ignore the Rollup plugins expect to be called in a Rollup context
-          await plugin.transform('asdf', `/some/stubbed/path/foo.css?${queryParams}`);
-          expect(transformCssToEsmSpy.mock.calls[0][0].commentOriginalSelector).toBe(false);
-        },
-      );
     });
   });
 });
