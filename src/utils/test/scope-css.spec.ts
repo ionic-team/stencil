@@ -121,7 +121,6 @@ describe('ShadowCss', function () {
   });
 
   describe(':host', () => {
-
     it('should handle no context', () => {
       expect(s(':host {}', 'a')).toEqual('.a-h {}');
     });

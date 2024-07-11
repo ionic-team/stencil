@@ -425,12 +425,7 @@ const scopeSelector = (selector: string, scopeSelectorText: string, hostSelector
     .join(', ');
 };
 
-const scopeSelectors = (
-  cssText: string,
-  scopeSelectorText: string,
-  hostSelector: string,
-  slotSelector: string,
-) => {
+const scopeSelectors = (cssText: string, scopeSelectorText: string, hostSelector: string, slotSelector: string) => {
   return processRules(cssText, (rule: CssRule) => {
     let selector = rule.selector;
     let content = rule.content;
@@ -453,12 +448,7 @@ const scopeSelectors = (
   });
 };
 
-const scopeCssText = (
-  cssText: string,
-  scopeId: string,
-  hostScopeId: string,
-  slotScopeId: string,
-) => {
+const scopeCssText = (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => {
   cssText = insertPolyfillHostInCssText(cssText);
   cssText = convertColonHost(cssText);
   cssText = convertColonHostContext(cssText);

@@ -35,7 +35,6 @@ const allCmpStyles = new Map<string, ComponentStyleMap>();
  * @param bundleOpts bundle options for Rollup
  * @returns a Rollup plugin which carries out the necessary work
  */
-let i = 0
 export const extTransformsPlugin = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
@@ -57,7 +56,6 @@ export const extTransformsPlugin = (
      * @returns metadata for Rollup or null if no transformation should be done
      */
     async transform(_, id) {
-      const ok = ++i
       if (/\0/.test(id)) {
         return null;
       }
@@ -123,10 +121,6 @@ export const extTransformsPlugin = (
           cmpStyles = allCmpStyles.get(scopeId);
         }
 
-        console.log(ok, '---------------------------------------------');
-        
-        console.log(ok, 'code', data.encapsulation, pluginTransforms.code);
-        
         const cssTransformResults = await compilerCtx.worker.transformCssToEsm({
           file: pluginTransforms.id,
           input: pluginTransforms.code,
@@ -200,13 +194,11 @@ export const extTransformsPlugin = (
                */
               cssTransformResults.styleText;
 
-          console.log(ok, 11, styleText);
           if (styleText.startsWith('/*!@:host')) {
             const a = new Error('styleText');
             console.log(a.stack);
-            
           }
-          
+
           buildCtx.stylesUpdated.push({
             styleTag: data.tag,
             styleMode: data.mode,

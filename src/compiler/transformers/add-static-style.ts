@@ -64,10 +64,7 @@ const getStyleLiteral = (cmp: d.ComponentCompilerMeta) => {
   return null;
 };
 
-const getMultipleModeStyle = (
-  cmp: d.ComponentCompilerMeta,
-  styles: d.StyleCompiler[],
-) => {
+const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompiler[]) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 
   styles.forEach((style) => {
