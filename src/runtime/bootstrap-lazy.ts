@@ -16,8 +16,7 @@ import {
 import { hmrStart } from './hmr-component';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
-import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
-import { convertScopedToShadow, registerStyle } from './styles';
+import { HYDRATED_CSS, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
 import { appDidLoad } from './update-component';
 export { setNonce } from '@platform';
 
@@ -35,10 +34,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const metaCharset = /*@__PURE__*/ head.querySelector('meta[charset]');
   const dataStyles = /*@__PURE__*/ doc.createElement('style');
   const deferredConnectedCallbacks: { connectedCallback: () => void }[] = [];
-  const styles = /*@__PURE__*/ doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let appLoadFallback: any;
   let isBootstrapping = true;
-  let i = 0;
 
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
@@ -51,11 +48,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     // If the app is already hydrated there is not point to disable the
     // async queue. This will improve the first input delay
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
-  }
-  if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-    for (; i < styles.length; i++) {
-      registerStyle(styles[i].getAttribute(HYDRATED_STYLE_ID), convertScopedToShadow(styles[i].innerHTML), true);
-    }
   }
 
   let hasSlotRelocation = false;

@@ -194,11 +194,6 @@ export const extTransformsPlugin = (
                */
               cssTransformResults.styleText;
 
-          if (styleText.startsWith('/*!@:host')) {
-            const a = new Error('styleText');
-            console.log(a.stack);
-          }
-
           buildCtx.stylesUpdated.push({
             styleTag: data.tag,
             styleMode: data.mode,

@@ -11,7 +11,6 @@
  * found in the LICENSE file at https://angular.io/license
  */
 
-import { convertScopedToShadow } from '../../runtime/styles';
 import { scopeCss } from '../shadow-css';
 
 describe('ShadowCss', function () {
@@ -258,38 +257,6 @@ describe('ShadowCss', function () {
       expect(s('@supports selector(::slotted(*)) {::slotted(*) {color: red; }}', 'sc-cmp')).toEqual(
         '@supports selector(::slotted(*)) {.sc-cmp-s > * {color:red;}}',
       );
-    });
-  });
-
-  describe('convertScopedToShadow', () => {
-    it('media query', () => {
-      const input = `@media screen and (max-width:800px, max-height:100%) {/*!@div*/div.a {font-size:50px;}}`;
-      const expected = `@media screen and (max-width:800px, max-height:100%) {div{font-size:50px;}}`;
-      expect(convertScopedToShadow(input)).toBe(expected);
-    });
-
-    it('div', () => {
-      const input = `/*!@div*/div.sc-ion-tag {}`;
-      const expected = `div{}`;
-      expect(convertScopedToShadow(input)).toBe(expected);
-    });
-
-    it('new lines', () => {
-      const input = `/*!@div*/div.sc-ion-tag \n\n\n     \t{}`;
-      const expected = `div{}`;
-      expect(convertScopedToShadow(input)).toBe(expected);
-    });
-
-    it(':host', () => {
-      const input = `/*!@:host*/.a-h {}`;
-      const expected = `:host{}`;
-      expect(convertScopedToShadow(input)).toBe(expected);
-    });
-
-    it('::slotted', () => {
-      const input = `/*!@::slotted(ul), ::slotted(li)*/.sc-ion-tag-s > ul, .sc-ion-tag-s > li {}`;
-      const expected = `::slotted(ul), ::slotted(li){}`;
-      expect(convertScopedToShadow(input)).toBe(expected);
     });
   });
 
