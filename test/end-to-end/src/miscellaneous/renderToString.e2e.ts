@@ -45,7 +45,7 @@ describe('renderToString', () => {
      * renders hydration styles and custom link tag within the head tag
      */
     expect(html).toContain(
-      '}</style> <link rel=\"stylesheet\" href=\"whatever.css\"> </head> <body> <div class=\"__next\"> <main> <car-list',
+      '}</style> <link rel="stylesheet" href="whatever.css"> </head> <body> <div class="__next"> <main> <car-list',
     );
   });
 
@@ -79,7 +79,7 @@ describe('renderToString', () => {
      * renders hydration styles and custom link tag within the head tag
      */
     expect(html).toContain(
-      '.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style><link rel=\"stylesheet\" href=\"whatever.css\"> </head> <body> <div class=\"__next\"> <main> <scoped-car-list cars=',
+      '.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style><link rel="stylesheet" href="whatever.css"> </head> <body> <div class="__next"> <main> <scoped-car-list cars=',
     );
   });
 });

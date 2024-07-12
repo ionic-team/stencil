@@ -6,12 +6,14 @@ import { Component, h } from '@stencil/core';
 })
 export class ServerVSClientCmp {
   render() {
-    return <div>
+    return (
       <div>
         <div>
-          <slot></slot>
+          <div>
+            <slot></slot>
+          </div>
         </div>
       </div>
-    </div>;
+    );
   }
 }

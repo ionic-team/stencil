@@ -84,14 +84,17 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
             styleElm.setAttribute('nonce', nonce);
           }
 
-          if ((BUILD.hydrateServerSide || BUILD.hotModuleReplacement) && (cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation)) {
+          if (
+            (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) &&
+            cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation
+          ) {
             styleElm.setAttribute(HYDRATED_STYLE_ID, scopeId);
           }
 
           /**
            * only attach style tag to <head /> section if:
            */
-          const injectStyle = (
+          const injectStyle =
             /**
              * we render a scoped component
              */
@@ -99,8 +102,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
             /**
              * we are using shadow dom and render the style tag within the shadowRoot
              */
-            ((cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) && styleContainerNode.nodeName !== 'HEAD')
-          );
+            (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && styleContainerNode.nodeName !== 'HEAD');
           if (injectStyle) {
             styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
           }
@@ -139,7 +141,12 @@ export const attachStyles = (hostRef: d.HostRef) => {
     hostRef.$modeName$,
   );
 
-  if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation && (flags & CMP_FLAGS.scopedCssEncapsulation)) {
+  if (
+    (BUILD.shadowDom || BUILD.scoped) &&
+    BUILD.cssAnnotations &&
+    flags & CMP_FLAGS.needsScopedEncapsulation &&
+    flags & CMP_FLAGS.scopedCssEncapsulation
+  ) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR

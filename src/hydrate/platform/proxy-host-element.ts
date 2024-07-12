@@ -5,10 +5,7 @@ import { CMP_FLAGS, MEMBER_FLAGS } from '@utils';
 
 import type * as d from '../../declarations';
 
-export function proxyHostElement(
-  elm: d.HostElement,
-  cmpMeta: d.ComponentRuntimeMeta,
-): void {
+export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta): void {
   if (typeof elm.componentOnReady !== 'function') {
     elm.componentOnReady = componentOnReady;
   }
