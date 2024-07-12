@@ -32,7 +32,6 @@ const allCmpStyles = new Map<string, ComponentStyleMap>();
  * @param config a user-supplied configuration
  * @param compilerCtx the current compiler context
  * @param buildCtx the current build context
- * @param bundleOpts bundle options for Rollup
  * @returns a Rollup plugin which carries out the necessary work
  */
 export const extTransformsPlugin = (
