@@ -29,7 +29,7 @@ function normalizeSerializationOptions(opts: Partial<SerializeNodeToHtmlOptions>
     removeBooleanAttributeQuotes:
       typeof opts.removeBooleanAttributeQuotes !== 'boolean' ? false : opts.removeBooleanAttributeQuotes,
     removeHtmlComments: typeof opts.removeHtmlComments !== 'boolean' ? false : opts.removeHtmlComments,
-    serializeShadowRoot: typeof opts.serializeShadowRoot !== 'boolean' ? false : opts.serializeShadowRoot,
+    serializeShadowRoot: typeof opts.serializeShadowRoot !== 'boolean' ? true : opts.serializeShadowRoot,
     fullDocument: typeof opts.fullDocument !== 'boolean' ? true : opts.fullDocument,
   } as const;
 }
@@ -229,14 +229,7 @@ function* streamToHtml(
 
     if (EMPTY_ELEMENTS.has(tagName) === false) {
       const shadowRoot = (node as HTMLElement).shadowRoot;
-      if (shadowRoot != null) {
-        /**
-         * if user doesn't desire to serialize shadow root, skip over it
-         */
-        if (!opts.serializeShadowRoot) {
-          return;
-        }
-
+      if (shadowRoot != null && opts.serializeShadowRoot) {
         output.indent = output.indent + (opts.indentSpaces ?? 0);
 
         yield* streamToHtml(shadowRoot, opts, output);

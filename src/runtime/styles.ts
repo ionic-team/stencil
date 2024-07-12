@@ -102,6 +102,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
             ((cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) && styleContainerNode.nodeName !== 'HEAD')
           );
           if (injectStyle) {
+            console.log
             styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
           }
         }
@@ -139,7 +140,7 @@ export const attachStyles = (hostRef: d.HostRef) => {
     hostRef.$modeName$,
   );
 
-  if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {
+  if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation && (flags & CMP_FLAGS.scopedCssEncapsulation)) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR

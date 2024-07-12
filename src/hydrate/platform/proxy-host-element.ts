@@ -8,7 +8,6 @@ import type * as d from '../../declarations';
 export function proxyHostElement(
   elm: d.HostElement,
   cmpMeta: d.ComponentRuntimeMeta,
-  opts: d.HydrateFactoryOptions,
 ): void {
   if (typeof elm.componentOnReady !== 'function') {
     elm.componentOnReady = componentOnReady;
@@ -26,14 +25,8 @@ export function proxyHostElement(
         mode: 'open',
         delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
       });
-    } else if (opts.serializeShadowRoot) {
-      elm.attachShadow({ mode: 'open' });
     } else {
-      /**
-       * For hydration users may want to render the shadow component as scoped
-       * component, so we need to assign the element as shadowRoot.
-       */
-      (elm as any).shadowRoot = elm;
+      elm.attachShadow({ mode: 'open' });
     }
   }
 
