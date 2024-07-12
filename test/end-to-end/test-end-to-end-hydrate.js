@@ -30,7 +30,11 @@ async function main() {
   if (results.hydratedCount !== 2) {
     throw new Error(`invalid hydratedCount: ${results.hydratedCount}`);
   }
-  if (results.components.length !== 2 || results.components[0].tag !== 'prerender-cmp' || results.components[1].tag !== 'slot-cmp') {
+  if (
+    results.components.length !== 2 ||
+    results.components[0].tag !== 'prerender-cmp' ||
+    results.components[1].tag !== 'slot-cmp'
+  ) {
     throw new Error(`invalid components: ${results.components}`);
   }
   if (results.httpStatus !== 200) {
