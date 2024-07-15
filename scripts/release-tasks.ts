@@ -6,6 +6,29 @@ import { BuildOptions } from './utils/options';
 import { isPrereleaseVersion, isValidVersionInput, SEMVER_INCREMENTS, updateChangeLog } from './utils/release-utils';
 
 /**
+ * We have to wrap execa in a promise to ensure it works with Listr. Listr uses rxjs under the hood which
+ * seems to have issues with execa's `ResultPromise` as it never resolves a task.
+ * @param command command to run
+ * @param args    arguments to pass to the command
+ * @param options execa options
+ * @returns a promise that resolves with the stdout and stderr of the command
+ */
+async function execa(command: string, args: string[], options?: any) {
+  /**
+   * consecutive imports are cached and don't have an impact on the execution speed
+   */
+  const { execa: execaOrig } = await import('execa');
+
+  return new Promise<{ stdout: string, stderr: string }>((resolve, reject) => {
+    const run = execaOrig(command, args, options);
+    run.then(({ stdout, stderr }) => resolve({
+      stdout: stdout as unknown as string,
+      stderr: stderr as unknown as string
+    }), (err) => reject(err))
+  })
+}
+
+/**
  * Runs a litany of tasks used to ensure a safe release of a new version of Stencil
  * @param opts build options containing the metadata needed to release a new version of Stencil
  * @param args stringified arguments used to influence the release steps that are taken
@@ -17,8 +40,6 @@ export async function runReleaseTasks(opts: BuildOptions, args: ReadonlyArray<st
   const newVersion = opts.version;
   const isDryRun = args.includes('--dry-run') || opts.version.includes('dryrun');
   let tagPrefix: string;
-
-  const { execa } = await import('execa');
 
   if (isDryRun) {
     console.log(color.bold.yellow(`\n  🏃‍ Dry Run!\n`));
