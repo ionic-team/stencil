@@ -57,7 +57,7 @@
     {
       // Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
-      allowedVersions: '<5.5.0',
+      allowedVersions: '<5.6.0',
       commitMessagePrefix: "feat(typescript):"
     },
     {
@@ -152,7 +152,7 @@
   rebaseWhen: 'never',
   /**
    * Cron syntax to run at midnight (UTC) on the first day of every month
-   * 
+   *
    * Note: Renovate does not support minute value granularity, so the wildcard value is necessary
    */
   schedule: ["* 0 1 * *"],
