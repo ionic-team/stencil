@@ -36,6 +36,7 @@ describe('renderToString', () => {
       </html>`,
       { fullDocument: true, serializeShadowRoot: false },
     );
+
     /**
      * starts with a DocType and HTML tag
      */
@@ -44,7 +45,7 @@ describe('renderToString', () => {
      * renders hydration styles and custom link tag within the head tag
      */
     expect(html).toContain(
-      'selected.sc-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style><link rel="stylesheet" href="whatever.css"> </head> <body>',
+      '}</style> <link rel="stylesheet" href="whatever.css"> </head> <body> <div class="__next"> <main> <car-list',
     );
   });
 
@@ -78,7 +79,7 @@ describe('renderToString', () => {
      * renders hydration styles and custom link tag within the head tag
      */
     expect(html).toContain(
-      '.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style><style sty-id="sc-another-car-detail">/*!@section*/section.sc-another-car-detail{color:green}</style><link rel="stylesheet" href="whatever.css"> </head> <body> <div class="__next"> <main> <scoped-car-list',
+      '.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style><link rel="stylesheet" href="whatever.css"> </head> <body> <div class="__next"> <main> <scoped-car-list cars=',
     );
   });
 });

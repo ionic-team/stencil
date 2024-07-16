@@ -65,10 +65,11 @@ describe('renderToString', () => {
     expect(await readableToString(streamToString(input))).toContain(renderedHTML);
   });
 
-  it('renders scoped component', async () => {
+  it('can render a simple shadow component', async () => {
     const { html } = await renderToString('<another-car-detail></another-car-detail>', {
       serializeShadowRoot: true,
       fullDocument: false,
+      prettyHtml: true,
     });
     expect(html).toMatchSnapshot();
   });
@@ -79,6 +80,7 @@ describe('renderToString', () => {
       {
         serializeShadowRoot: true,
         fullDocument: false,
+        prettyHtml: true,
       },
     );
     expect(html).toMatchSnapshot();
@@ -89,6 +91,7 @@ describe('renderToString', () => {
     const { html } = await renderToString(`<another-car-detail car=${JSON.stringify(vento)}></another-car-detail>`, {
       serializeShadowRoot: true,
       fullDocument: false,
+      prettyHtml: true,
     });
     expect(html).toMatchSnapshot();
     expect(html).toContain('2024 VW Vento');
@@ -102,7 +105,7 @@ describe('renderToString', () => {
         fullDocument: false,
       },
     );
-    expect(html).toContain('<section class="sc-another-car-detail" c-id="1.0.0.0"><!--t.1.1.1.0--> </section>');
+    expect(html).toContain('<section c-id="1.0.0.0"><!--t.1.1.1.0--> </section>');
   });
 
   it('supports styles for DSD', async () => {
@@ -110,7 +113,7 @@ describe('renderToString', () => {
       serializeShadowRoot: true,
       fullDocument: false,
     });
-    expect(html).toContain('section.sc-another-car-detail{color:green}');
+    expect(html).toContain('<template shadowrootmode="open"><style>section{color:green}</style>');
   });
 
   it('only returns the element if we render to DSD', async () => {
@@ -127,6 +130,7 @@ describe('renderToString', () => {
       {
         serializeShadowRoot: true,
         fullDocument: false,
+        prettyHtml: true,
       },
     );
     expect(html).toMatchSnapshot();
@@ -141,18 +145,18 @@ describe('renderToString', () => {
     });
     expect(html).toMatchSnapshot();
     expect(html).toContain(
-      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.2.2.0" s-id="2"><!--r.2--><section class="sc-car-list" c-id="2.0.0.0"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
+      `<car-detail custom-hydrate-flag=\"\" c-id=\"1.2.2.0\" s-id=\"2\"><!--r.2--><section c-id=\"2.0.0.0\"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>`,
     );
     expect(html).toContain(
-      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.4.2.0" s-id="3"><!--r.3--><section class="sc-car-list" c-id="3.0.0.0"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
+      `<car-detail custom-hydrate-flag=\"\" c-id=\"1.4.2.0\" s-id=\"3\"><!--r.3--><section c-id=\"3.0.0.0\"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>`,
     );
   });
 
   it('can render a scoped component within a shadow component (sync)', async () => {
     const input = `<car-list cars=${JSON.stringify([vento, beetle])}></car-list>`;
     const expectedResults = [
-      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.2.2.0" s-id="2"><!--r.2--><section class="sc-car-list" c-id="2.0.0.0"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
-      '<car-detail class="sc-car-list" custom-hydrate-flag="" c-id="1.4.2.0" s-id="3"><!--r.3--><section class="sc-car-list" c-id="3.0.0.0"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
+      '<car-detail custom-hydrate-flag="" c-id="1.2.2.0" s-id="2"><!--r.2--><section c-id="2.0.0.0"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
+      '<car-detail custom-hydrate-flag="" c-id="1.4.2.0" s-id="3"><!--r.3--><section c-id="3.0.0.0"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
     ] as const;
     const opts = {
       serializeShadowRoot: true,
@@ -221,21 +225,20 @@ describe('renderToString', () => {
     /**
      * renders the component with listener with proper vdom annotation, e.g.
      * ```html
-     * <dsd-listen-cmp class="sc-dsd-listen-cmp-h" custom-hydrate-flag="" s-id="1">
+     * <dsd-listen-cmp custom-hydrate-flag="" s-id="1">
      *   <template shadowrootmode="open">
      *     <style sty-id="sc-dsd-listen-cmp">
      *       .sc-dsd-listen-cmp-h{display:block}
      *     </style>
-     *     <slot c-id="1.0.0.0" class="sc-dsd-listen-cmp"></slot>
+     *     <slot c-id="1.0.0.0"></slot>
      *   </template>
      *   <!--r.1-->
      *   Hello World
      * </dsd-listen-cmp>
      * ```
      */
-
     expect(html).toContain(
-      `<dsd-listen-cmp class=\"sc-dsd-listen-cmp-h\" custom-hydrate-flag=\"\" s-id=\"1\"><template shadowrootmode=\"open\"><style sty-id=\"sc-dsd-listen-cmp\">/*!@:host*/.sc-dsd-listen-cmp-h{display:block}</style><slot class=\"sc-dsd-listen-cmp\" c-id=\"1.0.0.0\"></slot></template><!--r.1-->Hello World</dsd-listen-cmp>`,
+      `<dsd-listen-cmp custom-hydrate-flag=\"\" s-id=\"1\"><template shadowrootmode=\"open\"><style>:host{display:block}</style><slot c-id=\"1.0.0.0\"></slot></template><!--r.1-->Hello World</dsd-listen-cmp>`,
     );
 
     /**
@@ -250,7 +253,7 @@ describe('renderToString', () => {
      * </car-detail>
      */
     expect(html).toContain(
-      `<car-detail class=\"sc-car-list\" custom-hydrate-flag=\"\" c-id=\"2.4.2.0\" s-id=\"4\"><!--r.4--><section class=\"sc-car-list\" c-id=\"4.0.0.0\"><!--t.4.1.1.0-->2023 VW Beetle</section></car-detail>`,
+      `<car-detail custom-hydrate-flag=\"\" c-id=\"2.4.2.0\" s-id=\"4\"><!--r.4--><section c-id=\"4.0.0.0\"><!--t.4.1.1.0-->2023 VW Beetle</section></car-detail>`,
     );
   });
 
@@ -266,5 +269,21 @@ describe('renderToString', () => {
     expect(beforeHydrate).toHaveBeenCalledTimes(1);
     expect(afterHydrate).toHaveBeenCalledTimes(1);
     expect(html).toContain('<body><div>Hello Universe</div></body>');
+  });
+
+  it('does not render a shadow component if serializeShadowRoot is false', async () => {
+    const { html } = await renderToString('<another-car-detail></another-car-detail>', {
+      serializeShadowRoot: false,
+      fullDocument: false,
+    });
+    expect(html).toBe('<another-car-detail custom-hydrate-flag="" s-id="1"><!--r.1--></another-car-detail>');
+  });
+
+  it('does not render a shadow component but its light dom', async () => {
+    const { html } = await renderToString('<cmp-with-slot>Hello World</cmp-with-slot>', {
+      serializeShadowRoot: false,
+      fullDocument: false,
+    });
+    expect(html).toBe('<cmp-with-slot custom-hydrate-flag="" s-id="1"><!--r.1-->Hello World</cmp-with-slot>');
   });
 });

@@ -1938,7 +1938,6 @@ export interface TransformCssToEsmInput {
    * is not shared by multiple fields, nor is it a composite of multiple modes).
    */
   mode?: string;
-  commentOriginalSelector?: boolean;
   sourceMap?: boolean;
   minify?: boolean;
   docs?: boolean;

@@ -425,13 +425,7 @@ const scopeSelector = (selector: string, scopeSelectorText: string, hostSelector
     .join(', ');
 };
 
-const scopeSelectors = (
-  cssText: string,
-  scopeSelectorText: string,
-  hostSelector: string,
-  slotSelector: string,
-  commentOriginalSelector: boolean,
-) => {
+const scopeSelectors = (cssText: string, scopeSelectorText: string, hostSelector: string, slotSelector: string) => {
   return processRules(cssText, (rule: CssRule) => {
     let selector = rule.selector;
     let content = rule.content;
@@ -443,7 +437,7 @@ const scopeSelectors = (
       rule.selector.startsWith('@page') ||
       rule.selector.startsWith('@document')
     ) {
-      content = scopeSelectors(rule.content, scopeSelectorText, hostSelector, slotSelector, commentOriginalSelector);
+      content = scopeSelectors(rule.content, scopeSelectorText, hostSelector, slotSelector);
     }
 
     const cssRule: CssRule = {
@@ -454,13 +448,7 @@ const scopeSelectors = (
   });
 };
 
-const scopeCssText = (
-  cssText: string,
-  scopeId: string,
-  hostScopeId: string,
-  slotScopeId: string,
-  commentOriginalSelector: boolean,
-) => {
+const scopeCssText = (cssText: string, scopeId: string, hostScopeId: string, slotScopeId: string) => {
   cssText = insertPolyfillHostInCssText(cssText);
   cssText = convertColonHost(cssText);
   cssText = convertColonHostContext(cssText);
@@ -470,7 +458,7 @@ const scopeCssText = (
   cssText = convertShadowDOMSelectors(cssText);
 
   if (scopeId) {
-    cssText = scopeSelectors(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
+    cssText = scopeSelectors(cssText, scopeId, hostScopeId, slotScopeId);
   }
 
   cssText = replaceShadowCssHost(cssText, hostScopeId);
@@ -499,52 +487,15 @@ const replaceShadowCssHost = (cssText: string, hostScopeId: string) => {
   return cssText.replace(/-shadowcsshost-no-combinator/g, `.${hostScopeId}`);
 };
 
-export const scopeCss = (cssText: string, scopeId: string, commentOriginalSelector: boolean) => {
+export const scopeCss = (cssText: string, scopeId: string) => {
   const hostScopeId = scopeId + '-h';
   const slotScopeId = scopeId + '-s';
 
   const commentsWithHash = extractCommentsWithHash(cssText);
 
   cssText = stripComments(cssText);
-  const orgSelectors: {
-    placeholder: string;
-    comment: string;
-  }[] = [];
-
-  if (commentOriginalSelector) {
-    const processCommentedSelector = (rule: CssRule) => {
-      const placeholder = `/*!@___${orgSelectors.length}___*/`;
-      const comment = `/*!@${rule.selector}*/`;
-
-      orgSelectors.push({ placeholder, comment });
-      rule.selector = placeholder + rule.selector;
-      return rule;
-    };
-
-    cssText = processRules(cssText, (rule) => {
-      if (rule.selector[0] !== '@') {
-        return processCommentedSelector(rule);
-      } else if (
-        rule.selector.startsWith('@media') ||
-        rule.selector.startsWith('@supports') ||
-        rule.selector.startsWith('@page') ||
-        rule.selector.startsWith('@document')
-      ) {
-        rule.content = processRules(rule.content, processCommentedSelector);
-        return rule;
-      }
-      return rule;
-    });
-  }
-
-  const scoped = scopeCssText(cssText, scopeId, hostScopeId, slotScopeId, commentOriginalSelector);
+  const scoped = scopeCssText(cssText, scopeId, hostScopeId, slotScopeId);
   cssText = [scoped.cssText, ...commentsWithHash].join('\n');
-
-  if (commentOriginalSelector) {
-    orgSelectors.forEach(({ placeholder, comment }) => {
-      cssText = cssText.replace(placeholder, comment);
-    });
-  }
 
   scoped.slottedSelectors.forEach((slottedSelector) => {
     const regex = new RegExp(escapeRegExpSpecialCharacters(slottedSelector.orgSelector), 'g');

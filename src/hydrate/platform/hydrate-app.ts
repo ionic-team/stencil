@@ -91,7 +91,7 @@ export function hydrateApp(
             registerHost(elm, Cstr.cmpMeta);
 
             // proxy the host element with the component's metadata
-            proxyHostElement(elm, Cstr.cmpMeta, opts);
+            proxyHostElement(elm, Cstr.cmpMeta);
           }
         }
       }

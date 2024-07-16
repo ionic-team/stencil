@@ -16,14 +16,12 @@ import { createStaticGetter, getExternalStyles } from './transform-utils';
  * @param classMembers a class to existing members of a class. **this parameter will be mutated** rather than returning
  * a cloned version
  * @param cmp the metadata associated with the component being evaluated
- * @param commentOriginalSelector if `true`, add a comment with the original CSS selector to the style.
  */
 export const addStaticStyleGetterWithinClass = (
   classMembers: ts.ClassElement[],
   cmp: d.ComponentCompilerMeta,
-  commentOriginalSelector: boolean,
 ): void => {
-  const styleLiteral = getStyleLiteral(cmp, commentOriginalSelector);
+  const styleLiteral = getStyleLiteral(cmp);
   if (styleLiteral) {
     classMembers.push(createStaticGetter('style', styleLiteral));
   }
@@ -41,7 +39,7 @@ export const addStaticStyleGetterWithinClass = (
  * @param cmp the metadata associated with the component being evaluated
  */
 export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], cmp: d.ComponentCompilerMeta): void => {
-  const styleLiteral = getStyleLiteral(cmp, false);
+  const styleLiteral = getStyleLiteral(cmp);
   if (styleLiteral) {
     const statement = ts.factory.createExpressionStatement(
       ts.factory.createAssignment(
@@ -53,24 +51,20 @@ export const addStaticStylePropertyToClass = (styleStatements: ts.Statement[], c
   }
 };
 
-const getStyleLiteral = (cmp: d.ComponentCompilerMeta, commentOriginalSelector: boolean) => {
+const getStyleLiteral = (cmp: d.ComponentCompilerMeta) => {
   if (Array.isArray(cmp.styles) && cmp.styles.length > 0) {
     if (cmp.styles.length > 1 || (cmp.styles.length === 1 && cmp.styles[0].modeName !== DEFAULT_STYLE_MODE)) {
       // multiple style modes
-      return getMultipleModeStyle(cmp, cmp.styles, commentOriginalSelector);
+      return getMultipleModeStyle(cmp, cmp.styles);
     } else {
       // single style
-      return getSingleStyle(cmp, cmp.styles[0], commentOriginalSelector);
+      return getSingleStyle(cmp, cmp.styles[0]);
     }
   }
   return null;
 };
 
-const getMultipleModeStyle = (
-  cmp: d.ComponentCompilerMeta,
-  styles: d.StyleCompiler[],
-  commentOriginalSelector: boolean,
-) => {
+const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompiler[]) => {
   const styleModes: ts.ObjectLiteralElementLike[] = [];
 
   styles.forEach((style) => {
@@ -83,7 +77,7 @@ const getMultipleModeStyle = (
     if (typeof style.styleStr === 'string') {
       // inline the style string
       // static get style() { return { ios: "string" }; }
-      const styleLiteral = createStyleLiteral(cmp, style, commentOriginalSelector);
+      const styleLiteral = createStyleLiteral(cmp, style);
       const propStr = ts.factory.createPropertyAssignment(style.modeName, styleLiteral);
       styleModes.push(propStr);
     } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
@@ -106,7 +100,7 @@ const getMultipleModeStyle = (
   return ts.factory.createObjectLiteralExpression(styleModes, true);
 };
 
-const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, commentOriginalSelector: boolean) => {
+const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
   /**
    * the order of these if statements must match with
    * - {@link src/compiler/transformers/component-native/native-static-style.ts#addSingleStyleGetter}
@@ -116,7 +110,7 @@ const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, co
   if (typeof style.styleStr === 'string') {
     // inline the style string
     // static get style() { return "string"; }
-    return createStyleLiteral(cmp, style, commentOriginalSelector);
+    return createStyleLiteral(cmp, style);
   }
 
   if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
@@ -136,11 +130,11 @@ const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, co
   return null;
 };
 
-const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, commentOriginalSelector: boolean) => {
-  if (cmp.encapsulation === 'scoped' || (commentOriginalSelector && cmp.encapsulation === 'shadow')) {
+const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+  if (cmp.encapsulation === 'scoped') {
     // scope the css first
     const scopeId = getScopeId(cmp.tagName, style.modeName);
-    return ts.factory.createStringLiteral(scopeCss(style.styleStr, scopeId, commentOriginalSelector));
+    return ts.factory.createStringLiteral(scopeCss(style.styleStr, scopeId));
   }
 
   return ts.factory.createStringLiteral(style.styleStr);

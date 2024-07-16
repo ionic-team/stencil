@@ -43,6 +43,8 @@ export namespace Components {
     }
     interface CmpServerVsClient {
     }
+    interface CmpWithSlot {
+    }
     interface DomApi {
     }
     interface DomInteraction {
@@ -241,6 +243,12 @@ declare global {
         prototype: HTMLCmpServerVsClientElement;
         new (): HTMLCmpServerVsClientElement;
     };
+    interface HTMLCmpWithSlotElement extends Components.CmpWithSlot, HTMLStencilElement {
+    }
+    var HTMLCmpWithSlotElement: {
+        prototype: HTMLCmpWithSlotElement;
+        new (): HTMLCmpWithSlotElement;
+    };
     interface HTMLDomApiElement extends Components.DomApi, HTMLStencilElement {
     }
     var HTMLDomApiElement: {
@@ -406,6 +414,7 @@ declare global {
         "cmp-c": HTMLCmpCElement;
         "cmp-dsd": HTMLCmpDsdElement;
         "cmp-server-vs-client": HTMLCmpServerVsClientElement;
+        "cmp-with-slot": HTMLCmpWithSlotElement;
         "dom-api": HTMLDomApiElement;
         "dom-interaction": HTMLDomInteractionElement;
         "dom-visible": HTMLDomVisibleElement;
@@ -466,6 +475,8 @@ declare namespace LocalJSX {
         "initialCounter"?: number;
     }
     interface CmpServerVsClient {
+    }
+    interface CmpWithSlot {
     }
     interface DomApi {
     }
@@ -540,6 +551,7 @@ declare namespace LocalJSX {
         "cmp-c": CmpC;
         "cmp-dsd": CmpDsd;
         "cmp-server-vs-client": CmpServerVsClient;
+        "cmp-with-slot": CmpWithSlot;
         "dom-api": DomApi;
         "dom-interaction": DomInteraction;
         "dom-visible": DomVisible;
@@ -584,6 +596,7 @@ declare module "@stencil/core" {
             "cmp-c": LocalJSX.CmpC & JSXBase.HTMLAttributes<HTMLCmpCElement>;
             "cmp-dsd": LocalJSX.CmpDsd & JSXBase.HTMLAttributes<HTMLCmpDsdElement>;
             "cmp-server-vs-client": LocalJSX.CmpServerVsClient & JSXBase.HTMLAttributes<HTMLCmpServerVsClientElement>;
+            "cmp-with-slot": LocalJSX.CmpWithSlot & JSXBase.HTMLAttributes<HTMLCmpWithSlotElement>;
             "dom-api": LocalJSX.DomApi & JSXBase.HTMLAttributes<HTMLDomApiElement>;
             "dom-interaction": LocalJSX.DomInteraction & JSXBase.HTMLAttributes<HTMLDomInteractionElement>;
             "dom-visible": LocalJSX.DomVisible & JSXBase.HTMLAttributes<HTMLDomVisibleElement>;

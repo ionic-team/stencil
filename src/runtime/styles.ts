@@ -84,11 +84,28 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
             styleElm.setAttribute('nonce', nonce);
           }
 
-          if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {
+          if (
+            (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) &&
+            cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation
+          ) {
             styleElm.setAttribute(HYDRATED_STYLE_ID, scopeId);
           }
 
-          styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+          /**
+           * only attach style tag to <head /> section if:
+           */
+          const injectStyle =
+            /**
+             * we render a scoped component
+             */
+            !(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) ||
+            /**
+             * we are using shadow dom and render the style tag within the shadowRoot
+             */
+            (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && styleContainerNode.nodeName !== 'HEAD');
+          if (injectStyle) {
+            styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+          }
         }
 
         // Add styles for `slot-fb` elements if we're using slots outside the Shadow DOM
@@ -124,7 +141,12 @@ export const attachStyles = (hostRef: d.HostRef) => {
     hostRef.$modeName$,
   );
 
-  if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {
+  if (
+    (BUILD.shadowDom || BUILD.scoped) &&
+    BUILD.cssAnnotations &&
+    flags & CMP_FLAGS.needsScopedEncapsulation &&
+    flags & CMP_FLAGS.scopedCssEncapsulation
+  ) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR
@@ -151,34 +173,6 @@ export const attachStyles = (hostRef: d.HostRef) => {
  */
 export const getScopeId = (cmp: d.ComponentRuntimeMeta, mode?: string) =>
   'sc-' + (BUILD.mode && mode && cmp.$flags$ & CMP_FLAGS.hasMode ? cmp.$tagName$ + '-' + mode : cmp.$tagName$);
-
-/**
- * Convert a 'scoped' CSS string to one appropriate for use in the shadow DOM.
- *
- * Given a 'scoped' CSS string that looks like this:
- *
- * ```
- * /*!@div*\/div.class-name { display: flex };
- * ```
- *
- * Convert it to a 'shadow' appropriate string, like so:
- *
- * ```
- *  /*!@div*\/div.class-name { display: flex }
- *      ─┬─                  ────────┬────────
- *       │                           │
- *       │         ┌─────────────────┘
- *       ▼         ▼
- *      div{ display: flex }
- * ```
- *
- * Note that forward-slashes in the above are escaped so they don't end the
- * comment.
- *
- * @param css a CSS string to convert
- * @returns the converted string
- */
-export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
 
 declare global {
   export interface CSSStyleSheet {

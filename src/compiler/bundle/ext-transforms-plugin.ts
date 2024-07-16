@@ -5,7 +5,6 @@ import type * as d from '../../declarations';
 import { runPluginTransformsEsmImports } from '../plugin/plugin';
 import { getScopeId } from '../style/scope-css';
 import { parseImportPath } from '../transformers/stencil-import-path';
-import type { BundleOptions } from './bundle-interface';
 
 /**
  * This keeps a map of all the component styles we've seen already so we can create
@@ -33,14 +32,12 @@ const allCmpStyles = new Map<string, ComponentStyleMap>();
  * @param config a user-supplied configuration
  * @param compilerCtx the current compiler context
  * @param buildCtx the current build context
- * @param bundleOpts bundle options for Rollup
  * @returns a Rollup plugin which carries out the necessary work
  */
 export const extTransformsPlugin = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  bundleOpts: BundleOptions,
 ): Plugin => {
   return {
     name: 'extTransformsPlugin',
@@ -94,24 +91,6 @@ export const extTransformsPlugin = (
 
         const pluginTransforms = await runPluginTransformsEsmImports(config, compilerCtx, buildCtx, code, filePath);
 
-        // We need to check whether the current build is a dev-mode watch build w/ HMR enabled in
-        // order to know how we'll want to set `commentOriginalSelector` (below). If we are doing
-        // a hydrate build we need to set this to `true` because commenting-out selectors is what
-        // gives us support for scoped CSS w/ hydrated components (we don't support shadow DOM and
-        // styling via that route for them). However, we don't want to comment selectors in dev
-        // mode when using HMR in the browser, since there we _do_ support putting stylesheets into
-        // the shadow DOM and commenting out e.g. the `:host` selector in those stylesheets will
-        // break components' CSS when an HMR update is sent to the browser.
-        //
-        // See https://github.com/ionic-team/stencil/issues/3461 for details
-        const isDevWatchHMRBuild =
-          config.flags.watch &&
-          config.flags.dev &&
-          config.flags.serve &&
-          (config.devServer?.reloadStrategy ?? null) === 'hmr';
-        const commentOriginalSelector =
-          bundleOpts.platform === 'hydrate' && data.encapsulation === 'shadow' && !isDevWatchHMRBuild;
-
         if (data.tag) {
           cmp = buildCtx.components.find((c) => c.tagName === data.tag);
           const moduleFile = cmp && compilerCtx.moduleMap.get(cmp.sourceFilePath);
@@ -147,7 +126,6 @@ export const extTransformsPlugin = (
           tag: data.tag,
           encapsulation: data.encapsulation,
           mode: data.mode,
-          commentOriginalSelector,
           sourceMap: config.sourceMap,
           minify: config.minifyCss,
           autoprefixer: config.autoprefixCss,
@@ -214,6 +192,7 @@ export const extTransformsPlugin = (
                * as it is not connected to a component.
                */
               cssTransformResults.styleText;
+
           buildCtx.stylesUpdated.push({
             styleTag: data.tag,
             styleMode: data.mode,

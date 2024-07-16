@@ -121,7 +121,7 @@ export const getRollupOptions = (
       userIndexPlugin(config, compilerCtx),
       typescriptPlugin(compilerCtx, bundleOpts, config),
       extFormatPlugin(config),
-      extTransformsPlugin(config, compilerCtx, buildCtx, bundleOpts),
+      extTransformsPlugin(config, compilerCtx, buildCtx),
       workerPlugin(config, compilerCtx, buildCtx, bundleOpts.platform, !!bundleOpts.inlineWorkers),
       serverPlugin(config, bundleOpts.platform),
       ...beforePlugins,

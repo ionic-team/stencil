@@ -47,7 +47,7 @@ export function renderToString(
   /**
    * Defines whether we render the shadow root as a declarative shadow root or as scoped shadow root.
    */
-  opts.serializeShadowRoot = Boolean(opts.serializeShadowRoot);
+  opts.serializeShadowRoot = typeof opts.serializeShadowRoot === 'boolean' ? opts.serializeShadowRoot : true;
   /**
    * Make sure we wait for components to be hydrated.
    */
