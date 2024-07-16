@@ -6,11 +6,11 @@ import { BuildOptions } from './utils/options';
 import { isPrereleaseVersion, isValidVersionInput, SEMVER_INCREMENTS, updateChangeLog } from './utils/release-utils';
 
 /**
- * We have to wrap execa in a promise to ensure it works with Listr. Listr uses rxjs under the hood which
- * seems to have issues with execa's `ResultPromise` as it never resolves a task.
+ * We have to wrap `execa` in a promise to ensure it works with `Listr`. `Listr` uses rxjs under the hood which
+ * seems to have issues with `execa`'s `ResultPromise` as it never resolves a task.
  * @param command command to run
  * @param args    arguments to pass to the command
- * @param options execa options
+ * @param options `execa` options
  * @returns a promise that resolves with the stdout and stderr of the command
  */
 async function execa(command: string, args: string[], options?: any) {
