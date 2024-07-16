@@ -114,7 +114,6 @@ export const proxyComponent = (
       prototype.attributeChangedCallback = function (attrName: string, oldValue: string, newValue: string) {
         plt.jmp(() => {
           const propName = attrNameToPropName.get(attrName);
-          this
 
           //  In a web component lifecycle the attributeChangedCallback runs prior to connectedCallback
           //  in the case where an attribute was set inline.
@@ -156,7 +155,7 @@ export const proxyComponent = (
             prototype.hasOwnProperty(propName) &&
             typeof this[propName] === 'number' &&
             // cast type to number to avoid TS compiler issues
-            this[propName] == newValue as unknown as number
+            this[propName] == (newValue as unknown as number)
           ) {
             // if the propName exists on the prototype of `Cstr`, this update may be a result of Stencil using native
             // APIs to reflect props as attributes. Calls to `setAttribute(someElement, propName)` will result in
