@@ -154,7 +154,8 @@ export const proxyComponent = (
           } else if (
             prototype.hasOwnProperty(propName) &&
             typeof this[propName] === 'number' &&
-            this[propName] == newValue
+            // cast type to number to avoid TS compiler issues
+            this[propName] == (newValue as unknown as number)
           ) {
             // if the propName exists on the prototype of `Cstr`, this update may be a result of Stencil using native
             // APIs to reflect props as attributes. Calls to `setAttribute(someElement, propName)` will result in
