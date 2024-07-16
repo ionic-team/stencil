@@ -19,13 +19,17 @@ async function execa(command: string, args: string[], options?: any) {
    */
   const { execa: execaOrig } = await import('execa');
 
-  return new Promise<{ stdout: string, stderr: string }>((resolve, reject) => {
+  return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
     const run = execaOrig(command, args, options);
-    run.then(({ stdout, stderr }) => resolve({
-      stdout: stdout as unknown as string,
-      stderr: stderr as unknown as string
-    }), (err) => reject(err))
-  })
+    run.then(
+      ({ stdout, stderr }) =>
+        resolve({
+          stdout: stdout as unknown as string,
+          stderr: stderr as unknown as string,
+        }),
+      (err) => reject(err),
+    );
+  });
 }
 
 /**
