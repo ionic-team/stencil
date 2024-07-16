@@ -19,8 +19,6 @@ export async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions)
   } catch (e) {}
 
   // get the source typescript.js file to modify
-  console.log('READ', tsPath);
-
   let code = await fs.readFile(tsPath, 'utf8');
 
   // As of 5.0, because typescript is now bundled with esbuild the structure of
