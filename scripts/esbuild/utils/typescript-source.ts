@@ -19,6 +19,8 @@ export async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions)
   } catch (e) {}
 
   // get the source typescript.js file to modify
+  console.log('READ', tsPath);
+
   let code = await fs.readFile(tsPath, 'utf8');
 
   // As of 5.0, because typescript is now bundled with esbuild the structure of
@@ -73,25 +75,6 @@ export async function bundleTypeScriptSource(tsPath: string, opts: BuildOptions)
 
   const jestTypesciptFilename = join(opts.scriptsBuildDir, 'typescript-modified-for-jest.js');
   await fs.writeFile(jestTypesciptFilename, code);
-
-  // Here we transform the TypeScript source from a commonjs to an ES module.
-  // We do this so that we can add an import from the `@environment` module.
-
-  // trim off the last part that sets module.exports and polyfills globalThis since
-  // we don't want typescript to add itself to module.exports when in a node env
-  const tsEnding = `if (typeof module !== "undefined" && module.exports) { module.exports = ts; }`;
-
-  if (!code.includes(tsEnding)) {
-    throw new Error(`"${tsEnding}" not found`);
-  }
-  const lastEnding = code.lastIndexOf(tsEnding);
-  code = code.slice(0, lastEnding);
-
-  const o: string[] = [];
-  o.push(`// TypeScript ${opts.typescriptVersion}`);
-  o.push(code);
-  o.push(`export default ts;`);
-  code = o.join('\n');
 
   // TODO(STENCIL-839): investigate minification issue w/ typescript 5.0
   // const { minify } = await import('terser');
