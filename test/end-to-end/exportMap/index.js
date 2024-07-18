@@ -7,6 +7,7 @@ const { MockDocument } = require('@stencil/core/mock-doc');
 const appData = require('@stencil/core/internal/app-data');
 const { createNodeLogger } = require('@stencil/core/sys/node');
 const { createTesting } = require('@stencil/core/testing');
+const preset = require('@stencil/core/testing/jest-preset');
 
 assert(typeof version === 'string');
 assert(typeof run, 'function');
@@ -15,6 +16,7 @@ assert(typeof MockDocument === 'function');
 assert(Object.keys(appData).length === 3);
 assert(typeof createNodeLogger === 'function');
 assert(typeof createTesting === 'function');
+assert(preset.moduleFileExtensions);
 
 console.log(`🎉 All CJS imports successfully resolved!`);
 console.log('✅ passed!\n');

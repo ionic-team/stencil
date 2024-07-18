@@ -80,6 +80,9 @@
       "types": "./testing/index.d.ts",
       "require": "./testing/index.js"
     },
+    "./testing/jest-preset": {
+      "require": "./testing/jest-preset.js"
+    },
     "./testing/*": {
       "import": "./testing/*",
       "require": "./testing/*"
