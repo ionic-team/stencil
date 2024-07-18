@@ -45,9 +45,7 @@ export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: s
 }
 
 async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
-  const pattern = isGlob(copyTask.src)
-    ? copyTask.src
-    : path.join(copyTask.src, '**');
+  const pattern = isGlob(copyTask.src) ? copyTask.src : path.join(copyTask.src, '**');
 
   const files = await asyncGlob(pattern, {
     cwd: srcDir,

@@ -1,1 +1,1 @@
-export const copyFile = jest.fn().mockImplementation(() => 'JavaScript file content');;
+export const copyFile = jest.fn().mockImplementation(() => 'JavaScript file content');

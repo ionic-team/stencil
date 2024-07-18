@@ -5,13 +5,15 @@ export const config: Config = {
   outputTargets: [
     {
       type: 'dist-custom-elements',
-      copy: [{
-        src: './utils',
-        dest: './dist/utilsExtra',
-      }]
+      copy: [
+        {
+          src: './utils',
+          dest: './dist/utilsExtra',
+        },
+      ],
     },
     {
-      type: 'dist'
-    }
+      type: 'dist',
+    },
   ],
 };
