@@ -35,21 +35,23 @@ export const generateOutputTargets = async (
     outputLazy(config, compilerCtx, buildCtx),
   ]);
 
-  // the user may want to copy compiled assets which requires above tasks to
-  // have finished first
-  await outputCopy(config, compilerCtx, buildCtx),
+  await Promise.all([
+    // the user may want to copy compiled assets which requires above tasks to
+    // have finished first
+    outputCopy(config, compilerCtx, buildCtx),
 
-  // the www output target depends on the output of the lazy output target
-  // since it attempts to inline the lazy build entry point into `index.html`
-  // so we want to ensure that the lazy OT has already completed and written
-  // all of its files before the www OT runs.
-  await outputWww(config, compilerCtx, buildCtx);
+    // the www output target depends on the output of the lazy output target
+    // since it attempts to inline the lazy build entry point into `index.html`
+    // so we want to ensure that the lazy OT has already completed and written
+    // all of its files before the www OT runs.
+    outputWww(config, compilerCtx, buildCtx),
 
-  // must run after all the other outputs
-  // since it validates files were created
-  await outputDocs(config, compilerCtx, buildCtx);
-  await outputTypes(config, compilerCtx, buildCtx);
-  await outputCustom(config, compilerCtx, buildCtx);
+    // must run after all the other outputs
+    // since it validates files were created
+    outputDocs(config, compilerCtx, buildCtx),
+    outputTypes(config, compilerCtx, buildCtx),
+    outputCustom(config, compilerCtx, buildCtx),
+  ]);
 
   timeSpan.finish('generate outputs finished');
 };
