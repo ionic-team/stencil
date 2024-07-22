@@ -45,8 +45,12 @@ export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: s
 }
 
 async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
-  const pattern = isGlob(copyTask.src) ? copyTask.src : path.join(copyTask.src, '**');
-
+  /**
+   * To properly match all files within a certain directory we have to ensure to attach a `/**` to
+   * the end of the pattern. However we only want to do this if the `src` entry is not a glob pattern
+   * already or a file with an extension.
+   */
+  const pattern = isGlob(copyTask.src) || path.extname(copyTask.src).length > 0 ? copyTask.src : path.join(copyTask.src, '**');
   const files = await asyncGlob(pattern, {
     cwd: srcDir,
     nodir: true,
@@ -58,7 +62,10 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
 function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
   const dest = path.join(copyTask.dest, copyTask.keepDirStructure ? globRelPath : path.basename(globRelPath));
   return {
-    src: path.join(srcDir, globRelPath),
+    /**
+     * If the `src` entry is already an absolute path, we should remove it from the `globRelPath`
+     */
+    src: path.join(srcDir, globRelPath.replace(srcDir, '')),
     dest,
     ignore: copyTask.ignore,
     warn: copyTask.warn,
