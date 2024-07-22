@@ -28,13 +28,16 @@ export const generateOutputTargets = async (
   invalidateRollupCaches(compilerCtx);
 
   await Promise.all([
-    outputCopy(config, compilerCtx, buildCtx),
     outputCollection(config, compilerCtx, buildCtx, changedModuleFiles),
     outputCustomElements(config, compilerCtx, buildCtx),
     outputHydrateScript(config, compilerCtx, buildCtx),
     outputLazyLoader(config, compilerCtx),
     outputLazy(config, compilerCtx, buildCtx),
   ]);
+
+  // the user may want to copy compiled assets which requires above tasks to
+  // have finished first
+  await outputCopy(config, compilerCtx, buildCtx),
 
   // the www output target depends on the output of the lazy output target
   // since it attempts to inline the lazy build entry point into `index.html`
