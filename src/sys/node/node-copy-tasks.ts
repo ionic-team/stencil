@@ -50,7 +50,8 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
    * the end of the pattern. However we only want to do this if the `src` entry is not a glob pattern
    * already or a file with an extension.
    */
-  const pattern = isGlob(copyTask.src) || path.extname(copyTask.src).length > 0 ? copyTask.src : path.join(copyTask.src, '**');
+  const pattern =
+    isGlob(copyTask.src) || path.extname(copyTask.src).length > 0 ? copyTask.src : path.join(copyTask.src, '**');
   const files = await asyncGlob(pattern, {
     cwd: srcDir,
     nodir: true,
