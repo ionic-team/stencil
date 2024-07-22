@@ -63,10 +63,7 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
 function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, globRelPath: string): Required<d.CopyTask> {
   const dest = path.join(copyTask.dest, copyTask.keepDirStructure ? globRelPath : path.basename(globRelPath));
   return {
-    /**
-     * If the `src` entry is already an absolute path, we should remove it from the `globRelPath`
-     */
-    src: path.join(srcDir, globRelPath.replace(srcDir, '')),
+    src: path.join(srcDir, globRelPath),
     dest,
     ignore: copyTask.ignore,
     warn: copyTask.warn,
