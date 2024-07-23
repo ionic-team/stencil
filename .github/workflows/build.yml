@@ -12,11 +12,6 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
-        with:
-          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
-          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
-          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
-          persist-credentials: false
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
