@@ -55,6 +55,7 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
   const files = await asyncGlob(pattern, {
     cwd: srcDir,
     nodir: true,
+    absolute: false,
     ignore: copyTask.ignore,
   });
   return files.map((globRelPath) => createGlobCopyTask(copyTask, srcDir, globRelPath));
