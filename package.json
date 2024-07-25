@@ -66,6 +66,10 @@
       "import": "./compiler/*",
       "types": "./compiler/*"
     },
+    "./screenshot": {
+      "require": "./screenshot/index.js",
+      "types": "./screenshot/index.d.ts"
+    },
     "./sys/node": {
       "import": "./sys/node/index.js",
       "require": "./sys/node/index.js",
