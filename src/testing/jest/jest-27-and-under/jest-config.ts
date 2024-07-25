@@ -154,9 +154,8 @@ export function buildJestConfig(config: d.ValidatedConfig): string {
     jestConfig.verbose = stencilConfigTesting.verbose;
   }
   if (typeof stencilConfigTesting.bail !== 'undefined') {
-    jestConfig.bail = typeof stencilConfigTesting.bail === 'number'
-      ? stencilConfigTesting.bail
-      : stencilConfigTesting.bail ? 1 : 0;
+    jestConfig.bail =
+      typeof stencilConfigTesting.bail === 'number' ? stencilConfigTesting.bail : stencilConfigTesting.bail ? 1 : 0;
   }
   if (stencilConfigTesting.prettierPath) {
     jestConfig.prettierPath = stencilConfigTesting.prettierPath;

@@ -711,7 +711,7 @@ describe('validateTesting', () => {
 
       expect(config.testing.testMatch).toBeUndefined();
       expect(config.testing.testRegex).toEqual(['/regexStr/']);
-    })
+    });
   });
 
   describe('runner', () => {
