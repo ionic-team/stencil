@@ -579,7 +579,7 @@ describe('validateTesting', () => {
         throw new Error('No testRegex was found in the Stencil TestingConfig. Failing test.');
       }
 
-      testRegex = new RegExp(testRegexSetting);
+      testRegex = new RegExp(testRegexSetting[0]);
     });
 
     describe('test.* extensions', () => {
@@ -690,14 +690,28 @@ describe('validateTesting', () => {
       userConfig.flags = { ...flags, e2e: true };
       userConfig.testing = {
         testMatch: undefined,
+        testRegex: ['/regexStr/'],
+      };
+
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+
+      expect(config.testing.testMatch).toBeUndefined();
+      expect(config.testing.testRegex).toEqual(['/regexStr/']);
+    });
+
+    it('transforms testRegex to an array if passed in as string', () => {
+      userConfig.flags = { ...flags, e2e: true };
+      userConfig.testing = {
+        testMatch: undefined,
+        // @ts-expect-error invalid type because of type update
         testRegex: '/regexStr/',
       };
 
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
 
       expect(config.testing.testMatch).toBeUndefined();
-      expect(config.testing.testRegex).toBe('/regexStr/');
-    });
+      expect(config.testing.testRegex).toEqual(['/regexStr/']);
+    })
   });
 
   describe('runner', () => {

@@ -151,7 +151,9 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
      *   - this regex case shall match file names such as `my-cmp.spec.ts`, `test.spec.ts`
      *   - this regex case shall not match file names such as `attest.ts`, `bespec.ts`
      */
-    testing.testRegex = '(/__tests__/.*|(\\.|/)(test|spec|e2e))\\.[jt]sx?$';
+    testing.testRegex = ['(/__tests__/.*|(\\.|/)(test|spec|e2e))\\.[jt]sx?$'];
+  } else if (typeof testing.testRegex === 'string') {
+    testing.testRegex = [testing.testRegex];
   }
 
   if (Array.isArray(testing.testMatch)) {
