@@ -154,19 +154,6 @@ const clientHydrate = (
       }
     }
 
-    // recursively drill down, end to start so we can remove nodes
-    for (i = node.childNodes.length - 1; i >= 0; i--) {
-      clientHydrate(
-        parentVNode,
-        childRenderNodes,
-        slotNodes,
-        shadowRootNodes,
-        hostElm,
-        node.childNodes[i] as any,
-        hostId,
-      );
-    }
-
     if (node.shadowRoot) {
       // keep drilling down through the shadow root nodes
       for (i = node.shadowRoot.childNodes.length - 1; i >= 0; i--) {
@@ -181,6 +168,20 @@ const clientHydrate = (
         );
       }
     }
+
+    // recursively drill down, end to start so we can remove nodes
+    for (i = node.childNodes.length - 1; i >= 0; i--) {
+      clientHydrate(
+        parentVNode,
+        childRenderNodes,
+        slotNodes,
+        shadowRootNodes,
+        hostElm,
+        node.childNodes[i] as any,
+        hostId,
+      );
+    }
+
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     // `${COMMENT_TYPE}.${hostId}.${nodeId}.${depth}.${index}`
     childIdSplt = node.nodeValue.split('.');
