@@ -181,7 +181,6 @@ const clientHydrate = (
         hostId,
       );
     }
-
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     // `${COMMENT_TYPE}.${hostId}.${nodeId}.${depth}.${index}`
     childIdSplt = node.nodeValue.split('.');
