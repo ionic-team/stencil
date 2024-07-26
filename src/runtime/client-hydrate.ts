@@ -293,13 +293,13 @@ const clientHydrate = (
 export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: d.PlatformRuntime['$orgLocNodes$']) => {
   if (node.nodeType === NODE_TYPE.ElementNode) {
     let i = 0;
-    for (; i < node.childNodes.length; i++) {
-      initializeDocumentHydrate(node.childNodes[i] as any, orgLocNodes);
-    }
     if (node.shadowRoot) {
-      for (i = 0; i < node.shadowRoot.childNodes.length; i++) {
+      for (; i < node.shadowRoot.childNodes.length; i++) {
         initializeDocumentHydrate(node.shadowRoot.childNodes[i] as any, orgLocNodes);
       }
+    }
+    for (i = 0; i < node.childNodes.length; i++) {
+      initializeDocumentHydrate(node.childNodes[i] as any, orgLocNodes);
     }
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     const childIdSplt = node.nodeValue.split('.');
