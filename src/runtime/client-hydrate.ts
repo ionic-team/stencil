@@ -295,11 +295,11 @@ export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: d.Pla
     let i = 0;
     if (node.shadowRoot) {
       for (; i < node.shadowRoot.childNodes.length; i++) {
-        initializeDocumentHydrate(node.shadowRoot.childNodes[i] as any, orgLocNodes);
+        initializeDocumentHydrate(node.shadowRoot.childNodes[i] as d.RenderNode, orgLocNodes);
       }
     }
     for (i = 0; i < node.childNodes.length; i++) {
-      initializeDocumentHydrate(node.childNodes[i] as any, orgLocNodes);
+      initializeDocumentHydrate(node.childNodes[i] as d.RenderNode, orgLocNodes);
     }
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     const childIdSplt = node.nodeValue.split('.');
