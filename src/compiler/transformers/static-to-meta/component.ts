@@ -148,6 +148,8 @@ export const parseStaticComponentMeta = (
   };
 
   const visitComponentChildNode = (node: ts.Node) => {
+    validateComponentMembers(node);
+
     if (ts.isCallExpression(node)) {
       parseCallExpression(cmp, node);
     } else if (ts.isStringLiteral(node)) {
@@ -174,6 +176,42 @@ export const parseStaticComponentMeta = (
   compilerCtx.nodeMap.set(cmpNode, cmp);
 
   return cmpNode;
+};
+
+const validateComponentMembers = (node: ts.Node) => {
+  /**
+   * validate if:
+   */
+  if (
+    /**
+     * the component has a getter called "shadowRoot"
+     */
+    ts.isGetAccessorDeclaration(node) &&
+    ts.isIdentifier(node.name) &&
+    node.name.escapedText === 'shadowRoot' &&
+    /**
+     * the parent node is a class declaration
+     */
+    ts.isClassDeclaration(node.parent)
+  ) {
+    const decorator = ts.getDecorators(node.parent)[0];
+    /**
+     * the class is actually a Stencil component, has a decorator with a property named "tag"
+     */
+    if (
+      ts.isCallExpression(decorator.expression) &&
+      decorator.expression.arguments.length === 1 &&
+      ts.isObjectLiteralExpression(decorator.expression.arguments[0]) &&
+      decorator.expression.arguments[0].properties.some(
+        (prop) => ts.isPropertyAssignment(prop) && prop.name.getText() === 'tag',
+      )
+    ) {
+      const componentName = node.parent.name.getText();
+      throw new Error(
+        `The component "${componentName}" has a getter called "shadowRoot". This getter is reserved for use by Stencil components and should not be defined by the user.`,
+      );
+    }
+  }
 };
 
 const parseVirtualProps = (docs: d.CompilerJsDoc) => {
