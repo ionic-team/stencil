@@ -26,7 +26,7 @@ const BLACKLISTED_COMPONENT_METHODS = [
    * If someone would define a getter called "shadowRoot" on a component
    * this would cause issues when Stencil tries to hydrate the component.
    */
-  'shadowRoot'
+  'shadowRoot',
 ];
 
 /**
