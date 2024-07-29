@@ -21,6 +21,14 @@ import { parseStringLiteral } from './string-literal';
 import { parseStaticStyles } from './styles';
 import { parseStaticWatchers } from './watchers';
 
+const BLACKLISTED_COMPONENT_METHODS = [
+  /**
+   * If someone would define a getter called "shadowRoot" on a component
+   * this would cause issues when Stencil tries to hydrate the component.
+   */
+  'shadowRoot'
+];
+
 /**
  * Given a {@see ts.ClassDeclaration} which represents a Stencil component
  * class declaration, parse and format various pieces of data about static class
@@ -188,12 +196,14 @@ const validateComponentMembers = (node: ts.Node) => {
      */
     ts.isGetAccessorDeclaration(node) &&
     ts.isIdentifier(node.name) &&
-    node.name.escapedText === 'shadowRoot' &&
+    typeof node.name.escapedText === 'string' &&
+    BLACKLISTED_COMPONENT_METHODS.includes(node.name.escapedText) &&
     /**
      * the parent node is a class declaration
      */
     ts.isClassDeclaration(node.parent)
   ) {
+    const propName = node.name.escapedText;
     const decorator = ts.getDecorators(node.parent)[0];
     /**
      * the class is actually a Stencil component, has a decorator with a property named "tag"
@@ -208,7 +218,7 @@ const validateComponentMembers = (node: ts.Node) => {
     ) {
       const componentName = node.parent.name.getText();
       throw new Error(
-        `The component "${componentName}" has a getter called "shadowRoot". This getter is reserved for use by Stencil components and should not be defined by the user.`,
+        `The component "${componentName}" has a getter called "${propName}". This getter is reserved for use by Stencil components and should not be defined by the user.`,
       );
     }
   }
