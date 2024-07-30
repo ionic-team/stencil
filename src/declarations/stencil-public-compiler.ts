@@ -428,6 +428,7 @@ export interface Config extends StencilConfig {
   suppressLogs?: boolean;
   profile?: boolean;
   tsCompilerOptions?: any;
+  tsWatchOptions?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }

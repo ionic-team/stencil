@@ -17,6 +17,7 @@ export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.Compile
   const tsconfig = {
     path: '',
     compilerOptions: {} as ts.CompilerOptions,
+    watchOptions: {} as ts.WatchOptions,
     files: [] as string[],
     include: [] as string[],
     exclude: [] as string[],
@@ -89,6 +90,10 @@ export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.Compile
           if (isString(results.raw.extends)) {
             tsconfig.extends = results.raw.extends;
           }
+        }
+
+        if (results.watchOptions) {
+          tsconfig.watchOptions = results.watchOptions;
         }
 
         if (results.options) {
