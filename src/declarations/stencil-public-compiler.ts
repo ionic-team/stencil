@@ -1765,6 +1765,9 @@ export interface Testing {
   destroy(): Promise<void>;
 }
 
+export declare type Path = string;
+export declare type TransformerConfig = [string, Record<string, unknown>];
+
 /**
  * Options for initiating a run of Stencil tests (spec and/or end-to-end)
  */
@@ -1798,7 +1801,7 @@ export interface JestConfig {
    * By default, Jest runs all tests and produces all errors into the console upon completion.
    * The bail config option can be used here to have Jest stop running tests after the first failure. Default: false
    */
-  bail?: boolean;
+  bail?: boolean | number;
 
   /**
    * The directory where Jest should store its cached dependency information. Jest attempts to scan your dependency tree once (up-front)
@@ -1884,8 +1887,8 @@ export interface JestConfig {
   reporters?: any;
   resetMocks?: boolean;
   resetModules?: boolean;
-  resolver?: string;
-  restoreMocks?: string;
+  resolver?: Path | null;
+  restoreMocks?: boolean;
   rootDir?: string;
   roots?: any[];
   runner?: string;
@@ -1905,12 +1908,14 @@ export interface JestConfig {
   testMatch?: string[];
   testPathIgnorePatterns?: string[];
   testPreset?: string;
-  testRegex?: string;
+  testRegex?: string[];
   testResultsProcessor?: string;
   testRunner?: string;
   testURL?: string;
   timers?: string;
-  transform?: { [key: string]: string };
+  transform?: {
+    [regex: string]: Path | TransformerConfig;
+  };
   transformIgnorePatterns?: any[];
   unmockedModulePathPatterns?: any[];
   verbose?: boolean;
