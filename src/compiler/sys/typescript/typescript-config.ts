@@ -124,7 +124,7 @@ export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.Compile
   return tsconfig;
 };
 
-const getTsConfigPath = async (
+export const getTsConfigPath = async (
   config: d.ValidatedConfig,
   sys: d.CompilerSystem,
   init: d.LoadConfigInit,
