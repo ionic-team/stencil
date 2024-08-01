@@ -35,7 +35,7 @@ jobs:
         shell: bash
 
       - name: Checkout Code
-        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
         with:
           # A depth of 0 gets the entire git history, which we'll want for things like checking all git history/tags.
           # We need git history to generate the changelog; however, we don't know how deep to go.
