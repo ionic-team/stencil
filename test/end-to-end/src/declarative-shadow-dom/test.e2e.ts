@@ -218,7 +218,7 @@ describe('renderToString', () => {
     `,
       {
         serializeShadowRoot: true,
-        fullDocument: false,
+        fullDocument: true,
       },
     );
 
@@ -255,6 +255,10 @@ describe('renderToString', () => {
     expect(html).toContain(
       `<car-detail custom-hydrate-flag=\"\" c-id=\"2.4.2.0\" s-id=\"4\"><!--r.4--><section c-id=\"4.0.0.0\"><!--t.4.1.1.0-->2023 VW Beetle</section></car-detail>`,
     );
+
+    const page = await newE2EPage({ html, url: 'https://stencil.com' });
+    const cars = await page.findAll('>>>car-detail');
+    expect(cars.map((car) => car.textContent)).toEqual(['2024 VW Vento', '2023 VW Beetle']);
   });
 
   it('calls beforeHydrate and afterHydrate function hooks', async () => {
