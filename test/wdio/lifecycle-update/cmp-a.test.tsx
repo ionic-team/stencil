@@ -28,6 +28,7 @@ describe('lifecycle-update', function () {
 
     loads = await $('#output').$$('li');
     await expect(loads).toBeElementsArrayOfSize(9);
+    loads = await $('#output').$$('li');
 
     await expect(loads[0]).toHaveText('lifecycle-update-a componentWillLoad');
     await expect(loads[1]).toHaveText('lifecycle-update-a componentDidLoad');
@@ -44,6 +45,7 @@ describe('lifecycle-update', function () {
 
     loads = await $('#output').$$('li');
     await expect(loads).toBeElementsArrayOfSize(16);
+    loads = await $('#output').$$('li');
 
     await expect(loads[0]).toHaveText('lifecycle-update-a componentWillLoad');
     await expect(loads[1]).toHaveText('lifecycle-update-a componentDidLoad');
