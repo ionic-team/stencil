@@ -15,6 +15,9 @@
 * **testing:** update Jest types ([#5910](https://github.com/ionic-team/stencil/issues/5910)) ([5f8c969](https://github.com/ionic-team/stencil/commit/5f8c9692d41b58d3706c61db9a33215294e70049)), fixes [#5908](https://github.com/ionic-team/stencil/issues/5908)
 * **core:** update TypeScript to v5.5 ([#5898](https://github.com/ionic-team/stencil/issues/5898)) ([5e74837](https://github.com/ionic-team/stencil/commit/5e748378fd14fa5c6aaf0e001e8763a0ba3cf57c))
 
+### Note
+
+As we’ve made further enhancements to support declarative Shadow DOM, the Stencil team has determined that it’s not feasible to allow users to render a shadow component as a scoped component after compilation, such as by calling `renderToString` with `serializeShadowRoot: false`. This is because Stencil compiles styles for either shadow or scoped mode during the compilation process, embedding these styles into the hydrate module. Once this compilation is complete, the styles cannot be transformed to support the other mode. Recognizing that this change would impact the current functionality, the Stencil team has decided to proceed with this update. Moving forward, we recommend serializing all components marked with shadow: true as declarative Shadow DOM.
 
 
 ## 🏉 [4.19.2](https://github.com/ionic-team/stencil/compare/v4.19.1...v4.19.2) (2024-07-02)
