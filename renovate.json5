@@ -73,6 +73,12 @@
       allowedVersions: '<9.0.0',
     },
     {
+      // TODO(STENCIL-1274): Remove this block
+      // disable Eslint plugin updates until we have updated Eslint to v9
+      matchPackageNames: ['@typescript-eslint/eslint-plugin', '@typescript-eslint/parser'],
+      allowedVersions: '<8.0.0',
+    },
+    {
       matchPackagePrefixes: ['@typescript-eslint'],
       groupName: 'TypeScript-ESLint',
       // these packages can be released often, let's look at them every week
