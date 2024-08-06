@@ -2028,6 +2028,14 @@ export interface TestingConfig extends JestConfig {
    * Amount of time in milliseconds to wait before a screenshot is taken.
    */
   waitBeforeScreenshot?: number;
+
+  /**
+   * Specify what type of Stencil compiler logs you want to see.
+   * Possible values:
+   *  - error (default)
+   *  - warn
+   */
+  compilerLogLevel?: string;
 }
 
 export interface EmulateConfig {
