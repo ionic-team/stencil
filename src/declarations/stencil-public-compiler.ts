@@ -943,10 +943,10 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    */
   removeHtmlComments?: boolean;
   /**
-   * If set to `false` Stencil will ignore the fact that a component has a `shadow: true`
-   * flag and serializes it as a scoped component. If set to `true` the component will
-   * be rendered within a Declarative Shadow DOM.
-   * @default false
+   * If set to `true` the component will be rendered within a Declarative Shadow DOM.
+   * If set to `false` Stencil will ignore the contents of the shadow root and render the
+   * element as given in provided template.
+   * @default true
    */
   serializeShadowRoot?: boolean;
   /**
