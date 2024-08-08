@@ -2,6 +2,7 @@ import fs from 'fs-extra';
 import { dirname, join, relative } from 'path';
 import { rollup } from 'rollup';
 import ts, { ModuleResolutionKind, ScriptTarget } from 'typescript';
+import url from 'url';
 
 import { NODE_BUILTINS } from '../utils/constants';
 import { BuildOptions, getOptions } from '../utils/options';
@@ -260,9 +261,9 @@ function validateDts(opts: BuildOptions, dtsEntries: string[]): void {
  * @param opts build options to be used to validate the compiler
  */
 async function validateCompiler(opts: BuildOptions): Promise<void> {
-  const compilerPath = join(opts.output.compilerDir, 'stencil.js');
-  const cliPath = join(opts.output.cliDir, 'index.cjs');
-  const sysNodePath = join(opts.output.sysNodeDir, 'index.js');
+  const compilerPath = url.pathToFileURL(join(opts.output.compilerDir, 'stencil.js')).pathname;
+  const cliPath = url.pathToFileURL(join(opts.output.cliDir, 'index.cjs')).pathname;
+  const sysNodePath = url.pathToFileURL(join(opts.output.sysNodeDir, 'index.js')).pathname;
 
   const compiler = await import(compilerPath);
   const cli = await import(cliPath);
