@@ -31,9 +31,10 @@ export async function getInternalTestingBundle(opts: BuildOptions): Promise<ESBu
   const internalTestingAliases = {
     ...getEsbuildAliases(),
     '@platform': inputTestingPlatform,
+    '@stencil/core/mock-doc': '../../mock-doc/index.cjs',
   };
 
-  const external = getEsbuildExternalModules(opts, opts.output.internalDir);
+  const external: string[] = [...getEsbuildExternalModules(opts, opts.output.internalDir), '../../mock-doc/index.cjs'];
 
   const internalTestingBuildOptions: ESBuildOptions = {
     ...getBaseEsbuildOptions(),

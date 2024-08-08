@@ -1,6 +1,6 @@
 import type { BuildOptions as ESBuildOptions, Plugin } from 'esbuild';
 import fs from 'fs-extra';
-import { join } from 'path';
+import path from 'path';
 
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
@@ -24,13 +24,13 @@ const EXTERNAL_TESTING_MODULES = [
 ];
 
 export async function buildTesting(opts: BuildOptions) {
-  const inputDir = join(opts.buildDir, 'testing');
-  const sourceDir = join(opts.srcDir, 'testing');
+  const inputDir = path.join(opts.buildDir, 'testing');
+  const sourceDir = path.join(opts.srcDir, 'testing');
   await fs.emptyDir(opts.output.testingDir);
 
   await Promise.all([
     // copy jest testing entry files
-    fs.copy(join(opts.scriptsBundlesDir, 'helpers', 'jest'), opts.output.testingDir),
+    fs.copy(path.join(opts.scriptsBundlesDir, 'helpers', 'jest'), opts.output.testingDir),
     copyTestingInternalDts(opts, inputDir),
   ]);
 
@@ -46,6 +46,7 @@ export async function buildTesting(opts: BuildOptions) {
     ...EXTERNAL_TESTING_MODULES,
     ...getEsbuildExternalModules(opts, opts.output.testingDir),
     '../compiler/stencil.js',
+    '../internal/testing/*',
   ];
 
   const aliases = getEsbuildAliases();
@@ -54,10 +55,10 @@ export async function buildTesting(opts: BuildOptions) {
 
   const testingEsbuildOptions: ESBuildOptions = {
     ...getBaseEsbuildOptions(),
-    entryPoints: [join(sourceDir, 'index.ts')],
+    entryPoints: [path.join(sourceDir, 'index.ts')],
     bundle: true,
     format: 'cjs',
-    outfile: join(opts.output.testingDir, 'index.js'),
+    outfile: path.join(opts.output.testingDir, 'index.js'),
     platform: 'node',
     logLevel: 'info',
     external,
@@ -89,7 +90,7 @@ export async function buildTesting(opts: BuildOptions) {
 }
 
 function getLazyRequireFn(opts: BuildOptions) {
-  return fs.readFileSync(join(opts.bundleHelpersDir, 'lazy-require.js'), 'utf8').trim();
+  return fs.readFileSync(path.join(opts.bundleHelpersDir, 'lazy-require.js'), 'utf8').trim();
 }
 
 function lazyRequirePlugin(opts: BuildOptions, moduleIds: string[]): Plugin {
@@ -136,7 +137,7 @@ function ignorePuppeteerDependency(opts: BuildOptions): Plugin {
 export async function copyTestingInternalDts(opts: BuildOptions, inputDir: string) {
   // copy testing d.ts files
 
-  await fs.copy(join(inputDir), join(opts.output.testingDir), {
+  await fs.copy(path.join(inputDir), path.join(opts.output.testingDir), {
     filter: (f) => {
       if (f.endsWith('.d.ts')) {
         return true;
@@ -158,7 +159,7 @@ export async function copyTestingInternalDts(opts: BuildOptions, inputDir: strin
  * @param opts build options
  */
 export async function writePatchedPuppeteerDts(opts: BuildOptions) {
-  const typeFilePath = join(opts.output.testingDir, 'puppeteer', 'puppeteer-declarations.d.ts');
+  const typeFilePath = path.join(opts.output.testingDir, 'puppeteer', 'puppeteer-declarations.d.ts');
   const updatedFileContent = (await fs.readFile(typeFilePath, 'utf8'))
     .split('\n')
     .reduce((lines, line) => {

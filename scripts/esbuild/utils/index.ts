@@ -1,6 +1,6 @@
 import type { BuildOptions as ESBuildOptions, BuildResult as ESBuildResult, OutputFile, Plugin } from 'esbuild';
 import * as esbuild from 'esbuild';
-import { join } from 'path';
+import path from 'path';
 
 import { BuildOptions } from '../../utils/options';
 
@@ -16,20 +16,11 @@ export function getEsbuildAliases(): Record<string, string> {
     chalk: 'ansi-colors',
 
     // mapping aliases to top-level bundle entrypoints
-    '@stencil/core/testing': './testing/index.js',
-    '@stencil/core/compiler': './compiler/stencil.js',
-    '@stencil/core/dev-server': './dev-server/index.js',
-    '@stencil/core/mock-doc': './mock-doc/index.cjs',
-    '@stencil/core/internal/testing': './internal/testing/index.js',
-    '@stencil/core/cli': './cli/index.js',
-    '@sys-api-node': './sys/node/index.js',
-
-    // mapping node.js module names to `sys/node` "cache"
-    //
-    // these allow us to bundle and ship a dependency (like `glob`) as part
-    // of the Stencil distributable but also have our separate bundles
-    // reference the same file
-    glob: './sys/node/glob.js',
+    '@stencil/core/testing': '../testing/index.js',
+    '@stencil/core/compiler': '../compiler/stencil.js',
+    '@stencil/core/dev-server': '../dev-server/index.js',
+    '@stencil/core/mock-doc': '../mock-doc/index.cjs',
+    '@stencil/core/internal/testing': '../internal/testing/index.js',
 
     // dev server related aliases
     ws: './ws.js',
@@ -71,10 +62,24 @@ const externalNodeModules = [
  * @returns a list of modules which should be marked as external
  */
 export function getEsbuildExternalModules(opts: BuildOptions, ownEntryPoint: string): string[] {
-  const bundles = Object.values(opts.output);
-  const externalBundles = bundles.filter((outdir) => outdir !== ownEntryPoint).map((outdir) => join(outdir, '*'));
+  const root = path.resolve(__dirname, '..', '..', '..');
+  const bundles = Object.values(opts.output)
+    /**
+     * Filter out the `internal`, `cli`, and `compiler` directories, as they we intend to import
+     * these primitives directly from these packages.
+     */
+    .filter((bundle) => !bundle.endsWith('internal') && !bundle.endsWith('cli') && !bundle.endsWith('compiler'))
+    .filter((outdir) => outdir !== ownEntryPoint)
+    /**
+     * transform the absolute path to a relative one
+     */
+    .map((p) => '..' + path.sep + path.relative(root, path.join(p, '*')))
+    /**
+     * replace path separators with forward slashes
+     */
+    .map((p) => p.replaceAll(path.sep, '/'));
 
-  return [...externalNodeModules, ...externalBundles];
+  return [...externalNodeModules, ...bundles];
 }
 
 /**
