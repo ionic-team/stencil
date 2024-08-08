@@ -53,7 +53,7 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
   const pattern =
     isGlob(copyTask.src) || path.extname(copyTask.src).length > 0
       ? copyTask.src
-      : './' + path.relative(srcDir, path.join(copyTask.src, '**')).replaceAll(path.sep, '/');
+      : './' + path.relative(srcDir, path.join(path.resolve(srcDir, copyTask.src), '**')).replaceAll(path.sep, '/');
 
   const files = await asyncGlob(pattern, {
     cwd: srcDir,
