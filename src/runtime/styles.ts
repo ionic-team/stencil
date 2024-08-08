@@ -102,7 +102,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
            * attach styles at the beginning of a shadow root node if we render shadow components
            */
           if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && styleContainerNode.nodeName !== 'HEAD') {
-            styleContainerNode.insertBefore(styleElm);
+            styleContainerNode.insertBefore(styleElm, null);
           }
         }
 
