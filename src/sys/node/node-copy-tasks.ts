@@ -1,5 +1,5 @@
 import { buildError, catchError, flatOne, isGlob, normalizePath } from '@utils';
-import { glob } from 'glob';
+import { glob, type GlobOptions } from 'glob';
 import path from 'path';
 
 import type * as d from '../../declarations';
@@ -13,7 +13,7 @@ export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: s
   };
 
   try {
-    copyTasks = flatOne(await Promise.all(copyTasks.map((task) => processGlobs(task, srcDir))));
+    copyTasks = flatOne(await Promise.all(copyTasks.map((task) => processGlobTask(task, srcDir))));
 
     const allCopyTasks: d.CopyTask[] = [];
 
@@ -44,30 +44,22 @@ export async function nodeCopyTasks(copyTasks: Required<d.CopyTask>[], srcDir: s
   return results;
 }
 
-async function processGlobs(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
-  return isGlob(copyTask.src)
-    ? await processGlobTask(copyTask, srcDir)
-    : [
-        {
-          src: getSrcAbsPath(srcDir, copyTask.src),
-          dest: copyTask.keepDirStructure ? path.join(copyTask.dest, copyTask.src) : copyTask.dest,
-          warn: copyTask.warn,
-          keepDirStructure: copyTask.keepDirStructure,
-        },
-      ];
-}
-
-function getSrcAbsPath(srcDir: string, src: string) {
-  if (path.isAbsolute(src)) {
-    return src;
-  }
-  return path.join(srcDir, src);
-}
-
 async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): Promise<Required<d.CopyTask>[]> {
-  const files = await asyncGlob(copyTask.src, {
+  /**
+   * To properly match all files within a certain directory we have to ensure to attach a `/**` to
+   * the end of the pattern. However we only want to do this if the `src` entry is not a glob pattern
+   * already or a file with an extension.
+   */
+  const pattern =
+    isGlob(copyTask.src) || path.extname(copyTask.src).length > 0
+      ? copyTask.src
+      : './' + path.relative(srcDir, path.join(path.resolve(srcDir, copyTask.src), '**')).replaceAll(path.sep, '/');
+
+  const files = await asyncGlob(pattern, {
     cwd: srcDir,
     nodir: true,
+    absolute: false,
+    ignore: copyTask.ignore,
   });
   return files.map((globRelPath) => createGlobCopyTask(copyTask, srcDir, globRelPath));
 }
@@ -77,6 +69,7 @@ function createGlobCopyTask(copyTask: Required<d.CopyTask>, srcDir: string, glob
   return {
     src: path.join(srcDir, globRelPath),
     dest,
+    ignore: copyTask.ignore,
     warn: copyTask.warn,
     keepDirStructure: copyTask.keepDirStructure,
   };
@@ -96,7 +89,7 @@ async function processCopyTask(results: d.CopyResults, allCopyTasks: d.CopyTask[
       }
 
       await processCopyTaskDirectory(results, allCopyTasks, copyTask);
-    } else if (!shouldIgnore(copyTask.src)) {
+    } else {
       // this is a file we should copy
       if (!results.filePaths.includes(copyTask.dest)) {
         results.filePaths.push(copyTask.dest);
@@ -169,13 +162,6 @@ function addMkDir(mkDirs: string[], destDir: string) {
 
 const ROOT_DIR = normalizePath(path.resolve('/'));
 
-function shouldIgnore(filePath: string) {
-  filePath = filePath.trim().toLowerCase();
-  return IGNORE.some((ignoreFile) => filePath.endsWith(ignoreFile));
-}
-
-const IGNORE = ['.ds_store', '.gitignore', 'desktop.ini', 'thumbs.db'];
-
-export function asyncGlob(pattern: string, opts: any) {
-  return glob(pattern, opts);
+export async function asyncGlob(pattern: string, opts: GlobOptions): Promise<string[]> {
+  return glob(pattern, { ...opts, withFileTypes: false });
 }
