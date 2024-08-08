@@ -27,6 +27,7 @@ export const getComponentAssetsCopyTasks = (
             src: assetsMeta.absolutePath,
             dest: join(dest, assetsMeta.cmpRelativePath),
             warn: false,
+            ignore: undefined,
             keepDirStructure: false,
           });
         });
@@ -37,6 +38,7 @@ export const getComponentAssetsCopyTasks = (
             src: assetsMeta.absolutePath,
             dest: collectionDirDestination,
             warn: false,
+            ignore: undefined,
             keepDirStructure: false,
           });
         });

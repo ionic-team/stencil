@@ -38,6 +38,11 @@ jobs:
     needs: [build_core]
     uses: ./.github/workflows/test-bundlers.yml
 
+  copytask_tests:
+    name: Copy Task Tests
+    needs: [build_core]
+    uses: ./.github/workflows/test-copytask.yml
+
   component_starter_tests:
     name: Component Starter Smoke Test
     needs: [build_core]
