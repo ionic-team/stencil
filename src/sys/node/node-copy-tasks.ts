@@ -51,7 +51,10 @@ async function processGlobTask(copyTask: Required<d.CopyTask>, srcDir: string): 
    * already or a file with an extension.
    */
   const pattern =
-    isGlob(copyTask.src) || path.extname(copyTask.src).length > 0 ? copyTask.src : path.join(copyTask.src, '**');
+    isGlob(copyTask.src) || path.extname(copyTask.src).length > 0
+      ? copyTask.src
+      : './' + path.relative(process.cwd(), path.join(copyTask.src, '**')).replaceAll(path.sep, '/');
+
   const files = await asyncGlob(pattern, {
     cwd: srcDir,
     nodir: true,
