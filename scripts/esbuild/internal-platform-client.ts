@@ -69,7 +69,7 @@ export async function getInternalClientBundles(opts: BuildOptions): Promise<ESBu
 
   const polyfills = await fs.readdir(join(opts.srcDir, 'client', 'polyfills'));
   for (const polyFillFile of polyfills) {
-    patchBrowserAliases[join('./polyfills', polyFillFile)] = join(opts.srcDir, 'client', 'polyfills');
+    patchBrowserAliases[`polyfills/${polyFillFile}`] = join(opts.srcDir, 'client', 'polyfills');
   }
 
   const patchBrowserExternal = [

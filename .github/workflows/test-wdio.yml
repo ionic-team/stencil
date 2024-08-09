@@ -1,21 +1,14 @@
 name: WebdriverIO Tests
 
 on:
-  merge_group:
-  pull_request:
-  push:
-    branches:
-      - 'main'
+  workflow_call:
+    # Make this a reusable workflow, no value needed
+    # https://docs.github.com/en/actions/using-workflows/reusing-workflows
 
 jobs:
-  build_core:
-    name: Build
-    uses: ./.github/workflows/build.yml
-
   run_wdio:
     name: Run WebdriverIO Component Tests (${{ matrix.browser }})
     runs-on: ubuntu-22.04
-    needs: [build_core]
     strategy:
       matrix:
         browser: [CHROME, FIREFOX, EDGE]
@@ -23,6 +16,9 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+
+      - name: Get Core Dependencies
+        uses: ./.github/workflows/actions/get-core-dependencies
 
       - name: Use Node Version from Volta
         uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3

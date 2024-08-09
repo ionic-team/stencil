@@ -44,7 +44,10 @@ export async function buildCompiler(opts: BuildOptions) {
   transpileDts = transpileDts.replace('@stencil/core/internal', '../internal/index');
   await fs.writeFile(join(opts.output.compilerDir, 'transpile.d.ts'), transpileDts);
 
-  const alias = getEsbuildAliases();
+  const alias: Record<string, string> = {
+    ...getEsbuildAliases(),
+    glob: '../sys/node/glob.js',
+  };
 
   const external = [
     ...getEsbuildExternalModules(opts, opts.output.compilerDir),
