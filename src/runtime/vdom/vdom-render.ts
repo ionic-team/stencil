@@ -704,7 +704,12 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
       }
       // add the new vnode children
       addVnodes(elm, null, newVNode, newChildren, 0, newChildren.length - 1);
-    } else if (BUILD.updatable && oldChildren !== null) {
+    } else if (
+      // don't do this on initial render as it can cause non-hydrated content to be removed
+      !isInitialRender &&
+      BUILD.updatable &&
+      oldChildren !== null
+    ) {
       // no new child vnodes, but there are old child vnodes to remove
       removeVnodes(oldChildren, 0, oldChildren.length - 1);
     }

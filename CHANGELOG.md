@@ -1,3 +1,25 @@
+## 🚐 [4.20.0](https://github.com/ionic-team/stencil/compare/v4.19.2...v4.20.0) (2024-08-02)
+
+
+### Bug Fixes
+
+* **core:** add @stencil/core/testing/jest-preset to export map ([#5900](https://github.com/ionic-team/stencil/issues/5900)) ([3def2b7](https://github.com/ionic-team/stencil/commit/3def2b7e160c4f60318125fd6d0f22da35bc905a)), fixes [#5896](https://github.com/ionic-team/stencil/issues/5896)
+* **compiler:** don't allow shadowRoot getter to avoid hydration issues ([#5912](https://github.com/ionic-team/stencil/issues/5912)) ([5dd4f7f](https://github.com/ionic-team/stencil/commit/5dd4f7fb051c0bfd67f38fb32d61776993db2510))
+* **compiler:** no need for commenting selectors anymore ([#5892](https://github.com/ionic-team/stencil/issues/5892)) ([d571bbb](https://github.com/ionic-team/stencil/commit/d571bbbb68f361cd046c0ced724e2c4554aaa06b)), fixes [#5880](https://github.com/ionic-team/stencil/issues/5880)
+* **compiler:** respect project tsconfig watch options ([#5916](https://github.com/ionic-team/stencil/issues/5916)) ([74adeee](https://github.com/ionic-team/stencil/commit/74adeee75a6cdb290ab6127fb94281c7582e3b46)), closes [#5709](https://github.com/ionic-team/stencil/issues/5709), fixes [#5709](https://github.com/ionic-team/stencil/issues/5709), fixes [#5592](https://github.com/ionic-team/stencil/issues/5592)
+* **compiler:** run copy task after other output targets ([#5902](https://github.com/ionic-team/stencil/issues/5902)) ([c3d4e8b](https://github.com/ionic-team/stencil/commit/c3d4e8b170b405ef420236f12d7b19e21e541a81)), fixes [#5592](https://github.com/ionic-team/stencil/issues/5592)
+* **core:** add missing screenshot export ([#5909](https://github.com/ionic-team/stencil/issues/5909)) ([764a8ba](https://github.com/ionic-team/stencil/commit/764a8bafdefb5653d958a4573f23f8f8af317a73)), fixes [#5906](https://github.com/ionic-team/stencil/issues/5906)
+* **hydrate:** ensure beforeHydrateFn and afterHydrateFn always return a function ([#5890](https://github.com/ionic-team/stencil/issues/5890)) ([a7c212c](https://github.com/ionic-team/stencil/commit/a7c212c2a9deeb8cea738e334bf37b68322ada66)), fixes [#5884](https://github.com/ionic-team/stencil/issues/5884)
+* **runtime:** hydrate shadow dom first ([#5911](https://github.com/ionic-team/stencil/issues/5911)) ([ccf1a89](https://github.com/ionic-team/stencil/commit/ccf1a8941f732cb53d57785ecbe03388e744a1cd))
+* **runtime:** make isSameVnode return false on initial render in a hydration case ([#5891](https://github.com/ionic-team/stencil/issues/5891)) ([82a7bb9](https://github.com/ionic-team/stencil/commit/82a7bb9ead3dc637b646db09b6687a8d0c2735a2))
+* **testing:** update Jest types ([#5910](https://github.com/ionic-team/stencil/issues/5910)) ([5f8c969](https://github.com/ionic-team/stencil/commit/5f8c9692d41b58d3706c61db9a33215294e70049)), fixes [#5908](https://github.com/ionic-team/stencil/issues/5908)
+* **core:** update TypeScript to v5.5 ([#5898](https://github.com/ionic-team/stencil/issues/5898)) ([5e74837](https://github.com/ionic-team/stencil/commit/5e748378fd14fa5c6aaf0e001e8763a0ba3cf57c))
+
+### Note
+
+As we’ve made further enhancements to support declarative Shadow DOM, the Stencil team has determined that it’s not feasible to allow users to render a shadow component as a scoped component after compilation, such as by calling `renderToString` with `serializeShadowRoot: false`. This is because Stencil compiles styles for either shadow or scoped mode during the compilation process, embedding these styles into the hydrate module. Once this compilation is complete, the styles cannot be transformed to support the other mode. Recognizing that this change would impact the current functionality, the Stencil team has decided to proceed with this update. Moving forward, we recommend serializing all components marked with shadow: true as declarative Shadow DOM.
+
+
 ## 🏉 [4.19.2](https://github.com/ionic-team/stencil/compare/v4.19.1...v4.19.2) (2024-07-02)
 
 

@@ -117,6 +117,16 @@ export function buildJestConfig(config: d.ValidatedConfig): string {
   if (stencilConfigTesting.verbose) {
     jestConfig.verbose = stencilConfigTesting.verbose;
   }
+  if (typeof stencilConfigTesting.bail !== 'undefined') {
+    jestConfig.bail =
+      typeof stencilConfigTesting.bail === 'number' ? stencilConfigTesting.bail : stencilConfigTesting.bail ? 1 : 0;
+  }
+  if (stencilConfigTesting.prettierPath) {
+    jestConfig.prettierPath = stencilConfigTesting.prettierPath;
+  }
+  if (stencilConfigTesting.restoreMocks) {
+    jestConfig.restoreMocks = stencilConfigTesting.restoreMocks;
+  }
 
   jestConfig.testRunner = new Jest29Stencil().getDefaultJestRunner();
 

@@ -154,19 +154,6 @@ const clientHydrate = (
       }
     }
 
-    // recursively drill down, end to start so we can remove nodes
-    for (i = node.childNodes.length - 1; i >= 0; i--) {
-      clientHydrate(
-        parentVNode,
-        childRenderNodes,
-        slotNodes,
-        shadowRootNodes,
-        hostElm,
-        node.childNodes[i] as any,
-        hostId,
-      );
-    }
-
     if (node.shadowRoot) {
       // keep drilling down through the shadow root nodes
       for (i = node.shadowRoot.childNodes.length - 1; i >= 0; i--) {
@@ -180,6 +167,19 @@ const clientHydrate = (
           hostId,
         );
       }
+    }
+
+    // recursively drill down, end to start so we can remove nodes
+    for (i = node.childNodes.length - 1; i >= 0; i--) {
+      clientHydrate(
+        parentVNode,
+        childRenderNodes,
+        slotNodes,
+        shadowRootNodes,
+        hostElm,
+        node.childNodes[i] as any,
+        hostId,
+      );
     }
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     // `${COMMENT_TYPE}.${hostId}.${nodeId}.${depth}.${index}`
@@ -293,13 +293,13 @@ const clientHydrate = (
 export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: d.PlatformRuntime['$orgLocNodes$']) => {
   if (node.nodeType === NODE_TYPE.ElementNode) {
     let i = 0;
-    for (; i < node.childNodes.length; i++) {
-      initializeDocumentHydrate(node.childNodes[i] as any, orgLocNodes);
-    }
     if (node.shadowRoot) {
-      for (i = 0; i < node.shadowRoot.childNodes.length; i++) {
-        initializeDocumentHydrate(node.shadowRoot.childNodes[i] as any, orgLocNodes);
+      for (; i < node.shadowRoot.childNodes.length; i++) {
+        initializeDocumentHydrate(node.shadowRoot.childNodes[i] as d.RenderNode, orgLocNodes);
       }
+    }
+    for (i = 0; i < node.childNodes.length; i++) {
+      initializeDocumentHydrate(node.childNodes[i] as d.RenderNode, orgLocNodes);
     }
   } else if (node.nodeType === NODE_TYPE.CommentNode) {
     const childIdSplt = node.nodeValue.split('.');

@@ -1,4 +1,4 @@
-name: Analysis Tests
+name: Copy Task Tests
 
 on:
   workflow_call:
@@ -6,26 +6,15 @@ on:
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
 
 jobs:
-  analysis_test:
-    name: (${{ matrix.os }}.${{ matrix.node }})
-    strategy:
-      fail-fast: false
-      matrix:
-        node: ['16', '18', '20', '22']
-        os: ['ubuntu-latest', 'windows-latest']
-    runs-on: ${{ matrix.os }}
+  bundler_tests:
+    name: Verify Copy Task
+    runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout Code
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        uses: actions/checkout@a5ac7e51b41094c92402da3b24376905380afc29 # v4.1.6
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
-
-      - name: Use Node ${{ matrix.node }}
-        uses: actions/setup-node@1e60f620b9541d16bece96c5465dc8ee9832be0b # v4.0.3
-        with:
-          node-version: ${{ matrix.node }}
-          cache: 'npm'
 
       - name: Download Build Archive
         uses: ./.github/workflows/actions/download-archive
@@ -34,8 +23,8 @@ jobs:
           path: .
           filename: stencil-core-build.zip
 
-      - name: Analysis Tests
-        run: npm run test.analysis
+      - name: Bundler Tests
+        run: npm run test.copytask
         shell: bash
 
       - name: Check Git Context

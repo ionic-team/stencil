@@ -428,6 +428,7 @@ export interface Config extends StencilConfig {
   suppressLogs?: boolean;
   profile?: boolean;
   tsCompilerOptions?: any;
+  tsWatchOptions?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
 }
@@ -942,10 +943,10 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    */
   removeHtmlComments?: boolean;
   /**
-   * If set to `false` Stencil will ignore the fact that a component has a `shadow: true`
-   * flag and serializes it as a scoped component. If set to `true` the component will
-   * be rendered within a Declarative Shadow DOM.
-   * @default false
+   * If set to `true` the component will be rendered within a Declarative Shadow DOM.
+   * If set to `false` Stencil will ignore the contents of the shadow root and render the
+   * element as given in provided template.
+   * @default true
    */
   serializeShadowRoot?: boolean;
   /**
@@ -1647,6 +1648,11 @@ export interface CopyTask {
    */
   dest?: string;
   /**
+   * An optional array of glob patterns to exclude from the copy operation.
+   * @default ['**\/__mocks__/**', '**\/__fixtures__/**', '**\/dist/**', '**\/.{idea,git,cache,output,temp}/**', '**\/.ds_store', '**\/.gitignore', '**\/desktop.ini', '**\/thumbs.db']
+   */
+  ignore?: string[];
+  /**
    * Whether or not Stencil should issue warnings if it cannot find the
    * specified source files or directories. Defaults to `false`.
    *
@@ -1765,6 +1771,9 @@ export interface Testing {
   destroy(): Promise<void>;
 }
 
+export declare type Path = string;
+export declare type TransformerConfig = [string, Record<string, unknown>];
+
 /**
  * Options for initiating a run of Stencil tests (spec and/or end-to-end)
  */
@@ -1798,7 +1807,7 @@ export interface JestConfig {
    * By default, Jest runs all tests and produces all errors into the console upon completion.
    * The bail config option can be used here to have Jest stop running tests after the first failure. Default: false
    */
-  bail?: boolean;
+  bail?: boolean | number;
 
   /**
    * The directory where Jest should store its cached dependency information. Jest attempts to scan your dependency tree once (up-front)
@@ -1884,8 +1893,8 @@ export interface JestConfig {
   reporters?: any;
   resetMocks?: boolean;
   resetModules?: boolean;
-  resolver?: string;
-  restoreMocks?: string;
+  resolver?: Path | null;
+  restoreMocks?: boolean;
   rootDir?: string;
   roots?: any[];
   runner?: string;
@@ -1905,12 +1914,14 @@ export interface JestConfig {
   testMatch?: string[];
   testPathIgnorePatterns?: string[];
   testPreset?: string;
-  testRegex?: string;
+  testRegex?: string[];
   testResultsProcessor?: string;
   testRunner?: string;
   testURL?: string;
   timers?: string;
-  transform?: { [key: string]: string };
+  transform?: {
+    [regex: string]: Path | TransformerConfig;
+  };
   transformIgnorePatterns?: any[];
   unmockedModulePathPatterns?: any[];
   verbose?: boolean;

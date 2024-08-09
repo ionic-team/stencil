@@ -92,19 +92,17 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
           }
 
           /**
-           * only attach style tag to <head /> section if:
+           * attach styles at the end of the head tag if we render shadow components
            */
-          const injectStyle =
-            /**
-             * we render a scoped component
-             */
-            !(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) ||
-            /**
-             * we are using shadow dom and render the style tag within the shadowRoot
-             */
-            (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && styleContainerNode.nodeName !== 'HEAD');
-          if (injectStyle) {
-            styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+          if (!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
+            styleContainerNode.append(styleElm);
+          }
+
+          /**
+           * attach styles at the beginning of a shadow root node if we render shadow components
+           */
+          if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && styleContainerNode.nodeName !== 'HEAD') {
+            styleContainerNode.insertBefore(styleElm, null);
           }
         }
 

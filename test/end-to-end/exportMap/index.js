@@ -8,6 +8,7 @@ const appData = require('@stencil/core/internal/app-data');
 const { createNodeLogger } = require('@stencil/core/sys/node');
 const { createTesting } = require('@stencil/core/testing');
 const preset = require('@stencil/core/testing/jest-preset');
+const { ScreenshotLocalConnector } = require('@stencil/core/screenshot');
 
 assert(typeof version === 'string');
 assert(typeof run, 'function');
@@ -17,6 +18,7 @@ assert(Object.keys(appData).length === 3);
 assert(typeof createNodeLogger === 'function');
 assert(typeof createTesting === 'function');
 assert(preset.moduleFileExtensions);
+assert(ScreenshotLocalConnector);
 
 console.log(`🎉 All CJS imports successfully resolved!`);
 console.log('✅ passed!\n');

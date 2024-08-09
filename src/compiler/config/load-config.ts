@@ -82,6 +82,7 @@ export const loadConfig = async (init: LoadConfigInit = {}): Promise<LoadConfigR
 
       results.config.tsconfig = tsConfigResults.path;
       results.config.tsCompilerOptions = tsConfigResults.compilerOptions;
+      results.config.tsWatchOptions = tsConfigResults.watchOptions;
 
       results.tsconfig.path = tsConfigResults.path;
       results.tsconfig.compilerOptions = JSON.parse(JSON.stringify(tsConfigResults.compilerOptions));

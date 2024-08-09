@@ -21,6 +21,14 @@ import { parseStringLiteral } from './string-literal';
 import { parseStaticStyles } from './styles';
 import { parseStaticWatchers } from './watchers';
 
+const BLACKLISTED_COMPONENT_METHODS = [
+  /**
+   * If someone would define a getter called "shadowRoot" on a component
+   * this would cause issues when Stencil tries to hydrate the component.
+   */
+  'shadowRoot',
+];
+
 /**
  * Given a {@see ts.ClassDeclaration} which represents a Stencil component
  * class declaration, parse and format various pieces of data about static class
@@ -148,6 +156,8 @@ export const parseStaticComponentMeta = (
   };
 
   const visitComponentChildNode = (node: ts.Node) => {
+    validateComponentMembers(node);
+
     if (ts.isCallExpression(node)) {
       parseCallExpression(cmp, node);
     } else if (ts.isStringLiteral(node)) {
@@ -174,6 +184,44 @@ export const parseStaticComponentMeta = (
   compilerCtx.nodeMap.set(cmpNode, cmp);
 
   return cmpNode;
+};
+
+const validateComponentMembers = (node: ts.Node) => {
+  /**
+   * validate if:
+   */
+  if (
+    /**
+     * the component has a getter called "shadowRoot"
+     */
+    ts.isGetAccessorDeclaration(node) &&
+    ts.isIdentifier(node.name) &&
+    typeof node.name.escapedText === 'string' &&
+    BLACKLISTED_COMPONENT_METHODS.includes(node.name.escapedText) &&
+    /**
+     * the parent node is a class declaration
+     */
+    ts.isClassDeclaration(node.parent)
+  ) {
+    const propName = node.name.escapedText;
+    const decorator = ts.getDecorators(node.parent)[0];
+    /**
+     * the class is actually a Stencil component, has a decorator with a property named "tag"
+     */
+    if (
+      ts.isCallExpression(decorator.expression) &&
+      decorator.expression.arguments.length === 1 &&
+      ts.isObjectLiteralExpression(decorator.expression.arguments[0]) &&
+      decorator.expression.arguments[0].properties.some(
+        (prop) => ts.isPropertyAssignment(prop) && prop.name.getText() === 'tag',
+      )
+    ) {
+      const componentName = node.parent.name.getText();
+      throw new Error(
+        `The component "${componentName}" has a getter called "${propName}". This getter is reserved for use by Stencil components and should not be defined by the user.`,
+      );
+    }
+  }
 };
 
 const parseVirtualProps = (docs: d.CompilerJsDoc) => {
