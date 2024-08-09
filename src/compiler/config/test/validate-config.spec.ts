@@ -391,7 +391,6 @@ describe('validation', () => {
     expect(config.extras.scriptDataOpts).toBe(false);
     expect(config.extras.slotChildNodesFix).toBe(false);
     expect(config.extras.initializeNextTick).toBe(false);
-    expect(config.extras.tagNameTransform).toBe(false);
     expect(config.extras.scopedSlotTextContentFix).toBe(false);
   });
 
