@@ -54,6 +54,11 @@ describe('renderToString', () => {
       `<html>
       <head>
         <link rel="preconnect" href="https://some-url.com" />
+        <style>
+          .myComponent {
+            display: none;
+          }
+        </style>
       </head>
 
       <body>
@@ -72,11 +77,17 @@ describe('renderToString', () => {
       { fullDocument: true, serializeShadowRoot: false },
     );
 
+    /**
+     * expect the scoped component styles to be injected after the preconnect link
+     */
     expect(html).toContain(
-      '<link rel="preconnect" href="https://some-url.com"> <style sty-id="sc-scoped-car-list">.sc-scoped-car-list-h{',
+      '<link rel=\"preconnect\" href=\"https://some-url.com\"><style sty-id=\"sc-scoped-car-list\">.sc-scoped-car-list-h',
     );
-    expect(html).toContain(
-      '.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style></head> <body> <div class="__next"> <main> <scoped-car-list cars',
+    /**
+     * expect the custom style tag to be last in the head tag
+     */
+    expect(html.replaceAll(/\n[ ]+/g, '')).toContain(
+      `.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style> <style>.myComponent {display: none;}</style> </head> <body>`,
     );
   });
 
