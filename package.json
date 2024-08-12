@@ -159,7 +159,7 @@
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-jest": "^28.0.0",
-    "eslint-plugin-jsdoc": "^48.0.0",
+    "eslint-plugin-jsdoc": "^50.0.0",
     "eslint-plugin-simple-import-sort": "^12.0.0",
     "eslint-plugin-wdio": "^8.24.12",
     "execa": "9.3.0",
