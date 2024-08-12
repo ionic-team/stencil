@@ -81,7 +81,7 @@ describe('renderToString', () => {
      * expect the scoped component styles to be injected after the preconnect link
      */
     expect(html).toContain(
-      '<link rel=\"preconnect\" href=\"https://some-url.com\"><style sty-id=\"sc-scoped-car-list\">.sc-scoped-car-list-h',
+      '<link rel="preconnect" href="https://some-url.com"><style sty-id="sc-scoped-car-list">.sc-scoped-car-list-h',
     );
     /**
      * expect the custom style tag to be last in the head tag
