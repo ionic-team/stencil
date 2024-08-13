@@ -45,8 +45,9 @@ export async function buildTesting(opts: BuildOptions) {
   const external = [
     ...EXTERNAL_TESTING_MODULES,
     ...getEsbuildExternalModules(opts, opts.output.testingDir),
-    '../compiler/stencil.js',
     '../internal/testing/*',
+    '../src/cli/*',
+    '../compiler/*',
   ];
 
   const aliases = getEsbuildAliases();

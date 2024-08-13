@@ -73,7 +73,11 @@ export function getEsbuildExternalModules(opts: BuildOptions, ownEntryPoint: str
     /**
      * transform the absolute path to a relative one
      */
-    .map((p) => '..' + path.sep + path.relative(root, path.join(p, '*')))
+    .map((p) => [
+      '..' + path.sep + 'src'  + path.sep + path.relative(root, path.join(p, '*')),
+      '.' + path.sep + 'src'  + path.sep + path.relative(root, path.join(p, '*'))
+    ])
+    .flat()
     /**
      * replace path separators with forward slashes
      */

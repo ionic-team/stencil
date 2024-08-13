@@ -38,6 +38,7 @@ export async function buildSysNode(opts: BuildOptions) {
     // externalize each other we need to do so
     '../../compiler/stencil.js',
     '../../sys/node/*',
+    './glob.js',
   ];
 
   const sysNodeAliases = {

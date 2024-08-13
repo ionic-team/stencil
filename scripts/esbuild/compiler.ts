@@ -46,11 +46,13 @@ export async function buildCompiler(opts: BuildOptions) {
 
   const alias: Record<string, string> = {
     ...getEsbuildAliases(),
-    glob: '../sys/node/glob.js',
+    glob: './sys/node/glob.js',
+    '@stencil/core/mock-doc': './mock-doc/index.cjs',
   };
 
   const external = [
     ...getEsbuildExternalModules(opts, opts.output.compilerDir),
+    '../mock-doc/index.cjs',
     '../sys/node/autoprefixer.js',
     '../sys/node/index.js',
   ];
