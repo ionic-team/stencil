@@ -101,7 +101,8 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
                * after the last preconnect link to ensure the styles are preloaded
                */
               const preconnectLinks = styleContainerNode.querySelectorAll('link[rel=preconnect]');
-              const referenceNode = preconnectLinks.length > 0
+              const referenceNode =
+                preconnectLinks.length > 0
                   ? preconnectLinks[preconnectLinks.length - 1].nextSibling
                   : document.querySelector('style');
               styleContainerNode.insertBefore(styleElm, referenceNode);
