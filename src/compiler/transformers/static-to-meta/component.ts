@@ -201,6 +201,7 @@ const validateComponentMembers = (node: ts.Node) => {
     /**
      * the parent node is a class declaration
      */
+    node.parent &&
     ts.isClassDeclaration(node.parent)
   ) {
     const propName = node.name.escapedText;
