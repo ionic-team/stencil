@@ -105,7 +105,7 @@ export const BUILD: BuildConditionals = {
   devTools: false,
   shadowDelegatesFocus: true,
   initializeNextTick: false,
-  asyncLoading: false,
+  asyncLoading: true,
   asyncQueue: false,
   transformTagName: false,
   attachStyles: true,
