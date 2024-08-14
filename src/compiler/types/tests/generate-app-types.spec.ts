@@ -1750,7 +1750,7 @@ declare module "@stencil/core" {
               Fragment: {
                 location: 'import',
                 path: '@stencil/core',
-                id: ''
+                id: '',
               },
             },
           },
