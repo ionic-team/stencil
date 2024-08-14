@@ -105,13 +105,13 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
                 preconnectLinks.length > 0
                   ? preconnectLinks[preconnectLinks.length - 1].nextSibling
                   : document.querySelector('style');
-              styleContainerNode.insertBefore(styleElm, referenceNode);
+              (styleContainerNode as HTMLElement).insertBefore(styleElm, referenceNode);
             } else if ('host' in styleContainerNode) {
               /**
                * if a scoped component is used within a shadow root, we want to insert the styles
                * at the beginning of the shadow root node
                */
-              styleContainerNode.prepend(styleElm, null);
+              (styleContainerNode as HTMLElement).prepend(styleElm);
             }
           }
 
