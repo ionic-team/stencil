@@ -30,7 +30,10 @@ export async function buildCli(opts: BuildOptions) {
   // this isn't strictly necessary to alias - however, this minimizes cuts down the bundle size by ~70kb.
   cliAliases['prompts'] = 'prompts/lib/index.js';
 
-  const external = getEsbuildExternalModules(opts, opts.output.cliDir);
+  const external = [
+    ...getEsbuildExternalModules(opts, opts.output.cliDir),
+    '../testing/*',
+  ];
 
   const cliEsbuildOptions = {
     ...getBaseEsbuildOptions(),
