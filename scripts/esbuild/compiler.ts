@@ -48,6 +48,7 @@ export async function buildCompiler(opts: BuildOptions) {
     ...getEsbuildAliases(),
     glob: './sys/node/glob.js',
     '@stencil/core/mock-doc': './mock-doc/index.cjs',
+    '@sys-api-node': '../sys/node/index.js',
   };
 
   const external = [

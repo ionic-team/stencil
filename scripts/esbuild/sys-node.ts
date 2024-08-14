@@ -37,7 +37,7 @@ export async function buildSysNode(opts: BuildOptions) {
     // we build multiple things within `opts.output.sysNodeDir` which should
     // externalize each other we need to do so
     '../../compiler/stencil.js',
-    '../../sys/node/*',
+    '../../sys/node/index.js',
     './glob.js',
   ];
 
