@@ -136,7 +136,11 @@ export const setAccessor = (
             if (memberName === 'list') {
               isProp = false;
             } else if (oldValue == null || (elm as any)[memberName] != n) {
-              (elm as any)[memberName] = n;
+              if (typeof (elm as any).__lookupSetter__(memberName) === 'function') {
+                (elm as any)[memberName] = n;
+              } else {
+                elm.setAttribute(memberName, n);
+              }
             }
           } else {
             (elm as any)[memberName] = newValue;
