@@ -897,5 +897,5 @@ describe('setAccessor for standard html elements', () => {
     const spy2 = jest.spyOn(elm2, 'setAttribute');
     setAccessor(elm2, 'textContent', undefined, 'some-content', false, 0);
     expect(spy2.mock.calls).toEqual([]);
-  })
+  });
 });

@@ -129,7 +129,7 @@ patchPropAttributes(
 Object.defineProperty(MockButtonElement.prototype, 'form', {
   get(this: MockElement) {
     return this.hasAttribute('form') ? this.getAttribute('form') : null;
-  }
+  },
 });
 
 export class MockImageElement extends MockHTMLElement {
