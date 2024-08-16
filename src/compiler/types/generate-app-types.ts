@@ -108,7 +108,9 @@ const generateComponentTypesFile = (
     return `{ ${typeData
       .sort(sortImportNames)
       .map((td) => {
-        if (td.originalName === td.importName) {
+        if (td.originalName === '') {
+          return `${td.localName}`;
+        } else if (td.originalName === td.importName) {
           return `${td.originalName}`;
         } else {
           return `${td.originalName} as ${td.importName}`;
