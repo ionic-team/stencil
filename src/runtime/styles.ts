@@ -112,6 +112,8 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
                * at the beginning of the shadow root node
                */
               (styleContainerNode as HTMLElement).prepend(styleElm);
+            } else {
+              styleContainerNode.append(styleElm);
             }
           }
 
