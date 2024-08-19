@@ -21,6 +21,8 @@ export function getEsbuildAliases(): Record<string, string> {
     '@stencil/core/dev-server': '../dev-server/index.js',
     '@stencil/core/mock-doc': '../mock-doc/index.cjs',
     '@stencil/core/internal/testing': '../internal/testing/index.js',
+    '@stencil/core/cli': '../cli/index.cjs',
+    '@sys-api-node': '../sys/node/index.js',
 
     // dev server related aliases
     ws: './ws.js',
@@ -68,7 +70,7 @@ export function getEsbuildExternalModules(opts: BuildOptions, ownEntryPoint: str
      * Filter out the `internal`, `cli`, and `compiler` directories, as they we intend to import
      * these primitives directly from these packages.
      */
-    .filter((bundle) => !bundle.endsWith('internal') && !bundle.endsWith('cli') && !bundle.endsWith('compiler'))
+    .filter((bundle) => !bundle.endsWith('internal') && !bundle.endsWith('cli') && !bundle.endsWith('compiler') && !bundle.endsWith('screenshot') && !bundle.endsWith('mock-doc'))
     .filter((outdir) => outdir !== ownEntryPoint)
     /**
      * transform the absolute path to a relative one

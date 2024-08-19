@@ -46,14 +46,12 @@ export async function buildTesting(opts: BuildOptions) {
     ...EXTERNAL_TESTING_MODULES,
     ...getEsbuildExternalModules(opts, opts.output.testingDir),
     '../internal/testing/*',
-    '../src/cli/*',
-    '../compiler/*',
+    '../cli/index.cjs',
+    '../sys/node/index.js',
+    '../compiler/stencil.js'
   ];
 
   const aliases = getEsbuildAliases();
-  // we want to point at the cjs module here because we're building cjs
-  aliases['@stencil/core/cli'] = './cli/index.cjs';
-
   const testingEsbuildOptions: ESBuildOptions = {
     ...getBaseEsbuildOptions(),
     entryPoints: [path.join(sourceDir, 'index.ts')],
