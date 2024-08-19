@@ -48,7 +48,7 @@ export async function buildTesting(opts: BuildOptions) {
     '../internal/testing/*',
     '../cli/index.cjs',
     '../sys/node/index.js',
-    '../compiler/stencil.js'
+    '../compiler/stencil.js',
   ];
 
   const aliases = getEsbuildAliases();

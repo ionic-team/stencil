@@ -72,11 +72,7 @@ export async function getInternalClientBundles(opts: BuildOptions): Promise<ESBu
     patchBrowserAliases[`polyfills/${polyFillFile}`] = join(opts.srcDir, 'client', 'polyfills');
   }
 
-  const patchBrowserExternal = [
-    ...externalNodeModules,
-    '@stencil/core',
-    '@stencil/core/mock-doc',
-  ];
+  const patchBrowserExternal = [...externalNodeModules, '@stencil/core', '@stencil/core/mock-doc'];
 
   const internalClientPatchBrowserBundle: ESBuildOptions = {
     ...getBaseEsbuildOptions(),
