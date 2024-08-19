@@ -1,6 +1,5 @@
 import type { BuildOptions as ESBuildOptions, BuildResult as ESBuildResult, OutputFile, Plugin } from 'esbuild';
-import * as esbuild from 'esbuild';
-import path from 'path';
+import { build, context } from 'esbuild';
 
 import { BuildOptions } from '../../utils/options';
 
@@ -70,12 +69,12 @@ export function runBuilds(builds: ESBuildOptions[], opts: BuildOptions): Promise
   if (opts.isWatch) {
     return Promise.all(
       builds.map(async (buildConfig) => {
-        const context = await esbuild.context(buildConfig);
-        return context.watch();
+        const ctx = await context(buildConfig);
+        return ctx.watch();
       }),
     );
   } else {
-    return Promise.all(builds.map(esbuild.build));
+    return Promise.all(builds.map(build));
   }
 }
 
