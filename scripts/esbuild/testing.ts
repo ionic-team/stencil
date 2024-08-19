@@ -7,9 +7,9 @@ import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
 import {
   externalAlias,
+  externalNodeModules,
   getBaseEsbuildOptions,
   getEsbuildAliases,
-  getEsbuildExternalModules,
   getFirstOutputFile,
   runBuilds,
 } from './utils';
@@ -44,7 +44,7 @@ export async function buildTesting(opts: BuildOptions) {
 
   const external = [
     ...EXTERNAL_TESTING_MODULES,
-    ...getEsbuildExternalModules(opts, opts.output.testingDir),
+    ...externalNodeModules,
     '../internal/testing/*',
     '../cli/index.cjs',
     '../sys/node/index.js',

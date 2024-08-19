@@ -37,7 +37,7 @@ export function getEsbuildAliases(): Record<string, string> {
  * as side-effect-free, which allows imports from them to be properly
  * tree-shaken.
  */
-const externalNodeModules = [
+export const externalNodeModules = [
   '@jest/core',
   '@jest/reporters',
   '@microsoft/typescript-etw',
@@ -54,39 +54,6 @@ const externalNodeModules = [
   'puppeteer-core',
   'yargs',
 ];
-
-/**
- * Get a manifest of modules which should be marked as external for a given
- * esbuild bundle
- *
- * @param opts options for the current build
- * @param ownEntryPoint the entry point alias of the current module
- * @returns a list of modules which should be marked as external
- */
-export function getEsbuildExternalModules(opts: BuildOptions, ownEntryPoint: string): string[] {
-  const root = path.resolve(__dirname, '..', '..', '..');
-  const bundles = Object.values(opts.output)
-    /**
-     * Filter out the `internal`, `cli`, and `compiler` directories, as they we intend to import
-     * these primitives directly from these packages.
-     */
-    .filter((bundle) => !bundle.endsWith('internal') && !bundle.endsWith('cli') && !bundle.endsWith('compiler') && !bundle.endsWith('screenshot') && !bundle.endsWith('mock-doc'))
-    .filter((outdir) => outdir !== ownEntryPoint)
-    /**
-     * transform the absolute path to a relative one
-     */
-    .map((p) => [
-      '..' + path.sep + 'src' + path.sep + path.relative(root, path.join(p, '*')),
-      '.' + path.sep + 'src' + path.sep + path.relative(root, path.join(p, '*')),
-    ])
-    .flat()
-    /**
-     * replace path separators with forward slashes
-     */
-    .map((p) => p.replaceAll(path.sep, '/'));
-
-  return [...externalNodeModules, ...bundles];
-}
 
 /**
  * A helper which runs an array of esbuild, uh, _builds_

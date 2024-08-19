@@ -7,7 +7,7 @@ import webpack, { Configuration } from 'webpack';
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './utils';
+import { externalAlias, externalNodeModules, getBaseEsbuildOptions, getEsbuildAliases, runBuilds } from './utils';
 
 export async function buildSysNode(opts: BuildOptions) {
   const inputDir = path.join(opts.buildDir, 'sys', 'node');
@@ -32,7 +32,7 @@ export async function buildSysNode(opts: BuildOptions) {
   });
 
   const external = [
-    ...getEsbuildExternalModules(opts, opts.output.sysNodeDir),
+    ...externalNodeModules,
     // normally you wouldn't externalize your "own" directory here, but since
     // we build multiple things within `opts.output.sysNodeDir` which should
     // externalize each other we need to do so
