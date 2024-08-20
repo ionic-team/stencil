@@ -1747,6 +1747,11 @@ declare module "@stencil/core" {
                 location: 'import',
                 path: '@utils',
               },
+              Fragment: {
+                location: 'import',
+                path: '@stencil/core',
+                id: '',
+              },
             },
           },
         }),
@@ -1767,7 +1772,9 @@ declare module "@stencil/core" {
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { MyType as UserImplementedPropType } from "@utils";
+import { Fragment } from "@stencil/core";
 export { MyType as UserImplementedPropType } from "@utils";
+export { Fragment } from "@stencil/core";
 export namespace Components {
     /**
      * docs

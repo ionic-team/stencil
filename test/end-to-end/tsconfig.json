@@ -12,7 +12,7 @@
     "jsxFragmentFactory": "Fragment",
     "lib": [
       "dom",
-      "es2017"
+      "es2021"
     ],
     "module": "esnext",
     "moduleResolution": "node",

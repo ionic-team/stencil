@@ -886,4 +886,16 @@ describe('setAccessor for standard html elements', () => {
       expect(elm.style.cssText).toEqual('margin: 30px; color: orange;');
     });
   });
+
+  it('uses setAttribute if element has not setter', () => {
+    const elm = document.createElement('button');
+    const spy = jest.spyOn(elm, 'setAttribute');
+    setAccessor(elm, 'form', undefined, 'some-form', false, 0);
+    expect(spy.mock.calls).toEqual([['form', 'some-form']]);
+
+    const elm2 = document.createElement('button');
+    const spy2 = jest.spyOn(elm2, 'setAttribute');
+    setAccessor(elm2, 'textContent', undefined, 'some-content', false, 0);
+    expect(spy2.mock.calls).toEqual([]);
+  });
 });

@@ -92,10 +92,29 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
           }
 
           /**
-           * attach styles at the end of the head tag if we render shadow components
+           * attach styles at the end of the head tag if we render scoped components
            */
           if (!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
-            styleContainerNode.append(styleElm);
+            if (styleContainerNode.nodeName === 'HEAD') {
+              /**
+               * if the page contains preconnect links, we want to insert the styles
+               * after the last preconnect link to ensure the styles are preloaded
+               */
+              const preconnectLinks = styleContainerNode.querySelectorAll('link[rel=preconnect]');
+              const referenceNode =
+                preconnectLinks.length > 0
+                  ? preconnectLinks[preconnectLinks.length - 1].nextSibling
+                  : document.querySelector('style');
+              (styleContainerNode as HTMLElement).insertBefore(styleElm, referenceNode);
+            } else if ('host' in styleContainerNode) {
+              /**
+               * if a scoped component is used within a shadow root, we want to insert the styles
+               * at the beginning of the shadow root node
+               */
+              (styleContainerNode as HTMLElement).prepend(styleElm);
+            } else {
+              styleContainerNode.append(styleElm);
+            }
           }
 
           /**
