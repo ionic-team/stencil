@@ -619,8 +619,6 @@ export declare namespace h {
   export function h(sel: any, data: VNodeData | null, children: VNode): VNode;
 
   export namespace JSX {
-    interface Element extends LocalJSX.Element {}
-
     interface IntrinsicElements extends LocalJSX.IntrinsicElements, JSXBase.IntrinsicElements {
       [tagName: string]: any;
     }
