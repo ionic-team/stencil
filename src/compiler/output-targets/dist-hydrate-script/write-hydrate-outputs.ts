@@ -58,6 +58,15 @@ const writeHydrateOutput = async (
     rollupOutput.output.map(async (output) => {
       if (output.type === 'chunk') {
         output.code = relocateHydrateContextConst(config, compilerCtx, output.code);
+
+        /**
+         * Enable the line where we define `modeResolutionChain` for the hydrate module.
+         */
+        output.code = output.code.replace(
+          '// const modeResolutionChain = [];',
+          'const modeResolutionChain = [];'
+        );
+
         const filePath = join(hydrateAppDirPath, output.fileName);
         await compilerCtx.fs.writeFile(filePath, output.code, { immediateWrite: true });
       }

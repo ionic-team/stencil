@@ -290,4 +290,33 @@ describe('renderToString', () => {
     });
     expect(html).toBe('<cmp-with-slot custom-hydrate-flag="" s-id="1"><!--r.1-->Hello World</cmp-with-slot>');
   });
+
+  describe('modes in declarative shadow dom', () => {
+    it('renders components in ios mode', async () => {
+      const { html } = await renderToString('<prop-cmp first="Max" last="Mustermann"></prop-cmp>', {
+        fullDocument: false,
+        prettyHtml: true,
+        mode: () => 'ios',
+      });
+      expect(html).toContain('<style>');
+      expect(html).toContain(';color:white;');
+      const page = await newE2EPage({ html, url: 'https://stencil.com' });
+      const div = await page.find('>>>div');
+      const { color } = await div.getComputedStyle();
+      expect(color).toBe('rgb(255, 255, 255)');
+    });
+
+    it('renders components in md mode', async () => {
+      const { html } = await renderToString('<prop-cmp first="Max" last="Mustermann"></prop-cmp>', {
+        fullDocument: false,
+        prettyHtml: true,
+        mode: () => 'md',
+      });
+      expect(html).toContain(';color:black;');
+      const page = await newE2EPage({ html, url: 'https://stencil.com' });
+      const div = await page.find('>>>div');
+      const { color } = await div.getComputedStyle();
+      expect(color).toBe('rgb(0, 0, 0)');
+    });
+  })
 });

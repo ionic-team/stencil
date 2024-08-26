@@ -2,6 +2,7 @@ import type { ConfigFlags } from '../cli/config-flags';
 import type { PrerenderUrlResults, PrintLine } from '../internal';
 import type { BuildCtx, CompilerCtx } from './stencil-private';
 import type { JsonDocs } from './stencil-public-docs';
+import type { ResolutionHandler } from './stencil-public-runtime';
 
 export * from './stencil-public-docs';
 
@@ -955,6 +956,11 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    * @default true
    */
   fullDocument?: boolean;
+  /**
+   * Style mode to render the component in.
+   * @see https://stenciljs.com/docs/styling#style-modes
+   */
+  mode?: ResolutionHandler;
 }
 
 export interface HydrateFactoryOptions extends SerializeDocumentOptions {
