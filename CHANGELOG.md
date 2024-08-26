@@ -4,20 +4,20 @@
 ### Bug Fixes
 
 * **compiler:** default `asyncLoading` build conditional to `true` ([#5941](https://github.com/ionic-team/stencil/issues/5941)) ([0e261d6](https://github.com/ionic-team/stencil/commit/0e261d653b03fd55a975f4e56e2fae258c3dcd88)), closes [#3580](https://github.com/ionic-team/stencil/issues/3580)
-* **compiler:** prefer `localName` over `originalName` by running an empty check on `originalName` ([#5943](https://github.com/ionic-team/stencil/issues/5943)) ([0f42656](https://github.com/ionic-team/stencil/commit/0f42656f00a84be52e1c2497159c27cbfb0fba2a))
-* **compiler:** verify parent node when validating component members ([#5942](https://github.com/ionic-team/stencil/issues/5942)) ([37a0aaf](https://github.com/ionic-team/stencil/commit/37a0aaf176db2ad620fad18a3ddc1e64764c237c))
+* **compiler:** prefer `localName` over `originalName` by running an empty check on `originalName` ([#5943](https://github.com/ionic-team/stencil/issues/5943)) ([0f42656](https://github.com/ionic-team/stencil/commit/0f42656f00a84be52e1c2497159c27cbfb0fba2a)), closes [#5882](https://github.com/ionic-team/stencil/issues/5882)
+* **compiler:** verify parent node when validating component members ([#5942](https://github.com/ionic-team/stencil/issues/5942)) ([37a0aaf](https://github.com/ionic-team/stencil/commit/37a0aaf176db2ad620fad18a3ddc1e64764c237c)), closes [#5940](https://github.com/ionic-team/stencil/issues/5940)
 * **runtime:** have fallback for style setting ([#5948](https://github.com/ionic-team/stencil/issues/5948)) ([ae19d7a](https://github.com/ionic-team/stencil/commit/ae19d7ad736ee1ae4989a4d0ed08a607ea208b78))
-* **runtime:** only use setter if existing ([#5947](https://github.com/ionic-team/stencil/issues/5947)) ([7e9fa60](https://github.com/ionic-team/stencil/commit/7e9fa60d7692e630134618f1186386c0cc0b3a29))
+* **runtime:** only use setter if existing ([#5947](https://github.com/ionic-team/stencil/issues/5947)) ([7e9fa60](https://github.com/ionic-team/stencil/commit/7e9fa60d7692e630134618f1186386c0cc0b3a29)), closes [#2703](https://github.com/ionic-team/stencil/issues/2703)
 * **runtime:** place scoped component styles after preconnect links but before custom styles ([#5938](https://github.com/ionic-team/stencil/issues/5938)) ([8f92b11](https://github.com/ionic-team/stencil/commit/8f92b11c1940b86b460c2f3a574208b88e1bbecd))
 * **runtime:** provide second arg to `insertBefore` ([#5933](https://github.com/ionic-team/stencil/issues/5933)) ([afcc9a5](https://github.com/ionic-team/stencil/commit/afcc9a5ee7fba408c1be3f9ed594dcddae3fdb7b))
-* **runtime:** render component styles at the end of the head tag ([#5926](https://github.com/ionic-team/stencil/issues/5926)) ([90da726](https://github.com/ionic-team/stencil/commit/90da726789be4d26c35ad86cb1441ad7f440dce6))
+* **runtime:** render component styles at the end of the head tag ([#5926](https://github.com/ionic-team/stencil/issues/5926)) ([90da726](https://github.com/ionic-team/stencil/commit/90da726789be4d26c35ad86cb1441ad7f440dce6)), closes [#5915](https://github.com/ionic-team/stencil/issues/5915)
 * **runtime:** update call to `prepend` to remove `null` node ([#5946](https://github.com/ionic-team/stencil/issues/5946)) ([970c5d2](https://github.com/ionic-team/stencil/commit/970c5d25fba3b82df262a154980cc0f25fdd315c))
-* **typescript:** fix documentation on 'serializeShadowRoot' flag ([#5927](https://github.com/ionic-team/stencil/issues/5927)) ([277e3e3](https://github.com/ionic-team/stencil/commit/277e3e35730e37b028d2f2ed32960d5f947d7dd4))
+* **typescript:** fix documentation on 'serializeShadowRoot' flag ([#5927](https://github.com/ionic-team/stencil/issues/5927)) ([277e3e3](https://github.com/ionic-team/stencil/commit/277e3e35730e37b028d2f2ed32960d5f947d7dd4)), closes [#5914](https://github.com/ionic-team/stencil/issues/5914)
 
 
 ### Features
 
-* **compiler:** allow ignore pattern for copy task ([#5899](https://github.com/ionic-team/stencil/issues/5899)) ([f89c6a3](https://github.com/ionic-team/stencil/commit/f89c6a356bdcd78fc6427d3cb75776d749196eea))
+* **compiler:** allow ignore pattern for copy task ([#5899](https://github.com/ionic-team/stencil/issues/5899)) ([f89c6a3](https://github.com/ionic-team/stencil/commit/f89c6a356bdcd78fc6427d3cb75776d749196eea)), closes [#5781](https://github.com/ionic-team/stencil/issues/5781)
 
 
 
