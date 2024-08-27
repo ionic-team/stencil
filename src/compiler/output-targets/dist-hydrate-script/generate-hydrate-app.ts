@@ -5,6 +5,7 @@ import { RollupOptions } from 'rollup';
 import { rollup, type RollupBuild } from 'rollup';
 
 import {
+  STENCIL_APP_DATA_ID,
   STENCIL_HYDRATE_FACTORY_ID,
   STENCIL_INTERNAL_HYDRATE_ID,
   STENCIL_MOCK_DOC_ID,
@@ -50,6 +51,7 @@ export const generateHydrateApp = async (
     const packageDir = join(config.sys.getCompilerExecutingPath(), '..', '..');
     const input = join(packageDir, 'internal', 'hydrate', 'runner.js');
     const mockDoc = join(packageDir, 'mock-doc', 'index.js');
+    const appData = join(packageDir, 'internal', 'app-data', 'index.js');
 
     const rollupOptions: RollupOptions = {
       ...config.rollupConfig.inputOptions,
@@ -66,6 +68,9 @@ export const generateHydrateApp = async (
             }
             if (id === STENCIL_MOCK_DOC_ID) {
               return mockDoc;
+            }
+            if (id === STENCIL_APP_DATA_ID) {
+              return appData;
             }
             return null;
           },

@@ -1,4 +1,3 @@
-// @ts-ignore
 import { getHostRef, modeResolutionChain } from '@platform';
 
 import type * as d from '../declarations';
