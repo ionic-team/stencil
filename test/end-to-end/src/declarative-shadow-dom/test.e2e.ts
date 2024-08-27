@@ -318,5 +318,5 @@ describe('renderToString', () => {
       const { color } = await div.getComputedStyle();
       expect(color).toBe('rgb(0, 0, 0)');
     });
-  })
+  });
 });

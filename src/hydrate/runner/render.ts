@@ -143,7 +143,7 @@ async function render(win: MockWindow, opts: HydrateFactoryOptions, results: Hyd
         modeResolutionChain.length = 0;
         setMode(opts.mode);
       }
-      return hydrateFactory(win, opts, results, afterHydrate, resolve)
+      return hydrateFactory(win, opts, results, afterHydrate, resolve);
     });
   } catch (e) {
     renderCatchError(results, e);
