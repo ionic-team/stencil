@@ -135,13 +135,13 @@ async function render(win: MockWindow, opts: HydrateFactoryOptions, results: Hyd
   try {
     await Promise.resolve(beforeHydrateFn(win.document));
     return new Promise<HydrateResults>((resolve) => {
-      if (typeof opts.mode === 'function') {
+      if (Array.isArray(opts.modes)) {
         /**
          * Reset the mode resolution chain as we expect every `renderToString` call to render
          * the components in new environment/document.
          */
         modeResolutionChain.length = 0;
-        setMode(opts.mode);
+        opts.modes.forEach((mode) => setMode(mode));
       }
       return hydrateFactory(win, opts, results, afterHydrate, resolve);
     });

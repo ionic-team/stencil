@@ -296,7 +296,7 @@ describe('renderToString', () => {
       const { html } = await renderToString('<prop-cmp first="Max" last="Mustermann"></prop-cmp>', {
         fullDocument: false,
         prettyHtml: true,
-        mode: () => 'ios',
+        modes: [() => 'ios'],
       });
       expect(html).toContain('<style>');
       expect(html).toContain(';color:white;');
@@ -310,7 +310,7 @@ describe('renderToString', () => {
       const { html } = await renderToString('<prop-cmp first="Max" last="Mustermann"></prop-cmp>', {
         fullDocument: false,
         prettyHtml: true,
-        mode: () => 'md',
+        modes: [() => 'md'],
       });
       expect(html).toContain(';color:black;');
       const page = await newE2EPage({ html, url: 'https://stencil.com' });

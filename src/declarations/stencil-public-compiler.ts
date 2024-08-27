@@ -957,10 +957,10 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    */
   fullDocument?: boolean;
   /**
-   * Style mode to render the component in.
+   * Style modes to render the component in.
    * @see https://stenciljs.com/docs/styling#style-modes
    */
-  mode?: ResolutionHandler;
+  modes?: ResolutionHandler[];
 }
 
 export interface HydrateFactoryOptions extends SerializeDocumentOptions {
