@@ -213,10 +213,12 @@ describe('parse props', () => {
         optional: false,
         required: false,
         type: 'unknown',
+        attribute: 'val',
+        reflect: false,
       },
     });
     expect(t.property?.type).toBe('unknown');
-    expect(t.property?.attribute).toBe(undefined);
+    expect(t.property?.attribute).toBe('val');
     expect(t.property?.reflect).toBe(false);
   });
 

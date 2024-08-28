@@ -100,13 +100,9 @@ const parsePropDecorator = (
     required: prop.exclamationToken !== undefined && propName !== 'mode',
     optional: prop.questionToken !== undefined,
     docs: serializeSymbol(typeChecker, symbol),
+    attribute: getAttributeName(propName, propOptions),
+    reflect: getReflect(diagnostics, propDecorator, propOptions),
   };
-
-  // prop can have an attribute if type is NOT "unknown"
-  if (typeStr !== 'unknown') {
-    propMeta.attribute = getAttributeName(propName, propOptions);
-    propMeta.reflect = getReflect(diagnostics, propDecorator, propOptions);
-  }
 
   // extract default value
   const initializer = prop.initializer;
