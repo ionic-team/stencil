@@ -3,6 +3,7 @@ import { basename } from 'path';
 import type { RollupOutput } from 'rollup';
 
 import type * as d from '../../../declarations';
+import { MODE_RESOLUTION_CHAIN_DECLARATION } from './hydrate-factory-closure';
 import { relocateHydrateContextConst } from './relocate-hydrate-context';
 
 export const writeHydrateOutputs = (
@@ -58,6 +59,15 @@ const writeHydrateOutput = async (
     rollupOutput.output.map(async (output) => {
       if (output.type === 'chunk') {
         output.code = relocateHydrateContextConst(config, compilerCtx, output.code);
+
+        /**
+         * Enable the line where we define `modeResolutionChain` for the hydrate module.
+         */
+        output.code = output.code.replace(
+          `// const ${MODE_RESOLUTION_CHAIN_DECLARATION}`,
+          `const ${MODE_RESOLUTION_CHAIN_DECLARATION}`,
+        );
+
         const filePath = join(hydrateAppDirPath, output.fileName);
         await compilerCtx.fs.writeFile(filePath, output.code, { immediateWrite: true });
       }
