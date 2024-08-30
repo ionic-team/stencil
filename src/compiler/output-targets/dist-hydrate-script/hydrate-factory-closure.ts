@@ -1,5 +1,7 @@
 export const HYDRATE_APP_CLOSURE_START = `/*hydrateAppClosure start*/`;
 
+export const MODE_RESOLUTION_CHAIN_DECLARATION = `modeResolutionChain = [];`;
+
 /**
  * This is the entry point for the hydrate factory.
  *
@@ -8,7 +10,7 @@ export const HYDRATE_APP_CLOSURE_START = `/*hydrateAppClosure start*/`;
  * one module resolution chain across hydrate and core runtime.
  */
 export const HYDRATE_FACTORY_INTRO = `
-// const modeResolutionChain = [];
+// const ${MODE_RESOLUTION_CHAIN_DECLARATION}
 
 export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydrateResults, $stencilAfterHydrate, $stencilHydrateResolve) {
   var globalThis = $stencilWindow;
