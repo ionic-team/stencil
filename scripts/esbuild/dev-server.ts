@@ -78,7 +78,11 @@ export async function buildDevServer(opts: BuildOptions) {
     './open-in-editor-api',
   ];
 
-  const devServerAliases = getEsbuildAliases();
+  const devServerAliases = {
+    ...getEsbuildAliases(),
+    glob: '../../sys/node/glob.js',
+    '@stencil/core/mock-doc': '../../mock-doc/index.cjs',
+  };
   const devServerIndexEsbuildOptions = {
     ...getBaseEsbuildOptions(),
     alias: devServerAliases,
@@ -98,6 +102,8 @@ export async function buildDevServer(opts: BuildOptions) {
     ...getBaseEsbuildOptions(),
     alias: {
       ...devServerAliases,
+      glob: '../../sys/node/glob.js',
+      '@stencil/core/mock-doc': '../../mock-doc/index.cjs',
       '@sys-api-node': '../sys/node/index.js',
     },
     entryPoints: [join(inputDir, 'server-process.js')],
@@ -118,7 +124,9 @@ export async function buildDevServer(opts: BuildOptions) {
   } satisfies ESBuildOptions;
 
   const connectorAlias = {
+    glob: '../../sys/node/glob.js',
     '@stencil/core/dev-server/client': join(inputDir, 'client', 'index.js'),
+    '@stencil/core/mock-doc': '../../mock-doc/index.cjs',
   };
   const connectorEsbuildOptions = {
     ...getBaseEsbuildOptions(),

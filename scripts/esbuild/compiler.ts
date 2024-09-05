@@ -6,7 +6,7 @@ import { join } from 'path';
 import { getBanner } from '../utils/banner';
 import { BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './utils';
+import { externalNodeModules, getBaseEsbuildOptions, getEsbuildAliases, runBuilds } from './utils';
 import { bundleParse5 } from './utils/parse5';
 import { bundleTerser } from './utils/terser';
 import { bundleTypeScriptSource, tsCacheFilePath } from './utils/typescript-source';
@@ -44,10 +44,15 @@ export async function buildCompiler(opts: BuildOptions) {
   transpileDts = transpileDts.replace('@stencil/core/internal', '../internal/index');
   await fs.writeFile(join(opts.output.compilerDir, 'transpile.d.ts'), transpileDts);
 
-  const alias = getEsbuildAliases();
+  const alias: Record<string, string> = {
+    ...getEsbuildAliases(),
+    glob: './sys/node/glob.js',
+    '@sys-api-node': '../sys/node/index.js',
+  };
 
   const external = [
-    ...getEsbuildExternalModules(opts, opts.output.compilerDir),
+    ...externalNodeModules,
+    '../mock-doc/index.cjs',
     '../sys/node/autoprefixer.js',
     '../sys/node/index.js',
   ];

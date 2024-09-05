@@ -1,6 +1,5 @@
 import type { BuildOptions as ESBuildOptions, BuildResult as ESBuildResult, OutputFile, Plugin } from 'esbuild';
-import * as esbuild from 'esbuild';
-import { join } from 'path';
+import { build, context } from 'esbuild';
 
 import { BuildOptions } from '../../utils/options';
 
@@ -16,20 +15,13 @@ export function getEsbuildAliases(): Record<string, string> {
     chalk: 'ansi-colors',
 
     // mapping aliases to top-level bundle entrypoints
-    '@stencil/core/testing': './testing/index.js',
-    '@stencil/core/compiler': './compiler/stencil.js',
-    '@stencil/core/dev-server': './dev-server/index.js',
-    '@stencil/core/mock-doc': './mock-doc/index.cjs',
-    '@stencil/core/internal/testing': './internal/testing/index.js',
-    '@stencil/core/cli': './cli/index.js',
-    '@sys-api-node': './sys/node/index.js',
-
-    // mapping node.js module names to `sys/node` "cache"
-    //
-    // these allow us to bundle and ship a dependency (like `glob`) as part
-    // of the Stencil distributable but also have our separate bundles
-    // reference the same file
-    glob: './sys/node/glob.js',
+    '@stencil/core/testing': '../testing/index.js',
+    '@stencil/core/compiler': '../compiler/stencil.js',
+    '@stencil/core/dev-server': '../dev-server/index.js',
+    '@stencil/core/mock-doc': '../mock-doc/index.cjs',
+    '@stencil/core/internal/testing': '../internal/testing/index.js',
+    '@stencil/core/cli': '../cli/index.cjs',
+    '@sys-api-node': '../sys/node/index.js',
 
     // dev server related aliases
     ws: './ws.js',
@@ -44,7 +36,7 @@ export function getEsbuildAliases(): Record<string, string> {
  * as side-effect-free, which allows imports from them to be properly
  * tree-shaken.
  */
-const externalNodeModules = [
+export const externalNodeModules = [
   '@jest/core',
   '@jest/reporters',
   '@microsoft/typescript-etw',
@@ -63,21 +55,6 @@ const externalNodeModules = [
 ];
 
 /**
- * Get a manifest of modules which should be marked as external for a given
- * esbuild bundle
- *
- * @param opts options for the current build
- * @param ownEntryPoint the entry point alias of the current module
- * @returns a list of modules which should be marked as external
- */
-export function getEsbuildExternalModules(opts: BuildOptions, ownEntryPoint: string): string[] {
-  const bundles = Object.values(opts.output);
-  const externalBundles = bundles.filter((outdir) => outdir !== ownEntryPoint).map((outdir) => join(outdir, '*'));
-
-  return [...externalNodeModules, ...externalBundles];
-}
-
-/**
  * A helper which runs an array of esbuild, uh, _builds_
  *
  * This accepts an array of build configurations and will either run a
@@ -92,12 +69,12 @@ export function runBuilds(builds: ESBuildOptions[], opts: BuildOptions): Promise
   if (opts.isWatch) {
     return Promise.all(
       builds.map(async (buildConfig) => {
-        const context = await esbuild.context(buildConfig);
-        return context.watch();
+        const ctx = await context(buildConfig);
+        return ctx.watch();
       }),
     );
   } else {
-    return Promise.all(builds.map(esbuild.build));
+    return Promise.all(builds.map(build));
   }
 }
 
