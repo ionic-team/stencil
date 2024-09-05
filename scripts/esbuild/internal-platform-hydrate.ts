@@ -6,7 +6,7 @@ import { getBanner } from '../utils/banner';
 import { bundleDts } from '../utils/bundle-dts';
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules } from './utils';
+import { externalAlias, externalNodeModules, getBaseEsbuildOptions, getEsbuildAliases } from './utils';
 
 /**
  * Create objects containing ESbuild options for the two bundles comprising
@@ -35,7 +35,7 @@ export async function getInternalPlatformHydrateBundles(opts: BuildOptions): Pro
 
   const hydratePlatformInput = join(hydrateSrcDir, 'platform', 'index.js');
 
-  const external = getEsbuildExternalModules(opts, outputInternalHydrateDir);
+  const external = externalNodeModules;
 
   const internalHydrateAliases = getEsbuildAliases();
   internalHydrateAliases['@platform'] = hydratePlatformInput;

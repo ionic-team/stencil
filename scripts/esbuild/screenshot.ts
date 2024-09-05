@@ -5,7 +5,7 @@ import { join } from 'path';
 import { getBanner } from '../utils/banner';
 import { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './utils';
+import { externalNodeModules, getBaseEsbuildOptions, getEsbuildAliases, runBuilds } from './utils';
 
 const screenshotBuilds = {
   'Stencil Screenshot': 'index',
@@ -39,9 +39,7 @@ export async function buildScreenshot(opts: BuildOptions) {
   });
 
   const aliases = getEsbuildAliases();
-
-  const external = getEsbuildExternalModules(opts, opts.output.screenshotDir);
-
+  const external = externalNodeModules;
   const baseScreenshotOptions = {
     ...getBaseEsbuildOptions(),
     alias: aliases,
