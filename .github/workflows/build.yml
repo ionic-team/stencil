@@ -8,10 +8,7 @@ on:
 jobs:
   build_core:
     name: Core
-    strategy:
-      matrix:
-        os: ['ubuntu-22.04', 'windows-latest']
-    runs-on: ${{ matrix.os }}
+    runs-on: 'ubuntu-22.04'
     steps:
       - name: Checkout Code
         uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
@@ -32,7 +29,6 @@ jobs:
         shell: bash
 
       - name: Upload Build Artifacts
-        if: ${{ matrix.os == 'ubuntu-22.04' }}
         uses: ./.github/workflows/actions/upload-archive
         with:
           name: stencil-core
