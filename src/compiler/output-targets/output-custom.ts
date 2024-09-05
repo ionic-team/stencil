@@ -4,6 +4,10 @@ import type * as d from '../../declarations';
 import { generateDocData } from '../docs/generate-doc-data';
 
 export const outputCustom = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
+  if (config._isTesting) {
+    return;
+  }
+
   const task = config.watch ? 'always' : 'onBuildOnly';
   const customOutputTargets = config.outputTargets
     .filter(isOutputTargetCustom)

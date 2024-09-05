@@ -1737,6 +1737,10 @@ export namespace JSXBase {
     onSubmitCapture?: (event: Event) => void;
     onInvalid?: (event: Event) => void;
     onInvalidCapture?: (event: Event) => void;
+    onBeforeToggle?: (event: Event) => void;
+    onBeforeToggleCapture?: (event: Event) => void;
+    onToggle?: (event: Event) => void;
+    onToggleCapture?: (event: Event) => void;
 
     // Image Events
     onLoad?: (event: Event) => void;
