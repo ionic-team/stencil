@@ -1,14 +1,21 @@
 name: WebdriverIO Tests
 
 on:
-  workflow_call:
-    # Make this a reusable workflow, no value needed
-    # https://docs.github.com/en/actions/using-workflows/reusing-workflows
+  merge_group:
+  pull_request:
+  push:
+    branches:
+      - 'main'
 
 jobs:
+  build_core:
+    name: Build
+    uses: ./.github/workflows/build.yml
+
   run_wdio:
     name: Run WebdriverIO Component Tests (${{ matrix.browser }})
     runs-on: ubuntu-22.04
+    needs: [build_core]
     strategy:
       matrix:
         browser: [CHROME, FIREFOX, EDGE]

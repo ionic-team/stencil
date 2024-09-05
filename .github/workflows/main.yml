@@ -57,8 +57,3 @@ jobs:
     name: Unit Tests
     needs: [build_core]
     uses: ./.github/workflows/test-unit.yml
-
-  wdio_tests:
-    name: WebdriverIO Tests
-    needs: [build_core]
-    uses: ./.github/workflows/test-wdio.yml
