@@ -6,7 +6,7 @@ on:
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
 
 jobs:
-  run_wdio:
+  wdio_test:
     name: Run WebdriverIO Component Tests (${{ matrix.browser }})
     runs-on: ubuntu-22.04
     strategy:
