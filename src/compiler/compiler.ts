@@ -42,6 +42,8 @@ export const createCompiler = async (userConfig: Config): Promise<Compiler> => {
   }
   patchTypescript(config, compilerCtx.fs);
 
+  console.log('I DO NOTHING');
+
   const build = () => createFullBuild(config, compilerCtx);
 
   const createWatcher = () => createWatchBuild(config, compilerCtx);
