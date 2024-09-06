@@ -6,7 +6,7 @@ on:
     # https://docs.github.com/en/actions/using-workflows/reusing-workflows
 
 jobs:
-  run_wdio:
+  wdio_test:
     name: Run WebdriverIO Component Tests (${{ matrix.browser }})
     runs-on: ubuntu-22.04
     strategy:
@@ -27,9 +27,6 @@ jobs:
           node-version-file: './test/wdio/package.json'
           cache: 'npm'
 
-      - name: Install dependencies
-        run: npm ci
-
       - name: Download Build Archive
         uses: ./.github/workflows/actions/download-archive
         with:
@@ -39,6 +36,7 @@ jobs:
 
       - name: Run WebdriverIO Component Tests
         run: npm run test.wdio
+        shell: bash
         env:
           BROWSER: ${{ matrix.browser }}
 
