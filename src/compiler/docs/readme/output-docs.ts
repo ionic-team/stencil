@@ -54,7 +54,7 @@ export const generateReadme = async (
               await getUserReadmeContent(compilerCtx, readmeOutputPath)
             : userContent;
 
-        const readmeContent = generateMarkdown(currentReadmeContent, docsData, cmps, readmeOutput);
+        const readmeContent = generateMarkdown(currentReadmeContent, docsData, cmps, readmeOutput, config?.docs?.markdown);
 
         const results = await compilerCtx.fs.writeFile(readmeOutputPath, readmeContent);
         if (results.changedContent) {
@@ -74,9 +74,13 @@ export const generateMarkdown = (
   cmp: d.JsonDocsComponent,
   cmps: d.JsonDocsComponent[],
   readmeOutput: d.OutputTargetDocsReadme,
+  markdownConfig?: d.StencilDocsConfig['markdown'],
 ) => {
   //If the readmeOutput.dependencies is true or undefined the dependencies will be generated.
-  const dependencies = readmeOutput.dependencies !== false ? depsToMarkdown(cmp, cmps) : [];
+  const dependencies = readmeOutput.dependencies !== false
+    ? depsToMarkdown(cmp, cmps, markdownConfig?.targetComponent)
+    : [];
+
   return [
     userContent || '',
     AUTO_GENERATE_COMMENT,

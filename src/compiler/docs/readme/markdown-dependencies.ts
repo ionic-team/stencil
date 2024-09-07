@@ -1,10 +1,18 @@
-import { normalizePath, relative } from '@utils';
+import { normalizePath, relative} from '@utils';
 
 import type * as d from '../../../declarations';
+import { DEFAULT_TARGET_COMPONENT_STYLES } from './constants';
+import { isHexColor } from "./docs-util";
 
-export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[]) => {
+export const depsToMarkdown = (
+  cmp: d.JsonDocsComponent,
+  cmps: d.JsonDocsComponent[],
+  targetComponentConfig: d.StencilDocsConfig['markdown']['targetComponent'] = DEFAULT_TARGET_COMPONENT_STYLES,
+) => {
   const content: string[] = [];
+
   const deps = Object.entries(cmp.dependencyGraph);
+
   if (deps.length === 0) {
     return content;
   }
@@ -20,6 +28,7 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
     content.push(...usedBy);
     content.push(``);
   }
+
   if (cmp.dependencies.length > 0) {
     const dependsOn = cmp.dependencies.map((tag) => '- ' + getCmpLink(cmp, tag, cmps));
 
@@ -27,6 +36,21 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
     content.push(``);
     content.push(...dependsOn);
     content.push(``);
+  }
+
+  const { background: defaultBackground, textColor: defaultTextColor } = DEFAULT_TARGET_COMPONENT_STYLES;
+
+  let {
+    background = defaultBackground,
+    textColor = defaultTextColor,
+  } = targetComponentConfig;
+
+  if (!isHexColor(background)) {
+    background = defaultBackground;
+  }
+
+  if (!isHexColor(textColor)) {
+    textColor = defaultTextColor;
   }
 
   content.push(`### Graph`);
@@ -38,7 +62,7 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
     });
   });
 
-  content.push(`  style ${cmp.tag} fill:#f9f,stroke:#333,stroke-width:4px`);
+  content.push(`  style ${cmp.tag} fill:${background},stroke:${textColor},stroke-width:4px`);
 
   content.push('```');
 

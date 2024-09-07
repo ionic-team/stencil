@@ -1,4 +1,4 @@
-import { MarkdownTable } from '../../docs/readme/docs-util';
+import { isHexColor, MarkdownTable } from '../../docs/readme/docs-util';
 
 describe('markdown-table', () => {
   it('header', () => {
@@ -46,3 +46,28 @@ describe('markdown-table', () => {
     expect(o).toEqual([]);
   });
 });
+
+describe('isHexColor', () => {
+  it('should return true for valid hex colors', () => {
+    expect(isHexColor('#FFF')).toBe(true);
+    expect(isHexColor('#FFFFFF')).toBe(true);
+    expect(isHexColor('#000000')).toBe(true);
+    expect(isHexColor('#f0f0f0')).toBe(true);
+    expect(isHexColor('#aBcDeF')).toBe(true);
+  });
+
+  it('should return false for invalid hex colors', () => {
+    expect(isHexColor('FFF')).toBe(false);
+    expect(isHexColor('#GGGGGG')).toBe(false);
+    expect(isHexColor('#FF')).toBe(false);
+    expect(isHexColor('#FFFFFFF')).toBe(false);
+    expect(isHexColor('#FF0000FF')).toBe(false);
+  });
+
+  it('should return false for non-string inputs', () => {
+    expect(isHexColor('123')).toBe(false);
+    expect(isHexColor('true')).toBe(false);
+    expect(isHexColor('{}')).toBe(false);
+    expect(isHexColor('[]')).toBe(false);
+  });
+})

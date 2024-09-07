@@ -273,6 +273,8 @@ export interface StencilConfig {
    */
   env?: { [prop: string]: string | undefined };
 
+  docs?: StencilDocsConfig;
+
   globalScript?: string;
   srcIndexHtml?: string;
   watch?: boolean;
@@ -1707,6 +1709,38 @@ export interface CopyTask {
    */
   keepDirStructure?: boolean;
 }
+
+/**
+ * Configuration for generating documentation from Stencil components.
+ */
+export interface StencilDocsConfig {
+
+  /**
+   * Options for processing and rendering Markdown documentation files.
+   */
+  markdown: {
+
+    /**
+     * Styling for how the target component will be represented within documentation (e.g., in component diagrams).
+     */
+    targetComponent: {
+      /**
+       * Background color used for nodes representing the component in diagrams (e.g., Mermaid graphs).
+       * Use standard color names or hex codes.
+       * @example '#f0f0f0' (light gray)
+       */
+      background: string;
+
+      /**
+       * Text color used within nodes representing the component in diagrams (e.g., Mermaid graphs).
+       * Use standard color names or hex codes.
+       * @example '#333' (dark gray)
+       */
+      textColor: string;
+    };
+  };
+}
+
 
 // TODO(STENCIL-882): Remove this interface [BREAKING_CHANGE]
 export interface BundlingConfig {
