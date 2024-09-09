@@ -2,6 +2,7 @@ import { toEqualAttribute, toEqualAttributes, toHaveAttribute } from './attribut
 import { toHaveClass, toHaveClasses, toMatchClasses } from './class-list';
 import {
   toHaveFirstReceivedEventDetail,
+  toHaveLastReceivedEventDetail,
   toHaveNthReceivedEventDetail,
   toHaveReceivedEvent,
   toHaveReceivedEventDetail,
@@ -25,6 +26,7 @@ export const expectExtend = {
   toHaveReceivedEventDetail,
   toHaveReceivedEventTimes,
   toHaveFirstReceivedEventDetail,
+  toHaveLastReceivedEventDetail,
   toHaveNthReceivedEventDetail,
   toMatchScreenshot,
 };

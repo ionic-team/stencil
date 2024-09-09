@@ -166,7 +166,6 @@ export const getTranspileCssConfig = (
     encapsulation: importData && importData.encapsulation,
     mode: importData && importData.mode,
     sourceMap: compileOpts.sourceMap !== false,
-    commentOriginalSelector: false,
     minify: false,
     autoprefixer: false,
     module: compileOpts.module,

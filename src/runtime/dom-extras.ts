@@ -83,6 +83,12 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
     const slotName = (newChild['s-sn'] = getSlotName(newChild));
     const slotNode = getHostSlotNode(this.childNodes, slotName, this.tagName);
     if (slotNode) {
+      const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
+      slotPlaceholder['s-nr'] = newChild;
+      (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
+      newChild['s-ol'] = slotPlaceholder;
+      newChild['s-sh'] = slotNode['s-hn'];
+
       const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
       const insertedNode = insertBefore(appendAfter.parentNode, newChild, appendAfter.nextSibling);
@@ -147,6 +153,7 @@ export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
         slotPlaceholder['s-nr'] = newChild;
         (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
         newChild['s-ol'] = slotPlaceholder;
+        newChild['s-sh'] = slotNode['s-hn'];
 
         const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
         const appendAfter = slotChildNodes[0];

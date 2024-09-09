@@ -28,11 +28,7 @@ export const setPlatformHelpers = (helpers: {
   Object.assign(plt, helpers);
 };
 
-export const supportsShadow =
-  // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
-  BUILD.shadowDomShim && BUILD.shadowDom
-    ? /*@__PURE__*/ (() => (doc.head.attachShadow + '').indexOf('[native') > -1)()
-    : true;
+export const supportsShadow = BUILD.shadowDom;
 
 export const supportsListenerOptions = /*@__PURE__*/ (() => {
   let supportsListenerOptions = false;

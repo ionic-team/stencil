@@ -17,6 +17,7 @@ export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.Compile
   const tsconfig = {
     path: '',
     compilerOptions: {} as ts.CompilerOptions,
+    watchOptions: {} as ts.WatchOptions,
     files: [] as string[],
     include: [] as string[],
     exclude: [] as string[],
@@ -91,6 +92,10 @@ export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.Compile
           }
         }
 
+        if (results.watchOptions) {
+          tsconfig.watchOptions = results.watchOptions;
+        }
+
         if (results.options) {
           tsconfig.compilerOptions = results.options;
 
@@ -119,7 +124,7 @@ export const validateTsConfig = async (config: d.ValidatedConfig, sys: d.Compile
   return tsconfig;
 };
 
-const getTsConfigPath = async (
+export const getTsConfigPath = async (
   config: d.ValidatedConfig,
   sys: d.CompilerSystem,
   init: d.LoadConfigInit,

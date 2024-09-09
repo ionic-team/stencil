@@ -86,12 +86,12 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       BUILD.svg
         ? doc.createElementNS(
             isSvgMode ? SVG_NS : HTML_NS,
-            BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotFallback
+            !useNativeShadowDom && BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotFallback
               ? 'slot-fb'
               : (newVNode.$tag$ as string),
           )
         : doc.createElement(
-            BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotFallback
+            !useNativeShadowDom && BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotFallback
               ? 'slot-fb'
               : (newVNode.$tag$ as string),
           )
@@ -105,7 +105,13 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       updateElement(null, newVNode, isSvgMode);
     }
 
-    if ((BUILD.shadowDom || BUILD.scoped) && isDef(scopeId) && elm['s-si'] !== scopeId) {
+    /**
+     * walk up the DOM tree and check if we are in a shadow root because if we are within
+     * a shadow root DOM we don't need to attach scoped class names to the element
+     */
+    const rootNode = elm.getRootNode() as HTMLElement;
+    const isElementWithinShadowRoot = !rootNode.querySelector('body');
+    if (!isElementWithinShadowRoot && BUILD.scoped && isDef(scopeId) && elm['s-si'] !== scopeId) {
       // if there is a scopeId and this is the initial render
       // then let's add the scopeId as a css class
       elm.classList.add((elm['s-si'] = scopeId));
@@ -610,6 +616,19 @@ export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode, isInitialRe
   // need to have the same element tag, and same key to be the same
   if (leftVNode.$tag$ === rightVNode.$tag$) {
     if (BUILD.slotRelocation && leftVNode.$tag$ === 'slot') {
+      // We are not considering the same node if:
+      if (
+        // The component gets hydrated and no VDOM has been initialized.
+        // Here the comparison can't happen as $name$ property is not set for `leftNode`.
+        '$nodeId$' in leftVNode &&
+        isInitialRender &&
+        // `leftNode` is not from type HTMLComment which would cause many
+        // hydration comments to be removed
+        leftVNode.$elm$.nodeType !== 8
+      ) {
+        return false;
+      }
+
       return leftVNode.$name$ === rightVNode.$name$;
     }
     // this will be set if JSX tags in the build have `key` attrs set on them
@@ -685,7 +704,12 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
       }
       // add the new vnode children
       addVnodes(elm, null, newVNode, newChildren, 0, newChildren.length - 1);
-    } else if (BUILD.updatable && oldChildren !== null) {
+    } else if (
+      // don't do this on initial render as it can cause non-hydrated content to be removed
+      !isInitialRender &&
+      BUILD.updatable &&
+      oldChildren !== null
+    ) {
       // no new child vnodes, but there are old child vnodes to remove
       removeVnodes(oldChildren, 0, oldChildren.length - 1);
     }

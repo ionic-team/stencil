@@ -1,4 +1,4 @@
-import { addHostEventListeners } from '@runtime';
+import { BUILD } from '@app-data';
 
 import type * as d from '../../declarations';
 
@@ -56,7 +56,7 @@ export const win = window;
 export const doc = win.document;
 
 export const readTask = (cb: Function) => {
-  process.nextTick(() => {
+  nextTick(() => {
     try {
       cb();
     } catch (e) {
@@ -66,7 +66,7 @@ export const readTask = (cb: Function) => {
 };
 
 export const writeTask = (cb: Function) => {
-  process.nextTick(() => {
+  nextTick(() => {
     try {
       cb();
     } catch (e) {
@@ -120,7 +120,7 @@ export const setPlatformHelpers = (helpers: {
   Object.assign(plt, helpers);
 };
 
-export const supportsShadow = false;
+export const supportsShadow = BUILD.shadowDom;
 
 export const supportsListenerOptions = false;
 
@@ -145,7 +145,6 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
   hostRef.$onReadyPromise$ = new Promise((r) => (hostRef.$onReadyResolve$ = r));
   elm['s-p'] = [];
   elm['s-rc'] = [];
-  addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
   return hostRefs.set(elm, hostRef);
 };
 

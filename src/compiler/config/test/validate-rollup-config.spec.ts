@@ -56,6 +56,7 @@ describe('validateStats', () => {
     config.rollupConfig = {
       inputOptions: {
         context: 'window',
+        external: 'external_symbol',
         notAnOption: {},
       },
       outputOptions: {
@@ -69,6 +70,7 @@ describe('validateStats', () => {
     expect(rollupConfig).toEqual({
       inputOptions: {
         context: 'window',
+        external: 'external_symbol',
       },
       outputOptions: {
         globals: {

@@ -1144,23 +1144,23 @@ export interface HydrateResults {
   buildId: string;
   diagnostics: Diagnostic[];
   url: string;
-  host: string;
-  hostname: string;
-  href: string;
-  port: string;
-  pathname: string;
-  search: string;
-  hash: string;
-  html: string;
+  host: string | null;
+  hostname: string | null;
+  href: string | null;
+  port: string | null;
+  pathname: string | null;
+  search: string | null;
+  hash: string | null;
+  html: string | null;
   components: HydrateComponent[];
   anchors: HydrateAnchorElement[];
   imgs: HydrateImgElement[];
   scripts: HydrateScriptElement[];
   styles: HydrateStyleElement[];
   staticData: HydrateStaticData[];
-  title: string;
+  title: string | null;
   hydratedCount: number;
-  httpStatus: number;
+  httpStatus: number | null;
 }
 
 export interface HydrateComponent {
@@ -1938,7 +1938,6 @@ export interface TransformCssToEsmInput {
    * is not shared by multiple fields, nor is it a composite of multiple modes).
    */
   mode?: string;
-  commentOriginalSelector?: boolean;
   sourceMap?: boolean;
   minify?: boolean;
   docs?: boolean;
@@ -1960,6 +1959,7 @@ export interface PackageJsonData {
   name?: string;
   version?: string;
   main?: string;
+  exports?: { [key: string]: string | { [key: string]: string } };
   description?: string;
   bin?: { [key: string]: string };
   browser?: string;
@@ -2089,6 +2089,12 @@ declare global {
        * received the correct custom event `detail` data.
        */
       toHaveFirstReceivedEventDetail(eventDetail: any): void;
+
+      /**
+       * When given an EventSpy, checks the last event has
+       * received the correct custom event `detail` data.
+       */
+      toHaveLastReceivedEventDetail(eventDetail: any): void;
 
       /**
        * When given an EventSpy, checks the event at an index
@@ -2360,6 +2366,15 @@ export interface TypesImportData {
  * as generating `components.d.ts` files.
  */
 export interface TypesMemberNameData {
+  /**
+   * The original name of the import before any aliasing was applied.
+   *
+   * i.e. if a component imports a type as follows:
+   * `import { MyType as MyCoolType } from './my-type';`
+   *
+   * the `originalName` would be 'MyType'. If the import is not aliased, then `originalName` and `localName` will be the same.
+   */
+  originalName: string;
   /**
    * The name of the type as it's used within a file.
    */

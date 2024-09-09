@@ -7,7 +7,7 @@ import { join } from 'path';
 import { getBanner } from '../utils/banner';
 import { BuildOptions, createReplaceData } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules } from './utils';
+import { externalAlias, externalNodeModules, getBaseEsbuildOptions, getEsbuildAliases } from './utils';
 
 /**
  * Create objects containing ESbuild options for the two bundles which need to
@@ -32,14 +32,16 @@ export async function getInternalClientBundles(opts: BuildOptions): Promise<ESBu
     name: '@stencil/core/internal/client',
     description:
       'Stencil internal client platform to be imported by the Stencil Compiler and internal runtime. Breaking changes can and will happen at any time.',
-    main: 'index.js',
+    exports: './index.js',
+    main: './index.js',
+    type: 'module',
     sideEffects: false,
   });
 
   const internalClientAliases = getEsbuildAliases();
   internalClientAliases['@platform'] = join(inputClientDir, 'index.ts');
 
-  const clientExternal = getEsbuildExternalModules(opts, opts.output.internalDir);
+  const clientExternal = externalNodeModules;
 
   const internalClientBundle: ESBuildOptions = {
     ...getBaseEsbuildOptions(),
@@ -67,14 +69,10 @@ export async function getInternalClientBundles(opts: BuildOptions): Promise<ESBu
 
   const polyfills = await fs.readdir(join(opts.srcDir, 'client', 'polyfills'));
   for (const polyFillFile of polyfills) {
-    patchBrowserAliases[join('./polyfills', polyFillFile)] = join(opts.srcDir, 'client', 'polyfills');
+    patchBrowserAliases[`polyfills/${polyFillFile}`] = join(opts.srcDir, 'client', 'polyfills');
   }
 
-  const patchBrowserExternal = [
-    ...getEsbuildExternalModules(opts, opts.output.internalDir),
-    '@stencil/core',
-    '@stencil/core/mock-doc',
-  ];
+  const patchBrowserExternal = [...externalNodeModules, '@stencil/core', '@stencil/core/mock-doc'];
 
   const internalClientPatchBrowserBundle: ESBuildOptions = {
     ...getBaseEsbuildOptions(),

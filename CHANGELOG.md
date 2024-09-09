@@ -1,3 +1,102 @@
+# 🐷 [4.21.0](https://github.com/ionic-team/stencil/compare/v4.20.0...v4.21.0) (2024-08-26)
+
+
+### Bug Fixes
+
+* **compiler:** default `asyncLoading` build conditional to `true` ([#5941](https://github.com/ionic-team/stencil/issues/5941)) ([0e261d6](https://github.com/ionic-team/stencil/commit/0e261d653b03fd55a975f4e56e2fae258c3dcd88)), closes [#3580](https://github.com/ionic-team/stencil/issues/3580)
+* **compiler:** prefer `localName` over `originalName` by running an empty check on `originalName` ([#5943](https://github.com/ionic-team/stencil/issues/5943)) ([0f42656](https://github.com/ionic-team/stencil/commit/0f42656f00a84be52e1c2497159c27cbfb0fba2a)), closes [#5882](https://github.com/ionic-team/stencil/issues/5882)
+* **compiler:** verify parent node when validating component members ([#5942](https://github.com/ionic-team/stencil/issues/5942)) ([37a0aaf](https://github.com/ionic-team/stencil/commit/37a0aaf176db2ad620fad18a3ddc1e64764c237c)), closes [#5940](https://github.com/ionic-team/stencil/issues/5940)
+* **runtime:** have fallback for style setting ([#5948](https://github.com/ionic-team/stencil/issues/5948)) ([ae19d7a](https://github.com/ionic-team/stencil/commit/ae19d7ad736ee1ae4989a4d0ed08a607ea208b78))
+* **runtime:** only use setter if existing ([#5947](https://github.com/ionic-team/stencil/issues/5947)) ([7e9fa60](https://github.com/ionic-team/stencil/commit/7e9fa60d7692e630134618f1186386c0cc0b3a29)), closes [#2703](https://github.com/ionic-team/stencil/issues/2703)
+* **runtime:** place scoped component styles after preconnect links but before custom styles ([#5938](https://github.com/ionic-team/stencil/issues/5938)) ([8f92b11](https://github.com/ionic-team/stencil/commit/8f92b11c1940b86b460c2f3a574208b88e1bbecd))
+* **runtime:** provide second arg to `insertBefore` ([#5933](https://github.com/ionic-team/stencil/issues/5933)) ([afcc9a5](https://github.com/ionic-team/stencil/commit/afcc9a5ee7fba408c1be3f9ed594dcddae3fdb7b))
+* **runtime:** render component styles at the end of the head tag ([#5926](https://github.com/ionic-team/stencil/issues/5926)) ([90da726](https://github.com/ionic-team/stencil/commit/90da726789be4d26c35ad86cb1441ad7f440dce6)), closes [#5915](https://github.com/ionic-team/stencil/issues/5915)
+* **runtime:** update call to `prepend` to remove `null` node ([#5946](https://github.com/ionic-team/stencil/issues/5946)) ([970c5d2](https://github.com/ionic-team/stencil/commit/970c5d25fba3b82df262a154980cc0f25fdd315c))
+* **typescript:** fix documentation on 'serializeShadowRoot' flag ([#5927](https://github.com/ionic-team/stencil/issues/5927)) ([277e3e3](https://github.com/ionic-team/stencil/commit/277e3e35730e37b028d2f2ed32960d5f947d7dd4)), closes [#5914](https://github.com/ionic-team/stencil/issues/5914)
+
+
+### Features
+
+* **compiler:** allow ignore pattern for copy task ([#5899](https://github.com/ionic-team/stencil/issues/5899)) ([f89c6a3](https://github.com/ionic-team/stencil/commit/f89c6a356bdcd78fc6427d3cb75776d749196eea)), closes [#5781](https://github.com/ionic-team/stencil/issues/5781)
+
+
+
+## 🚐 [4.20.0](https://github.com/ionic-team/stencil/compare/v4.19.2...v4.20.0) (2024-08-02)
+
+
+### Bug Fixes
+
+* **core:** add @stencil/core/testing/jest-preset to export map ([#5900](https://github.com/ionic-team/stencil/issues/5900)) ([3def2b7](https://github.com/ionic-team/stencil/commit/3def2b7e160c4f60318125fd6d0f22da35bc905a)), fixes [#5896](https://github.com/ionic-team/stencil/issues/5896)
+* **compiler:** don't allow shadowRoot getter to avoid hydration issues ([#5912](https://github.com/ionic-team/stencil/issues/5912)) ([5dd4f7f](https://github.com/ionic-team/stencil/commit/5dd4f7fb051c0bfd67f38fb32d61776993db2510))
+* **compiler:** no need for commenting selectors anymore ([#5892](https://github.com/ionic-team/stencil/issues/5892)) ([d571bbb](https://github.com/ionic-team/stencil/commit/d571bbbb68f361cd046c0ced724e2c4554aaa06b)), fixes [#5880](https://github.com/ionic-team/stencil/issues/5880)
+* **compiler:** respect project tsconfig watch options ([#5916](https://github.com/ionic-team/stencil/issues/5916)) ([74adeee](https://github.com/ionic-team/stencil/commit/74adeee75a6cdb290ab6127fb94281c7582e3b46)), closes [#5709](https://github.com/ionic-team/stencil/issues/5709), fixes [#5709](https://github.com/ionic-team/stencil/issues/5709), fixes [#5592](https://github.com/ionic-team/stencil/issues/5592)
+* **compiler:** run copy task after other output targets ([#5902](https://github.com/ionic-team/stencil/issues/5902)) ([c3d4e8b](https://github.com/ionic-team/stencil/commit/c3d4e8b170b405ef420236f12d7b19e21e541a81)), fixes [#5592](https://github.com/ionic-team/stencil/issues/5592)
+* **core:** add missing screenshot export ([#5909](https://github.com/ionic-team/stencil/issues/5909)) ([764a8ba](https://github.com/ionic-team/stencil/commit/764a8bafdefb5653d958a4573f23f8f8af317a73)), fixes [#5906](https://github.com/ionic-team/stencil/issues/5906)
+* **hydrate:** ensure beforeHydrateFn and afterHydrateFn always return a function ([#5890](https://github.com/ionic-team/stencil/issues/5890)) ([a7c212c](https://github.com/ionic-team/stencil/commit/a7c212c2a9deeb8cea738e334bf37b68322ada66)), fixes [#5884](https://github.com/ionic-team/stencil/issues/5884)
+* **runtime:** hydrate shadow dom first ([#5911](https://github.com/ionic-team/stencil/issues/5911)) ([ccf1a89](https://github.com/ionic-team/stencil/commit/ccf1a8941f732cb53d57785ecbe03388e744a1cd))
+* **runtime:** make isSameVnode return false on initial render in a hydration case ([#5891](https://github.com/ionic-team/stencil/issues/5891)) ([82a7bb9](https://github.com/ionic-team/stencil/commit/82a7bb9ead3dc637b646db09b6687a8d0c2735a2))
+* **testing:** update Jest types ([#5910](https://github.com/ionic-team/stencil/issues/5910)) ([5f8c969](https://github.com/ionic-team/stencil/commit/5f8c9692d41b58d3706c61db9a33215294e70049)), fixes [#5908](https://github.com/ionic-team/stencil/issues/5908)
+* **core:** update TypeScript to v5.5 ([#5898](https://github.com/ionic-team/stencil/issues/5898)) ([5e74837](https://github.com/ionic-team/stencil/commit/5e748378fd14fa5c6aaf0e001e8763a0ba3cf57c))
+
+### Note
+
+As we’ve made further enhancements to support declarative Shadow DOM, the Stencil team has determined that it’s not feasible to allow users to render a shadow component as a scoped component after compilation, such as by calling `renderToString` with `serializeShadowRoot: false`. This is because Stencil compiles styles for either shadow or scoped mode during the compilation process, embedding these styles into the hydrate module. Once this compilation is complete, the styles cannot be transformed to support the other mode. Recognizing that this change would impact the current functionality, the Stencil team has decided to proceed with this update. Moving forward, we recommend serializing all components marked with shadow: true as declarative Shadow DOM.
+
+
+## 🏉 [4.19.2](https://github.com/ionic-team/stencil/compare/v4.19.1...v4.19.2) (2024-07-02)
+
+
+### Bug Fixes
+
+* **hydrate:** partially revert [#5838](https://github.com/ionic-team/stencil/issues/5838) ([#5876](https://github.com/ionic-team/stencil/issues/5876)) ([dfbc340](https://github.com/ionic-team/stencil/commit/dfbc34007a818eef418e2f312a9dd7a0fef81af6))
+* **hydrate:** support server side rendering of components with listener ([#5877](https://github.com/ionic-team/stencil/issues/5877)) ([2c5b7f8](https://github.com/ionic-team/stencil/commit/2c5b7f8ecb9e999e3c584b3a1af5a317f035ae4d)), fixes [#5869](https://github.com/ionic-team/stencil/issues/5869)
+* **testing:** add testing sub module to export map ([#5873](https://github.com/ionic-team/stencil/issues/5873)) ([bb2e04f](https://github.com/ionic-team/stencil/commit/bb2e04f488280f12c2db91510d4bb2171e4493e1)), fixes [#5871](https://github.com/ionic-team/stencil/issues/5871) and [#5868](https://github.com/ionic-team/stencil/issues/5868)
+
+
+
+## 🍈 [4.19.1](https://github.com/ionic-team/stencil/compare/v4.19.0...v4.19.1) (2024-06-27)
+
+
+### Bug Fixes
+
+* **compiler:** account for package imports in aliasing ([#5862](https://github.com/ionic-team/stencil/issues/5862)) ([02b41d3](https://github.com/ionic-team/stencil/commit/02b41d3e64dfb7a2960ad32968e991fef159c137)), fixes [#5859](https://github.com/ionic-team/stencil/issues/5859) 
+* **compiler:** try to create web worker with the workerPath before falling back to blob ([#3513](https://github.com/ionic-team/stencil/issues/3513)) ([c84dd32](https://github.com/ionic-team/stencil/commit/c84dd32499e8d0f092579e1c0317537a4ae341ac)), fixes [#3512](https://github.com/ionic-team/stencil/issues/3512)
+* **hydrate:** change type resolve order ([#5863](https://github.com/ionic-team/stencil/issues/5863)) ([42b1ff2](https://github.com/ionic-team/stencil/commit/42b1ff23405cf27670b335e3b95d9dceb65578ae))
+* **internal:** add cli sub package to export map ([ad95222](https://github.com/ionic-team/stencil/commit/ad95222bbd7a6421ac518cce24f3fd59102d4774))
+* **internal:** add mock-doc export in client runtime package.json ([ad95222](https://github.com/ionic-team/stencil/commit/4ff9011b9d07fba3f7deeb5f5f71cf5fd2d41397))
+
+
+
+# 🏄 [4.19.0](https://github.com/ionic-team/stencil/compare/v4.18.3...v4.19.0) (2024-06-26)
+
+
+### Bug Fixes
+
+* **compiler:** support rollup's external input option ([#3227](https://github.com/ionic-team/stencil/issues/3227)) ([2c68849](https://github.com/ionic-team/stencil/commit/2c6884970baf9f01f36d0843ce4ad59745e5a1f0)), fixes [#3226](https://github.com/ionic-team/stencil/issues/3226)
+* **emit:** don't emit test files ([#5789](https://github.com/ionic-team/stencil/issues/5789)) ([50892f1](https://github.com/ionic-team/stencil/commit/50892f153c4c95e2728ecc460c87582fcd763a1e)), fixes [#5788](https://github.com/ionic-team/stencil/issues/5788)
+* **hydrate:** support vdom annotation in nested dsd structures ([#5856](https://github.com/ionic-team/stencil/issues/5856)) ([61bb5e3](https://github.com/ionic-team/stencil/commit/61bb5e3a080c011fb3242c0428cad9238b43149d))
+* label attribute not toggling input ([#3474](https://github.com/ionic-team/stencil/issues/3474)) ([13db920](https://github.com/ionic-team/stencil/commit/13db92075b8dec53f5226761cec5ace5edb73d0c)), fixes [#3473](https://github.com/ionic-team/stencil/issues/3473)
+* **mock-doc:** expose ShadowRoot and DocumentFragment globals ([#5827](https://github.com/ionic-team/stencil/issues/5827)) ([98bbd7c](https://github.com/ionic-team/stencil/commit/98bbd7c0d6fb67f085aa9ce0c3013e942c882be2)), fixes [#3260](https://github.com/ionic-team/stencil/issues/3260)
+* **runtime:** allow watchers to fire w/ no Stencil members ([#5855](https://github.com/ionic-team/stencil/issues/5855)) ([850ad4f](https://github.com/ionic-team/stencil/commit/850ad4f4dd7c2349109be987af1e6f5df8c39608)), fixes [#5854](https://github.com/ionic-team/stencil/issues/5854)
+* **runtime:** catch errors in async lifecycle methods ([#5826](https://github.com/ionic-team/stencil/issues/5826)) ([87e5b33](https://github.com/ionic-team/stencil/commit/87e5b33a3b2c7d65803394d8209449de2e85a0a4)), fixes [#5824](https://github.com/ionic-team/stencil/issues/5824)
+* **runtime:** don't register listener before connected to DOM ([#5844](https://github.com/ionic-team/stencil/issues/5844)) ([9d7021f](https://github.com/ionic-team/stencil/commit/9d7021feab38fa03a8cbc0d489350786381d235c)), fixes [#4067](https://github.com/ionic-team/stencil/issues/4067)
+* **runtime:** properly assign style declarations ([#5838](https://github.com/ionic-team/stencil/issues/5838)) ([5c10ebf](https://github.com/ionic-team/stencil/commit/5c10ebfd090d904409be6addc8a5e907b2e91ed0))
+* **testing:** allow to re-use pages across it blocks ([#5830](https://github.com/ionic-team/stencil/issues/5830)) ([561eab4](https://github.com/ionic-team/stencil/commit/561eab4af68c4b24f349f0791085e191c0f8a69c)), fixes [#3720](https://github.com/ionic-team/stencil/issues/3720)
+* **typescript:** remove unsupported label property ([#5840](https://github.com/ionic-team/stencil/issues/5840)) ([d26ea2b](https://github.com/ionic-team/stencil/commit/d26ea2b7490db64e4e6cd1af8eccfe48c63c5122)), fixes [#3473](https://github.com/ionic-team/stencil/issues/3473)
+
+
+### Features
+
+* **cli:** support generation of sass and less files ([#5857](https://github.com/ionic-team/stencil/issues/5857)) ([1883812](https://github.com/ionic-team/stencil/commit/18838123f11f7277d82c8045ff41859d3c14e025)), closes [#2155](https://github.com/ionic-team/stencil/issues/2155)
+* **compiler:** generate export maps on build ([#5809](https://github.com/ionic-team/stencil/issues/5809)) ([b6d2404](https://github.com/ionic-team/stencil/commit/b6d24043bd518a7ddaf28f5da65730dd8669303d))
+* **complier:** support type import aliasing ([#5836](https://github.com/ionic-team/stencil/issues/5836)) ([7ffb25d](https://github.com/ionic-team/stencil/commit/7ffb25d259de5b863e7dc3bc43270265cc786557)), closes [#2335](https://github.com/ionic-team/stencil/issues/2335)
+* **runtime:** support declarative shadow DOM ([#5792](https://github.com/ionic-team/stencil/issues/5792)) ([c837063](https://github.com/ionic-team/stencil/commit/c83706362819eb44d43cba66851f9ea81f27d3bd)), closes [#4010](https://github.com/ionic-team/stencil/issues/4010)
+* **testing:** add `toHaveLastReceivedEventDetail` event spy matcher ([#5829](https://github.com/ionic-team/stencil/issues/5829)) ([63491de](https://github.com/ionic-team/stencil/commit/63491de1e6ae18a5c6bdaa07e20629b6c765b677)), closes [#2488](https://github.com/ionic-team/stencil/issues/2488)
+* **testing:** allow to disable network error logging via 'logFailingNetworkRequests' option ([#5839](https://github.com/ionic-team/stencil/issues/5839)) ([dac3e33](https://github.com/ionic-team/stencil/commit/dac3e33e14bec08b8c38190642761b286fe92168)), closes [#2572](https://github.com/ionic-team/stencil/issues/2572)
+* **testing:** expose captureBeyondViewport in pageCompareScreenshot ([#5828](https://github.com/ionic-team/stencil/issues/5828)) ([cf6a450](https://github.com/ionic-team/stencil/commit/cf6a4503b3f211802eb11960029d2c49dd8af6c7)), closes [#3188](https://github.com/ionic-team/stencil/issues/3188)
+
+
+
 ## 😄 [4.18.3](https://github.com/ionic-team/stencil/compare/v4.18.2...v4.18.3) (2024-05-28)
 
 

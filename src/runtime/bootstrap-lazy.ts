@@ -1,5 +1,6 @@
 import { BUILD } from '@app-data';
 import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
+import { addHostEventListeners } from '@runtime';
 import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
@@ -15,8 +16,7 @@ import {
 import { hmrStart } from './hmr-component';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
-import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
-import { convertScopedToShadow, registerStyle } from './styles';
+import { HYDRATED_CSS, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
 import { appDidLoad } from './update-component';
 export { setNonce } from '@platform';
 
@@ -34,10 +34,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   const metaCharset = /*@__PURE__*/ head.querySelector('meta[charset]');
   const dataStyles = /*@__PURE__*/ doc.createElement('style');
   const deferredConnectedCallbacks: { connectedCallback: () => void }[] = [];
-  const styles = /*@__PURE__*/ doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let appLoadFallback: any;
   let isBootstrapping = true;
-  let i = 0;
 
   Object.assign(plt, options);
   plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
@@ -50,11 +48,6 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     // If the app is already hydrated there is not point to disable the
     // async queue. This will improve the first input delay
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
-  }
-  if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-    for (; i < styles.length; i++) {
-      registerStyle(styles[i].getAttribute(HYDRATED_STYLE_ID), convertScopedToShadow(styles[i].innerHTML), true);
-    }
   }
 
   let hasSlotRelocation = false;
@@ -96,6 +89,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       const HostElement = class extends HTMLElement {
         ['s-p']: Promise<void>[];
         ['s-rc']: (() => void)[];
+        hasRegisteredEventListeners = false;
 
         // StencilLazyHost
         constructor(self: HTMLElement) {
@@ -110,13 +104,26 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
             // add the read-only property "shadowRoot" to the host element
             // adding the shadow root build conditionals to minimize runtime
             if (supportsShadow) {
-              if (BUILD.shadowDelegatesFocus) {
-                self.attachShadow({
-                  mode: 'open',
-                  delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
-                });
+              if (!self.shadowRoot) {
+                // we don't want to call `attachShadow` if there's already a shadow root
+                // attached to the component
+                if (BUILD.shadowDelegatesFocus) {
+                  self.attachShadow({
+                    mode: 'open',
+                    delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
+                  });
+                } else {
+                  self.attachShadow({ mode: 'open' });
+                }
               } else {
-                self.attachShadow({ mode: 'open' });
+                // we want to check to make sure that the mode for the shadow
+                // root already attached to the element (i.e. created via DSD)
+                // is set to 'open' since that's the only mode we support
+                if (self.shadowRoot.mode !== 'open') {
+                  throw new Error(
+                    `Unable to re-use existing shadow root for ${cmpMeta.$tagName$}! Mode is set to ${self.shadowRoot.mode} but Stencil only supports open shadow roots.`,
+                  );
+                }
               }
             } else if (!BUILD.hydrateServerSide && !('shadowRoot' in self)) {
               (self as any).shadowRoot = self;
@@ -125,6 +132,19 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         }
 
         connectedCallback() {
+          const hostRef = getHostRef(this);
+
+          /**
+           * The `connectedCallback` lifecycle event can potentially be fired multiple times
+           * if the element is removed from the DOM and re-inserted. This is not a common use case,
+           * but it can happen in some scenarios. To prevent registering the same event listeners
+           * multiple times, we will only register them once.
+           */
+          if (!this.hasRegisteredEventListeners) {
+            this.hasRegisteredEventListeners = true;
+            addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
+          }
+
           if (appLoadFallback) {
             clearTimeout(appLoadFallback);
             appLoadFallback = null;
@@ -206,7 +226,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
     // Add hydration styles
     if (BUILD.invisiblePrehydration && (BUILD.hydratedClass || BUILD.hydratedAttribute)) {
-      dataStyles.textContent += cmpTags + HYDRATED_CSS;
+      dataStyles.textContent += cmpTags.sort() + HYDRATED_CSS;
     }
 
     // If we have styles, add them to the DOM

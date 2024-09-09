@@ -113,11 +113,9 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
   try {
     const varNames = new Set([results.defaultVarName]);
 
-    if (isString(input.tag)) {
-      if (input.encapsulation === 'scoped' || (input.encapsulation === 'shadow' && input.commentOriginalSelector)) {
-        const scopeId = getScopeId(input.tag, input.mode);
-        results.styleText = scopeCss(results.styleText, scopeId, !!input.commentOriginalSelector);
-      }
+    if (isString(input.tag) && input.encapsulation === 'scoped') {
+      const scopeId = getScopeId(input.tag, input.mode);
+      results.styleText = scopeCss(results.styleText, scopeId);
     }
 
     const cssImports = getCssToEsmImports(varNames, results.styleText, input.file, input.mode);

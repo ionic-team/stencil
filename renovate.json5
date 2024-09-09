@@ -57,7 +57,7 @@
     {
       // Increment this value as a part of updating TypeScript
       matchPackageNames: ['typescript'],
-      allowedVersions: '<5.5.0',
+      allowedVersions: '<5.6.0',
       commitMessagePrefix: "feat(typescript):"
     },
     {
@@ -71,6 +71,12 @@
       // disable eslint v9 updates until typescript-eslint supports it
       matchPackageNames: ['eslint'],
       allowedVersions: '<9.0.0',
+    },
+    {
+      // TODO(STENCIL-1274): Remove this block
+      // disable Eslint plugin updates until we have updated Eslint to v9
+      matchPackageNames: ['@typescript-eslint/eslint-plugin', '@typescript-eslint/parser'],
+      allowedVersions: '<8.0.0',
     },
     {
       matchPackagePrefixes: ['@typescript-eslint'],
@@ -151,9 +157,11 @@
   // Never rebase the branch or update it unless manually requested to avoid noisy PR emails
   rebaseWhen: 'never',
   /**
-   * Natural language syntax taken directly from renovate preset examples (with time adjusted).
+   * Cron syntax to run at midnight (UTC) on the first day of every month
+   *
+   * Note: Renovate does not support minute value granularity, so the wildcard value is necessary
    */
-  schedule: ["before 8am on the first day of the month"],
+  schedule: ["* 0 1 * *"],
   /**
    * Ensure semantic commits are enabled for commits + PR titles.
    *

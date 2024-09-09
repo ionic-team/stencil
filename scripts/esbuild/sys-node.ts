@@ -1,27 +1,27 @@
 import type { BuildOptions as ESBuildOptions } from 'esbuild';
 import fs from 'fs-extra';
-import { join } from 'path';
+import path from 'path';
 import resolve from 'resolve';
 import webpack, { Configuration } from 'webpack';
 
 import { getBanner } from '../utils/banner';
 import type { BuildOptions } from '../utils/options';
 import { writePkgJson } from '../utils/write-pkg-json';
-import { externalAlias, getBaseEsbuildOptions, getEsbuildAliases, getEsbuildExternalModules, runBuilds } from './utils';
+import { externalAlias, externalNodeModules, getBaseEsbuildOptions, getEsbuildAliases, runBuilds } from './utils';
 
 export async function buildSysNode(opts: BuildOptions) {
-  const inputDir = join(opts.buildDir, 'sys', 'node');
-  const srcDir = join(opts.srcDir, 'sys', 'node');
-  const inputFile = join(srcDir, 'index.ts');
-  const outputFile = join(opts.output.sysNodeDir, 'index.js');
+  const inputDir = path.join(opts.buildDir, 'sys', 'node');
+  const srcDir = path.join(opts.srcDir, 'sys', 'node');
+  const inputFile = path.join(srcDir, 'index.ts');
+  const outputFile = path.join(opts.output.sysNodeDir, 'index.js');
 
   // clear out rollup stuff and ensure directory exists
   await fs.emptyDir(opts.output.sysNodeDir);
 
   // create public d.ts
-  let dts = await fs.readFile(join(inputDir, 'public.d.ts'), 'utf8');
+  let dts = await fs.readFile(path.join(inputDir, 'public.d.ts'), 'utf8');
   dts = dts.replace('@stencil/core/internal', '../../internal/index');
-  await fs.writeFile(join(opts.output.sysNodeDir, 'index.d.ts'), dts);
+  await fs.writeFile(path.join(opts.output.sysNodeDir, 'index.d.ts'), dts);
 
   // write @stencil/core/sys/node/package.json
   writePkgJson(opts, opts.output.sysNodeDir, {
@@ -32,14 +32,20 @@ export async function buildSysNode(opts: BuildOptions) {
   });
 
   const external = [
-    ...getEsbuildExternalModules(opts, opts.output.sysNodeDir),
+    ...externalNodeModules,
     // normally you wouldn't externalize your "own" directory here, but since
     // we build multiple things within `opts.output.sysNodeDir` which should
     // externalize each other we need to do so
-    join(opts.output.sysNodeDir, '*'),
+    '../../compiler/stencil.js',
+    '../../sys/node/index.js',
+    './glob.js',
   ];
 
-  const sysNodeAliases = getEsbuildAliases();
+  const sysNodeAliases = {
+    ...getEsbuildAliases(),
+    '@stencil/core/compiler': '../../compiler/stencil.js',
+    '@sys-api-node': '../../sys/node/index.js',
+  };
 
   const sysNodeOptions: ESBuildOptions = {
     ...getBaseEsbuildOptions(),
@@ -57,8 +63,8 @@ export async function buildSysNode(opts: BuildOptions) {
   };
 
   // sys/node/worker.js bundle
-  const inputWorkerFile = join(srcDir, 'worker.ts');
-  const outputWorkerFile = join(opts.output.sysNodeDir, 'worker.js');
+  const inputWorkerFile = path.join(srcDir, 'worker.ts');
+  const outputWorkerFile = path.join(opts.output.sysNodeDir, 'worker.js');
 
   const workerOptions: ESBuildOptions = {
     ...getBaseEsbuildOptions(),
@@ -81,7 +87,7 @@ export async function buildSysNode(opts: BuildOptions) {
 
 export const sysNodeBundleCacheDir = 'sys-node-bundle-cache';
 async function sysNodeExternalBundles(opts: BuildOptions) {
-  const cachedDir = join(opts.scriptsBuildDir, sysNodeBundleCacheDir);
+  const cachedDir = path.join(opts.scriptsBuildDir, sysNodeBundleCacheDir);
 
   await fs.ensureDir(cachedDir);
 
@@ -101,27 +107,27 @@ async function sysNodeExternalBundles(opts: BuildOptions) {
    * is not supported by Jest v26. This is a workaround to remove the `node:`.
    * TODO(STENCIL-1323): remove once we deprecated Jest v26 support
    */
-  const globOutputPath = join(opts.output.sysNodeDir, 'glob.js');
+  const globOutputPath = path.join(opts.output.sysNodeDir, 'glob.js');
   const glob = fs.readFileSync(globOutputPath, 'utf8');
   fs.writeFileSync(globOutputPath, glob.replace(/require\("node:/g, 'require("'));
 
   // open-in-editor's visualstudio.vbs file
   // TODO(STENCIL-1052): remove once Rollup -> esbuild migration is complete
-  const visualstudioVbsSrc = join(opts.nodeModulesDir, 'open-in-editor', 'lib', 'editors', 'visualstudio.vbs');
-  const visualstudioVbsDesc = join(opts.output.devServerDir, 'visualstudio.vbs');
+  const visualstudioVbsSrc = path.join(opts.nodeModulesDir, 'open-in-editor', 'lib', 'editors', 'visualstudio.vbs');
+  const visualstudioVbsDesc = path.join(opts.output.devServerDir, 'visualstudio.vbs');
   await fs.copy(visualstudioVbsSrc, visualstudioVbsDesc);
 
   // copy open's xdg-open file
   // TODO(STENCIL-1052): remove once Rollup -> esbuild migration is complete
-  const xdgOpenSrcPath = join(opts.nodeModulesDir, 'open', 'xdg-open');
-  const xdgOpenDestPath = join(opts.output.devServerDir, 'xdg-open');
+  const xdgOpenSrcPath = path.join(opts.nodeModulesDir, 'open', 'xdg-open');
+  const xdgOpenDestPath = path.join(opts.output.devServerDir, 'xdg-open');
   await fs.copy(xdgOpenSrcPath, xdgOpenDestPath);
 }
 
 export function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir: string, entryFileName: string) {
   return new Promise<void>(async (resolveBundle, rejectBundle) => {
-    const outputFile = join(outputDir, entryFileName);
-    const cachedFile = join(cachedDir, entryFileName) + (opts.isProd ? '.min.js' : '');
+    const outputFile = path.join(outputDir, entryFileName);
+    const cachedFile = path.join(cachedDir, entryFileName) + (opts.isProd ? '.min.js' : '');
 
     const cachedExists = fs.existsSync(cachedFile);
     if (cachedExists) {
@@ -132,7 +138,7 @@ export function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir:
 
     const whitelist = new Set(['child_process', 'os', 'typescript']);
     const webpackConfig: Configuration = {
-      entry: join(opts.srcDir, 'sys', 'node', 'bundles', entryFileName),
+      entry: path.join(opts.srcDir, 'sys', 'node', 'bundles', entryFileName),
       output: {
         path: outputDir,
         filename: entryFileName,
@@ -166,10 +172,10 @@ export function bundleExternal(opts: BuildOptions, outputDir: string, cachedDir:
       },
       resolve: {
         alias: {
-          '@utils': join(opts.buildDir, 'utils', 'index.js'),
-          postcss: join(opts.nodeModulesDir, 'postcss'),
-          'source-map': join(opts.nodeModulesDir, 'source-map'),
-          chalk: join(opts.bundleHelpersDir, 'empty.js'),
+          '@utils': path.join(opts.buildDir, 'utils', 'index.js'),
+          postcss: path.join(opts.nodeModulesDir, 'postcss'),
+          'source-map': path.join(opts.nodeModulesDir, 'source-map'),
+          chalk: path.join(opts.bundleHelpersDir, 'empty.js'),
         },
       },
       optimization: {

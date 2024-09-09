@@ -49,12 +49,12 @@ export const proxyComponent = (
     );
   }
 
-  if (BUILD.member && cmpMeta.$members$) {
-    if (BUILD.watchCallback && Cstr.watchers) {
+  if ((BUILD.member && cmpMeta.$members$) || (BUILD.watchCallback && (cmpMeta.$watchers$ || Cstr.watchers))) {
+    if (BUILD.watchCallback && Cstr.watchers && !cmpMeta.$watchers$) {
       cmpMeta.$watchers$ = Cstr.watchers;
     }
     // It's better to have a const than two Object.entries()
-    const members = Object.entries(cmpMeta.$members$);
+    const members = Object.entries(cmpMeta.$members$ ?? {});
     members.map(([memberName, [memberFlags]]) => {
       if (
         (BUILD.prop || BUILD.state) &&
@@ -154,7 +154,8 @@ export const proxyComponent = (
           } else if (
             prototype.hasOwnProperty(propName) &&
             typeof this[propName] === 'number' &&
-            this[propName] == newValue
+            // cast type to number to avoid TS compiler issues
+            this[propName] == (newValue as unknown as number)
           ) {
             // if the propName exists on the prototype of `Cstr`, this update may be a result of Stencil using native
             // APIs to reflect props as attributes. Calls to `setAttribute(someElement, propName)` will result in

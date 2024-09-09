@@ -82,6 +82,15 @@ export const createTsWatchProgram = async (
     (reportWatchStatus) => {
       config.logger.debug(reportWatchStatus.messageText);
     },
+    // We don't want to allow users to mess with the watch method, so
+    // we only strip out the excludeFiles and excludeDirectories properties
+    // to allow the user to still have control over which files get excluded from the watcher
+    config.tsWatchOptions
+      ? {
+          excludeFiles: config.tsWatchOptions.excludeFiles,
+          excludeDirectories: config.tsWatchOptions.excludeDirectories,
+        }
+      : undefined,
   );
 
   // Add a callback that will execute whenever a new instance

@@ -106,7 +106,7 @@ const updateTypeName = (currentTypeName: string, typeAlias: d.TypesMemberNameDat
    * those in string literals. We do not check for a starting quote (" | ' | `) here as some browsers do not support
    * negative lookbehind. This works "well enough" until STENCIL-419 is completed.
    */
-  const typeNameRegex = new RegExp(`${typeAlias.localName}\\b${endingStrChar}`, 'g');
+  const typeNameRegex = new RegExp(`\\b${typeAlias.localName}\\b${endingStrChar}`, 'g');
   return currentTypeName.replace(typeNameRegex, typeAlias.importName);
 };
 

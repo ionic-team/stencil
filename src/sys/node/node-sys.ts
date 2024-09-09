@@ -1,4 +1,4 @@
-import { isFunction, isPromise, normalizePath } from '@utils';
+import { isFunction, normalizePath } from '@utils';
 import { parse as parseYarnLockFile } from '@yarnpkg/lockfile';
 import { createHash } from 'crypto';
 import exit from 'exit';
@@ -48,20 +48,15 @@ export function createNodeSys(c: { process?: any; logger?: Logger } = {}): Compi
   const devServerExecutingPath = path.join(__dirname, '..', '..', 'dev-server', 'index.js');
 
   const runInterruptsCallbacks = () => {
-    const promises: Promise<any>[] = [];
+    const returnValues: Promise<any>[] = [];
     let cb: () => any;
     while (isFunction((cb = onInterruptsCallbacks.pop()))) {
       try {
         const rtn = cb();
-        if (isPromise(rtn)) {
-          promises.push(rtn);
-        }
+        returnValues.push(rtn);
       } catch (e) {}
     }
-    if (promises.length > 0) {
-      return Promise.all(promises);
-    }
-    return null;
+    return Promise.all(returnValues).then(() => {});
   };
 
   const sys: CompilerSystem = {

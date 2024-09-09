@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "4.18.3",
+  "version": "4.21.0",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -22,15 +22,85 @@
     "sys/",
     "testing/"
   ],
+  "exports": {
+    ".": {
+      "import": "./internal/stencil-core/index.js",
+      "require": "./internal/stencil-core/index.cjs",
+      "types": "./internal/stencil-core/index.d.ts"
+    },
+    "./cli": {
+      "import": "./cli/index.js",
+      "require": "./cli/index.cjs"
+    },
+    "./internal": {
+      "import": "./internal/index.js",
+      "types": "./internal/index.d.ts"
+    },
+    "./internal/client": {
+      "import": "./internal/client/index.js",
+      "require": "./internal/client/index.js"
+    },
+    "./internal/testing": {
+      "import": "./internal/testing/index.js",
+      "require": "./internal/testing/index.js"
+    },
+    "./internal/testing/*": {
+      "import": "./internal/testing/*"
+    },
+    "./internal/app-data": {
+      "import": "./internal/app-data/index.js",
+      "require": "./internal/app-data/index.cjs",
+      "types": "./internal/app-data/index.d.ts"
+    },
+    "./mock-doc": {
+      "import": "./mock-doc/index.js",
+      "require": "./mock-doc/index.cjs",
+      "types": "./mock-doc/index.d.ts"
+    },
+    "./compiler": {
+      "import": "./compiler/stencil.js",
+      "require": "./compiler/stencil.js",
+      "types": "./compiler/stencil.d.ts"
+    },
+    "./compiler/*": {
+      "import": "./compiler/*",
+      "types": "./compiler/*"
+    },
+    "./screenshot": {
+      "require": "./screenshot/index.js",
+      "types": "./screenshot/index.d.ts"
+    },
+    "./sys/node": {
+      "import": "./sys/node/index.js",
+      "require": "./sys/node/index.js",
+      "types": "./sys/node/index.d.ts"
+    },
+    "./sys/node/*": {
+      "import": "./sys/node/*",
+      "require": "./sys/node/*"
+    },
+    "./testing": {
+      "import": "./testing/index.js",
+      "types": "./testing/index.d.ts",
+      "require": "./testing/index.js"
+    },
+    "./testing/jest-preset": {
+      "require": "./testing/jest-preset.js"
+    },
+    "./testing/*": {
+      "import": "./testing/*",
+      "require": "./testing/*"
+    }
+  },
   "scripts": {
     "build": "npm run clean && npm run tsc.prod && npm run ts scripts/index.ts -- --prod --ci",
     "build.watch": "npm run build -- --watch",
     "build.updateSelectorEngine": "npm run ts scripts/updateSelectorEngine.ts",
-    "clean": "rm -rf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean:scripts && npm run clean.screenshots",
-    "clean.screenshots": "rm -rf test/end-to-end/screenshot/builds test/end-to-end/screenshot/images",
-    "clean:scripts": "rm -rf scripts/build",
+    "clean": "rimraf build/ cli/ compiler/ dev-server/ internal/ mock-doc/ sys/ testing/ && npm run clean:scripts && npm run clean.screenshots",
+    "clean.screenshots": "rimraf test/end-to-end/screenshot/builds test/end-to-end/screenshot/images",
+    "clean:scripts": "rimraf scripts/build",
     "lint": "eslint 'bin/*' 'scripts/*.ts' 'scripts/**/*.ts' 'src/*.ts' 'src/**/*.ts' 'src/**/*.tsx' 'test/wdio/**/*.tsx'",
-    "install.jest": "bash ./src/testing/jest/install-dependencies.sh",
+    "install.jest": "npx tsx ./src/testing/jest/install-dependencies.mts",
     "prettier": "npm run prettier.base -- --write",
     "prettier.base": "prettier --cache \"./({bin,scripts,src,test}/**/*.{ts,tsx,js,jsx})|bin/stencil|.github/(**/)?*.(yml|yaml)|*.js\"",
     "prettier.dry-run": "npm run prettier.base -- --list-different",
@@ -42,6 +112,7 @@
     "test": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js --coverage",
     "test.analysis": "cd test && npm run analysis.build-and-analyze",
     "test.bundlers": "cd test && npm run bundlers",
+    "test.copytask": "cd test/copy-task && npm ci && npm run test",
     "test.dist": "npm run ts scripts/index.ts -- --validate-build",
     "test.end-to-end": "cd test/end-to-end && npm ci && npm test && npm run test.dist",
     "test.jest": "node --experimental-vm-modules ./node_modules/jest/bin/jest.js",
@@ -88,10 +159,10 @@
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-jest": "^28.0.0",
-    "eslint-plugin-jsdoc": "^48.0.0",
+    "eslint-plugin-jsdoc": "^50.0.0",
     "eslint-plugin-simple-import-sort": "^12.0.0",
     "eslint-plugin-wdio": "^8.24.12",
-    "execa": "8.0.1",
+    "execa": "9.3.0",
     "exit": "^0.1.2",
     "fs-extra": "^11.0.0",
     "glob": "10.4.1",
@@ -114,13 +185,14 @@
     "prettier": "3.3.1",
     "prompts": "2.4.2",
     "puppeteer": "^21.0.0",
+    "rimraf": "^6.0.1",
     "rollup": "2.56.3",
     "semver": "^7.3.7",
     "terser": "5.31.1",
     "tsx": "^4.10.3",
-    "typescript": "~5.4.0",
+    "typescript": "~5.5.4",
     "webpack": "^5.75.0",
-    "ws": "8.17.0"
+    "ws": "8.17.1"
   },
   "engines": {
     "node": ">=16.0.0",

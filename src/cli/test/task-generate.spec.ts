@@ -11,13 +11,16 @@ jest.mock('prompts', () => ({
   prompt: promptMock,
 }));
 
-const setup = async () => {
+let formatToPick = 'css';
+
+const setup = async (plugins: any[] = []) => {
   const sys = mockCompilerSystem();
   const config: d.ValidatedConfig = mockValidatedConfig({
     configPath: '/testing-path',
     flags: createConfigFlags({ task: 'generate' }),
     srcDir: '/src',
     sys,
+    plugins,
   });
 
   // set up some mocks / spies
@@ -28,9 +31,16 @@ const setup = async () => {
   // mock prompt usage: tagName and filesToGenerate are the keys used for
   // different calls, so we can cheat here and just do a single
   // mockResolvedValue
-  promptMock.mockResolvedValue({
-    tagName: 'my-component',
-    filesToGenerate: ['css', 'spec.tsx', 'e2e.ts'],
+  let format = formatToPick;
+  promptMock.mockImplementation((params) => {
+    if (params.name === 'sassFormat') {
+      format = 'sass';
+      return { sassFormat: 'sass' };
+    }
+    return {
+      tagName: 'my-component',
+      filesToGenerate: [format, 'spec.tsx', 'e2e.ts'],
+    };
   });
 
   return { config, errorSpy, validateTagSpy };
@@ -53,6 +63,7 @@ describe('generate task', () => {
     jest.restoreAllMocks();
     jest.clearAllMocks();
     jest.resetModules();
+    formatToPick = 'css';
   });
 
   afterAll(() => {
@@ -117,7 +128,7 @@ describe('generate task', () => {
     userChoices.forEach((file) => {
       expect(writeFileSpy).toHaveBeenCalledWith(
         file.path,
-        getBoilerplateByExtension('my-component', file.extension, true),
+        getBoilerplateByExtension('my-component', file.extension, true, 'css'),
       );
     });
   });
@@ -134,5 +145,44 @@ describe('generate task', () => {
       '\t/src/components/my-component/test/my-component.e2e.ts',
     );
     expect(config.sys.exit).toHaveBeenCalledWith(1);
+  });
+
+  it('should generate files for sass projects', async () => {
+    const { config } = await setup([{ name: 'sass' }]);
+    const writeFileSpy = jest.spyOn(config.sys, 'writeFile');
+    await silentGenerate(config);
+    const userChoices: ReadonlyArray<BoilerplateFile> = [
+      { extension: 'tsx', path: '/src/components/my-component/my-component.tsx' },
+      { extension: 'sass', path: '/src/components/my-component/my-component.sass' },
+      { extension: 'spec.tsx', path: '/src/components/my-component/test/my-component.spec.tsx' },
+      { extension: 'e2e.ts', path: '/src/components/my-component/test/my-component.e2e.ts' },
+    ];
+
+    userChoices.forEach((file) => {
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        file.path,
+        getBoilerplateByExtension('my-component', file.extension, true, 'sass'),
+      );
+    });
+  });
+
+  it('should generate files for less projects', async () => {
+    formatToPick = 'less';
+    const { config } = await setup([{ name: 'less' }]);
+    const writeFileSpy = jest.spyOn(config.sys, 'writeFile');
+    await silentGenerate(config);
+    const userChoices: ReadonlyArray<BoilerplateFile> = [
+      { extension: 'tsx', path: '/src/components/my-component/my-component.tsx' },
+      { extension: 'less', path: '/src/components/my-component/my-component.less' },
+      { extension: 'spec.tsx', path: '/src/components/my-component/test/my-component.spec.tsx' },
+      { extension: 'e2e.ts', path: '/src/components/my-component/test/my-component.e2e.ts' },
+    ];
+
+    userChoices.forEach((file) => {
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        file.path,
+        getBoilerplateByExtension('my-component', file.extension, true, 'less'),
+      );
+    });
   });
 });

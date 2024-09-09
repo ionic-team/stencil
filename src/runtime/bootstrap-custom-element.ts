@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { forceUpdate, getHostRef, registerHost, styles, supportsShadow } from '@platform';
+import { addHostEventListeners, forceUpdate, getHostRef, registerHost, styles, supportsShadow } from '@platform';
 import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
@@ -72,6 +72,9 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
       registerHost(this, cmpMeta);
     },
     connectedCallback() {
+      const hostRef = getHostRef(this);
+      addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
+
       connectedCallback(this);
       if (BUILD.connectedCallback && originalConnectedCallback) {
         originalConnectedCallback.call(this);
@@ -85,13 +88,24 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     },
     __attachShadow() {
       if (supportsShadow) {
-        if (BUILD.shadowDelegatesFocus) {
-          this.attachShadow({
-            mode: 'open',
-            delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
-          });
+        if (!this.shadowRoot) {
+          if (BUILD.shadowDelegatesFocus) {
+            this.attachShadow({
+              mode: 'open',
+              delegatesFocus: !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDelegatesFocus),
+            });
+          } else {
+            this.attachShadow({ mode: 'open' });
+          }
         } else {
-          this.attachShadow({ mode: 'open' });
+          // we want to check to make sure that the mode for the shadow
+          // root already attached to the element (i.e. created via DSD)
+          // is set to 'open' since that's the only mode we support
+          if (this.shadowRoot.mode !== 'open') {
+            throw new Error(
+              `Unable to re-use existing shadow root for ${cmpMeta.$tagName$}! Mode is set to ${this.shadowRoot.mode} but Stencil only supports open shadow roots.`,
+            );
+          }
         }
       } else {
         (this as any).shadowRoot = this;

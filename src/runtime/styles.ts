@@ -60,7 +60,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
 
   if (style) {
     if (typeof style === 'string') {
-      styleContainerNode = styleContainerNode.head || styleContainerNode;
+      styleContainerNode = styleContainerNode.head || (styleContainerNode as HTMLElement);
       let appliedStyles = rootAppliedStyles.get(styleContainerNode);
       let styleElm;
       if (!appliedStyles) {
@@ -84,11 +84,45 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
             styleElm.setAttribute('nonce', nonce);
           }
 
-          if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {
+          if (
+            (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) &&
+            cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation
+          ) {
             styleElm.setAttribute(HYDRATED_STYLE_ID, scopeId);
           }
 
-          styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+          /**
+           * attach styles at the end of the head tag if we render scoped components
+           */
+          if (!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
+            if (styleContainerNode.nodeName === 'HEAD') {
+              /**
+               * if the page contains preconnect links, we want to insert the styles
+               * after the last preconnect link to ensure the styles are preloaded
+               */
+              const preconnectLinks = styleContainerNode.querySelectorAll('link[rel=preconnect]');
+              const referenceNode =
+                preconnectLinks.length > 0
+                  ? preconnectLinks[preconnectLinks.length - 1].nextSibling
+                  : document.querySelector('style');
+              (styleContainerNode as HTMLElement).insertBefore(styleElm, referenceNode);
+            } else if ('host' in styleContainerNode) {
+              /**
+               * if a scoped component is used within a shadow root, we want to insert the styles
+               * at the beginning of the shadow root node
+               */
+              (styleContainerNode as HTMLElement).prepend(styleElm);
+            } else {
+              styleContainerNode.append(styleElm);
+            }
+          }
+
+          /**
+           * attach styles at the beginning of a shadow root node if we render shadow components
+           */
+          if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && styleContainerNode.nodeName !== 'HEAD') {
+            styleContainerNode.insertBefore(styleElm, null);
+          }
         }
 
         // Add styles for `slot-fb` elements if we're using slots outside the Shadow DOM
@@ -119,12 +153,17 @@ export const attachStyles = (hostRef: d.HostRef) => {
   const flags = cmpMeta.$flags$;
   const endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
   const scopeId = addStyle(
-    BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : elm.getRootNode(),
+    BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : (elm.getRootNode() as ShadowRoot),
     cmpMeta,
     hostRef.$modeName$,
   );
 
-  if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {
+  if (
+    (BUILD.shadowDom || BUILD.scoped) &&
+    BUILD.cssAnnotations &&
+    flags & CMP_FLAGS.needsScopedEncapsulation &&
+    flags & CMP_FLAGS.scopedCssEncapsulation
+  ) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR
@@ -151,34 +190,6 @@ export const attachStyles = (hostRef: d.HostRef) => {
  */
 export const getScopeId = (cmp: d.ComponentRuntimeMeta, mode?: string) =>
   'sc-' + (BUILD.mode && mode && cmp.$flags$ & CMP_FLAGS.hasMode ? cmp.$tagName$ + '-' + mode : cmp.$tagName$);
-
-/**
- * Convert a 'scoped' CSS string to one appropriate for use in the shadow DOM.
- *
- * Given a 'scoped' CSS string that looks like this:
- *
- * ```
- * /*!@div*\/div.class-name { display: flex };
- * ```
- *
- * Convert it to a 'shadow' appropriate string, like so:
- *
- * ```
- *  /*!@div*\/div.class-name { display: flex }
- *      ─┬─                  ────────┬────────
- *       │                           │
- *       │         ┌─────────────────┘
- *       ▼         ▼
- *      div{ display: flex }
- * ```
- *
- * Note that forward-slashes in the above are escaped so they don't end the
- * comment.
- *
- * @param css a CSS string to convert
- * @returns the converted string
- */
-export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
 
 declare global {
   export interface CSSStyleSheet {

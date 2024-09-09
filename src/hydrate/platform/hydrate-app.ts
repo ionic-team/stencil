@@ -1,5 +1,5 @@
 import { globalScripts } from '@app-globals';
-import { doc, getHostRef, loadModule, plt, registerHost } from '@platform';
+import { addHostEventListeners, doc, getHostRef, loadModule, plt, registerHost } from '@platform';
 import { connectedCallback, insertVdomAnnotations } from '@runtime';
 
 import type * as d from '../../declarations';
@@ -28,7 +28,7 @@ export function hydrateApp(
   let ranCompleted = false;
 
   function hydratedComplete() {
-    global.clearTimeout(tmrId);
+    globalThis.clearTimeout(tmrId);
     createdElements.clear();
     connectedElements.clear();
 
@@ -120,7 +120,7 @@ export function hydrateApp(
 
           // add it to our Set so we know it's already being connected
           connectedElements.add(elm);
-          return hydrateComponent(win, results, elm.nodeName, elm, waitingElements);
+          return hydrateComponent.call(elm, win, results, elm.nodeName, elm, waitingElements);
         }
       }
 
@@ -148,7 +148,7 @@ export function hydrateApp(
     } as (typeof window)['document']['createElementNS'];
 
     // ensure we use NodeJS's native setTimeout, not the mocked hydrate app scoped one
-    tmrId = global.setTimeout(timeoutExceeded, opts.timeout);
+    tmrId = globalThis.setTimeout(timeoutExceeded, opts.timeout);
 
     plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', doc.baseURI).href;
 
@@ -163,6 +163,7 @@ export function hydrateApp(
 }
 
 async function hydrateComponent(
+  this: HTMLElement,
   win: Window & typeof globalThis,
   results: d.HydrateResults,
   tagName: string,
@@ -183,6 +184,9 @@ async function hydrateComponent(
 
     if (cmpMeta != null) {
       waitingElements.add(elm);
+      const hostRef = getHostRef(this);
+      addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
+
       try {
         connectedCallback(elm);
         await elm.componentOnReady();

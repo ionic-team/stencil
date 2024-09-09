@@ -115,6 +115,8 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
 
     const failOnConsoleError = opts.failOnConsoleError === true;
     const failOnNetworkError = opts.failOnNetworkError === true;
+    const logFailingNetworkRequests =
+      typeof opts.logFailingNetworkRequests === 'boolean' ? opts.logFailingNetworkRequests : true;
 
     page.on('console', (ev) => {
       if (ev.type() === 'error') {
@@ -145,7 +147,7 @@ export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage>
       });
       if (failOnNetworkError) {
         throw new Error(req.failure().errorText);
-      } else {
+      } else if (logFailingNetworkRequests) {
         console.error('requestfailed', req.url());
       }
     });

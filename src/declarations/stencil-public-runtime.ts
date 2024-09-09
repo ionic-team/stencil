@@ -1098,7 +1098,6 @@ export namespace JSXBase {
   export interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     htmlFor?: string;
-    htmlfor?: string;
   }
 
   export interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1224,7 +1223,6 @@ export namespace JSXBase {
   export interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     htmlFor?: string;
-    htmlfor?: string;
     name?: string;
   }
 
@@ -1739,6 +1737,10 @@ export namespace JSXBase {
     onSubmitCapture?: (event: Event) => void;
     onInvalid?: (event: Event) => void;
     onInvalidCapture?: (event: Event) => void;
+    onBeforeToggle?: (event: Event) => void;
+    onBeforeToggleCapture?: (event: Event) => void;
+    onToggle?: (event: Event) => void;
+    onToggleCapture?: (event: Event) => void;
 
     // Image Events
     onLoad?: (event: Event) => void;

@@ -84,6 +84,26 @@ export const createWatchBuild = async (
       );
     }
 
+    // Make sure all files in the module map are still in the fs
+    // Otherwise, we can run into build errors because the compiler can think
+    // there are two component files with the same tag name
+    Array.from(compilerCtx.moduleMap.keys()).forEach((key) => {
+      if (filesUpdated.has(key) || filesDeleted.has(key)) {
+        // Check if the file exists in the fs
+        const fileExists = compilerCtx.fs.accessSync(key);
+        if (!fileExists) {
+          compilerCtx.moduleMap.delete(key);
+        }
+      }
+    });
+
+    // Make sure all added/updated files are watched
+    // We need to check both added/updates since the TS watch program behaves kinda weird
+    // and doesn't always handle file renames the same way
+    new Set([...filesUpdated, ...filesAdded]).forEach((filePath) => {
+      compilerCtx.addWatchFile(filePath);
+    });
+
     dirsAdded.clear();
     dirsDeleted.clear();
     filesAdded.clear();

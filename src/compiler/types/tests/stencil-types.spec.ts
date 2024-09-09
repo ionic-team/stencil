@@ -111,6 +111,7 @@ describe('stencil-types', () => {
           [typePath]: [
             {
               localName: 'SomeOtherType',
+              originalName: 'SomeOtherType',
             },
           ],
         });
@@ -176,6 +177,7 @@ describe('stencil-types', () => {
           [typePath]: [
             {
               localName: initialType,
+              originalName: initialType,
               importName: expectedType,
             },
           ],
@@ -198,6 +200,7 @@ describe('stencil-types', () => {
       const typeMemberNames = [
         {
           localName: 'SomeType',
+          originalName: 'SomeType',
           importName: 'SomeOtherType',
         },
       ];
@@ -211,6 +214,7 @@ describe('stencil-types', () => {
       const typeMemberNames = [
         {
           localName: 'Ar',
+          originalName: 'Ar',
           importName: 'Ar1',
         },
       ];
@@ -224,6 +228,7 @@ describe('stencil-types', () => {
       const typeMemberNames = [
         {
           localName: 'Ar',
+          originalName: 'Ar',
           importName: 'Ar1',
         },
       ];
@@ -237,10 +242,12 @@ describe('stencil-types', () => {
       const typeMemberNames = [
         {
           localName: 'SomeType',
+          originalName: 'SomeType',
           importName: 'SomeType1',
         },
         {
           localName: 'AnotherType',
+          originalName: 'AnotherType',
           importName: 'AnotherType1',
         },
       ];
@@ -254,6 +261,7 @@ describe('stencil-types', () => {
       const typeMemberNames = [
         {
           localName: 'SomeType',
+          originalName: 'SomeType',
           importName: 'SomeType1',
         },
       ];
@@ -279,6 +287,7 @@ describe('stencil-types', () => {
       const typeMemberNames = [
         {
           localName: 'SomeType',
+          originalName: 'SomeType',
           importName: 'SomeType1',
         },
       ];

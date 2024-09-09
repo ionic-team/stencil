@@ -22,7 +22,7 @@ export const stubComponentCompilerEvent = (
       resolved: '"foo" | "bar"',
       references: {
         UserImplementedEventType: {
-          id: 'placeholder',
+          id: './resources.ts::UserImplementedEventType',
           location: 'import',
           path: './resources',
         },
