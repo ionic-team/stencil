@@ -70,4 +70,4 @@ describe('isHexColor', () => {
     expect(isHexColor('{}')).toBe(false);
     expect(isHexColor('[]')).toBe(false);
   });
-})
+});
