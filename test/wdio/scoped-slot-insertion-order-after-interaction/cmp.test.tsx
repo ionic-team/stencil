@@ -25,8 +25,9 @@ describe('scoped-slot-insertion-order-after-interaction', () => {
       ),
     });
 
-
-    const scopedSlotInsertionOrderAfterInteraction = document.querySelector('scoped-slot-insertion-order-after-interaction');
+    const scopedSlotInsertionOrderAfterInteraction = document.querySelector(
+      'scoped-slot-insertion-order-after-interaction',
+    );
 
     // The element to be inserted
     const el = document.createElement('p');
