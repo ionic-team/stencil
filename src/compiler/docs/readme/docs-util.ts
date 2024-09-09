@@ -145,7 +145,7 @@ const normalizeColumnWidth = (rows: RowData[]) => {
 export const isHexColor = (str: string): boolean => {
   const hexColorRegex = /^#([0-9A-Fa-f]{3}){1,2}$/;
   return hexColorRegex.test(str);
-}
+};
 
 interface ColumnData {
   text: string;

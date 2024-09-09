@@ -1,8 +1,8 @@
-import { normalizePath, relative} from '@utils';
+import { normalizePath, relative } from '@utils';
 
 import type * as d from '../../../declarations';
 import { DEFAULT_TARGET_COMPONENT_STYLES } from './constants';
-import { isHexColor } from "./docs-util";
+import { isHexColor } from './docs-util';
 
 export const depsToMarkdown = (
   cmp: d.JsonDocsComponent,
@@ -40,10 +40,7 @@ export const depsToMarkdown = (
 
   const { background: defaultBackground, textColor: defaultTextColor } = DEFAULT_TARGET_COMPONENT_STYLES;
 
-  let {
-    background = defaultBackground,
-    textColor = defaultTextColor,
-  } = targetComponentConfig;
+  let { background = defaultBackground, textColor = defaultTextColor } = targetComponentConfig;
 
   if (!isHexColor(background)) {
     background = defaultBackground;

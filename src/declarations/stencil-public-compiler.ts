@@ -1714,12 +1714,10 @@ export interface CopyTask {
  * Configuration for generating documentation from Stencil components.
  */
 export interface StencilDocsConfig {
-
   /**
    * Options for processing and rendering Markdown documentation files.
    */
   markdown: {
-
     /**
      * Styling for how the target component will be represented within documentation (e.g., in component diagrams).
      */
@@ -1740,7 +1738,6 @@ export interface StencilDocsConfig {
     };
   };
 }
-
 
 // TODO(STENCIL-882): Remove this interface [BREAKING_CHANGE]
 export interface BundlingConfig {
