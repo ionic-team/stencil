@@ -1,30 +1,42 @@
 import type * as d from '../../../declarations';
-import { DEFAULT_TARGET_COMPONENT_STYLES } from "../readme/constants";
-import { depsToMarkdown } from "../readme/markdown-dependencies";
+import { DEFAULT_TARGET_COMPONENT_STYLES } from '../../config/constants';
+import { depsToMarkdown } from '../readme/markdown-dependencies';
 
 describe('depsToMarkdown()', () => {
   it('should use default settings if docs.markdown configuration was not provided', () => {
-    const mockConfig = {} as d.ValidatedConfig;
-    const md = depsToMarkdown({
-      dependencies: [],
-      dependencyGraph: {
-        's-test': ['s-test-dep1']
+    const mockConfig = {
+      docs: {
+        markdown: {
+          targetComponent: {
+            ...DEFAULT_TARGET_COMPONENT_STYLES,
+          },
+        },
       },
-      dependents: [],
-      docs: "",
-      docsTags: [],
-      encapsulation: undefined,
-      events: [],
-      listeners: [],
-      methods: [],
-      parts: [],
-      props: [],
-      readme: "",
-      slots: [],
-      styles: [],
-      tag: "",
-      usage: undefined
-    }, [], mockConfig);
+    } as d.ValidatedConfig;
+    const md = depsToMarkdown(
+      {
+        dependencies: [],
+        dependencyGraph: {
+          's-test': ['s-test-dep1'],
+        },
+        dependents: [],
+        docs: '',
+        docsTags: [],
+        encapsulation: undefined,
+        events: [],
+        listeners: [],
+        methods: [],
+        parts: [],
+        props: [],
+        readme: '',
+        slots: [],
+        styles: [],
+        tag: '',
+        usage: undefined,
+      },
+      [],
+      mockConfig,
+    );
     expect(md).toEqual([
       '## Dependencies',
       '',
@@ -34,7 +46,7 @@ describe('depsToMarkdown()', () => {
       '  s-test --> s-test-dep1',
       `  style  fill:${DEFAULT_TARGET_COMPONENT_STYLES.background},stroke:${DEFAULT_TARGET_COMPONENT_STYLES.textColor},stroke-width:4px`,
       '```',
-      ''
+      '',
     ]);
   });
 
@@ -45,30 +57,35 @@ describe('depsToMarkdown()', () => {
         markdown: {
           targetComponent: {
             background: mockColor,
-          }
-        }
-      }
-    } as d.ValidatedConfig;
-    const md = depsToMarkdown({
-      dependencies: [],
-      dependencyGraph: {
-        's-test': ['s-test-dep1']
+            textColor: DEFAULT_TARGET_COMPONENT_STYLES.textColor,
+          },
+        },
       },
-      dependents: [],
-      docs: "",
-      docsTags: [],
-      encapsulation: undefined,
-      events: [],
-      listeners: [],
-      methods: [],
-      parts: [],
-      props: [],
-      readme: "",
-      slots: [],
-      styles: [],
-      tag: "",
-      usage: undefined
-    }, [], mockConfig);
+    } as d.ValidatedConfig;
+    const md = depsToMarkdown(
+      {
+        dependencies: [],
+        dependencyGraph: {
+          's-test': ['s-test-dep1'],
+        },
+        dependents: [],
+        docs: '',
+        docsTags: [],
+        encapsulation: undefined,
+        events: [],
+        listeners: [],
+        methods: [],
+        parts: [],
+        props: [],
+        readme: '',
+        slots: [],
+        styles: [],
+        tag: '',
+        usage: undefined,
+      },
+      [],
+      mockConfig,
+    );
     expect(md).toEqual([
       '## Dependencies',
       '',
@@ -78,7 +95,7 @@ describe('depsToMarkdown()', () => {
       '  s-test --> s-test-dep1',
       `  style  fill:${mockColor},stroke:${DEFAULT_TARGET_COMPONENT_STYLES.textColor},stroke-width:4px`,
       '```',
-      ''
+      '',
     ]);
   });
 
@@ -88,31 +105,36 @@ describe('depsToMarkdown()', () => {
       docs: {
         markdown: {
           targetComponent: {
+            background: DEFAULT_TARGET_COMPONENT_STYLES.background,
             textColor: mockColor,
-          }
-        }
-      }
-    } as d.ValidatedConfig;
-    const md = depsToMarkdown({
-      dependencies: [],
-      dependencyGraph: {
-        's-test': ['s-test-dep1']
+          },
+        },
       },
-      dependents: [],
-      docs: "",
-      docsTags: [],
-      encapsulation: undefined,
-      events: [],
-      listeners: [],
-      methods: [],
-      parts: [],
-      props: [],
-      readme: "",
-      slots: [],
-      styles: [],
-      tag: "",
-      usage: undefined
-    }, [], mockConfig);
+    } as d.ValidatedConfig;
+    const md = depsToMarkdown(
+      {
+        dependencies: [],
+        dependencyGraph: {
+          's-test': ['s-test-dep1'],
+        },
+        dependents: [],
+        docs: '',
+        docsTags: [],
+        encapsulation: undefined,
+        events: [],
+        listeners: [],
+        methods: [],
+        parts: [],
+        props: [],
+        readme: '',
+        slots: [],
+        styles: [],
+        tag: '',
+        usage: undefined,
+      },
+      [],
+      mockConfig,
+    );
     expect(md).toEqual([
       '## Dependencies',
       '',
@@ -122,7 +144,7 @@ describe('depsToMarkdown()', () => {
       '  s-test --> s-test-dep1',
       `  style  fill:${DEFAULT_TARGET_COMPONENT_STYLES.background},stroke:${mockColor},stroke-width:4px`,
       '```',
-      ''
+      '',
     ]);
   });
 });

@@ -1,8 +1,6 @@
 import { normalizePath, relative } from '@utils';
 
 import type * as d from '../../../declarations';
-import { DEFAULT_TARGET_COMPONENT_STYLES } from './constants';
-import { isHexColor } from './docs-util';
 
 export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], config: d.ValidatedConfig) => {
   const content: string[] = [];
@@ -34,21 +32,6 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
     content.push(``);
   }
 
-  const { background: defaultBackground, textColor: defaultTextColor } = DEFAULT_TARGET_COMPONENT_STYLES;
-
-  let { background = defaultBackground, textColor = defaultTextColor } =
-    config.docs?.markdown?.targetComponent ?? DEFAULT_TARGET_COMPONENT_STYLES;
-
-  if (!isHexColor(background)) {
-    background = defaultBackground;
-    config.logger.warn('Default value for docs.markdown.targetComponent.background is being used.');
-  }
-
-  if (!isHexColor(textColor)) {
-    textColor = defaultTextColor;
-    config.logger.warn('Default value for docs.markdown.targetComponent.textColor is being used.');
-  }
-
   content.push(`### Graph`);
   content.push('```mermaid');
   content.push('graph TD;');
@@ -57,6 +40,8 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
       content.push(`  ${key} --> ${dep}`);
     });
   });
+
+  const { background, textColor } = config.docs.markdown.targetComponent;
 
   content.push(`  style ${cmp.tag} fill:${background},stroke:${textColor},stroke-width:4px`);
 
