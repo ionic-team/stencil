@@ -19,6 +19,7 @@ import {
 } from './constants';
 import { validateOutputTargets } from './outputs';
 import { validateDevServer } from './validate-dev-server';
+import { validateDocs } from './validate-docs';
 import { validateHydrated } from './validate-hydrated';
 import { validateDistNamespace } from './validate-namespace';
 import { validateNamespace } from './validate-namespace';
@@ -136,6 +137,7 @@ export const validateConfig = (
     rollupConfig: validateRollupConfig(config),
     sys: config.sys ?? bootstrapConfig.sys ?? createNodeSys({ logger }),
     testing: config.testing ?? {},
+    docs: validateDocs(config, logger),
     transformAliasedImportPaths: isBoolean(userConfig.transformAliasedImportPaths)
       ? userConfig.transformAliasedImportPaths
       : true,
