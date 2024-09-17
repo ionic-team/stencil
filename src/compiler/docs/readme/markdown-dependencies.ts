@@ -2,7 +2,11 @@ import { normalizePath, relative } from '@utils';
 
 import type * as d from '../../../declarations';
 
-export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsComponent[], config: d.ValidatedConfig) => {
+export const depsToMarkdown = (
+  cmp: d.JsonDocsComponent,
+  cmps: d.JsonDocsComponent[],
+  outputTarget: d.OutputTargetDocsReadme,
+) => {
   const content: string[] = [];
 
   const deps = Object.entries(cmp.dependencyGraph);
@@ -41,9 +45,9 @@ export const depsToMarkdown = (cmp: d.JsonDocsComponent, cmps: d.JsonDocsCompone
     });
   });
 
-  const { background, textColor } = config.docs.markdown.targetComponent;
+  const { background, text } = outputTarget.colors;
 
-  content.push(`  style ${cmp.tag} fill:${background},stroke:${textColor},stroke-width:4px`);
+  content.push(`  style ${cmp.tag} fill:${background},stroke:${text},stroke-width:4px`);
 
   content.push('```');
 

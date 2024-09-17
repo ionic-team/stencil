@@ -74,7 +74,33 @@ const validateReadmeOutputTarget = (config: d.ValidatedConfig, outputTarget: d.O
   if (outputTarget.footer == null) {
     outputTarget.footer = NOTE;
   }
+
   outputTarget.strict = !!outputTarget.strict;
+
+  if (!outputTarget.colors) {
+    outputTarget.colors = DEFAULT_DOCS_README_COLORS;
+  } else {
+    let invalidColor = false;
+
+    if (!outputTarget.colors.background || (invalidColor = !isHexColor(outputTarget.colors.background))) {
+      if (invalidColor) {
+        config.logger.warn(
+          `'${outputTarget.colors.background}' is not a valid hex color. The default value for diagram backgrounds ('${DEFAULT_DOCS_README_COLORS.background}') will be used.`,
+        );
+      }
+      outputTarget.colors.background = DEFAULT_DOCS_README_COLORS.background;
+    }
+
+    if (!outputTarget.colors.text || (invalidColor = !isHexColor(outputTarget.colors.text))) {
+      if (invalidColor) {
+        config.logger.warn(
+          `'${outputTarget.colors.text}' is not a valid hex color. The default value for diagram text ('${DEFAULT_DOCS_README_COLORS.text}') will be used.`,
+        );
+      }
+      outputTarget.colors.text = DEFAULT_DOCS_README_COLORS.text;
+    }
+  }
+
   return outputTarget;
 };
 
@@ -114,4 +140,26 @@ const validateVScodeDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarge
     err.messageText = `docs-vscode outputTarget missing the "file" path`;
   }
   return outputTarget;
+};
+
+/**
+ * Checks if a given string is a valid hexadecimal color representation.
+ *
+ * @param str - The string to be checked.
+ * @returns `true` if the string is a valid hex color (e.g., '#FF00AA', '#f0f'), `false` otherwise.
+ *
+ * @example
+ * isHexColor('#FF00AA'); // true
+ * isHexColor('#f0f');    // true
+ * isHexColor('#abcde');  // false (too many characters)
+ * isHexColor('FF00AA');  // false (missing #)
+ */
+const isHexColor = (str: string): boolean => {
+  const hexColorRegex = /^#([0-9A-Fa-f]{3}){1,2}$/;
+  return hexColorRegex.test(str);
+};
+
+const DEFAULT_DOCS_README_COLORS: d.OutputTargetDocsReadme['colors'] = {
+  background: '#f9f',
+  text: '#333',
 };
