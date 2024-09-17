@@ -62,7 +62,7 @@ export const validateDocs = (config: d.ValidatedConfig, diagnostics: d.Diagnosti
   return docsOutputs;
 };
 
-const validateReadmeOutputTarget = (config: d.ValidatedConfig, outputTarget: d.OutputTargetDocsReadme) => {
+export const validateReadmeOutputTarget = (config: d.ValidatedConfig, outputTarget: d.OutputTargetDocsReadme) => {
   if (!isString(outputTarget.dir)) {
     outputTarget.dir = config.srcDir;
   }
@@ -154,12 +154,12 @@ const validateVScodeDocsOutputTarget = (diagnostics: d.Diagnostic[], outputTarge
  * isHexColor('#abcde');  // false (too many characters)
  * isHexColor('FF00AA');  // false (missing #)
  */
-const isHexColor = (str: string): boolean => {
+export const isHexColor = (str: string): boolean => {
   const hexColorRegex = /^#([0-9A-Fa-f]{3}){1,2}$/;
   return hexColorRegex.test(str);
 };
 
-const DEFAULT_DOCS_README_COLORS: d.OutputTargetDocsReadme['colors'] = {
+export const DEFAULT_DOCS_README_COLORS: d.OutputTargetDocsReadme['colors'] = {
   background: '#f9f',
   text: '#333',
 };
