@@ -104,7 +104,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
               const referenceNode =
                 preconnectLinks.length > 0
                   ? preconnectLinks[preconnectLinks.length - 1].nextSibling
-                  : document.querySelector('style');
+                  : styleContainerNode.querySelector('style');
               (styleContainerNode as HTMLElement).insertBefore(styleElm, referenceNode);
             } else if ('host' in styleContainerNode) {
               /**
