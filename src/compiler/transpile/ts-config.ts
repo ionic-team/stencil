@@ -27,7 +27,7 @@ export const getTsOptionsToExtend = (config: d.ValidatedConfig): ts.CompilerOpti
     // declaration files
     declaration: config.outputTargets.some(isOutputTargetDistTypes),
     module: ts.ModuleKind.ESNext,
-    moduleResolution: ts.ModuleResolutionKind.NodeJs,
+    moduleResolution: ts.ModuleResolutionKind.Bundler,
     noEmitOnError: false,
     outDir: config.cacheDir || config.sys.tmpDirSync(),
     sourceMap: config.sourceMap,
