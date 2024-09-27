@@ -319,4 +319,43 @@ describe('renderToString', () => {
       expect(color).toBe('rgb(0, 0, 0)');
     });
   });
+
+  it('does not render the shadow root twice', async () => {
+    const { html } = await renderToString(
+      `
+      <nested-cmp-parent>
+        <nested-cmp-child custom-hydrate-flag="" s-id="3">
+          <template shadowrootmode="open">
+            <div c-id="3.0.0.0" class="some-other-class">
+              <slot c-id="3.1.1.0"></slot>
+            </div>
+          </template>
+          <!--r.3-->
+          Hello World
+        </nested-cmp-child>
+      </nested-cmp-parent>
+    `,
+      {
+        fullDocument: false,
+        prettyHtml: true,
+      },
+    );
+    expect(html).toBe(`<nested-cmp-parent custom-hydrate-flag="" s-id="1">
+  <template shadowrootmode="open">
+    <div c-id="1.0.0.0" class="some-class">
+      <slot c-id="1.1.1.0"></slot>
+    </div>
+  </template>
+  <!--r.1-->
+  <nested-cmp-child custom-hydrate-flag="" s-id="2">
+    <template shadowrootmode="open">
+      <div c-id="2.0.0.0" class="some-other-class">
+        <slot c-id="2.1.1.0"></slot>
+      </div>
+    </template>
+    <!--r.2-->
+    Hello World
+  </nested-cmp-child>
+</nested-cmp-parent>`);
+  });
 });
