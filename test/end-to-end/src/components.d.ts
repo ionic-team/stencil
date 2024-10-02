@@ -100,6 +100,10 @@ export namespace Components {
         "someMethodWithArgs": (unit: string, value: number) => Promise<string>;
         "someProp": number;
     }
+    interface NestedCmpChild {
+    }
+    interface NestedCmpParent {
+    }
     interface PathAliasCmp {
     }
     interface PrerenderCmp {
@@ -334,6 +338,18 @@ declare global {
         prototype: HTMLMethodCmpElement;
         new (): HTMLMethodCmpElement;
     };
+    interface HTMLNestedCmpChildElement extends Components.NestedCmpChild, HTMLStencilElement {
+    }
+    var HTMLNestedCmpChildElement: {
+        prototype: HTMLNestedCmpChildElement;
+        new (): HTMLNestedCmpChildElement;
+    };
+    interface HTMLNestedCmpParentElement extends Components.NestedCmpParent, HTMLStencilElement {
+    }
+    var HTMLNestedCmpParentElement: {
+        prototype: HTMLNestedCmpParentElement;
+        new (): HTMLNestedCmpParentElement;
+    };
     interface HTMLPathAliasCmpElement extends Components.PathAliasCmp, HTMLStencilElement {
     }
     var HTMLPathAliasCmpElement: {
@@ -427,6 +443,8 @@ declare global {
         "import-assets": HTMLImportAssetsElement;
         "listen-cmp": HTMLListenCmpElement;
         "method-cmp": HTMLMethodCmpElement;
+        "nested-cmp-child": HTMLNestedCmpChildElement;
+        "nested-cmp-parent": HTMLNestedCmpParentElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prerender-cmp": HTMLPrerenderCmpElement;
         "prop-cmp": HTMLPropCmpElement;
@@ -507,6 +525,10 @@ declare namespace LocalJSX {
     interface MethodCmp {
         "someProp"?: number;
     }
+    interface NestedCmpChild {
+    }
+    interface NestedCmpParent {
+    }
     interface PathAliasCmp {
     }
     interface PrerenderCmp {
@@ -564,6 +586,8 @@ declare namespace LocalJSX {
         "import-assets": ImportAssets;
         "listen-cmp": ListenCmp;
         "method-cmp": MethodCmp;
+        "nested-cmp-child": NestedCmpChild;
+        "nested-cmp-parent": NestedCmpParent;
         "path-alias-cmp": PathAliasCmp;
         "prerender-cmp": PrerenderCmp;
         "prop-cmp": PropCmp;
@@ -609,6 +633,8 @@ declare module "@stencil/core" {
             "import-assets": LocalJSX.ImportAssets & JSXBase.HTMLAttributes<HTMLImportAssetsElement>;
             "listen-cmp": LocalJSX.ListenCmp & JSXBase.HTMLAttributes<HTMLListenCmpElement>;
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
+            "nested-cmp-child": LocalJSX.NestedCmpChild & JSXBase.HTMLAttributes<HTMLNestedCmpChildElement>;
+            "nested-cmp-parent": LocalJSX.NestedCmpParent & JSXBase.HTMLAttributes<HTMLNestedCmpParentElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;

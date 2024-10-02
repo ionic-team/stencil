@@ -1,4 +1,11 @@
-import { CONTENT_REF_ID, ORG_LOCATION_ID, SLOT_NODE_ID, TEXT_NODE_ID, XLINK_NS } from '../runtime/runtime-constants';
+import {
+  CONTENT_REF_ID,
+  HYDRATE_ID,
+  ORG_LOCATION_ID,
+  SLOT_NODE_ID,
+  TEXT_NODE_ID,
+  XLINK_NS,
+} from '../runtime/runtime-constants';
 import { cloneAttributes } from './attribute';
 import { NODE_TYPES } from './constants';
 import { type MockDocument } from './document';
@@ -274,6 +281,21 @@ function* streamToHtml(
             }
 
             for (let i = 0; i < childNodeLength; i++) {
+              /**
+               * In cases where a user would pass in a declarative shadow dom of a
+               * Stencil component, we want to skip over the template tag as we
+               * will be parsing the shadow root of the component again.
+               *
+               * We know it is a hydrated Stencil component by checking if the `HYDRATE_ID`
+               * is set on the node.
+               */
+              const sId = (node as HTMLElement).attributes.getNamedItem(HYDRATE_ID);
+              const isStencilDeclarativeShadowDOM = childNodes[i].nodeName.toLowerCase() === 'template' && sId;
+              if (isStencilDeclarativeShadowDOM) {
+                yield `\n${' '.repeat(output.indent)}<!--r.${sId.value}-->`;
+                continue;
+              }
+
               yield* streamToHtml(childNodes[i], opts, output);
             }
 
