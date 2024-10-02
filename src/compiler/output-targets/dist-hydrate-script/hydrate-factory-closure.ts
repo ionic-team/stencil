@@ -63,6 +63,7 @@ export function hydrateFactory($stencilWindow, $stencilHydrateOpts, $stencilHydr
   var HTMLTemplateElement = $stencilWindow.HTMLTemplateElement;
   var HTMLTitleElement = $stencilWindow.HTMLTitleElement;
   var IntersectionObserver = $stencilWindow.IntersectionObserver;
+  var ResizeObserver = $stencilWindow.ResizeObserver;
   var KeyboardEvent = $stencilWindow.KeyboardEvent;
   var MouseEvent = $stencilWindow.MouseEvent;
   var Node = $stencilWindow.Node;
