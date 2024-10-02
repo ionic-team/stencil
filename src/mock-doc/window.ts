@@ -21,6 +21,7 @@ import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
 import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
 import { MockPerformance, resetPerformance } from './performance';
+import { MockResizeObserver } from './resize-observer';
 import { MockStorage } from './storage';
 
 const nativeClearInterval = clearInterval;
@@ -309,6 +310,10 @@ export class MockWindow {
 
   get IntersectionObserver() {
     return MockIntersectionObserver;
+  }
+
+  get ResizeObserver() {
+    return MockResizeObserver;
   }
 
   get localStorage() {
