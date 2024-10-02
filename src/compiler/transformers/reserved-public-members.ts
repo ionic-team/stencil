@@ -34,6 +34,7 @@ export const validatePublicName = (
 };
 
 const HTML_ELEMENT_KEYS = [
+  'popover',
   'title',
   'lang',
   'translate',
