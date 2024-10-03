@@ -26,7 +26,7 @@ export const formatComponentRuntimeMeta = (
     if (compilerMeta.shadowDelegatesFocus) {
       flags |= CMP_FLAGS.shadowDelegatesFocus;
     }
-  } else if (compilerMeta.encapsulation === 'scoped') {
+  } else if (compilerMeta.encapsulation === 'scoped' || compilerMeta.encapsulation === 'none') {
     flags |= CMP_FLAGS.scopedCssEncapsulation;
   }
   if (compilerMeta.formAssociated) {

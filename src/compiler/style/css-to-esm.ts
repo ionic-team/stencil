@@ -112,8 +112,8 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
 
   try {
     const varNames = new Set([results.defaultVarName]);
-
-    if (isString(input.tag) && input.encapsulation === 'scoped') {
+    const scopedEncapsulations = ['scoped', 'none'];
+    if (isString(input.tag) && scopedEncapsulations.includes(input.encapsulation)) {
       const scopeId = getScopeId(input.tag, input.mode);
       results.styleText = scopeCss(results.styleText, scopeId);
     }

@@ -145,18 +145,18 @@ describe('renderToString', () => {
     });
     expect(html).toMatchSnapshot();
     expect(html).toContain(
-      `<car-detail custom-hydrate-flag=\"\" c-id=\"1.2.2.0\" s-id=\"2\"><!--r.2--><section c-id=\"2.0.0.0\"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>`,
+      `<car-detail class=\"sc-car-detail-h sc-car-detail-s\" custom-hydrate-flag=\"\" c-id=\"1.2.2.0\" s-id=\"2\"><!--r.2--><section class=\"sc-car-detail\" c-id=\"2.0.0.0\"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>`,
     );
     expect(html).toContain(
-      `<car-detail custom-hydrate-flag=\"\" c-id=\"1.4.2.0\" s-id=\"3\"><!--r.3--><section c-id=\"3.0.0.0\"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>`,
+      `<car-detail class=\"sc-car-detail-h sc-car-detail-s\" custom-hydrate-flag=\"\" c-id=\"1.4.2.0\" s-id=\"3\"><!--r.3--><section class=\"sc-car-detail\" c-id=\"3.0.0.0\"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>`,
     );
   });
 
   it('can render a scoped component within a shadow component (sync)', async () => {
     const input = `<car-list cars=${JSON.stringify([vento, beetle])}></car-list>`;
     const expectedResults = [
-      '<car-detail custom-hydrate-flag="" c-id="1.2.2.0" s-id="2"><!--r.2--><section c-id="2.0.0.0"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
-      '<car-detail custom-hydrate-flag="" c-id="1.4.2.0" s-id="3"><!--r.3--><section c-id="3.0.0.0"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
+      '<car-detail class=\"sc-car-detail-h sc-car-detail-s\" custom-hydrate-flag=\"\" c-id=\"1.2.2.0\" s-id=\"2\"><!--r.2--><section class=\"sc-car-detail\" c-id=\"2.0.0.0\"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
+      '<car-detail class=\"sc-car-detail-h sc-car-detail-s\" custom-hydrate-flag=\"\" c-id=\"1.4.2.0\" s-id=\"3\"><!--r.3--><section class=\"sc-car-detail\" c-id=\"3.0.0.0\"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
     ] as const;
     const opts = {
       serializeShadowRoot: true,
@@ -253,7 +253,7 @@ describe('renderToString', () => {
      * </car-detail>
      */
     expect(html).toContain(
-      `<car-detail custom-hydrate-flag=\"\" c-id=\"2.4.2.0\" s-id=\"4\"><!--r.4--><section c-id=\"4.0.0.0\"><!--t.4.1.1.0-->2023 VW Beetle</section></car-detail>`,
+      `<car-detail class=\"sc-car-detail-h sc-car-detail-s\" custom-hydrate-flag=\"\" c-id=\"2.4.2.0\" s-id=\"4\"><!--r.4--><section class=\"sc-car-detail\" c-id=\"4.0.0.0\"><!--t.4.1.1.0-->2023 VW Beetle</section></car-detail>`,
     );
 
     const page = await newE2EPage({ html, url: 'https://stencil.com' });
@@ -326,6 +326,9 @@ describe('renderToString', () => {
       <nested-cmp-parent>
         <nested-cmp-child custom-hydrate-flag="" s-id="3">
           <template shadowrootmode="open">
+            <style>
+              :host { display: block; }
+            </style>
             <div c-id="3.0.0.0" class="some-other-class">
               <slot c-id="3.1.1.0"></slot>
             </div>
@@ -342,13 +345,29 @@ describe('renderToString', () => {
     );
     expect(html).toBe(`<nested-cmp-parent custom-hydrate-flag="" s-id="1">
   <template shadowrootmode="open">
+    <style sty-id="sc-nested-scope-cmp">
+      .sc-nested-scope-cmp-h{color:green}slot-fb{display:contents}slot-fb[hidden]{display:none}
+    </style>
+    <style>
+      :host{display:inline-block}
+    </style>
     <div c-id="1.0.0.0" class="some-class">
-      <slot c-id="1.1.1.0"></slot>
+      <nested-scope-cmp c-id="1.1.1.0" class="sc-nested-scope-cmp-h sc-nested-scope-cmp-s" custom-hydrate-flag="" s-id="3">
+        <!--r.3-->
+        <!--o.1.2.c-->
+        <div c-id="3.0.0.0" class="sc-nested-scope-cmp sc-nested-scope-cmp-s some-scope-class">
+          <!--s.3.1.1.0.-->
+          <slot c-id="1.2.2.0" class="sc-nested-scope-cmp"></slot>
+        </div>
+      </nested-scope-cmp>
     </div>
   </template>
   <!--r.1-->
   <nested-cmp-child custom-hydrate-flag="" s-id="2">
     <template shadowrootmode="open">
+      <style>
+        :host{display:block}
+      </style>
       <div c-id="2.0.0.0" class="some-other-class">
         <slot c-id="2.1.1.0"></slot>
       </div>

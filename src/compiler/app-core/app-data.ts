@@ -57,7 +57,7 @@ export const getBuildFeatures = (cmps: ComponentCompilerMeta[]): BuildFeatures =
     propString: cmps.some((c) => c.hasPropString),
     propMutable: cmps.some((c) => c.hasPropMutable),
     reflect: cmps.some((c) => c.hasReflect),
-    scoped: cmps.some((c) => c.encapsulation === 'scoped'),
+    scoped: cmps.some((c) => c.encapsulation === 'scoped' || c.encapsulation === 'none'),
     shadowDom,
     shadowDelegatesFocus: shadowDom && cmps.some((c) => c.shadowDelegatesFocus),
     slot,
