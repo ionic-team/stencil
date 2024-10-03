@@ -1,31 +1,31 @@
 import { MockDocumentFragment } from './document-fragment';
 
 export class MockShadowRoot extends MockDocumentFragment {
-  get activeElement() {
+  get activeElement(): HTMLElement | null {
     return null;
   }
 
-  set adoptedStyleSheets(adoptedStyleSheets: any) {
+  set adoptedStyleSheets(_adoptedStyleSheets: StyleSheet[]) {
     throw new Error('Unimplemented');
   }
 
-  get adoptedStyleSheets() {
+  get adoptedStyleSheets(): StyleSheet[] {
     return [];
   }
 
-  get cloneable() {
+  get cloneable(): boolean {
     return false;
   }
 
-  get delegatesFocus() {
+  get delegatesFocus(): boolean {
     return false;
   }
 
-  get fullscreenElement() {
-    return null
+  get fullscreenElement(): HTMLElement | null {
+    return null;
   }
 
-  get host() {
+  get host(): HTMLElement | null {
     let parent = this.parentElement();
     while (parent) {
       if (parent.nodeType === 11) {
@@ -36,27 +36,27 @@ export class MockShadowRoot extends MockDocumentFragment {
     return null;
   }
 
-  get mode() {
+  get mode(): 'open' | 'closed' {
     return 'open';
   }
 
-  get pictureInPictureElement() {
+  get pictureInPictureElement(): HTMLElement | null {
     return null;
   }
 
-  get pointerLockElement() {
+  get pointerLockElement(): HTMLElement | null {
     return null;
   }
 
-  get serializable() {
+  get serializable(): boolean {
     return false;
   }
 
-  get slotAssignment() {
-    return 'named'
+  get slotAssignment(): 'named' | 'manual' {
+    return 'named';
   }
 
-  get styleSheets() {
+  get styleSheets(): StyleSheet[] {
     return [];
   }
 }
