@@ -1,3 +1,28 @@
+# 🍲 [4.22.0](https://github.com/ionic-team/stencil/compare/v4.21.0...v4.22.0) (2024-10-03)
+
+
+### Bug Fixes
+
+* **compiler:** add reserved keyword ([#6001](https://github.com/ionic-team/stencil/issues/6001)) ([7ede77a](https://github.com/ionic-team/stencil/commit/7ede77a873486b5cf47f0b26571f852675f67dd6)), closes [#6000](https://github.com/ionic-team/stencil/issues/6000)
+* **compiler:** handle file rename in watch mode ([#5971](https://github.com/ionic-team/stencil/issues/5971)) ([8f0a882](https://github.com/ionic-team/stencil/commit/8f0a8823facade0be6eabf8569831f456497c2a0)), closes [#3443](https://github.com/ionic-team/stencil/issues/3443)
+* **compiler:** no generate custom output ([#5951](https://github.com/ionic-team/stencil/issues/5951)) ([5cddfd9](https://github.com/ionic-team/stencil/commit/5cddfd91a37c7405a9abef897e67eed6be089412)), closes [#5950](https://github.com/ionic-team/stencil/issues/5950)
+* **declarations:** add missing event handler types ([#5964](https://github.com/ionic-team/stencil/issues/5964)) ([6ef1334](https://github.com/ionic-team/stencil/commit/6ef1334ee2709d1de730f7512e77e18640179bc9))
+* **hydrate:** Add missing alias to hydrate build to fix app globals ([#6005](https://github.com/ionic-team/stencil/issues/6005)) ([c5a8ea9](https://github.com/ionic-team/stencil/commit/c5a8ea9851856b3262f9f8448d85ac638f4b393b))
+* **hydrate:** support style modes in hydrate modules ([#5953](https://github.com/ionic-team/stencil/issues/5953)) ([15f3b26](https://github.com/ionic-team/stencil/commit/15f3b26bf8fb49933c2d3a26072b6d1b5672873b))
+* **mock-doc:** avoid double hydration of components ([#6003](https://github.com/ionic-team/stencil/issues/6003)) ([dbc2f58](https://github.com/ionic-team/stencil/commit/dbc2f58944ec53b4df26a21c768aa106710c8404))
+* **mock-doc:** provide mock for resize observer ([#6007](https://github.com/ionic-team/stencil/issues/6007)) ([6d6a65e](https://github.com/ionic-team/stencil/commit/6d6a65e21b9436d17b26d14e1d206473a1ffa851))
+* **runtime:** ensure referenceNode is child node of styleContainerNode ([#5994](https://github.com/ionic-team/stencil/issues/5994)) ([a02bc36](https://github.com/ionic-team/stencil/commit/a02bc3606f2e10331ff9aaa12618dbee271d86fa))
+* **runtime:** scoped slot append/prepend correct order after interaction ([#5970](https://github.com/ionic-team/stencil/issues/5970)) ([2569abd](https://github.com/ionic-team/stencil/commit/2569abdcdd420b77f1035af154db174c6a9a1601))
+* **scripts:** fix Esbuild scripts to allow to run on Windows ([#5930](https://github.com/ionic-team/stencil/issues/5930)) ([8ad326c](https://github.com/ionic-team/stencil/commit/8ad326c2ca811cb20bd78b1edd849816c13f6692))
+
+
+### Features
+
+* **compiler:** customize readme mermaid diagram colors ([#5980](https://github.com/ionic-team/stencil/issues/5980)) ([9ca8951](https://github.com/ionic-team/stencil/commit/9ca8951d529efb4926467775f939c305ac07874b)), closes [#2876](https://github.com/ionic-team/stencil/issues/2876) [#2876](https://github.com/ionic-team/stencil/issues/2876)
+* **typescript:** Update to 5.5.4 ([#5959](https://github.com/ionic-team/stencil/issues/5959)) ([ce153a0](https://github.com/ionic-team/stencil/commit/ce153a0297b8fb0de730fd3cc46b33b559697ccf))
+
+
+
 # 🐷 [4.21.0](https://github.com/ionic-team/stencil/compare/v4.20.0...v4.21.0) (2024-08-26)
 
 
