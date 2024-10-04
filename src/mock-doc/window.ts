@@ -22,6 +22,7 @@ import { MockNavigator } from './navigator';
 import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
 import { MockPerformance, resetPerformance } from './performance';
 import { MockResizeObserver } from './resize-observer';
+import { MockShadowRoot } from './shadow-root';
 import { MockStorage } from './storage';
 
 const nativeClearInterval = clearInterval;
@@ -186,6 +187,10 @@ export class MockWindow {
   }
   set DocumentFragment(docFragCstr: any) {
     this.__docFragCstr = docFragCstr;
+  }
+
+  get ShadowRoot() {
+    return MockShadowRoot;
   }
 
   get DocumentType() {
