@@ -104,6 +104,8 @@ export namespace Components {
     }
     interface NestedCmpParent {
     }
+    interface NestedScopeCmp {
+    }
     interface PathAliasCmp {
     }
     interface PrerenderCmp {
@@ -350,6 +352,12 @@ declare global {
         prototype: HTMLNestedCmpParentElement;
         new (): HTMLNestedCmpParentElement;
     };
+    interface HTMLNestedScopeCmpElement extends Components.NestedScopeCmp, HTMLStencilElement {
+    }
+    var HTMLNestedScopeCmpElement: {
+        prototype: HTMLNestedScopeCmpElement;
+        new (): HTMLNestedScopeCmpElement;
+    };
     interface HTMLPathAliasCmpElement extends Components.PathAliasCmp, HTMLStencilElement {
     }
     var HTMLPathAliasCmpElement: {
@@ -445,6 +453,7 @@ declare global {
         "method-cmp": HTMLMethodCmpElement;
         "nested-cmp-child": HTMLNestedCmpChildElement;
         "nested-cmp-parent": HTMLNestedCmpParentElement;
+        "nested-scope-cmp": HTMLNestedScopeCmpElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prerender-cmp": HTMLPrerenderCmpElement;
         "prop-cmp": HTMLPropCmpElement;
@@ -529,6 +538,8 @@ declare namespace LocalJSX {
     }
     interface NestedCmpParent {
     }
+    interface NestedScopeCmp {
+    }
     interface PathAliasCmp {
     }
     interface PrerenderCmp {
@@ -588,6 +599,7 @@ declare namespace LocalJSX {
         "method-cmp": MethodCmp;
         "nested-cmp-child": NestedCmpChild;
         "nested-cmp-parent": NestedCmpParent;
+        "nested-scope-cmp": NestedScopeCmp;
         "path-alias-cmp": PathAliasCmp;
         "prerender-cmp": PrerenderCmp;
         "prop-cmp": PropCmp;
@@ -635,6 +647,7 @@ declare module "@stencil/core" {
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
             "nested-cmp-child": LocalJSX.NestedCmpChild & JSXBase.HTMLAttributes<HTMLNestedCmpChildElement>;
             "nested-cmp-parent": LocalJSX.NestedCmpParent & JSXBase.HTMLAttributes<HTMLNestedCmpParentElement>;
+            "nested-scope-cmp": LocalJSX.NestedScopeCmp & JSXBase.HTMLAttributes<HTMLNestedScopeCmpElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;
