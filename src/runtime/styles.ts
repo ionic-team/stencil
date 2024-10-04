@@ -112,7 +112,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
                * at the beginning of the shadow root node.
                *
                * However if there is already a style node in the ShadowRoot, we just append
-               * the styles to the exising node.
+               * the styles to the existing node.
                */
               const existingStyleContainer = styleContainerNode.querySelector('style');
               if (existingStyleContainer) {
