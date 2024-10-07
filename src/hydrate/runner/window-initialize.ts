@@ -4,7 +4,11 @@ import { STENCIL_DOC_DATA } from 'src/runtime/runtime-constants';
 import type * as d from '../../declarations';
 import { runtimeLogging } from './runtime-log';
 
-const docData = {
+/**
+ * Maintain a unqiue `docData` object across multiple hydration runs
+ * to ensure that host ids remain unique.
+ */
+const docData: d.DocData = {
   hostIds: 0,
   rootLevelIds: 0,
   staticComponents: new Set<string>(),
@@ -65,9 +69,6 @@ export function initializeWindow(
 
   runtimeLogging(win, opts, results);
 
-  /**
-   * apply the hydrate host id so that
-   */
   (doc as d.StencilDocument)[STENCIL_DOC_DATA] = docData;
 
   return win;

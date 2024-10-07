@@ -25,6 +25,10 @@ import { insertBefore } from './vdom-render';
  */
 export const insertVdomAnnotations = (doc: Document, staticComponents: string[]) => {
   if (doc != null) {
+    /**
+     * Initiated `docData` object from the document if it exists to ensure we
+     * maintain the same `docData` object across multiple hydration hydration runs.
+     */
     const docData: d.DocData = STENCIL_DOC_DATA in doc ? (doc[STENCIL_DOC_DATA] as d.DocData) : { ...DEFAULT_DOC_DATA };
     docData.staticComponents = new Set(staticComponents);
     const orgLocationNodes: d.RenderNode[] = [];
