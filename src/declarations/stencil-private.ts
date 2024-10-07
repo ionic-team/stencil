@@ -36,7 +36,7 @@ export interface DocData {
   rootLevelIds: number;
   staticComponents: Set<string>;
 }
-export type StencilDocument = Document & { '_stencilDocData': DocData };
+export type StencilDocument = Document & { _stencilDocData: DocData };
 
 export interface SourceMap {
   file: string;

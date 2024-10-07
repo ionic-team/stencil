@@ -65,7 +65,7 @@ export const DEFAULT_DOC_DATA = {
   hostIds: 0,
   rootLevelIds: 0,
   staticComponents: new Set<string>(),
-}
+};
 
 /**
  * Constant for styles to be globally applied to `slot-fb` elements for pseudo-slot behavior.

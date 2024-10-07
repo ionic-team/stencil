@@ -7,7 +7,7 @@ import { runtimeLogging } from './runtime-log';
 const docData = {
   hostIds: 0,
   rootLevelIds: 0,
-  staticComponents: new Set<string>()
+  staticComponents: new Set<string>(),
 } as d.DocData;
 
 export function initializeWindow(
@@ -66,9 +66,9 @@ export function initializeWindow(
   runtimeLogging(win, opts, results);
 
   /**
-   * apply the hydrate host id so that 
+   * apply the hydrate host id so that
    */
-  (doc as d.StencilDocument)[STENCIL_DOC_DATA] = docData
+  (doc as d.StencilDocument)[STENCIL_DOC_DATA] = docData;
 
   return win;
 }

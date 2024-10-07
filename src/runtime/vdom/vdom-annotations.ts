@@ -25,9 +25,7 @@ import { insertBefore } from './vdom-render';
  */
 export const insertVdomAnnotations = (doc: Document, staticComponents: string[]) => {
   if (doc != null) {
-    const docData: d.DocData = STENCIL_DOC_DATA in doc
-      ? doc[STENCIL_DOC_DATA] as d.DocData
-      : { ...DEFAULT_DOC_DATA };
+    const docData: d.DocData = STENCIL_DOC_DATA in doc ? (doc[STENCIL_DOC_DATA] as d.DocData) : { ...DEFAULT_DOC_DATA };
     docData.staticComponents = new Set(staticComponents);
     const orgLocationNodes: d.RenderNode[] = [];
 
