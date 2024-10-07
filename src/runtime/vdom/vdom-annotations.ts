@@ -23,9 +23,10 @@ import { insertBefore } from './vdom-render';
  */
 export const insertVdomAnnotations = (doc: Document, staticComponents: string[]) => {
   if (doc != null) {
+    const uniqueStartId = Date.now()
     const docData: DocData = {
-      hostIds: 0,
-      rootLevelIds: 0,
+      hostIds: uniqueStartId,
+      rootLevelIds: uniqueStartId,
       staticComponents: new Set(staticComponents),
     };
     const orgLocationNodes: d.RenderNode[] = [];
