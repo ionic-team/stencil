@@ -58,6 +58,7 @@ export const TEXT_NODE_ID = 't';
 export const HYDRATE_ID = 's-id';
 export const HYDRATED_STYLE_ID = 'sty-id';
 export const HYDRATE_CHILD_ID = 'c-id';
+export const HYDRATE_HOST_ID = 'h-id';
 export const HYDRATED_CSS = '{visibility:hidden}.hydrated{visibility:inherit}';
 
 /**

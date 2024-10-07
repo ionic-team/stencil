@@ -1,3 +1,4 @@
+import type * as d from '../declarations';
 import { MockHeaders } from '.';
 import { createConsole } from './console';
 import { MockCustomElementRegistry } from './custom-element-registry';
@@ -58,7 +59,7 @@ export class MockWindow {
 
   console: Console;
   customElements: CustomElementRegistry;
-  document: Document;
+  document: d.StencilDocument;
   performance: Performance;
 
   devicePixelRatio: number;
