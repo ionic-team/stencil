@@ -1,14 +1,18 @@
 import { constrainTimeouts, type MockWindow } from '@stencil/core/mock-doc';
-import { HYDRATE_HOST_ID } from 'src/runtime/runtime-constants';
+import { STENCIL_DOC_DATA } from 'src/runtime/runtime-constants';
 
 import type * as d from '../../declarations';
 import { runtimeLogging } from './runtime-log';
 
-let uniqueHostId = 0;
+const docData = {
+  hostIds: 0,
+  rootLevelIds: 0,
+  staticComponents: new Set<string>()
+} as d.DocData;
 
 export function initializeWindow(
   win: MockWindow,
-  doc: d.StencilDocument,
+  doc: Document,
   opts: d.HydrateDocumentOptions,
   results: d.HydrateResults,
 ) {
@@ -64,7 +68,7 @@ export function initializeWindow(
   /**
    * apply the hydrate host id so that 
    */
-  doc[HYDRATE_HOST_ID] = uniqueHostId++;
+  (doc as d.StencilDocument)[STENCIL_DOC_DATA] = docData
 
   return win;
 }
