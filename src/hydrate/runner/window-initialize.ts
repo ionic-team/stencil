@@ -5,7 +5,7 @@ import type * as d from '../../declarations';
 import { runtimeLogging } from './runtime-log';
 
 /**
- * Maintain a unqiue `docData` object across multiple hydration runs
+ * Maintain a unique `docData` object across multiple hydration runs
  * to ensure that host ids remain unique.
  */
 const docData: d.DocData = {
