@@ -113,7 +113,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
                *
                * However if there is already a style node in the ShadowRoot, we just append
                * the styles to the existing node.
-               * 
+               *
                * Note: order of how styles are applied is important. The new style node
                * should be inserted before the existing style node.
                */
