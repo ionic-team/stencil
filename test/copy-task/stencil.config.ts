@@ -7,7 +7,7 @@ export const config: Config = {
       type: 'dist-custom-elements',
       copy: [
         {
-          src: './utils',
+          src: './utils/**',
           dest: './dist/utilsExtra',
         },
       ],
