@@ -346,13 +346,26 @@ describe('renderToString', () => {
     );
     expect(html).toBe(`<nested-cmp-parent custom-hydrate-flag="" s-id="29">
   <template shadowrootmode="open">
+    <style>
+      .sc-nested-scope-cmp-h{color:green}:host{display:inline-block}
+    </style>
     <div c-id="29.0.0.0" class="some-class">
-      <slot c-id="29.1.1.0"></slot>
+      <nested-scope-cmp c-id="29.1.1.0" class="sc-nested-scope-cmp-h sc-nested-scope-cmp-s" custom-hydrate-flag="" s-id="31">
+        <!--r.31-->
+        <!--o.29.2.c-->
+        <div c-id="31.0.0.0" class="sc-nested-scope-cmp sc-nested-scope-cmp-s some-scope-class">
+          <!--s.31.1.1.0.-->
+          <slot c-id="29.2.2.0" class="sc-nested-scope-cmp"></slot>
+        </div>
+      </nested-scope-cmp>
     </div>
   </template>
   <!--r.29-->
   <nested-cmp-child custom-hydrate-flag="" s-id="30">
     <template shadowrootmode="open">
+      <style>
+        :host{display:block}
+      </style>
       <div c-id="30.0.0.0" class="some-other-class">
         <slot c-id="30.1.1.0"></slot>
       </div>
