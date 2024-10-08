@@ -60,6 +60,13 @@ export const HYDRATED_STYLE_ID = 'sty-id';
 export const HYDRATE_CHILD_ID = 'c-id';
 export const HYDRATED_CSS = '{visibility:hidden}.hydrated{visibility:inherit}';
 
+export const STENCIL_DOC_DATA = '_stencilDocData';
+export const DEFAULT_DOC_DATA = {
+  hostIds: 0,
+  rootLevelIds: 0,
+  staticComponents: new Set<string>(),
+};
+
 /**
  * Constant for styles to be globally applied to `slot-fb` elements for pseudo-slot behavior.
  *

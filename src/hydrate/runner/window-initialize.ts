@@ -1,7 +1,18 @@
 import { constrainTimeouts, type MockWindow } from '@stencil/core/mock-doc';
+import { STENCIL_DOC_DATA } from 'src/runtime/runtime-constants';
 
 import type * as d from '../../declarations';
 import { runtimeLogging } from './runtime-log';
+
+/**
+ * Maintain a unique `docData` object across multiple hydration runs
+ * to ensure that host ids remain unique.
+ */
+const docData: d.DocData = {
+  hostIds: 0,
+  rootLevelIds: 0,
+  staticComponents: new Set<string>(),
+} as d.DocData;
 
 export function initializeWindow(
   win: MockWindow,
@@ -57,6 +68,8 @@ export function initializeWindow(
   }
 
   runtimeLogging(win, opts, results);
+
+  (doc as d.StencilDocument)[STENCIL_DOC_DATA] = docData;
 
   return win;
 }

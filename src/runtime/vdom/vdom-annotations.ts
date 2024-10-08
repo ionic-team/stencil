@@ -3,11 +3,13 @@ import { getHostRef } from '@platform';
 import type * as d from '../../declarations';
 import {
   CONTENT_REF_ID,
+  DEFAULT_DOC_DATA,
   HYDRATE_CHILD_ID,
   HYDRATE_ID,
   NODE_TYPE,
   ORG_LOCATION_ID,
   SLOT_NODE_ID,
+  STENCIL_DOC_DATA,
   TEXT_NODE_ID,
 } from '../runtime-constants';
 import { insertBefore } from './vdom-render';
@@ -23,11 +25,12 @@ import { insertBefore } from './vdom-render';
  */
 export const insertVdomAnnotations = (doc: Document, staticComponents: string[]) => {
   if (doc != null) {
-    const docData: DocData = {
-      hostIds: 0,
-      rootLevelIds: 0,
-      staticComponents: new Set(staticComponents),
-    };
+    /**
+     * Initiated `docData` object from the document if it exists to ensure we
+     * maintain the same `docData` object across multiple hydration hydration runs.
+     */
+    const docData: d.DocData = STENCIL_DOC_DATA in doc ? (doc[STENCIL_DOC_DATA] as d.DocData) : { ...DEFAULT_DOC_DATA };
+    docData.staticComponents = new Set(staticComponents);
     const orgLocationNodes: d.RenderNode[] = [];
 
     parseVNodeAnnotations(doc, doc.body, docData, orgLocationNodes);
@@ -99,7 +102,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
 const parseVNodeAnnotations = (
   doc: Document,
   node: d.RenderNode,
-  docData: DocData,
+  docData: d.DocData,
   orgLocationNodes: d.RenderNode[],
 ) => {
   if (node == null) {
@@ -145,7 +148,7 @@ const insertVNodeAnnotations = (
   doc: Document,
   hostElm: d.HostElement,
   vnode: d.VNode | undefined,
-  docData: DocData,
+  docData: d.DocData,
   cmpData: CmpData,
 ) => {
   if (vnode != null) {
@@ -244,12 +247,6 @@ const insertChildVNodeAnnotations = (
     });
   }
 };
-
-interface DocData {
-  hostIds: number;
-  rootLevelIds: number;
-  staticComponents: Set<string>;
-}
 
 interface CmpData {
   nodeIds: number;

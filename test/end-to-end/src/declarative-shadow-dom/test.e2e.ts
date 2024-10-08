@@ -105,7 +105,7 @@ describe('renderToString', () => {
         fullDocument: false,
       },
     );
-    expect(html).toContain('<section c-id="1.0.0.0"><!--t.1.1.1.0--> </section>');
+    expect(html).toContain('<section c-id="4.0.0.0"><!--t.4.1.1.0--> </section>');
   });
 
   it('supports styles for DSD', async () => {
@@ -145,31 +145,35 @@ describe('renderToString', () => {
     });
     expect(html).toMatchSnapshot();
     expect(html).toContain(
-      `<car-detail custom-hydrate-flag=\"\" c-id=\"1.2.2.0\" s-id=\"2\"><!--r.2--><section c-id=\"2.0.0.0\"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>`,
+      `<car-detail custom-hydrate-flag=\"\" c-id=\"9.2.2.0\" s-id=\"10\"><!--r.10--><section c-id=\"10.0.0.0\"><!--t.10.1.1.0-->2024 VW Vento</section></car-detail>`,
     );
     expect(html).toContain(
-      `<car-detail custom-hydrate-flag=\"\" c-id=\"1.4.2.0\" s-id=\"3\"><!--r.3--><section c-id=\"3.0.0.0\"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>`,
+      `<car-detail custom-hydrate-flag=\"\" c-id=\"9.4.2.0\" s-id=\"11\"><!--r.11--><section c-id=\"11.0.0.0\"><!--t.11.1.1.0-->2023 VW Beetle</section></car-detail>`,
     );
   });
 
   it('can render a scoped component within a shadow component (sync)', async () => {
     const input = `<car-list cars=${JSON.stringify([vento, beetle])}></car-list>`;
-    const expectedResults = [
-      '<car-detail custom-hydrate-flag="" c-id="1.2.2.0" s-id="2"><!--r.2--><section c-id="2.0.0.0"><!--t.2.1.1.0-->2024 VW Vento</section></car-detail>',
-      '<car-detail custom-hydrate-flag="" c-id="1.4.2.0" s-id="3"><!--r.3--><section c-id="3.0.0.0"><!--t.3.1.1.0-->2023 VW Beetle</section></car-detail>',
-    ] as const;
     const opts = {
       serializeShadowRoot: true,
       fullDocument: false,
     };
 
     const resultRenderToString = await readableToString(renderToString(input, opts, true));
-    expect(resultRenderToString).toContain(expectedResults[0]);
-    expect(resultRenderToString).toContain(expectedResults[1]);
+    expect(resultRenderToString).toContain(
+      '<car-detail custom-hydrate-flag="" c-id="12.2.2.0" s-id="13"><!--r.13--><section c-id="13.0.0.0"><!--t.13.1.1.0-->2024 VW Vento</section></car-detail>',
+    );
+    expect(resultRenderToString).toContain(
+      '<car-detail custom-hydrate-flag="" c-id="12.4.2.0" s-id="14"><!--r.14--><section c-id="14.0.0.0"><!--t.14.1.1.0-->2023 VW Beetle</section></car-detail>',
+    );
 
     const resultStreamToString = await readableToString(streamToString(input, opts));
-    expect(resultStreamToString).toContain(expectedResults[0]);
-    expect(resultStreamToString).toContain(expectedResults[1]);
+    expect(resultStreamToString).toContain(
+      '<car-detail custom-hydrate-flag="" c-id="15.2.2.0" s-id="16"><!--r.16--><section c-id="16.0.0.0"><!--t.16.1.1.0-->2024 VW Vento</section></car-detail>',
+    );
+    expect(resultStreamToString).toContain(
+      '<car-detail custom-hydrate-flag="" c-id="15.4.2.0" s-id="17"><!--r.17--><section c-id="17.0.0.0"><!--t.17.1.1.0-->2023 VW Beetle</section></car-detail>',
+    );
   });
 
   it('can take over a server side rendered component and re-render it in the browser', async () => {
@@ -238,7 +242,7 @@ describe('renderToString', () => {
      * ```
      */
     expect(html).toContain(
-      `<dsd-listen-cmp custom-hydrate-flag=\"\" s-id=\"1\"><template shadowrootmode=\"open\"><style>:host{display:block}</style><slot c-id=\"1.0.0.0\"></slot></template><!--r.1-->Hello World</dsd-listen-cmp>`,
+      `<dsd-listen-cmp custom-hydrate-flag=\"\" s-id=\"21\"><template shadowrootmode=\"open\"><style>:host{display:block}</style><slot c-id=\"21.0.0.0\"></slot></template><!--r.21-->Hello World</dsd-listen-cmp>`,
     );
 
     /**
@@ -253,7 +257,7 @@ describe('renderToString', () => {
      * </car-detail>
      */
     expect(html).toContain(
-      `<car-detail custom-hydrate-flag=\"\" c-id=\"2.4.2.0\" s-id=\"4\"><!--r.4--><section c-id=\"4.0.0.0\"><!--t.4.1.1.0-->2023 VW Beetle</section></car-detail>`,
+      `<car-detail custom-hydrate-flag=\"\" c-id=\"22.4.2.0\" s-id=\"24\"><!--r.24--><section c-id=\"24.0.0.0\"><!--t.24.1.1.0-->2023 VW Beetle</section></car-detail>`,
     );
 
     const page = await newE2EPage({ html, url: 'https://stencil.com' });
@@ -280,7 +284,7 @@ describe('renderToString', () => {
       serializeShadowRoot: false,
       fullDocument: false,
     });
-    expect(html).toBe('<another-car-detail custom-hydrate-flag="" s-id="1"><!--r.1--></another-car-detail>');
+    expect(html).toBe('<another-car-detail custom-hydrate-flag="" s-id="25"><!--r.25--></another-car-detail>');
   });
 
   it('does not render a shadow component but its light dom', async () => {
@@ -288,7 +292,7 @@ describe('renderToString', () => {
       serializeShadowRoot: false,
       fullDocument: false,
     });
-    expect(html).toBe('<cmp-with-slot custom-hydrate-flag="" s-id="1"><!--r.1-->Hello World</cmp-with-slot>');
+    expect(html).toBe('<cmp-with-slot custom-hydrate-flag="" s-id="26"><!--r.26-->Hello World</cmp-with-slot>');
   });
 
   describe('modes in declarative shadow dom', () => {
@@ -340,20 +344,20 @@ describe('renderToString', () => {
         prettyHtml: true,
       },
     );
-    expect(html).toBe(`<nested-cmp-parent custom-hydrate-flag="" s-id="1">
+    expect(html).toBe(`<nested-cmp-parent custom-hydrate-flag="" s-id="29">
   <template shadowrootmode="open">
-    <div c-id="1.0.0.0" class="some-class">
-      <slot c-id="1.1.1.0"></slot>
+    <div c-id="29.0.0.0" class="some-class">
+      <slot c-id="29.1.1.0"></slot>
     </div>
   </template>
-  <!--r.1-->
-  <nested-cmp-child custom-hydrate-flag="" s-id="2">
+  <!--r.29-->
+  <nested-cmp-child custom-hydrate-flag="" s-id="30">
     <template shadowrootmode="open">
-      <div c-id="2.0.0.0" class="some-other-class">
-        <slot c-id="2.1.1.0"></slot>
+      <div c-id="30.0.0.0" class="some-other-class">
+        <slot c-id="30.1.1.0"></slot>
       </div>
     </template>
-    <!--r.2-->
+    <!--r.30-->
     Hello World
   </nested-cmp-child>
 </nested-cmp-parent>`);

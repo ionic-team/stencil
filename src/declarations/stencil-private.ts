@@ -31,6 +31,13 @@ import type {
 import type { JsonDocMethodParameter } from './stencil-public-docs';
 import type { ComponentInterface, ListenTargetOptions, VNode } from './stencil-public-runtime';
 
+export interface DocData {
+  hostIds: number;
+  rootLevelIds: number;
+  staticComponents: Set<string>;
+}
+export type StencilDocument = Document & { _stencilDocData: DocData };
+
 export interface SourceMap {
   file: string;
   mappings: string;
