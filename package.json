@@ -184,7 +184,7 @@
     "postcss": "^8.2.8",
     "prettier": "3.3.1",
     "prompts": "2.4.2",
-    "puppeteer": "^21.0.0",
+    "puppeteer": "^23.5.1",
     "rimraf": "^6.0.1",
     "rollup": "2.56.3",
     "semver": "^7.3.7",
