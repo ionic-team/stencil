@@ -1,3 +1,15 @@
+## 🌪 [4.22.1](https://github.com/ionic-team/stencil/compare/v4.22.0...v4.22.1) (2024-10-09)
+
+
+### Bug Fixes
+
+* **mock-doc:** add missing ShadowRoot window primitive ([#6011](https://github.com/ionic-team/stencil/issues/6011)) ([2f944e2](https://github.com/ionic-team/stencil/commit/2f944e23664e191990424d0dc0fe953f67229373))
+* **mock-doc:** get native primitive from globalThis ([#6021](https://github.com/ionic-team/stencil/issues/6021)) ([72fabd1](https://github.com/ionic-team/stencil/commit/72fabd14cc4934609e2fb8d462807b7445985ae9))
+* **runtime:** create unique host ids ([#6018](https://github.com/ionic-team/stencil/issues/6018)) ([1564b7a](https://github.com/ionic-team/stencil/commit/1564b7a6ad5a8b96c60ee3dc67fd4ee516176e04))
+* **runtime:** merge styles within ShadowRoot into a single node ([#6014](https://github.com/ionic-team/stencil/issues/6014)) ([61f90b0](https://github.com/ionic-team/stencil/commit/61f90b04ecf8896d74840ea295f949f3de38676c))
+
+
+
 # 🍲 [4.22.0](https://github.com/ionic-team/stencil/compare/v4.21.0...v4.22.0) (2024-10-03)
 
 
