@@ -25,11 +25,11 @@ import { MockResizeObserver } from './resize-observer';
 import { MockShadowRoot } from './shadow-root';
 import { MockStorage } from './storage';
 
-const nativeClearInterval = clearInterval;
-const nativeClearTimeout = clearTimeout;
-const nativeSetInterval = setInterval;
-const nativeSetTimeout = setTimeout;
-const nativeURL = URL;
+const nativeClearInterval = globalThis.clearInterval;
+const nativeClearTimeout = globalThis.clearTimeout;
+const nativeSetInterval = globalThis.setInterval;
+const nativeSetTimeout = globalThis.setTimeout;
+const nativeURL = globalThis.URL;
 const nativeWindow = globalThis.window;
 
 export class MockWindow {
