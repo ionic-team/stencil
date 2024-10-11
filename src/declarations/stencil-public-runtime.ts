@@ -1129,6 +1129,8 @@ export namespace JSXBase {
     autoPlay?: boolean;
     autoplay?: boolean | string;
     controls?: boolean;
+    controlslist?: 'nodownload' | 'nofullscreen' | 'noremoteplayback';
+    controlsList?: 'nodownload' | 'nofullscreen' | 'noremoteplayback';
     crossOrigin?: string;
     crossorigin?: string;
     loop?: boolean;
