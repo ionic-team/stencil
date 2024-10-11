@@ -107,21 +107,34 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
                   : styleContainerNode.querySelector('style');
               (styleContainerNode as HTMLElement).insertBefore(styleElm, referenceNode);
             } else if ('host' in styleContainerNode) {
-              /**
-               * If a scoped component is used within a shadow root, we want to insert the styles
-               * at the beginning of the shadow root node.
-               *
-               * However if there is already a style node in the ShadowRoot, we just append
-               * the styles to the existing node.
-               *
-               * Note: order of how styles are applied is important. The new style node
-               * should be inserted before the existing style node.
-               */
-              const existingStyleContainer = styleContainerNode.querySelector('style');
-              if (existingStyleContainer) {
-                existingStyleContainer.innerHTML = style + existingStyleContainer.innerHTML;
+              if (supportsConstructableStylesheets) {
+                /**
+                 * If a scoped component is used within a shadow root then turn the styles into a
+                 * constructable stylesheet and add it to the shadow root's adopted stylesheets.
+                 *
+                 * Note: order of how styles are adopted is important. The new stylesheet should be
+                 * adopted before the existing styles.
+                 */
+                const stylesheet = new CSSStyleSheet();
+                stylesheet.replaceSync(style);
+                styleContainerNode.adoptedStyleSheets = [stylesheet, ...styleContainerNode.adoptedStyleSheets];
               } else {
-                (styleContainerNode as HTMLElement).prepend(styleElm);
+                /**
+                 * If a scoped component is used within a shadow root and constructable stylesheets are
+                 * not supported, we want to insert the styles at the beginning of the shadow root node.
+                 *
+                 * However, if there is already a style node in the shadow root, we just append
+                 * the styles to the existing node.
+                 *
+                 * Note: order of how styles are applied is important. The new style node
+                 * should be inserted before the existing style node.
+                 */
+                const existingStyleContainer = styleContainerNode.querySelector('style');
+                if (existingStyleContainer) {
+                  existingStyleContainer.innerHTML = style + existingStyleContainer.innerHTML;
+                } else {
+                  (styleContainerNode as HTMLElement).prepend(styleElm);
+                }
               }
             } else {
               styleContainerNode.append(styleElm);
