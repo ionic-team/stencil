@@ -1865,7 +1865,6 @@ export interface CustomElementsDefineOptions {
   exclude?: string[];
   resourcesUrl?: string;
   syncQueue?: boolean;
-  transformTagName?: (tagName: string) => string;
   jmp?: (c: Function) => any;
   raf?: (c: FrameRequestCallback) => number;
   ael?: (
