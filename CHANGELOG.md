@@ -3,13 +3,9 @@
 
 ### Bug Fixes
 
-* **docs:** escape backticks in type or default value columns ([#6025](https://github.com/ionic-team/stencil/issues/6025)) ([009d370](https://github.com/ionic-team/stencil/commit/009d370c4e9968664a563d2ab42a151cd49ded96))
+* **docs:** escape backticks in type or default value columns ([#6025](https://github.com/ionic-team/stencil/issues/6025)) ([009d370](https://github.com/ionic-team/stencil/commit/009d370c4e9968664a563d2ab42a151cd49ded96)), closes [#6024](https://github.com/ionic-team/stencil/issues/6024)
 * **types:** add controlslist to html declarations ([#6026](https://github.com/ionic-team/stencil/issues/6026)) ([f4b48e9](https://github.com/ionic-team/stencil/commit/f4b48e9c058e7d9e694560ace519a2f2bf656ff5)), closes [#6015](https://github.com/ionic-team/stencil/issues/6015)
-
-
-### Features
-
-* **runtime:** make shadow root adopt scoped component styles ([#6028](https://github.com/ionic-team/stencil/issues/6028)) ([8ff3048](https://github.com/ionic-team/stencil/commit/8ff3048e28209af08f8dbe0142443deff19ceee2))
+* **runtime:** make shadow root adopt scoped component styles ([#6028](https://github.com/ionic-team/stencil/issues/6028)) ([8ff3048](https://github.com/ionic-team/stencil/commit/8ff3048e28209af08f8dbe0142443deff19ceee2)), closes [#6027](https://github.com/ionic-team/stencil/issues/6027)
 
 
 
