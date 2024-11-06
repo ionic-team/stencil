@@ -984,7 +984,7 @@ const updateElementScopeIds = (element: d.RenderNode, parent: d.RenderNode, iter
   if (element && parent && element.nodeType === NODE_TYPE.ElementNode) {
     const scopeIds = new Set(findScopeIds(parent).filter(Boolean));
     if (scopeIds.size) {
-      element.classList?.add(...(element['s-scs'] = [...scopeIds]));
+      element.classList?.add(...(element['s-scs'] = Array.from(scopeIds)));
 
       if (element['s-ol'] || iterateChildNodes) {
         /**
