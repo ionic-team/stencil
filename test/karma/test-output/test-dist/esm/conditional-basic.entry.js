@@ -1,0 +1,16 @@
+import { r as registerInstance, h } from './index-a2c0d171.js';
+
+const ConditionalBasic = class {
+  constructor(hostRef) {
+    registerInstance(this, hostRef);
+    this.showContent = false;
+  }
+  testClick() {
+    this.showContent = !this.showContent;
+  }
+  render() {
+    return (h("div", null, h("button", { onClick: this.testClick.bind(this), class: "test" }, "Test"), h("div", { class: "results" }, this.showContent ? 'Content' : '')));
+  }
+};
+
+export { ConditionalBasic as conditional_basic };

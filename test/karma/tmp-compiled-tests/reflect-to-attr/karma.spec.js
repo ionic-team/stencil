@@ -1,0 +1,110 @@
+"use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (g && (g = 0, op[0] && (_ = 0)), _) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var util_1 = require("../util");
+describe('reflect-to-attr', function () {
+    var _this = this;
+    var _a = (0, util_1.setupDomTests)(document), setupDom = _a.setupDom, tearDownDom = _a.tearDownDom;
+    var app;
+    beforeEach(function () { return __awaiter(_this, void 0, void 0, function () {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, setupDom('/reflect-to-attr/index.html')];
+                case 1:
+                    app = _a.sent();
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    afterEach(tearDownDom);
+    it('should have proper attributes', function () { return __awaiter(_this, void 0, void 0, function () {
+        var cmp;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    cmp = app.querySelector('reflect-to-attr');
+                    expect(cmp.getAttribute('str')).toEqual('single');
+                    expect(cmp.getAttribute('nu')).toEqual('2');
+                    expect(cmp.getAttribute('undef')).toEqual(null);
+                    expect(cmp.getAttribute('null')).toEqual(null);
+                    expect(cmp.getAttribute('bool')).toEqual(null);
+                    expect(cmp.getAttribute('other-bool')).toEqual('');
+                    cmp.str = 'second';
+                    cmp.nu = -12.2;
+                    cmp.undef = 'no undef';
+                    cmp.null = 'no null';
+                    cmp.bool = true;
+                    cmp.otherBool = false;
+                    return [4 /*yield*/, (0, util_1.waitForChanges)()];
+                case 1:
+                    _a.sent();
+                    expect(cmp.getAttribute('str')).toEqual('second');
+                    expect(cmp.getAttribute('nu')).toEqual('-12.2');
+                    expect(cmp.getAttribute('undef')).toEqual('no undef');
+                    expect(cmp.getAttribute('null')).toEqual('no null');
+                    expect(cmp.getAttribute('bool')).toEqual('');
+                    expect(cmp.getAttribute('other-bool')).toEqual(null);
+                    expect(cmp.getAttribute('dynamic-str')).toEqual('value');
+                    expect(cmp.getAttribute('dynamic-nu')).toEqual('123');
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+    it('should reflect booleans property', function () { return __awaiter(_this, void 0, void 0, function () {
+        var cmp, toggle;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0:
+                    cmp = app.querySelector('reflect-to-attr');
+                    expect(cmp.disabled).toBe(false);
+                    toggle = app.querySelector('#toggle');
+                    toggle.click();
+                    return [4 /*yield*/, (0, util_1.waitForChanges)()];
+                case 1:
+                    _a.sent();
+                    expect(cmp.disabled).toBe(true);
+                    toggle.click();
+                    return [4 /*yield*/, (0, util_1.waitForChanges)()];
+                case 2:
+                    _a.sent();
+                    expect(cmp.disabled).toBe(false);
+                    return [2 /*return*/];
+            }
+        });
+    }); });
+});

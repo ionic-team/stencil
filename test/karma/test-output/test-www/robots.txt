@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://karma.stenciljs.com/prerender/sitemap.xml

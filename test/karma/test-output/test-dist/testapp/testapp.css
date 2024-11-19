@@ -1,0 +1,1 @@
+h2{font-size:16px;color:red}h2::after{content:': from global-css-entry.css'}h1{font-size:18px;color:maroon;display:-ms-flexbox;display:flex}h1::after{content:": from global-sass-entry.scss"}
