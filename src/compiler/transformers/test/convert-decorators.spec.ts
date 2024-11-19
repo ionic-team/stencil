@@ -35,7 +35,9 @@ describe('convert-decorators', () => {
               "docs": { "tags": [], "text": "" },
               "attribute": "val",
               "reflect": false,
-              "defaultValue": "\\"initial value\\""
+              "defaultValue": "\\"initial value\\"",
+              "getter": false, 
+              "setter": false
             }
           };
         }}`,

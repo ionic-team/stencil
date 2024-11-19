@@ -37,6 +37,8 @@ export const parseStaticProps = (staticMembers: ts.ClassElement[]): d.ComponentC
       complexType: val.complexType,
       docs: val.docs,
       internal: isInternal(val.docs),
+      getter: !!val.getter,
+      setter: !!val.setter,
     };
   });
 };

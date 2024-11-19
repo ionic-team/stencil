@@ -61,37 +61,85 @@ export const proxyComponent = (
         (memberFlags & MEMBER_FLAGS.Prop ||
           ((!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && memberFlags & MEMBER_FLAGS.State))
       ) {
-        // proxyComponent - prop
-        Object.defineProperty(prototype, memberName, {
-          get(this: d.RuntimeRef) {
-            // proxyComponent, get value
-            return getValue(this, memberName);
-          },
-          set(this: d.RuntimeRef, newValue) {
-            // only during dev time
-            if (BUILD.isDev) {
-              const ref = getHostRef(this);
-              if (
-                // we are proxying the instance (not element)
-                (flags & PROXY_FLAGS.isElementConstructor) === 0 &&
-                // the element is not constructing
-                (ref && ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
-                // the member is a prop
-                (memberFlags & MEMBER_FLAGS.Prop) !== 0 &&
-                // the member is not mutable
-                (memberFlags & MEMBER_FLAGS.Mutable) === 0
-              ) {
-                consoleDevWarn(
-                  `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`,
-                );
+        if ((memberFlags & MEMBER_FLAGS.Getter) === 0) {
+          // proxyComponent - prop
+          Object.defineProperty(prototype, memberName, {
+            get(this: d.RuntimeRef) {
+              // proxyComponent, get value
+              return getValue(this, memberName);
+            },
+            set(this: d.RuntimeRef, newValue) {
+              // only during dev time
+              if (BUILD.isDev) {
+                const ref = getHostRef(this);
+                if (
+                  // we are proxying the instance (not element)
+                  (flags & PROXY_FLAGS.isElementConstructor) === 0 &&
+                  // the element is not constructing
+                  (ref && ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
+                  // the member is a prop
+                  (memberFlags & MEMBER_FLAGS.Prop) !== 0 &&
+                  // the member is not mutable
+                  (memberFlags & MEMBER_FLAGS.Mutable) === 0
+                ) {
+                  consoleDevWarn(
+                    `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`,
+                  );
+                }
               }
-            }
-            // proxyComponent, set value
-            setValue(this, memberName, newValue, cmpMeta);
-          },
-          configurable: true,
-          enumerable: true,
-        });
+              // proxyComponent, set value
+              setValue(this, memberName, newValue, cmpMeta);
+            },
+            configurable: true,
+            enumerable: true,
+          });
+        } else if (flags & PROXY_FLAGS.isElementConstructor && memberFlags & MEMBER_FLAGS.Getter) {
+          if (BUILD.lazyLoad) {
+            // lazily maps the element get / set to the class get / set
+            // proxyComponent - lazy prop getter
+            Object.defineProperty(prototype, memberName, {
+              get(this: d.RuntimeRef) {
+                const ref = getHostRef(this);
+                const instance = BUILD.lazyLoad && ref ? ref.$lazyInstance$ : prototype;
+                if (!instance) return;
+
+                return instance[memberName];
+              },
+              configurable: true,
+              enumerable: true,
+            });
+          }
+          if (memberFlags & MEMBER_FLAGS.Setter) {
+            // proxyComponent - lazy and non-lazy. Catches original set to fire updates (for @Watch)
+            const origSetter = Object.getOwnPropertyDescriptor(prototype, memberName).set;
+            Object.defineProperty(prototype, memberName, {
+              set(this: d.RuntimeRef, newValue) {
+                // non-lazy setter - amends original set to fire update
+                const ref = getHostRef(this);
+                if (origSetter) {
+                  origSetter.apply(this, [newValue]);
+                  setValue(this, memberName, ref.$hostElement$[memberName as keyof d.HostElement], cmpMeta);
+                  return;
+                }
+                if (!ref) return;
+
+                // lazy setter maps the element set to the class set
+                const setVal = (init = false) => {
+                  ref.$lazyInstance$[memberName] = newValue;
+                  Object.getOwnPropertyDescriptor(prototype, memberName).set;
+                  setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta, !init);
+                };
+
+                // If there's a value from an attribute, (before the class is defined), queue & set async
+                if (ref.$lazyInstance$) {
+                  setVal();
+                } else {
+                  ref.$onInstancePromise$.then(() => setVal(true));
+                }
+              },
+            })
+          }
+        }
       } else if (
         BUILD.lazyLoad &&
         BUILD.method &&
@@ -190,7 +238,12 @@ export const proxyComponent = (
             return;
           }
 
-          this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
+          const propDesc = Object.getOwnPropertyDescriptor(prototype, propName);
+          // test whether this property either has no 'getter' or if it does, does it also have a 'setter'
+          // before attempting to write back to component props
+          if (!propDesc.get || !!propDesc.set) {
+            this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
+          }
         });
       };
 

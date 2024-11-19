@@ -25,6 +25,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'string',
+        getter: false,
+        setter: false,
       },
     });
 
@@ -126,6 +128,8 @@ describe('parse props', () => {
         reflect: false,
         required: true,
         type: 'string',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.required).toBe(true);
@@ -156,6 +160,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'string',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.mutable).toBe(true);
@@ -185,6 +191,8 @@ describe('parse props', () => {
         reflect: true,
         required: false,
         type: 'string',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.reflect).toBe(true);
@@ -213,6 +221,8 @@ describe('parse props', () => {
         optional: false,
         required: false,
         type: 'unknown',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('unknown');
@@ -249,6 +259,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'any',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('any');
@@ -281,6 +293,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'string',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.name).toBe('multiWord');
@@ -311,6 +325,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'string',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('string');
@@ -341,6 +357,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'number',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('number');
@@ -371,6 +389,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'boolean',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('boolean');
@@ -401,6 +421,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'any',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('any');
@@ -432,6 +454,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'string',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('string');
@@ -463,6 +487,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'number',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('number');
@@ -494,6 +520,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'boolean',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('boolean');
@@ -526,9 +554,127 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'any',
+        getter: false,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('any');
+    expect(t.property?.attribute).toBe('val');
+  });
+
+  it('prop getter w/ inferred string type', () => {
+    const t = transpileModule(`
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        @Prop()
+        get val() {
+          return 'hello';
+        };
+      }
+    `);
+
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'string',
+          original: 'string',
+        },
+        docs: {
+          text: '',
+          tags: [],
+        },
+        defaultValue: `'hello'`,
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'string',
+        getter: true,
+        setter: false,
+      },
+    });
+    expect(t.property?.type).toBe('string');
+    expect(t.property?.attribute).toBe('val');
+  });
+
+  it('prop getter w/ inferred number type from property access expression', () => {
+    const t = transpileModule(`
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        private _numberVal = 3;
+        @Prop()
+        get val() {
+          return this._numberVal;
+        };
+      }
+    `);
+
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'number',
+          original: 'number',
+        },
+        docs: {
+          text: '',
+          tags: [],
+        },
+        defaultValue: `3`,
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'number',
+        getter: true,
+        setter: false,
+      },
+    });
+    expect(t.property?.type).toBe('number');
+    expect(t.property?.attribute).toBe('val');
+  });
+
+  it('prop getter and setter w/ inferred boolean type from property access expression', () => {
+    const t = transpileModule(`
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        private _boolVal = false;
+        @Prop()
+        get val() {
+          return this._boolVal;
+        };
+        set val(newVal: boolean) {
+          this._boolVal = newVal;
+        };
+      }
+    `);
+
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'boolean',
+          original: 'boolean',
+        },
+        docs: {
+          text: '',
+          tags: [],
+        },
+        defaultValue: `false`,
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'boolean',
+        getter: true,
+        setter: true,
+      },
+    });
+    expect(t.property?.type).toBe('boolean');
     expect(t.property?.attribute).toBe('val');
   });
 });

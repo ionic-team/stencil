@@ -28,6 +28,8 @@ describe('attribute-complex', () => {
     el.setAttribute('str-0', 'false');
     el.setAttribute('str-1', '123');
     el.str2 = 321;
+    
+    el.setAttribute('obj', 'James Pond RoboCod');
 
     const instance = await el.getInstance();
     expect(instance.nu0).toBe(3);
@@ -41,6 +43,8 @@ describe('attribute-complex', () => {
     expect(instance.str0).toBe('false');
     expect(instance.str1).toBe('123');
     expect(instance.str2).toBe('321');
+
+    expect(instance.obj).toBe('{"name":"James Pond RoboCod"}');
   });
 
   it('should cast element props', async () => {
@@ -63,5 +67,6 @@ describe('attribute-complex', () => {
 
     await browser.pause(100);
     expect(instance.str0).toBe('hello'); // default value
+    expect(instance.obj).toBe('{"name":"James Pond RoboCod"}');
   });
 });
