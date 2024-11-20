@@ -123,18 +123,18 @@ export const proxyComponent = (
                 }
                 if (!ref) return;
 
-                // lazy setter maps the element set to the class set
-                const setVal = (init = false) => {
+                // we need to wait for the lazy instance to be ready
+                // before we can set it's value via it's setter function
+                const setterSetVal = (init = false) => {
                   ref.$lazyInstance$[memberName] = newValue;
-                  Object.getOwnPropertyDescriptor(prototype, memberName).set;
                   setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta, !init);
                 };
 
                 // If there's a value from an attribute, (before the class is defined), queue & set async
                 if (ref.$lazyInstance$) {
-                  setVal();
+                  setterSetVal();
                 } else {
-                  ref.$onInstancePromise$.then(() => setVal(true));
+                  ref.$onReadyPromise$.then(() => setterSetVal(true));
                 }
               },
             });
