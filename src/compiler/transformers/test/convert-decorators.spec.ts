@@ -33,11 +33,11 @@ describe('convert-decorators', () => {
               "required": false,
               "optional": false,
               "docs": { "tags": [], "text": "" },
+              "getter": false, 
+              "setter": false,
               "attribute": "val",
               "reflect": false,
-              "defaultValue": "\\"initial value\\"",
-              "getter": false, 
-              "setter": false
+              "defaultValue": "\\"initial value\\""
             }
           };
         }}`,
@@ -86,6 +86,8 @@ describe('convert-decorators', () => {
         complexType: { original: 'string', resolved: 'string', references: {} },
         docs: { tags: [], text: '' },
         internal: false,
+        getter: false,
+        setter: false,
       },
     ]);
   });
@@ -112,6 +114,8 @@ describe('convert-decorators', () => {
         complexType: { original: 'string', resolved: 'string', references: {} },
         docs: { tags: [], text: '' },
         internal: false,
+        getter: false,
+        setter: false,
       },
     ]);
   });

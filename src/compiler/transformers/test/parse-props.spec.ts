@@ -68,6 +68,8 @@ describe('parse props', () => {
       },
       docs: { tags: [], text: '' },
       internal: false,
+      getter: false,
+      setter: false,
     });
   });
 
@@ -100,6 +102,8 @@ describe('parse props', () => {
         reflect: false,
         required: false,
         type: 'any',
+        getter: false,
+        setter: false,
       },
     });
   });
