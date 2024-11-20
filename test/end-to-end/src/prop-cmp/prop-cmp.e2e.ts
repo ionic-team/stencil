@@ -33,9 +33,8 @@ describe('@Prop', () => {
     // select the "prop-cmp" element within the page (same as querySelector)
     const elm = await page.find('prop-cmp >>> div');
     expect(elm).toEqualText(
-      'Hello, my name is Marty McFly. My full name being Mr Marty McFly. I like to wear down filled jackets'
+      'Hello, my name is Marty McFly. My full name being Mr Marty McFly. I like to wear down filled jackets',
     );
-    
   });
 
   it('should set props from attributes', async () => {
@@ -44,7 +43,9 @@ describe('@Prop', () => {
     `);
 
     const elm = await page.find('prop-cmp >>> div');
-    expect(elm).toEqualText('Hello, my name is Marty McFly. My full name being Mr Marty McFly. I like to wear down filled jackets');
+    expect(elm).toEqualText(
+      'Hello, my name is Marty McFly. My full name being Mr Marty McFly. I like to wear down filled jackets',
+    );
   });
 
   it('should not set read-only props', async () => {
@@ -54,7 +55,7 @@ describe('@Prop', () => {
 
     const elm = await page.find('prop-cmp >>> div');
     expect(elm).toEqualText(
-      'Hello, my name is Marty McFly. My full name being Mr Marty McFly. I like to wear life preservers'
+      'Hello, my name is Marty McFly. My full name being Mr Marty McFly. I like to wear life preservers',
     );
   });
 
@@ -65,7 +66,7 @@ describe('@Prop', () => {
 
     const elm = await page.find('prop-cmp >>> div');
     expect(elm).toEqualText(
-      'Hello, my name is Marty McFly. My full name being Mr Marty McFly. I like to wear life preservers'
+      'Hello, my name is Marty McFly. My full name being Mr Marty McFly. I like to wear life preservers',
     );
   });
 });

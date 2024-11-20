@@ -137,7 +137,7 @@ export const proxyComponent = (
                   ref.$onInstancePromise$.then(() => setVal(true));
                 }
               },
-            })
+            });
           }
         }
       } else if (

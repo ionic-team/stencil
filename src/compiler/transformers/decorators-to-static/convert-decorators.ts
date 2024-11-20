@@ -236,7 +236,7 @@ const removeStencilMethodDecorators = (
           member.name,
           member.parameters,
           member.type,
-          member.body
+          member.body,
         );
       } else if (ts.isSetAccessor(member)) {
         const err = buildError(diagnostics);
@@ -267,7 +267,7 @@ const removeStencilMethodDecorators = (
         err.messageText = 'Unknown class member encountered!';
         augmentDiagnosticWithNode(err, member);
       }
-    } 
+    }
     return member;
   });
 };

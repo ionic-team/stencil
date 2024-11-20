@@ -8,7 +8,13 @@ import { scheduleUpdate } from './update-component';
 
 export const getValue = (ref: d.RuntimeRef, propName: string) => getHostRef(ref).$instanceValues$.get(propName);
 
-export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta, fireWatchers = true) => {
+export const setValue = (
+  ref: d.RuntimeRef,
+  propName: string,
+  newVal: any,
+  cmpMeta: d.ComponentRuntimeMeta,
+  fireWatchers = true,
+) => {
   // check our new property value against our internal value
   const hostRef = getHostRef(ref);
 

@@ -28,7 +28,7 @@ describe('attribute-complex', () => {
     el.setAttribute('str-0', 'false');
     el.setAttribute('str-1', '123');
     el.str2 = 321;
-    
+
     el.setAttribute('obj', 'James Pond RoboCod');
 
     const instance = await el.getInstance();
@@ -57,6 +57,8 @@ describe('attribute-complex', () => {
     el.bool0 = 'true';
     el.bool1 = 'false';
     el.bool2 = false;
+
+    el.obj = 'James Pond RoboCod';
 
     expect(instance.nu0).toBe(1234);
     expect(instance.nu1).toBe(-111.1);
