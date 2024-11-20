@@ -20,15 +20,17 @@ export class EventReRegister implements ComponentInterface {
     console.log('disconnected');
   }
   render() {
-    return <Host tabindex="1">
-      <ul id="reattach">
-        <li>Focus this component;</li>
-        <li>Press key;</li>
-        <li>See console output</li>
-        <li>Press 'Reconnect' button</li>
-        <li>Repeat steps 1-3</li>
-      </ul>
-      <p>Event fired times: {this.eventFiredTimes}</p>
-      </Host>;
+    return (
+      <Host tabindex="1">
+        <ul id="reattach">
+          <li>Focus this component;</li>
+          <li>Press key;</li>
+          <li>See console output</li>
+          <li>Press 'Reconnect' button</li>
+          <li>Repeat steps 1-3</li>
+        </ul>
+        <p>Event fired times: {this.eventFiredTimes}</p>
+      </Host>
+    );
   }
 }

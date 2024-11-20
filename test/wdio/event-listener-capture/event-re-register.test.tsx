@@ -27,8 +27,7 @@ describe('event-listener-capture using lazy load components', function () {
     await browser.action('key').down('a').pause(100).up('a').perform();
 
     // check if event fired 3 times
-    await expect(reattach).toHaveText(
-      expect.stringContaining('Event fired times: 3'));
+    await expect(reattach).toHaveText(expect.stringContaining('Event fired times: 3'));
 
     // remove node from DOM
     elem.remove();
@@ -43,7 +42,6 @@ describe('event-listener-capture using lazy load components', function () {
     await browser.action('key').down('a').pause(100).up('a').perform();
 
     // check if event fired 6 times
-    await expect(reattach).toHaveText(
-      expect.stringContaining('Event fired times: 6'));
+    await expect(reattach).toHaveText(expect.stringContaining('Event fired times: 6'));
   });
 });
