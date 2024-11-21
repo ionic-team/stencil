@@ -3,12 +3,13 @@
   "type": "module",
   "version": "0.0.0",
   "scripts": {
-    "build": "run-s build.test-sibling build.main build.global-script build.prerender build.invisible-prehydration",
+    "build": "run-s build.no-external-runtime build.test-sibling build.main build.global-script build.prerender build.invisible-prehydration",
     "build.main": "node ../../bin/stencil build --debug --es5",
     "build.global-script": "node ../../bin/stencil build --debug --es5 --config global-script.stencil.config.ts",
     "build.test-sibling": "cd test-sibling && npm run build",
     "build.prerender": "node ../../bin/stencil build --config prerender.stencil.config.ts --prerender --debug && node ./test-prerender/prerender.js && node ./test-prerender/no-script-build.js",
     "build.invisible-prehydration": "node ../../bin/stencil build --debug --es5 --config invisible-prehydration.stencil.config.ts",
+    "build.no-external-runtime": "node ../../bin/stencil build --debug --es5 --config no-external-runtime.stencil.config.ts",
     "test": "run-s build wdio",
     "wdio": "wdio run ./wdio.conf.ts"
   },

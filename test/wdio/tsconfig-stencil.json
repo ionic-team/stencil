@@ -38,6 +38,9 @@
     "./test-sibling/**/*.tsx",
     // we also exclude the files in the invisible-prehydration directory
     "./invisible-prehydration/**/*.tsx",
-    "./invisible-prehydration/**/*.ts"
+    "./invisible-prehydration/**/*.ts",
+    // exclude no-external-runtime because they are built separately with `externalRuntime: false`
+    "./no-external-runtime/**/*.tsx",
+    "./no-external-runtime/**/*.ts",
   ]
 }

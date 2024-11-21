@@ -107,6 +107,9 @@ export class MockAnchorElement extends MockHTMLElement {
     this.setAttribute('href', value);
   }
   get pathname() {
+    if (!this.href) {
+      return '';
+    }
     return new URL(this.href).pathname;
   }
 }

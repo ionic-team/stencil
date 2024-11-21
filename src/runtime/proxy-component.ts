@@ -29,24 +29,25 @@ export const proxyComponent = (
    * @ref https://web.dev/articles/more-capable-form-controls#lifecycle_callbacks
    */
   if (BUILD.formAssociated && cmpMeta.$flags$ & CMP_FLAGS.formAssociated && flags & PROXY_FLAGS.isElementConstructor) {
-    FORM_ASSOCIATED_CUSTOM_ELEMENT_CALLBACKS.forEach((cbName) =>
+    FORM_ASSOCIATED_CUSTOM_ELEMENT_CALLBACKS.forEach((cbName) => {
+      const originalFormAssociatedCallback = prototype[cbName];
       Object.defineProperty(prototype, cbName, {
         value(this: d.HostElement, ...args: any[]) {
           const hostRef = getHostRef(this);
-          const elm = BUILD.lazyLoad ? hostRef.$hostElement$ : this;
-          const instance: d.ComponentInterface = BUILD.lazyLoad ? hostRef.$lazyInstance$ : elm;
+          const instance: d.ComponentInterface = BUILD.lazyLoad ? hostRef.$lazyInstance$ : this;
           if (!instance) {
-            hostRef.$onReadyPromise$.then((instance: d.ComponentInterface) => {
-              const cb = instance[cbName];
-              typeof cb === 'function' && cb.call(instance, ...args);
+            hostRef.$onReadyPromise$.then((asyncInstance: d.ComponentInterface) => {
+              const cb = asyncInstance[cbName];
+              typeof cb === 'function' && cb.call(asyncInstance, ...args);
             });
           } else {
-            const cb = instance[cbName];
+            // Use the method on `instance` if `lazyLoad` is set, otherwise call the original method to avoid an infinite loop.
+            const cb = BUILD.lazyLoad ? instance[cbName] : originalFormAssociatedCallback;
             typeof cb === 'function' && cb.call(instance, ...args);
           }
         },
-      }),
-    );
+      });
+    });
   }
 
   if ((BUILD.member && cmpMeta.$members$) || (BUILD.watchCallback && (cmpMeta.$watchers$ || Cstr.watchers))) {

@@ -55,6 +55,7 @@ unused-exports*.txt
 
 # wdio test output
 test/wdio/test-components
+test/wdio/test-components-no-external-runtime
 test/wdio/www-global-script/
 test/wdio/www-prerender-script
 test/wdio/www-invisible-prehydration/

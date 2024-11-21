@@ -1,3 +1,15 @@
+## 🐤 [4.22.3](https://github.com/ionic-team/stencil/compare/v4.22.2...v4.22.3) (2024-11-21)
+
+
+### Bug Fixes
+
+* correctly call proxied formAssociated callbacks ([#6046](https://github.com/ionic-team/stencil/issues/6046)) ([dffb49d](https://github.com/ionic-team/stencil/commit/dffb49d5af9f8d4dc8187120214f08cac4d2efa7)), closes [#6038](https://github.com/ionic-team/stencil/issues/6038)
+* **mock-doc:** return empty string if anchor has no href attribute ([#6051](https://github.com/ionic-team/stencil/issues/6051)) ([e44642f](https://github.com/ionic-team/stencil/commit/e44642f4e473977e89bfab201dcfe712989f8d02)), closes [#6047](https://github.com/ionic-team/stencil/issues/6047)
+* **runtime:** ensure event listener are not registered twice ([#6052](https://github.com/ionic-team/stencil/issues/6052)) ([8f1bc55](https://github.com/ionic-team/stencil/commit/8f1bc5501ffc7effb17c2acd863a7b39243fdb6c)), closes [#6045](https://github.com/ionic-team/stencil/issues/6045)
+* **runtime:** scope id fix for component children for typescript issue ([#6041](https://github.com/ionic-team/stencil/issues/6041)) ([ab4cfce](https://github.com/ionic-team/stencil/commit/ab4cfce43fafff3f7302fff4e4c952489c245804)), closes [#6042](https://github.com/ionic-team/stencil/issues/6042)
+
+
+
 ## 🎺 [4.22.2](https://github.com/ionic-team/stencil/compare/v4.22.1...v4.22.2) (2024-10-25)
 
 
