@@ -55,6 +55,7 @@ export const propDecoratorsToStatic = (
  * @param program a {@link ts.Program} object
  * @param prop the TypeScript `PropertyDeclaration` to parse
  * @param decoratorName the name of the decorator to look for
+ * @param newMembers a collection of parsed `@Prop` annotated class members. Used for `get()` decorated props to find a corresponding `set()`
  * @returns a property assignment expression to be added to the Stencil component's class
  */
 const parsePropDecorator = (

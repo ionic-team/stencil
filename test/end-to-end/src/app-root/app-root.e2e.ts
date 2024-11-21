@@ -23,7 +23,7 @@ describe('goto root url', () => {
     // and once it's received, then return the element's "textContent" property
     const elm = await page.find('prop-cmp >>> div');
     expect(elm).toEqualText(
-      'Hello, my name is Stencil JS. My full name being Mr Stencil JS. I like to wear life preservers',
+      'Hello, my name is Stencil JS. My full name being Mr Stencil JS. I like to wear life preservers.',
     );
 
     await page.compareScreenshot('navigate to homepage', {
@@ -40,7 +40,7 @@ describe('goto root url', () => {
     });
 
     const elm = await page.find('prop-cmp >>> div');
-    expect(elm).toEqualText('Hello, my name is Doc Brown. My full name being Mr Doc Brown. I like to wear lab coats');
+    expect(elm).toEqualText('Hello, my name is Doc Brown. My full name being Mr Doc Brown. I like to wear lab coats.');
 
     await page.compareScreenshot('navigate to homepage with querystrings');
   });

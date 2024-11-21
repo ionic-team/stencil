@@ -55,7 +55,7 @@ export class AppRoot {
   render() {
     return (
       <Host>
-        <prop-cmp first={this.first} lastName={this.last} mode="ios" />
+        <prop-cmp first={this.first} lastName={this.last} clothes={this.clothes} mode="ios" />
         <div id="video" class={linariaCss}></div>
       </Host>
     );
