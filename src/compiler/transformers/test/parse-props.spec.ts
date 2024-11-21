@@ -720,6 +720,39 @@ describe('parse props', () => {
     });
   });
 
+  it('should correctly parse a get / set prop with an inferred literal type', () => {
+    const t = transpileModule(`
+    @Component({tag: 'cmp-a'})
+      export class CmpA {
+        private _val: 'Something' | 'Else' = 'Something';
+        @Prop()
+        get val() {
+          return this._val;
+        };
+      }
+    `);
+
+    expect(t.properties[0]).toEqual({
+      name: 'val',
+      type: 'string',
+      attribute: 'val',
+      reflect: false,
+      mutable: false,
+      required: false,
+      optional: false,
+      defaultValue: "'Something'",
+      complexType: {
+        original: '"Something" | "Else"',
+        resolved: '"Else" | "Something"',
+        references: {},
+      },
+      docs: { tags: [], text: '' },
+      internal: false,
+      getter: true,
+      setter: false,
+    });
+  });
+
   it('should not infer type from `get()` property access expression when getter type is explicit', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
