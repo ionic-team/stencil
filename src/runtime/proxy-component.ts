@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { consoleDevWarn, getHostRef, plt } from '@platform';
+import { consoleDevWarn, getHostRef, parsePropertyValue, plt } from '@platform';
 import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
@@ -117,7 +117,17 @@ export const proxyComponent = (
                 // non-lazy setter - amends original set to fire update
                 const ref = getHostRef(this);
                 if (origSetter) {
-                  origSetter.apply(this, [newValue]);
+                  const currentValue = ref.$hostElement$[memberName as keyof d.HostElement];
+                  if (!ref.$instanceValues$.get(memberName) && currentValue) {
+                    // the prop `set()` doesn't fire during `constructor()`:
+                    // no initial value gets set (in instanceValues)
+                    // meaning watchers fire even though the value hasn't changed.
+                    // So if there's a current value and no initial value, let's set it now.
+                    ref.$instanceValues$.set(memberName, currentValue);
+                  }
+                  // this sets the value via the `set()` function which
+                  // might not end up changing the underlying value
+                  origSetter.apply(this, [parsePropertyValue(newValue, cmpMeta.$members$[memberName][0])]);
                   setValue(this, memberName, ref.$hostElement$[memberName as keyof d.HostElement], cmpMeta);
                   return;
                 }
@@ -125,16 +135,26 @@ export const proxyComponent = (
 
                 // we need to wait for the lazy instance to be ready
                 // before we can set it's value via it's setter function
-                const setterSetVal = (init = false) => {
-                  ref.$lazyInstance$[memberName] = newValue;
-                  setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta, !init);
+                const setterSetVal = () => {
+                  const currentValue = ref.$lazyInstance$[memberName];
+                  if (!ref.$instanceValues$.get(memberName) && currentValue) {
+                    // the prop `set()` doesn't fire during `constructor()`:
+                    // no initial value gets set (in instanceValues)
+                    // meaning watchers fire even though the value hasn't changed.
+                    // So if there's a current value and no initial value, let's set it now.
+                    ref.$instanceValues$.set(memberName, currentValue);
+                  }
+                  // this sets the value via the `set()` function which
+                  // might not end up changing the underlying value
+                  ref.$lazyInstance$[memberName] = parsePropertyValue(newValue, cmpMeta.$members$[memberName][0]);
+                  setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta);
                 };
 
                 // If there's a value from an attribute, (before the class is defined), queue & set async
                 if (ref.$lazyInstance$) {
                   setterSetVal();
                 } else {
-                  ref.$onReadyPromise$.then(() => setterSetVal(true));
+                  ref.$onReadyPromise$.then(() => setterSetVal());
                 }
               },
             });

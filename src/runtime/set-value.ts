@@ -8,13 +8,7 @@ import { scheduleUpdate } from './update-component';
 
 export const getValue = (ref: d.RuntimeRef, propName: string) => getHostRef(ref).$instanceValues$.get(propName);
 
-export const setValue = (
-  ref: d.RuntimeRef,
-  propName: string,
-  newVal: any,
-  cmpMeta: d.ComponentRuntimeMeta,
-  fireWatchers = true,
-) => {
+export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMeta: d.ComponentRuntimeMeta) => {
   // check our new property value against our internal value
   const hostRef = getHostRef(ref);
 
@@ -78,7 +72,7 @@ export const setValue = (
 
     if (!BUILD.lazyLoad || instance) {
       // get an array of method names of watch functions to call
-      if (BUILD.watchCallback && cmpMeta.$watchers$ && flags & HOST_FLAGS.isWatchReady && fireWatchers) {
+      if (BUILD.watchCallback && cmpMeta.$watchers$ && flags & HOST_FLAGS.isWatchReady) {
         const watchMethods = cmpMeta.$watchers$[propName];
 
         if (watchMethods) {

@@ -117,15 +117,25 @@ const parsePropDecorator = (
     propMeta.defaultValue = prop.initializer.getText();
   } else if (ts.isGetAccessorDeclaration(prop)) {
     // shallow comb to find default value for a getter
-    const returnSt = prop.body?.statements.find((st) => ts.isReturnStatement(st)) as ts.ReturnStatement;
-    const retExp = returnSt.expression;
+    const returnStatement = prop.body?.statements.find((st) => ts.isReturnStatement(st)) as ts.ReturnStatement;
+    const returnExpression = returnStatement.expression;
 
-    if (retExp && ts.isLiteralExpression(retExp)) {
-      propMeta.defaultValue = retExp.getText();
-    } else if (retExp && ts.isPropertyAccessExpression(retExp)) {
-      const nameToFind = retExp.name.getText();
+    if (returnExpression && ts.isLiteralExpression(returnExpression)) {
+      // the getter has a literal return value
+      propMeta.defaultValue = returnExpression.getText();
+    } else if (returnExpression && ts.isPropertyAccessExpression(returnExpression)) {
+      const nameToFind = returnExpression.name.getText();
       const foundProp = findGetProp(nameToFind, newMembers);
-      if (foundProp && foundProp.initializer) propMeta.defaultValue = foundProp.initializer.getText();
+
+      if (foundProp && foundProp.initializer) {
+        propMeta.defaultValue = foundProp.initializer.getText();
+
+        if (propMeta.type === 'unknown') {
+          const type = typeChecker.getTypeAtLocation(foundProp);
+          propMeta.type = propTypeFromTSType(type);
+          propMeta.complexType = getComplexType(typeChecker, foundProp, type, program);
+        }
+      }
     }
   }
 

@@ -566,7 +566,7 @@ describe('parse props', () => {
     expect(t.property?.attribute).toBe('val');
   });
 
-  it('prop getter w/ inferred string type', () => {
+  it('should infer string type from `get()` return value', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
       export class CmpA {
@@ -603,7 +603,7 @@ describe('parse props', () => {
     expect(t.property?.attribute).toBe('val');
   });
 
-  it('prop getter w/ inferred number type from property access expression', () => {
+  it('should infer number type from `get()` property access expression', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
       export class CmpA {
@@ -641,7 +641,7 @@ describe('parse props', () => {
     expect(t.property?.attribute).toBe('val');
   });
 
-  it('prop getter and setter w/ inferred boolean type from property access expression', () => {
+  it('should infer boolean type from `get()` property access expression', () => {
     const t = transpileModule(`
       @Component({tag: 'cmp-a'})
       export class CmpA {
@@ -649,9 +649,6 @@ describe('parse props', () => {
         @Prop()
         get val() {
           return this._boolVal;
-        };
-        set val(newVal: boolean) {
-          this._boolVal = newVal;
         };
       }
     `);
@@ -675,10 +672,89 @@ describe('parse props', () => {
         required: false,
         type: 'boolean',
         getter: true,
-        setter: true,
+        setter: false,
       },
     });
     expect(t.property?.type).toBe('boolean');
+    expect(t.property?.attribute).toBe('val');
+  });
+
+  it('should correctly parse a get / set prop with an inferred enum type', () => {
+    const t = transpileModule(`
+    export enum Mode {
+      DEFAULT = 'default'
+    }
+    @Component({tag: 'cmp-a'})
+      export class CmpA {
+        private _val: Mode;
+        @Prop()
+        get val() {
+          return this._val;
+        };
+      }
+    `);
+
+    // Using the `properties` array directly here since the `transpileModule`
+    // method doesn't like the top-level enum export with the current `target` and
+    // `module` values for the tsconfig
+    expect(t.properties[0]).toEqual({
+      name: 'val',
+      type: 'string',
+      attribute: 'val',
+      reflect: false,
+      mutable: false,
+      required: false,
+      optional: false,
+      defaultValue: undefined,
+      complexType: {
+        original: 'Mode',
+        resolved: 'Mode',
+        references: {
+          Mode: { location: 'local', path: 'module.tsx', id: 'module.tsx::Mode' },
+        },
+      },
+      docs: { tags: [], text: '' },
+      internal: false,
+      getter: true,
+      setter: false,
+    });
+  });
+
+  it('should not infer type from `get()` property access expression when getter type is explicit', () => {
+    const t = transpileModule(`
+      @Component({tag: 'cmp-a'})
+      export class CmpA {
+        private _boolVal: boolean = false;
+        @Prop()
+        get val(): string {
+          return this._boolVal;
+        };
+      }
+    `);
+
+    expect(getStaticGetter(t.outputText, 'properties')).toEqual({
+      val: {
+        attribute: 'val',
+        complexType: {
+          references: {},
+          resolved: 'string',
+          original: 'string',
+        },
+        docs: {
+          text: '',
+          tags: [],
+        },
+        defaultValue: `false`,
+        mutable: false,
+        optional: false,
+        reflect: false,
+        required: false,
+        type: 'string',
+        getter: true,
+        setter: false,
+      },
+    });
+    expect(t.property?.type).toBe('string');
     expect(t.property?.attribute).toBe('val');
   });
 });
