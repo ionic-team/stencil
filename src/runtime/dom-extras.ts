@@ -1,15 +1,12 @@
 import { BUILD } from '@app-data';
 import { getHostRef, plt, supportsShadow } from '@platform';
-import { CMP_FLAGS, HOST_FLAGS, NODE_TYPES } from '@utils/constants';
+import { HOST_FLAGS, NODE_TYPES } from '@utils/constants';
 
 import type * as d from '../declarations';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { insertBefore, updateFallbackSlotVisibility } from './vdom/vdom-render';
 
-export const patchPseudoShadowDom = (
-  hostElementPrototype: HTMLElement,
-  descriptorPrototype: d.ComponentRuntimeMeta,
-) => {
+export const patchPseudoShadowDom = (hostElementPrototype: HTMLElement) => {
   patchCloneNode(hostElementPrototype);
   patchSlotAppendChild(hostElementPrototype);
   patchSlotAppend(hostElementPrototype);
@@ -18,7 +15,7 @@ export const patchPseudoShadowDom = (
   patchSlotInsertAdjacentHTML(hostElementPrototype);
   patchSlotInsertAdjacentText(hostElementPrototype);
   patchTextContent(hostElementPrototype);
-  patchChildSlotNodes(hostElementPrototype, descriptorPrototype);
+  patchChildSlotNodes(hostElementPrototype);
   patchSlotRemoveChild(hostElementPrototype);
 };
 
@@ -368,48 +365,42 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
   }
 };
 
-export const patchChildSlotNodes = (elm: HTMLElement, cmpMeta: d.ComponentRuntimeMeta) => {
+export const patchChildSlotNodes = (elm: HTMLElement) => {
   class FakeNodeList extends Array {
     item(n: number) {
       return this[n];
     }
   }
-  // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
-  if (cmpMeta.$flags$ & CMP_FLAGS.needsShadowDomShim) {
-    const childNodesFn = (elm as any).__lookupGetter__('childNodes');
+  const childNodesFn = (elm as any).__lookupGetter__('childNodes');
 
-    Object.defineProperty(elm, 'children', {
-      get() {
-        return this.childNodes.map((n: any) => n.nodeType === 1);
-      },
-    });
+  Object.defineProperty(elm, 'children', {
+    get() {
+      return this.childNodes.map((n: any) => n.nodeType === 1);
+    },
+  });
 
-    Object.defineProperty(elm, 'childElementCount', {
-      get() {
-        return elm.children.length;
-      },
-    });
+  Object.defineProperty(elm, 'childElementCount', {
+    get() {
+      return elm.children.length;
+    },
+  });
 
-    Object.defineProperty(elm, 'childNodes', {
-      get() {
-        const childNodes = childNodesFn.call(this) as NodeListOf<d.RenderNode>;
-        if (
-          (plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 &&
-          getHostRef(this).$flags$ & HOST_FLAGS.hasRendered
-        ) {
-          const result = new FakeNodeList();
-          for (let i = 0; i < childNodes.length; i++) {
-            const slot = childNodes[i]['s-nr'];
-            if (slot) {
-              result.push(slot);
-            }
+  Object.defineProperty(elm, 'childNodes', {
+    get() {
+      const childNodes = childNodesFn.call(this) as NodeListOf<d.RenderNode>;
+      if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 && getHostRef(this).$flags$ & HOST_FLAGS.hasRendered) {
+        const result = new FakeNodeList();
+        for (let i = 0; i < childNodes.length; i++) {
+          const slot = childNodes[i]['s-nr'];
+          if (slot) {
+            result.push(slot);
           }
-          return result;
         }
-        return FakeNodeList.from(childNodes);
-      },
-    });
-  }
+        return result;
+      }
+      return FakeNodeList.from(childNodes);
+    },
+  });
 };
 
 /**
