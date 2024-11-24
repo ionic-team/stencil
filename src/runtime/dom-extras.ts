@@ -1,6 +1,6 @@
 import { BUILD } from '@app-data';
 import { getHostRef, plt, supportsShadow } from '@platform';
-import { HOST_FLAGS, NODE_TYPES } from '@utils/constants';
+import { HOST_FLAGS } from '@utils/constants';
 
 import type * as d from '../declarations';
 import { PLATFORM_FLAGS } from './runtime-constants';
@@ -46,10 +46,11 @@ export const patchCloneNode = (HostElementPrototype: HTMLElement) => {
         's-rf',
         's-scs',
       ];
+      const childNodes = (this as any).__childNodes || this.childNodes;
 
-      for (; i < srcNode.childNodes.length; i++) {
-        slotted = (srcNode.childNodes[i] as any)['s-nr'];
-        nonStencilNode = stencilPrivates.every((privateField) => !(srcNode.childNodes[i] as any)[privateField]);
+      for (; i < childNodes.length; i++) {
+        slotted = (childNodes[i] as any)['s-nr'];
+        nonStencilNode = stencilPrivates.every((privateField) => !(childNodes[i] as any)[privateField]);
         if (slotted) {
           if (BUILD.appendChildSlotFix && (clonedNode as any).__appendChild) {
             (clonedNode as any).__appendChild(slotted.cloneNode(true));
@@ -58,7 +59,7 @@ export const patchCloneNode = (HostElementPrototype: HTMLElement) => {
           }
         }
         if (nonStencilNode) {
-          clonedNode.appendChild((srcNode.childNodes[i] as any).cloneNode(true));
+          clonedNode.appendChild((childNodes[i] as any).cloneNode(true));
         }
       }
     }
@@ -78,13 +79,9 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
   HostElementPrototype.appendChild = function (this: d.RenderNode, newChild: d.RenderNode) {
     const slotName = (newChild['s-sn'] = getSlotName(newChild));
-    const slotNode = getHostSlotNode(this.childNodes, slotName, this.tagName);
+    const slotNode = getHostSlotNode((this as any).__childNodes || this.childNodes, slotName, this.tagName);
     if (slotNode) {
-      const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
-      slotPlaceholder['s-nr'] = newChild;
-      (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
-      newChild['s-ol'] = slotPlaceholder;
-      newChild['s-sh'] = slotNode['s-hn'];
+      addSlotRelocateNode(newChild, slotNode);
 
       const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
@@ -108,22 +105,17 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
  */
 const patchSlotRemoveChild = (ElementPrototype: any) => {
   ElementPrototype.__removeChild = ElementPrototype.removeChild;
+
   ElementPrototype.removeChild = function (this: d.RenderNode, toRemove: d.RenderNode) {
     if (toRemove && typeof toRemove['s-sn'] !== 'undefined') {
-      const slotNode = getHostSlotNode(this.childNodes, toRemove['s-sn'], this.tagName);
-      if (slotNode) {
-        // Get all slot content
-        const slotChildNodes = getHostSlotChildNodes(slotNode, toRemove['s-sn']);
-        // See if any of the slotted content matches the node to remove
-        const existingNode = slotChildNodes.find((n) => n === toRemove);
-
-        if (existingNode) {
-          existingNode.remove();
-          // Check if there is fallback content that should be displayed if that
-          // was the last node in the slot
-          updateFallbackSlotVisibility(this);
-          return;
-        }
+      const childNodes = (this as any).__childNodes || this.childNodes;
+      const slotNode = getHostSlotNode(childNodes, toRemove['s-sn'], this.tagName);
+      if (slotNode && toRemove.isConnected) {
+        toRemove.remove();
+        // Check if there is fallback content that should be displayed if that
+        // was the last node in the slot
+        updateFallbackSlotVisibility(this);
+        return;
       }
     }
     return (this as any).__removeChild(toRemove);
@@ -136,7 +128,7 @@ const patchSlotRemoveChild = (ElementPrototype: any) => {
  * @param HostElementPrototype the `Element` to be patched
  */
 export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
-  const originalPrepend = HostElementPrototype.prepend;
+  (HostElementPrototype as any).__prepend = HostElementPrototype.prepend;
 
   HostElementPrototype.prepend = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
@@ -144,14 +136,10 @@ export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
         newChild = this.ownerDocument.createTextNode(newChild) as unknown as d.RenderNode;
       }
       const slotName = (newChild['s-sn'] = getSlotName(newChild));
-      const slotNode = getHostSlotNode(this.childNodes, slotName, this.tagName);
+      const childNodes = (this as any).__childNodes || this.childNodes;
+      const slotNode = getHostSlotNode(childNodes, slotName, this.tagName);
       if (slotNode) {
-        const slotPlaceholder: d.RenderNode = document.createTextNode('') as any;
-        slotPlaceholder['s-nr'] = newChild;
-        (slotNode['s-cr'].parentNode as any).__appendChild(slotPlaceholder);
-        newChild['s-ol'] = slotPlaceholder;
-        newChild['s-sh'] = slotNode['s-hn'];
-
+        addSlotRelocateNode(newChild, slotNode, true);
         const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
         const appendAfter = slotChildNodes[0];
         return insertBefore(appendAfter.parentNode, newChild, appendAfter.nextSibling);
@@ -161,7 +149,7 @@ export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
         newChild.hidden = true;
       }
 
-      return originalPrepend.call(this, newChild);
+      return (HostElementPrototype as any).__prepend(newChild);
     });
   };
 };
@@ -173,6 +161,7 @@ export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
  * @param HostElementPrototype the `Element` to be patched
  */
 export const patchSlotAppend = (HostElementPrototype: HTMLElement) => {
+  (HostElementPrototype as any).__append = HostElementPrototype.append;
   HostElementPrototype.append = function (this: d.HostElement, ...newChildren: (d.RenderNode | string)[]) {
     newChildren.forEach((newChild: d.RenderNode | string) => {
       if (typeof newChild === 'string') {
@@ -260,166 +249,130 @@ export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement
  * @param hostElementPrototype the `Element` to be patched
  */
 export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
-  const descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
+  let descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
+  let toOverride = Node.prototype;
 
-  Object.defineProperty(hostElementPrototype, '__textContent', descriptor);
-
-  if (BUILD.experimentalScopedSlotChanges) {
-    // Patch `textContent` to mimic shadow root behavior
-    Object.defineProperty(hostElementPrototype, 'textContent', {
-      // To mimic shadow root behavior, we need to return the text content of all
-      // nodes in a slot reference node
-      get(): string | null {
-        const slotRefNodes = getAllChildSlotNodes(this.childNodes);
-
-        const textContent = slotRefNodes
-          .map((node) => {
-            const text = [];
-
-            // Need to get the text content of all nodes in the slot reference node
-            let slotContent = node.nextSibling as d.RenderNode | null;
-            while (slotContent && slotContent['s-sn'] === node['s-sn']) {
-              if (slotContent.nodeType === NODE_TYPES.TEXT_NODE || slotContent.nodeType === NODE_TYPES.ELEMENT_NODE) {
-                text.push(slotContent.textContent?.trim() ?? '');
-              }
-              slotContent = slotContent.nextSibling as d.RenderNode | null;
-            }
-
-            return text.filter((ref) => ref !== '').join(' ');
-          })
-          .filter((text) => text !== '')
-          .join(' ');
-
-        // Pad the string to return
-        return ' ' + textContent + ' ';
-      },
-
-      // To mimic shadow root behavior, we need to overwrite all nodes in a slot
-      // reference node. If a default slot reference node exists, the text content will be
-      // placed there. Otherwise, the new text node will be hidden
-      set(value: string | null) {
-        const slotRefNodes = getAllChildSlotNodes(this.childNodes);
-
-        slotRefNodes.forEach((node) => {
-          // Remove the existing content of the slot
-          let slotContent = node.nextSibling as d.RenderNode | null;
-          while (slotContent && slotContent['s-sn'] === node['s-sn']) {
-            const tmp = slotContent;
-            slotContent = slotContent.nextSibling as d.RenderNode | null;
-            tmp.remove();
-          }
-
-          // If this is a default slot, add the text node in the slot location.
-          // Otherwise, destroy the slot reference node
-          if (node['s-sn'] === '') {
-            const textNode = this.ownerDocument.createTextNode(value);
-            textNode['s-sn'] = '';
-            insertBefore(node.parentElement, textNode, node.nextSibling);
-          } else {
-            node.remove();
-          }
-        });
-      },
-    });
-  } else {
-    Object.defineProperty(hostElementPrototype, 'textContent', {
-      get(): string | null {
-        // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
-        // the empty string
-        const slotNode = getHostSlotNode(this.childNodes, '', this.tagName);
-        // when a slot node is found, the textContent _may_ be found in the next sibling (text) node, depending on how
-        // nodes were reordered during the vdom render. first try to get the text content from the sibling.
-        if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
-          return slotNode.nextSibling.textContent;
-        } else if (slotNode) {
-          return slotNode.textContent;
-        } else {
-          // fallback to the original implementation
-          return this.__textContent;
-        }
-      },
-
-      set(value: string | null) {
-        // get the 'default slot', which would be the first slot in a shadow tree (if we were using one), whose name is
-        // the empty string
-        const slotNode = getHostSlotNode(this.childNodes, '', this.tagName);
-        // when a slot node is found, the textContent _may_ need to be placed in the next sibling (text) node,
-        // depending on how nodes were reordered during the vdom render. first try to set the text content on the
-        // sibling.
-        if (slotNode?.nextSibling?.nodeType === NODE_TYPES.TEXT_NODE) {
-          slotNode.nextSibling.textContent = value;
-        } else if (slotNode) {
-          slotNode.textContent = value;
-        } else {
-          // we couldn't find a slot, but that doesn't mean that there isn't one. if this check ran before the DOM
-          // loaded, we could have missed it. check for a content reference element on the scoped component and insert
-          // it there
-          this.__textContent = value;
-          const contentRefElm = this['s-cr'];
-          if (contentRefElm) {
-            insertBefore(this, contentRefElm, this.firstChild);
-          }
-        }
-      },
-    });
+  if (!descriptor) {
+    // for mock-doc
+    descriptor = Object.getOwnPropertyDescriptor(hostElementPrototype, 'textContent');
+    toOverride = hostElementPrototype;
   }
+
+  if (descriptor) Object.defineProperty(toOverride, '__textContent', descriptor);
+
+  Object.defineProperty(hostElementPrototype, 'textContent', {
+    get: function () {
+      let text = '';
+      const childNodes = this.__childNodes ? this.childNodes : getSlottedChildNodes(this.childNodes);
+      childNodes.forEach((node: d.RenderNode) => (text += node.textContent || ''));
+      return text;
+    },
+    set: function (value) {
+      const childNodes = this.__childNodes ? this.childNodes : getSlottedChildNodes(this.childNodes);
+      childNodes.forEach((node: d.RenderNode) => {
+        if (node['s-ol']) node['s-ol'].remove();
+        node.remove();
+      });
+      this.insertAdjacentHTML('beforeend', value);
+    },
+  });
 };
 
 export const patchChildSlotNodes = (elm: HTMLElement) => {
+  let childNodesFn = Object.getOwnPropertyDescriptor(Node.prototype, 'childNodes');
+  let toOverride = Node.prototype;
+
   class FakeNodeList extends Array {
     item(n: number) {
       return this[n];
     }
   }
-  const childNodesFn = (elm as any).__lookupGetter__('childNodes');
+
+  if (!childNodesFn) {
+    // for mock-doc
+    childNodesFn = Object.getOwnPropertyDescriptor(elm, 'childNodes');
+    toOverride = elm;
+  }
+
+  if (childNodesFn) Object.defineProperty(toOverride, '__childNodes', childNodesFn);
 
   Object.defineProperty(elm, 'children', {
     get() {
-      return this.childNodes.map((n: any) => n.nodeType === 1);
+      return this.childNodes.filter((n: any) => n.nodeType === 1);
     },
   });
 
   Object.defineProperty(elm, 'childElementCount', {
     get() {
-      return elm.children.length;
+      return this.children.length;
     },
   });
 
+  if (!childNodesFn) return;
+
   Object.defineProperty(elm, 'childNodes', {
     get() {
-      const childNodes = childNodesFn.call(this) as NodeListOf<d.RenderNode>;
-      if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 && getHostRef(this).$flags$ & HOST_FLAGS.hasRendered) {
+      if (
+        !plt.$flags$ ||
+        !getHostRef(this)?.$flags$ ||
+        ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0 && getHostRef(this)?.$flags$ & HOST_FLAGS.hasRendered)
+      ) {
         const result = new FakeNodeList();
-        for (let i = 0; i < childNodes.length; i++) {
-          const slot = childNodes[i]['s-nr'];
-          if (slot) {
-            result.push(slot);
-          }
-        }
+        const nodes = getSlottedChildNodes(this.__childNodes);
+        result.push(...nodes);
         return result;
       }
-      return FakeNodeList.from(childNodes);
+      return FakeNodeList.from(this.__childNodes);
     },
   });
 };
 
-/**
- * Recursively finds all slot reference nodes ('s-sr') in a series of child nodes.
- *
- * @param childNodes The set of child nodes to search for slot reference nodes.
- * @returns An array of slot reference nodes.
- */
-const getAllChildSlotNodes = (childNodes: NodeListOf<ChildNode>): d.RenderNode[] => {
-  const slotRefNodes = [];
+/// UTILS ///
 
-  for (const childNode of Array.from(childNodes) as d.RenderNode[]) {
-    if (childNode['s-sr']) {
-      slotRefNodes.push(childNode);
-    }
-    slotRefNodes.push(...getAllChildSlotNodes(childNode.childNodes));
+/**
+ * Creates an empty text node to act as a forwarding address to a slotted node:
+ * 1) When non-shadow components re-render, they need a place to temporarily put 'lightDOM' elements.
+ * 2) Patched dom methods and accessors use this node to calculate what 'lightDOM' nodes are in the host.
+ * @param newChild a node that's going to be added to the component
+ * @param slotNode the slot node that the node will be added to
+ * @param prepend move the slotted location node to the beginning of the host
+ *  (the order of the slot location nodes determines the order of the slotted nodes in our patched accessors)
+ */
+export const addSlotRelocateNode = (newChild: d.RenderNode, slotNode: d.RenderNode, prepend?: boolean) => {
+  let slottedNodeLocation: d.RenderNode;
+  // does newChild already have a slot location node?
+  if (newChild['s-ol'] && newChild['s-ol'].isConnected) {
+    slottedNodeLocation = newChild['s-ol'];
+  } else {
+    slottedNodeLocation = document.createTextNode('') as any;
+    slottedNodeLocation['s-nr'] = newChild;
   }
 
-  return slotRefNodes;
+  const parent = slotNode['s-cr'].parentNode as any;
+  const appendMethod = prepend ? parent.__prepend : parent.__appendChild;
+
+  newChild['s-ol'] = slottedNodeLocation;
+  newChild['s-sh'] = slotNode['s-hn'];
+
+  appendMethod.call(parent, slottedNodeLocation);
+};
+
+/**
+ * Get's the child nodes of a component that are actually slotted.
+ * This is only required until all patches are unified
+ * either under 'experimentalSlotFixes' or on by default
+ * @param childNodes all 'internal' child nodes of the component
+ * @returns An array of slotted reference nodes.
+ */
+const getSlottedChildNodes = (childNodes: NodeListOf<d.RenderNode>) => {
+  const result = [];
+  for (let i = 0; i < childNodes.length; i++) {
+    const slottedNode = childNodes[i]['s-nr'];
+    if (slottedNode && slottedNode.isConnected) {
+      result.push(slottedNode);
+    }
+  }
+  return result;
 };
 
 const getSlotName = (node: d.RenderNode) =>

@@ -195,8 +195,12 @@ const relocateToHostRoot = (parentElm: Element) => {
 
   const host = parentElm.closest(hostTagName.toLowerCase());
   if (host != null) {
-    const contentRefNode = (Array.from(host.childNodes) as d.RenderNode[]).find((ref) => ref['s-cr']);
-    const childNodeArray = Array.from(parentElm.childNodes) as d.RenderNode[];
+    const contentRefNode = (Array.from((host as d.RenderNode).__childNodes || host.childNodes) as d.RenderNode[]).find(
+      (ref) => ref['s-cr'],
+    );
+    const childNodeArray = Array.from(
+      (parentElm as d.RenderNode).__childNodes || parentElm.childNodes,
+    ) as d.RenderNode[];
 
     // If we have a content ref, we need to invert the order of the nodes we're relocating
     // to preserve the correct order of elements in the DOM on future relocations
@@ -219,7 +223,7 @@ const relocateToHostRoot = (parentElm: Element) => {
 
 const putBackInOriginalLocation = (parentElm: d.RenderNode, recursive: boolean) => {
   plt.$flags$ |= PLATFORM_FLAGS.isTmpDisconnected;
-  const oldSlotChildNodes: ChildNode[] = Array.from(parentElm.childNodes);
+  const oldSlotChildNodes: ChildNode[] = Array.from(parentElm.__childNodes || parentElm.childNodes);
 
   if (parentElm['s-sr'] && BUILD.experimentalSlotFixes) {
     let node = parentElm;
@@ -741,7 +745,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
  * @param elm the element of interest
  */
 export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
-  const childNodes: d.RenderNode[] = elm.childNodes as any;
+  const childNodes: d.RenderNode[] = elm.__childNodes || (elm.childNodes as any);
 
   for (const childNode of childNodes) {
     if (childNode.nodeType === NODE_TYPE.ElementNode) {
@@ -812,13 +816,14 @@ const markSlotContentForRelocation = (elm: d.RenderNode) => {
   let hostContentNodes: NodeList;
   let j;
 
-  for (const childNode of elm.childNodes as unknown as d.RenderNode[]) {
+  const children = elm.__childNodes || elm.childNodes;
+  for (const childNode of children as unknown as d.RenderNode[]) {
     // we need to find child nodes which are slot references so we can then try
     // to match them up with nodes that need to be relocated
     if (childNode['s-sr'] && (node = childNode['s-cr']) && node.parentNode) {
       // first get the content reference comment node ('s-cr'), then we get
       // its parent, which is where all the host content is now
-      hostContentNodes = node.parentNode.childNodes;
+      hostContentNodes = (node.parentNode as d.RenderNode).__childNodes || node.parentNode.childNodes;
       const slotName = childNode['s-sn'];
 
       // iterate through all the nodes under the location where the host was
@@ -992,7 +997,7 @@ const updateElementScopeIds = (element: d.RenderNode, parent: d.RenderNode, iter
          * So, we need to notify the child nodes to update their new scope ids since
          * the DOM structure is changed.
          */
-        for (const childNode of Array.from(element.childNodes)) {
+        for (const childNode of Array.from(element.__childNodes || element.childNodes)) {
           updateElementScopeIds(childNode as d.RenderNode, element, true);
         }
       }
@@ -1235,7 +1240,8 @@ render() {
   // Only an issue if there were no "slots" rendered. Otherwise, nodes are hidden correctly.
   // This _only_ happens for `scoped` components!
   if (BUILD.experimentalScopedSlotChanges && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
-    for (const childNode of rootVnode.$elm$.childNodes) {
+    const children = rootVnode.$elm$.__childNodes || rootVnode.$elm$.childNodes;
+    for (const childNode of children) {
       if (childNode['s-hn'] !== hostTagName && !childNode['s-sh']) {
         // Store the initial value of `hidden` so we can reset it later when
         // moving nodes around.
