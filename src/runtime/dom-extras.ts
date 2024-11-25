@@ -389,6 +389,18 @@ export const patchChildSlotNodes = (elm: HTMLElement, cmpMeta: d.ComponentRuntim
         return elm.children.length;
       },
     });
+    
+    Object.defineProperty(elm, 'firstChild', {
+      get() {
+        return this.childNodes[0];
+      },
+    });
+
+    Object.defineProperty(elm, 'lastChild', {
+      get() {
+        return this.childNodes[this.childNodes.length - 1];
+      },
+    });
 
     Object.defineProperty(elm, 'childNodes', {
       get() {
@@ -410,6 +422,149 @@ export const patchChildSlotNodes = (elm: HTMLElement, cmpMeta: d.ComponentRuntim
       },
     });
   }
+};
+
+/**
+ * Patches sibling accessors of a 'slotted' node within a non-shadow component.
+ * Meaning whilst stepping through a non-shadow element's nodes, only the mock 'lightDOM' nodes are returned.
+ * Especially relevant when rendering components via SSR... Frameworks will often try to reconcile their 
+ * VDOM with the real DOM by stepping through nodes with 'nextSibling' et al.
+ * - `nextSibling`
+ * - `nextSiblingElement`
+ * - `previousSibling`
+ * - `previousSiblingElement`
+ * @param NodePrototype the slotted node to be patched
+ */
+export const patchNextPrev = (node: any) => {
+  if (!node || (node as any).__nextSibling || !globalThis.Node) return;
+
+  patchNextSibling(node);
+  patchPreviousSibling(node);
+  patchNextElementSibling(node);
+  patchPreviousElementSibling(node);
+};
+
+/**
+ * Patches the `nextSibling` accessor of a non-shadow slotted node
+ * @param node the slotted node to be patched
+ * Required during during testing / mock environnement.
+ */
+const patchNextSibling = (node: Node) => {
+  // already been patched? return
+  if (!node || (node as any).__nextSibling) return;
+
+  let descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'nextSibling');
+  let toOverride = Node.prototype;
+
+  if (!descriptor) {
+    // for mock-doc
+    descriptor = Object.getOwnPropertyDescriptor(node, 'nextSibling');
+    toOverride = node;
+  }
+  if (descriptor) Object.defineProperty(toOverride, '__nextSibling', descriptor);
+
+  Object.defineProperty(node, 'nextSibling', {
+    get: function () {
+      const parentNodes = this['s-ol']?.parentNode.childNodes;
+      const index = parentNodes?.indexOf(this);
+      if (parentNodes && index > -1) {
+        return parentNodes[index + 1];
+      }
+      return this.__nextSibling;
+    },
+  });
+};
+
+/**
+ * Patches the `nextElementSibling` accessor of a non-shadow slotted node
+ * @param element the slotted element to be patched
+ * Required during during testing / mock environnement.
+ */
+const patchNextElementSibling = (element: HTMLElement) => {
+  if (!element || (element as any).__nextElementSibling || !element.nextElementSibling) return;
+
+  let descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'nextElementSibling');
+  let toOverride = Node.prototype;
+
+  if (!descriptor) {
+    // for mock-doc
+    descriptor = Object.getOwnPropertyDescriptor(element, 'nextElementSibling');
+    toOverride = element;
+  }
+  if (descriptor) Object.defineProperty(toOverride, '__nextElementSibling', descriptor);
+
+  Object.defineProperty(element, 'nextElementSibling', {
+    get: function () {
+      const parentEles = this['s-ol']?.parentNode.children;
+      const index = parentEles?.indexOf(this);
+      if (parentEles && index > -1) {
+        return parentEles[index + 1];
+      }
+      return this.__nextElementSibling;
+    },
+  });
+};
+
+/**
+ * Patches the `previousSibling` accessor of a non-shadow slotted node
+ * @param element the slotted node to be patched
+ * Required during during testing / mock environnement.
+ */
+const patchPreviousSibling = (node: Node) => {
+  if (!node || (node as any).__previousSibling) return;
+
+  let descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'previousSibling');
+  let toOverride = Node.prototype;
+
+  if (!descriptor) {
+    // for mock-doc
+    descriptor = Object.getOwnPropertyDescriptor(node, 'previousSibling');
+    toOverride = node;
+  }
+  if (descriptor) Object.defineProperty(toOverride, '__previousSibling', descriptor);
+
+  Object.defineProperty(node, 'previousSibling', {
+    get: function () {
+      const parentNodes = this['s-ol']?.parentNode.childNodes;
+      const index = parentNodes?.indexOf(this);
+      if (parentNodes && index > -1) {
+        return parentNodes[index - 1];
+      }
+      return this.__previousSibling;
+    },
+  });
+};
+
+/**
+ * Patches the `previousElementSibling` accessor of a non-shadow slotted node
+ * @param ElementPrototype the slotted node to be patched
+ * @param DescriptorNodePrototype optional. Where to find the OG descriptor for `previousElementSibling`.
+ * Required during during testing / mock environnement.
+ */
+const patchPreviousElementSibling = (element: HTMLElement) => {
+  if (!element || (element as any).__previousElementSibling || !element.previousElementSibling)
+    return;
+
+  let descriptor = Object.getOwnPropertyDescriptor(Element.prototype, 'previousElementSibling');
+  let toOverride = Node.prototype;
+
+  if (!descriptor) {
+    // for mock-doc
+    descriptor = Object.getOwnPropertyDescriptor(element, 'previousElementSibling');
+    toOverride = element;
+  }
+  if (descriptor) Object.defineProperty(toOverride, '__previousElementSibling', descriptor);
+
+  Object.defineProperty(element, 'previousElementSibling', {
+    get: function () {
+      const parentNodes = this['s-ol']?.parentNode.children;
+      const index = parentNodes?.indexOf(this);
+      if (parentNodes && index > -1) {
+        return parentNodes[index - 1];
+      }
+      return this.__previousElementSibling;
+    },
+  });
 };
 
 /**
