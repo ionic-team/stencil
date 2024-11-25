@@ -250,15 +250,12 @@ export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement
  */
 export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
   let descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
-  let toOverride = Node.prototype;
 
   if (!descriptor) {
     // for mock-doc
     descriptor = Object.getOwnPropertyDescriptor(hostElementPrototype, 'textContent');
-    toOverride = hostElementPrototype;
   }
-
-  if (descriptor) Object.defineProperty(toOverride, '__textContent', descriptor);
+  if (descriptor) Object.defineProperty(hostElementPrototype, '__textContent', descriptor);
 
   Object.defineProperty(hostElementPrototype, 'textContent', {
     get: function () {
@@ -279,22 +276,19 @@ export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
 };
 
 export const patchChildSlotNodes = (elm: HTMLElement) => {
-  let childNodesFn = Object.getOwnPropertyDescriptor(Node.prototype, 'childNodes');
-  let toOverride = Node.prototype;
-
   class FakeNodeList extends Array {
     item(n: number) {
       return this[n];
     }
   }
 
+  let childNodesFn = Object.getOwnPropertyDescriptor(Node.prototype, 'childNodes');
   if (!childNodesFn) {
     // for mock-doc
     childNodesFn = Object.getOwnPropertyDescriptor(elm, 'childNodes');
-    toOverride = elm;
   }
 
-  if (childNodesFn) Object.defineProperty(toOverride, '__childNodes', childNodesFn);
+  if (childNodesFn) Object.defineProperty(elm, '__childNodes', childNodesFn);
 
   Object.defineProperty(elm, 'children', {
     get() {
