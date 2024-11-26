@@ -10,7 +10,7 @@ describe('dom-extras - patches for non-shadow dom methods and accessors', () => 
     return (node as Element)?.outerHTML || node?.nodeValue.trim();
   };
 
-  beforeAll(async () => {
+  beforeEach(async () => {
     @Component({
       tag: 'cmp-a',
       scoped: true,
