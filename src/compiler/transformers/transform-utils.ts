@@ -1049,7 +1049,10 @@ const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
  * @param typeChecker a reference to the {@link ts.TypeChecker}
  * @returns the name of the property in string form
  */
-export const tsPropDeclNameAsString = (node: ts.PropertyDeclaration, typeChecker: ts.TypeChecker): string => {
+export const tsPropDeclNameAsString = (
+  node: ts.PropertyDeclaration | ts.GetAccessorDeclaration,
+  typeChecker: ts.TypeChecker,
+): string => {
   const declarationName: ts.DeclarationName = ts.getNameOfDeclaration(node);
 
   // The name of a class field declaration can be a computed property name,

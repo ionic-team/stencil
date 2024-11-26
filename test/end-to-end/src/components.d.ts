@@ -111,7 +111,12 @@ export namespace Components {
     interface PrerenderCmp {
     }
     interface PropCmp {
+        "clothes": string;
         "first": string;
+        /**
+          * @readonly
+         */
+        "fullName": string;
         "lastName": string;
         /**
           * Mode
@@ -545,7 +550,12 @@ declare namespace LocalJSX {
     interface PrerenderCmp {
     }
     interface PropCmp {
+        "clothes"?: string;
         "first"?: string;
+        /**
+          * @readonly
+         */
+        "fullName"?: string;
         "lastName"?: string;
         /**
           * Mode

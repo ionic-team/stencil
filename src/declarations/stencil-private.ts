@@ -684,6 +684,8 @@ export interface ComponentCompilerStaticProperty {
   reflect?: boolean;
   docs: CompilerJsDoc;
   defaultValue?: string;
+  getter: boolean;
+  setter: boolean;
 }
 
 /**
