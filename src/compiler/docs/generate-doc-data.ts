@@ -204,6 +204,9 @@ const getRealProperties = (properties: d.ComponentCompilerProperty[]): d.JsonDoc
 
       optional: member.optional,
       required: member.required,
+
+      getter: member.getter,
+      setter: member.setter,
     }));
 };
 
@@ -227,6 +230,9 @@ const getVirtualProperties = (virtualProps: d.ComponentCompilerVirtualProperty[]
 
     optional: true,
     required: false,
+
+    getter: undefined,
+    setter: undefined,
   }));
 };
 

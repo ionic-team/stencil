@@ -316,6 +316,14 @@ export interface JsonDocsProp {
    * ```
    */
   required: boolean;
+  /**
+   * `true` if the prop has a `get()`. `false` otherwise
+   */
+  getter: boolean;
+  /**
+   * `true` if the prop has a `set()`. `false` otherwise
+   */
+  setter: boolean;
 }
 export interface JsonDocsMethod {
   name: string;

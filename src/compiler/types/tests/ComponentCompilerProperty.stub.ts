@@ -31,6 +31,8 @@ export const stubComponentCompilerProperty = (
     reflect: false,
     required: false,
     type: 'number',
+    getter: undefined,
+    setter: undefined,
   };
 
   return { ...defaults, ...overrides };
