@@ -171,11 +171,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
         // This check is intentionally not combined with the surrounding `experimentalSlotFixes` check
         // since, moving forward, we only want to patch the pseudo shadow DOM when the component is scoped
         if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
-          patchPseudoShadowDom(HostElement.prototype, cmpMeta);
+          patchPseudoShadowDom(HostElement.prototype);
         }
       } else {
         if (BUILD.slotChildNodesFix) {
-          patchChildSlotNodes(HostElement.prototype, cmpMeta);
+          patchChildSlotNodes(HostElement.prototype);
         }
         if (BUILD.cloneNodeFix) {
           patchCloneNode(HostElement.prototype);

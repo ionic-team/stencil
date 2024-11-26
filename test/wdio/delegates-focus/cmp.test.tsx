@@ -25,8 +25,8 @@ describe('delegates-focus', function () {
   });
 
   it('should delegate focus', async () => {
-    await $('delegates-focus').waitForExist();
-    await $('no-delegates-focus').waitForExist();
+    await $('delegates-focus.hydrated').waitForExist();
+    await $('no-delegates-focus.hydrated').waitForExist();
 
     const delegatesFocus = document.querySelector('delegates-focus');
     const noDelegatesFocus = document.querySelector('no-delegates-focus');

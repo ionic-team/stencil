@@ -10,6 +10,7 @@ describe('attribute-boolean', () => {
   });
 
   it('button click rerenders', async () => {
+    await $('attribute-boolean-root.hydrated').waitForExist();
     const root: any = document.body.querySelector('attribute-boolean-root')!;
     await expect($(root)).toHaveAttribute('aria-hidden', 'false');
     await expect(root).toHaveAttribute('aria-hidden', 'false');

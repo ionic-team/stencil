@@ -10,6 +10,7 @@ describe('attribute-basic', () => {
   });
 
   it('button click rerenders', async () => {
+    await $('attribute-basic.hydrated').waitForExist();
     await expect($('.single')).toHaveText('single');
     await expect($('.multiWord')).toHaveText('multiWord');
     await expect($('.customAttr')).toHaveText('my-custom-attr');
