@@ -1436,6 +1436,12 @@ export interface RenderNode extends HostElement {
   ['s-nr']?: RenderNode;
 
   /**
+   * Original Order:
+   * During SSR; a number representing the order of a slotted node
+   */
+  ['s-oo']?: number;
+
+  /**
    * Scope Id
    */
   ['s-si']?: string;
