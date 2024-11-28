@@ -334,10 +334,10 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
  *  (the order of the slot location nodes determines the order of the slotted nodes in our patched accessors)
  */
 export const addSlotRelocateNode = (
-  newChild: d.RenderNode, 
-  slotNode: d.RenderNode, 
-  prepend?: boolean, 
-  position?: number
+  newChild: d.RenderNode,
+  slotNode: d.RenderNode,
+  prepend?: boolean,
+  position?: number,
 ) => {
   let slottedNodeLocation: d.RenderNode;
   // does newChild already have a slot location node?
@@ -351,7 +351,7 @@ export const addSlotRelocateNode = (
   if (!slotNode['s-cr'] || !slotNode['s-cr'].parentNode) return;
 
   const parent = slotNode['s-cr'].parentNode as any;
-  const appendMethod = prepend ? parent.__prepend : parent.__appendChild;
+  const appendMethod = prepend ? parent.__prepend || parent.prepend : parent.__appendChild || parent.appendChild;
 
   if (typeof position !== 'undefined') {
     if (BUILD.hydrateClientSide) {

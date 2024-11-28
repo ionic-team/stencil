@@ -2,6 +2,7 @@ import { getHostRef } from '@platform';
 
 import type * as d from '../../declarations';
 import {
+  COMMENT_NODE_ID,
   CONTENT_REF_ID,
   DEFAULT_DOC_DATA,
   HYDRATE_CHILD_ID,
@@ -11,7 +12,6 @@ import {
   SLOT_NODE_ID,
   STENCIL_DOC_DATA,
   TEXT_NODE_ID,
-  COMMENT_NODE_ID,
 } from '../runtime-constants';
 import { insertBefore } from './vdom-render';
 
@@ -52,7 +52,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
 
           if (nodeRef.nodeType === NODE_TYPE.ElementNode) {
             nodeRef.setAttribute(HYDRATE_CHILD_ID, childId);
-            if (typeof nodeRef['s-sn'] === 'string') {
+            if (typeof nodeRef['s-sn'] === 'string' && !nodeRef.getAttribute('slot')) {
               nodeRef.setAttribute('s-sn', nodeRef['s-sn']);
             }
           } else if (nodeRef.nodeType === NODE_TYPE.TextNode) {
@@ -230,7 +230,7 @@ const insertChildVNodeAnnotations = (
 
   if (childElm.nodeType === NODE_TYPE.ElementNode) {
     childElm.setAttribute(HYDRATE_CHILD_ID, childId);
-    if (typeof childElm['s-sn'] === 'string') {
+    if (typeof childElm['s-sn'] === 'string' && !childElm.getAttribute('slot')) {
       childElm.setAttribute('s-sn', childElm['s-sn']);
     }
   } else if (childElm.nodeType === NODE_TYPE.TextNode) {

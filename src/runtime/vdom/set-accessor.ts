@@ -11,8 +11,8 @@ import { BUILD } from '@app-data';
 import { isMemberInElement, plt, win } from '@platform';
 import { isComplexType } from '@utils';
 
-import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 import type * as d from '../../declarations';
+import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 /**
  * When running a VDom render set properties present on a VDom node onto the

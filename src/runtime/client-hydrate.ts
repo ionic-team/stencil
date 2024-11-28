@@ -2,8 +2,10 @@ import { BUILD } from '@app-data';
 import { doc, plt } from '@platform';
 
 import type * as d from '../declarations';
+import { addSlotRelocateNode } from './dom-extras';
 import { createTime } from './profile';
 import {
+  COMMENT_NODE_ID,
   CONTENT_REF_ID,
   HYDRATE_CHILD_ID,
   HYDRATE_ID,
@@ -11,10 +13,8 @@ import {
   ORG_LOCATION_ID,
   SLOT_NODE_ID,
   TEXT_NODE_ID,
-  COMMENT_NODE_ID,
 } from './runtime-constants';
 import { newVNode } from './vdom/h';
-import { addSlotRelocateNode } from './dom-extras';
 
 /**
  * Takes an SSR rendered document, as annotated by 'vdom-annotations.ts' and:
@@ -60,7 +60,7 @@ export const initializeClientHydrate = (
     hostElm,
     hostElm,
     hostId,
-    slottedNodes
+    slottedNodes,
   );
 
   let crIndex = 0;
@@ -75,7 +75,7 @@ export const initializeClientHydrate = (
     const orgLocationId = childRenderNode.$hostId$ + '.' + childRenderNode.$nodeId$;
     const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = childRenderNode.$elm$ as d.RenderNode;
-    
+
     if (!shadowRoot) {
       node['s-hn'] = tagName.toUpperCase();
 
@@ -85,7 +85,7 @@ export const initializeClientHydrate = (
         node['s-cr'] = hostElm['s-cr'];
       }
     }
-  
+
     if (orgLocationNode && orgLocationNode.isConnected) {
       if (shadowRoot && orgLocationNode['s-en'] === '') {
         // if this node is within a shadowDOM, with an original location home
@@ -106,7 +106,7 @@ export const initializeClientHydrate = (
     // Remove the original location from the map
     plt.$orgLocNodes$.delete(orgLocationId);
   }
-    
+
   const hosts: d.HostElement[] = [];
   let snIndex = 0;
   const snLen = slottedNodes.length;
@@ -178,7 +178,7 @@ export const initializeClientHydrate = (
       }
     });
   }
-  
+
   hostRef.$hostElement$ = hostElm;
   endHydrate();
 };
@@ -189,7 +189,7 @@ export const initializeClientHydrate = (
  *
  * In addition to constructing the VNode tree, we also track information about the node's descendants:
  * - which are slots
- * - which should exist in the shadow root 
+ * - which should exist in the shadow root
  * - which are nodes that should be rendered as children of the parent node
  *
  * @param parentVNode The vNode representing the parent node.
@@ -247,9 +247,23 @@ const clientHydrate = (
           parentVNode.$children$ = [];
         }
 
-        // Test if this element was 'slotted'. Recreate node attributes
+        // Test if this element was 'slotted' or is a 'slot' (with fallback). Recreate node attributes
         const slotName = childVNode.$elm$.getAttribute('s-sn');
         if (typeof slotName === 'string') {
+          if (childVNode.$tag$ === 'slot-fb') {
+            // This is a slot node. Set it up and find any assigned slotted nodes
+            addSlot(
+              slotName,
+              childIdSplt[2],
+              childVNode,
+              node,
+              parentVNode,
+              childRenderNodes,
+              slotNodes,
+              shadowRootNodes,
+              slottedNodes,
+            );
+          }
           childVNode.$elm$['s-sn'] = slotName;
           childVNode.$elm$.removeAttribute('s-sn');
         }
@@ -306,7 +320,7 @@ const clientHydrate = (
     childIdSplt = node.nodeValue.split('.');
 
     if (childIdSplt[1] === hostId || childIdSplt[1] === '0') {
-      // This comment node for either the host id or a 0 host id (a root component)
+      // A comment node for either this host OR (if 0) a root component
       childNodeType = childIdSplt[0];
 
       childVNode = createSimpleVNode({
@@ -325,14 +339,14 @@ const clientHydrate = (
 
       if (childNodeType === TEXT_NODE_ID) {
         childVNode.$elm$ = node.nextSibling as any;
-        
+
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.TextNode) {
           childVNode.$text$ = childVNode.$elm$.textContent;
           childRenderNodes.push(childVNode);
 
           // Remove the text comment since it's no longer needed
           node.remove();
-          
+
           // Checks to make sure this node actually belongs to this host.
           // If it was slotted from another component, we don't want to add it to this host's VDOM; it can be removed on render reconciliation.
           // We *want* slotting logic to take care of it
@@ -348,10 +362,10 @@ const clientHydrate = (
           }
         }
       } else if (childNodeType === COMMENT_NODE_ID) {
-        // A non-Stencil comment node
         childVNode.$elm$ = node.nextSibling as any;
 
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.CommentNode) {
+          // A non-Stencil comment node
           childRenderNodes.push(childVNode);
 
           // Remove the comment comment since it's no longer needed
@@ -361,77 +375,24 @@ const clientHydrate = (
         // This comment node is specifically for this host id
 
         if (childNodeType === SLOT_NODE_ID) {
-          // Comment refers to a slot node: 
+          // Comment refers to a slot node:
           // `${SLOT_NODE_ID}.${hostId}.${nodeId}.${depth}.${index}.${slotName}`;
           childVNode.$tag$ = 'slot';
 
           // Add the slot name
           const slotName = (node['s-sn'] = childVNode.$name$ = childIdSplt[5] || '');
-          node['s-sr'] = true;
-
-          // Find this slots' current host parent (as dictated by the VDOM tree).
-          // Important because where it is now in the constructed SSR markup might be different to where to *should* be
-          const parentNodeId = parentVNode?.$elm$
-            ? parentVNode.$elm$['s-id'] || parentVNode.$elm$.getAttribute('s-id')
-            : '';
-
-          if (BUILD.shadowDom && shadowRootNodes) {
-            /* SHADOW */
-
-            // Browser supports shadowRoot and this is a shadow dom component; create an actual slot element
-            const slot = (childVNode.$elm$ = doc.createElement(childVNode.$tag$) as d.RenderNode);
-
-            if (childVNode.$name$) {
-              // Add the slot name attribute
-              childVNode.$elm$.setAttribute('name', slotName);
-            }
-
-            if (parentNodeId && parentNodeId !== childVNode.$hostId$) {
-              // Shadow component's slot is placed inside a nested component's shadowDOM; it doesn't belong to this host - it was forwarded by the SSR markup.
-              // Insert it in the root of this host; it's lightDOM. It doesn't really matter where in the host root; the component will take care of it.
-              parentVNode.$elm$.insertBefore(slot, parentVNode.$elm$.children[0]);
-            } else {
-              // Insert the new slot element before the slot comment
-              node.parentNode.insertBefore(childVNode.$elm$, node);
-            }
-            addSlottedNodes(slottedNodes, childIdSplt[2], slotName, node, childVNode.$hostId$);
-
-            // Remove the slot comment since it's not needed for shadow
-            node.remove();
-
-            if (childVNode.$depth$ === '0') {
-              shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
-            }
-          } else {
-            /* NON-SHADOW */
-            const slot = childVNode.$elm$ as d.RenderNode;
-
-            // Test to see if this non-shadow component's mock 'slot' is placed inside a nested component's shadowDOM. If so, it doesn't belong here;
-            // it was forwarded by the SSR markup. So we'll insert it into the root of this host; it's lightDOM with accompanying 'slotted' nodes
-            const shouldMove = parentNodeId && parentNodeId !== childVNode.$hostId$ && parentVNode.$elm$.shadowRoot;
-
-            // attempt to find any mock slotted nodes which we'll move later
-            addSlottedNodes(
-              slottedNodes,
-              childIdSplt[2],
-              slotName,
-              node,
-              shouldMove ? parentNodeId : childVNode.$hostId$
-            );
-
-            if (shouldMove) {
-              // Move slot comment node (to after any other comment nodes)
-              parentVNode.$elm$.insertBefore(slot, parentVNode.$elm$.children[0]);
-            }
-            childRenderNodes.push(childVNode);
-          }
-
-          slotNodes.push(childVNode);
-
-          if (!parentVNode.$children$) {
-            parentVNode.$children$ = [];
-          }
-          parentVNode.$children$[childVNode.$index$ as any] = childVNode;
+          // add the `<slot>` node to the VNode tree and prepare any slotted any child nodes
+          addSlot(
+            slotName,
+            childIdSplt[2],
+            childVNode,
+            node,
+            parentVNode,
+            childRenderNodes,
+            slotNodes,
+            shadowRootNodes,
+            slottedNodes,
+          );
         } else if (childNodeType === CONTENT_REF_ID) {
           // `${CONTENT_REF_ID}.${hostId}`;
           if (BUILD.shadowDom && shadowRootNodes) {
@@ -455,10 +416,10 @@ const clientHydrate = (
 };
 
 /**
- * Recursively locate any comments representing a original location for a node in a node's children or shadowRoot children. 
+ * Recursively locate any comments representing a original location for a node in a node's children or shadowRoot children.
  * Creates a map of component IDs and "Original Location ID's" which are derived from comment nodes placed by 'vdom-annotations.ts'
  * They relate to lightDOM nodes that were moved deeper into the SSR markup. e.g. `<!--o.1-->` maps to `<div c-id="0.1">`
- * 
+ *
  * @param node The node to search.
  * @param orgLocNodes A map of the original location annotations and the current node being searched.
  */
@@ -494,7 +455,7 @@ export const initializeDocumentHydrate = (node: d.RenderNode, orgLocNodes: d.Pla
 
 /**
  * Creates a VNode to add to a hydrated component VDOM
- * 
+ *
  * @param vnode - a vnode partial which will be augmented
  * @returns an complete vnode
  */
@@ -516,10 +477,80 @@ const createSimpleVNode = (vnode: Partial<RenderNodeData>): RenderNodeData => {
   return { ...defaultVNode, ...vnode };
 };
 
+function addSlot(
+  slotName: string,
+  slotId: string,
+  childVNode: RenderNodeData,
+  node: d.RenderNode,
+  parentVNode: d.VNode,
+  childRenderNodes: RenderNodeData[],
+  slotNodes: RenderNodeData[],
+  shadowRootNodes: d.RenderNode[],
+  slottedNodes: SlottedNodes[],
+) {
+  node['s-sr'] = true;
+
+  // Find this slots' current host parent (as dictated by the VDOM tree).
+  // Important because where it is now in the constructed SSR markup might be different to where to *should* be
+  const parentNodeId = parentVNode?.$elm$ ? parentVNode.$elm$['s-id'] || parentVNode.$elm$.getAttribute('s-id') : '';
+
+  if (BUILD.shadowDom && shadowRootNodes) {
+    /* SHADOW */
+
+    // Browser supports shadowRoot and this is a shadow dom component; create an actual slot element
+    const slot = (childVNode.$elm$ = doc.createElement(childVNode.$tag$ as string) as d.RenderNode);
+
+    if (childVNode.$name$) {
+      // Add the slot name attribute
+      childVNode.$elm$.setAttribute('name', slotName);
+    }
+
+    if (parentNodeId && parentNodeId !== childVNode.$hostId$) {
+      // Shadow component's slot is placed inside a nested component's shadowDOM; it doesn't belong to this host - it was forwarded by the SSR markup.
+      // Insert it in the root of this host; it's lightDOM. It doesn't really matter where in the host root; the component will take care of it.
+      parentVNode.$elm$.insertBefore(slot, parentVNode.$elm$.children[0]);
+    } else {
+      // Insert the new slot element before the slot comment
+      node.parentNode.insertBefore(childVNode.$elm$, node);
+    }
+    addSlottedNodes(slottedNodes, slotId, slotName, node, childVNode.$hostId$);
+
+    // Remove the slot comment since it's not needed for shadow
+    node.remove();
+
+    if (childVNode.$depth$ === '0') {
+      shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
+    }
+  } else {
+    /* NON-SHADOW */
+    const slot = childVNode.$elm$ as d.RenderNode;
+
+    // Test to see if this non-shadow component's mock 'slot' is placed inside a nested component's shadowDOM. If so, it doesn't belong here;
+    // it was forwarded by the SSR markup. So we'll insert it into the root of this host; it's lightDOM with accompanying 'slotted' nodes
+    const shouldMove = parentNodeId && parentNodeId !== childVNode.$hostId$ && parentVNode.$elm$.shadowRoot;
+
+    // attempt to find any mock slotted nodes which we'll move later
+    addSlottedNodes(slottedNodes, slotId, slotName, node, shouldMove ? parentNodeId : childVNode.$hostId$);
+
+    if (shouldMove) {
+      // Move slot comment node (to after any other comment nodes)
+      parentVNode.$elm$.insertBefore(slot, parentVNode.$elm$.children[0]);
+    }
+    childRenderNodes.push(childVNode);
+  }
+
+  slotNodes.push(childVNode);
+
+  if (!parentVNode.$children$) {
+    parentVNode.$children$ = [];
+  }
+  parentVNode.$children$[childVNode.$index$ as any] = childVNode;
+}
+
 /**
- * Adds groups of slotted nodes (grouped by slot ID) to this host element's 'master' array. 
+ * Adds groups of slotted nodes (grouped by slot ID) to this host element's 'master' array.
  * We'll use this after the host element's VDOM is completely constructed to finally position and add meta required by non-shadow slotted nodes
- * 
+ *
  * @param slottedNodes - the main host element 'master' array to add to
  * @param slotNodeId - the slot node unique ID
  * @param slotName - the slot node name (can be '')
@@ -531,7 +562,7 @@ const addSlottedNodes = (
   slotNodeId: string,
   slotName: string,
   slotNode: d.RenderNode,
-  hostId: string
+  hostId: string,
 ) => {
   let slottedNode = slotNode.nextSibling as d.RenderNode;
   slottedNodes[slotNodeId as any] = slottedNodes[slotNodeId as any] || [];
@@ -541,7 +572,7 @@ const addSlottedNodes = (
   // Also ignore slot fallback nodes - they're not part of the lightDOM
   while (
     slottedNode &&
-    (slottedNode['s-sn'] === slotName ||
+    (((slottedNode['getAttribute'] && slottedNode.getAttribute('slot')) || slottedNode['s-sn']) === slotName ||
       (slotName === '' &&
         !slottedNode['s-sn'] &&
         ((slottedNode.nodeType === NODE_TYPE.CommentNode && slottedNode.nodeValue.indexOf('.') !== 1) ||
