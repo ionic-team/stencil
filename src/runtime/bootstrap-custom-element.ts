@@ -48,11 +48,11 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
       // This check is intentionally not combined with the surrounding `experimentalSlotFixes` check
       // since, moving forward, we only want to patch the pseudo shadow DOM when the component is scoped
-      patchPseudoShadowDom(Cstr.prototype, cmpMeta);
+      patchPseudoShadowDom(Cstr.prototype);
     }
   } else {
     if (BUILD.slotChildNodesFix) {
-      patchChildSlotNodes(Cstr.prototype, cmpMeta);
+      patchChildSlotNodes(Cstr.prototype);
     }
     if (BUILD.cloneNodeFix) {
       patchCloneNode(Cstr.prototype);

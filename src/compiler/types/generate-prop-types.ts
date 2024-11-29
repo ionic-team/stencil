@@ -11,14 +11,22 @@ import { updateTypeIdentifierNames } from './stencil-types';
  */
 export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta, typeImportData: d.TypesImportData): d.TypeInfo => {
   return [
-    ...cmpMeta.properties.map((cmpProp) => ({
-      name: cmpProp.name,
-      type: getType(cmpProp, typeImportData, cmpMeta.sourceFilePath),
-      optional: cmpProp.optional,
-      required: cmpProp.required,
-      internal: cmpProp.internal,
-      jsdoc: getTextDocs(cmpProp.docs),
-    })),
+    ...cmpMeta.properties.map((cmpProp) => {
+      let doc = getTextDocs(cmpProp.docs);
+      if (cmpProp.getter && !cmpProp.setter && !doc?.match('@readonly')) {
+        cmpProp.docs = cmpProp.docs || { tags: [], text: '' };
+        cmpProp.docs.tags = [...(cmpProp.docs.tags || []), { name: 'readonly', text: '' }];
+        doc = getTextDocs(cmpProp.docs);
+      }
+      return {
+        name: cmpProp.name,
+        type: getType(cmpProp, typeImportData, cmpMeta.sourceFilePath),
+        optional: cmpProp.optional,
+        required: cmpProp.required,
+        internal: cmpProp.internal,
+        jsdoc: doc,
+      };
+    }),
     ...cmpMeta.virtualProperties.map((cmpProp) => ({
       name: cmpProp.name,
       type: cmpProp.type,

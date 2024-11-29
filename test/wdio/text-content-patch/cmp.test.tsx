@@ -23,19 +23,13 @@ describe('textContent patch', () => {
     it('should return the content of all slots', async () => {
       const elm = $('text-content-patch-scoped-with-slot');
       await expect(elm.getText()).toMatchInlineSnapshot(`
-        "Top content
-        Slot content
-        Bottom content
-        Suffix content"
-      `);
+        "Slot content
+Suffix content"`);
     });
 
     it('should return an empty string if there is no slotted content', async () => {
       const elm = $('text-content-patch-scoped');
-      await expect(elm.getText()).toMatchInlineSnapshot(`
-        "Top content
-        Bottom content"
-      `);
+      await expect(await elm.getText()).toBe(``);
     });
 
     it('should overwrite the default slot content', async () => {
@@ -47,11 +41,7 @@ describe('textContent patch', () => {
         elm as any as HTMLElement,
       );
 
-      await expect(elm.getText()).toMatchInlineSnapshot(`
-        "Top content
-        New slot content
-        Bottom content"
-      `);
+      await expect(elm.getText()).toMatchInlineSnapshot(`"New slot content"`);
     });
 
     it('should not insert the text node if there is no default slot', async () => {
@@ -63,10 +53,7 @@ describe('textContent patch', () => {
         elm as any as HTMLElement,
       );
 
-      await expect(elm.getText()).toMatchInlineSnapshot(`
-        "Top content
-        Bottom content"
-      `);
+      await expect(await elm.getText()).toBe(``);
     });
   });
 });

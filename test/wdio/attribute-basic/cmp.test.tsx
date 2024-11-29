@@ -10,10 +10,12 @@ describe('attribute-basic', () => {
   });
 
   it('button click rerenders', async () => {
+    await $('attribute-basic.hydrated').waitForExist();
     await expect($('.single')).toHaveText('single');
     await expect($('.multiWord')).toHaveText('multiWord');
     await expect($('.customAttr')).toHaveText('my-custom-attr');
     await expect($('.htmlForLabel')).toHaveAttribute('for', 'a');
+    await expect($('.getter')).toHaveText('getter');
 
     const button = await $('button');
     await button.click();
@@ -21,5 +23,6 @@ describe('attribute-basic', () => {
     await expect($('.single')).toHaveText('single-update');
     await expect($('.multiWord')).toHaveText('multiWord-update');
     await expect($('.customAttr')).toHaveText('my-custom-attr-update');
+    await expect($('.getter')).toHaveText('getter-update');
   });
 });

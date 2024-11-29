@@ -684,6 +684,8 @@ export interface ComponentCompilerStaticProperty {
   reflect?: boolean;
   docs: CompilerJsDoc;
   defaultValue?: string;
+  getter: boolean;
+  setter: boolean;
 }
 
 /**
@@ -1453,6 +1455,13 @@ export interface RenderNode extends HostElement {
    * empty "" for shadow, "c" from scoped
    */
   ['s-en']?: '' | /*shadow*/ 'c' /*scoped*/;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the internal `childNodes` of the scoped element
+   */
+  readonly __childNodes?: NodeListOf<ChildNode>;
 }
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
