@@ -18,14 +18,15 @@ import { newVNode } from './vdom/h';
 
 /**
  * Takes an SSR rendered document, as annotated by 'vdom-annotations.ts' and:
- * 1) Recreate an accurate VDOM tree to reconcile with during 'vdom-render.ts' (a failure to do so will result in DOM nodes being duplicated when rendering)
- * 2) Add `shadow: true` DOM trees to their document-fragment
- * 3) Move slotted nodes out of shadowDOMs
+ *
+ * 1) Recreate an accurate VDOM which is fed to 'vdom-render.ts'. A failure to do so can cause hydration errors; extra renders, duplicated nodes
+ * 2) Add shadowDOM trees to their respective #document-fragment
+ * 3) Move forwarded, slotted nodes out of shadowDOMs
  * 4) Add meta nodes to non-shadow DOMs and their 'slotted' nodes
  *
  * @param hostElm The element to hydrate.
  * @param tagName The element's tag name.
- * @param hostId The host ID assigned to the element by the server.
+ * @param hostId The host ID assigned to the element by the server. e.g. `s-id="1"`
  * @param hostRef The host reference for the element.
  */
 export const initializeClientHydrate = (
@@ -36,10 +37,16 @@ export const initializeClientHydrate = (
 ) => {
   const endHydrate = createTime('hydrateClient', tagName);
   const shadowRoot = hostElm.shadowRoot;
+  // children placed by SSR within this component but don't necessarily belong to it.
+  // We need to keep tabs on them so we can move them to the right place later
   const childRenderNodes: RenderNodeData[] = [];
+  // nodes representing a `<slot>` element
   const slotNodes: RenderNodeData[] = [];
+  // nodes that have been slotted from outside the component
   const slottedNodes: SlottedNodes[] = [];
+  // nodes that make up this component's shadowDOM
   const shadowRootNodes: d.RenderNode[] = BUILD.shadowDom && shadowRoot ? [] : null;
+  // The root VNode for this component
   const vnode: d.VNode = newVNode(tagName, null);
   vnode.$elm$ = hostElm;
 
@@ -67,12 +74,13 @@ export const initializeClientHydrate = (
   const crLength = childRenderNodes.length;
   let childRenderNode: RenderNodeData;
 
-  // Steps through childNodes we found.
+  // Steps through the child nodes we found.
   // If moved from an original location (by nature of being rendered in SSR markup) we might be able to move it back there now,
   // so slotted nodes don't get added to internal shadowDOMs
   for (crIndex; crIndex < crLength; crIndex++) {
     childRenderNode = childRenderNodes[crIndex];
     const orgLocationId = childRenderNode.$hostId$ + '.' + childRenderNode.$nodeId$;
+    // The original location of this node
     const orgLocationNode = plt.$orgLocNodes$.get(orgLocationId);
     const node = childRenderNode.$elm$ as d.RenderNode;
 
@@ -128,7 +136,7 @@ export const initializeClientHydrate = (
       slottedItem = slotGroup[snGroupIdx];
 
       if (!hosts[slottedItem.hostId as any]) {
-        // Vache this host for other grouped slotted nodes
+        // Cache this host for other grouped slotted nodes
         hosts[slottedItem.hostId as any] = plt.$orgLocNodes$.get(slottedItem.hostId);
       }
       // This *shouldn't* happen as we collect all the custom elements first in `initializeDocumentHydrate`
@@ -195,7 +203,7 @@ export const initializeClientHydrate = (
  * @param parentVNode The vNode representing the parent node.
  * @param childRenderNodes An array of all child nodes in the parent's node tree.
  * @param slotNodes An array of all slot nodes in the parent's node tree.
- * @param shadowRootNodes An array all nodes that should be rendered in the shadow root in the parent's node tree.
+ * @param shadowRootNodes An array of nodes that should be rendered in the shadowDOM of the parent.
  * @param hostElm The parent element.
  * @param node The node to construct the vNode tree for.
  * @param hostId The host ID assigned to the element by the server.
@@ -416,9 +424,9 @@ const clientHydrate = (
 };
 
 /**
- * Recursively locate any comments representing a original location for a node in a node's children or shadowRoot children.
- * Creates a map of component IDs and "Original Location ID's" which are derived from comment nodes placed by 'vdom-annotations.ts'
- * They relate to lightDOM nodes that were moved deeper into the SSR markup. e.g. `<!--o.1-->` maps to `<div c-id="0.1">`
+ * Recursively locate any comments representing an 'original location' for a node; in a node's children or shadowRoot children.
+ * Creates a map of component IDs and 'original location' ID's which are derived from comment nodes placed by 'vdom-annotations.ts'.
+ * Each 'original location' relates to lightDOM node that was moved deeper into the SSR markup. e.g. `<!--o.1-->` maps to `<div c-id="0.1">`
  *
  * @param node The node to search.
  * @param orgLocNodes A map of the original location annotations and the current node being searched.

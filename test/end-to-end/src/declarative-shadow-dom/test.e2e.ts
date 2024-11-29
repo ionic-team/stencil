@@ -355,7 +355,7 @@ describe('renderToString', () => {
         <!--o.29.2.c-->
         <div c-id="31.0.0.0" class="sc-nested-scope-cmp sc-nested-scope-cmp-s some-scope-class">
           <!--s.31.1.1.0.-->
-          <slot c-id="29.2.2.0" class="sc-nested-scope-cmp"></slot>
+          <slot c-id="29.2.2.0" class="sc-nested-scope-cmp" s-sn=""></slot>
         </div>
       </nested-scope-cmp>
     </div>

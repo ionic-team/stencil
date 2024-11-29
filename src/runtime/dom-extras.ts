@@ -287,8 +287,14 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
     // for mock-doc
     childNodesFn = Object.getOwnPropertyDescriptor(elm, 'childNodes');
   }
-
   if (childNodesFn) Object.defineProperty(elm, '__childNodes', childNodesFn);
+
+  let childrenFn = Object.getOwnPropertyDescriptor(Element.prototype, 'children');
+  if (!childrenFn) {
+    // for mock-doc
+    childrenFn = Object.getOwnPropertyDescriptor(elm, 'children');
+  }
+  if (childrenFn) Object.defineProperty(elm, '__children', childrenFn);
 
   Object.defineProperty(elm, 'children', {
     get() {
