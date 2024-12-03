@@ -1,8 +1,9 @@
 import { BUILD } from '@app-data';
-import { CMP_FLAGS } from '@utils';
 import { doc, plt, supportsShadow } from '@platform';
+import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
+import { patchNextPrev } from './dom-extras';
 import { createTime } from './profile';
 import {
   CONTENT_REF_ID,
@@ -14,7 +15,6 @@ import {
   TEXT_NODE_ID,
 } from './runtime-constants';
 import { newVNode } from './vdom/h';
-import { patchNextPrev } from './dom-extras';
 
 /**
  * Entrypoint of the client-side hydration process. Facilitates calls to hydrate the
@@ -70,7 +70,7 @@ export const initializeClientHydrate = (
     }
 
     plt.$orgLocNodes$.delete(orgLocationId);
-    
+
     if (BUILD.experimentalSlotFixes) {
       if (BUILD.scoped && hostRef.$cmpMeta$.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
         // This check is intentionally not combined with the surrounding `experimentalSlotFixes` check

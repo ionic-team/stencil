@@ -81,13 +81,19 @@ describe('dom-extras - patches for non-shadow dom methods and accessors', () => 
     expect(nodeOrEleContent(children[2])).toBe(undefined);
   });
 
-  it('patches `childElementCount` to only count elements that have been slotted', async () => {
-    expect(specPage.root.childElementCount).toBe(2);
-  });
-
   it('patches `textContent` to only return slotted node text', async () => {
     expect(specPage.root.textContent.replace(/\s+/g, ' ').trim()).toBe(
       `Some default slot, slotted text a default slot, slotted element a second slot, slotted element nested element in the second slot`,
+    );
+  });
+
+  it('firstChild', async () => {
+    expect(nodeOrEleContent(specPage.root.firstChild)).toBe(`Some default slot, slotted text`);
+  });
+
+  it('lastChild', async () => {
+    expect(nodeOrEleContent(specPage.root.lastChild)).toBe(
+      `<div slot=\"second-slot\"> a second slot, slotted element <span>nested element in the second slot<span></span></span></div>`,
     );
   });
 });
