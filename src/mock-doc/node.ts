@@ -234,10 +234,15 @@ export class MockElement extends MockNode {
   attachInternals(): MockElementInternals {
     return new Proxy({} as unknown as MockElementInternals, {
       get: function (_target, prop, _receiver) {
-        console.error(
-          `NOTE: Property ${String(prop)} was accessed on ElementInternals, but this property is not implemented.
-Testing components with ElementInternals is fully supported in e2e tests.`,
-        );
+        /**
+         * only print warning when running in a test environment
+         */
+        if ('process' in globalThis && globalThis.process.env.__STENCIL_SPEC_TESTS__) {
+          console.error(
+            `NOTE: Property ${String(prop)} was accessed on ElementInternals, but this property is not implemented.
+  Testing components with ElementInternals is fully supported in e2e tests.`
+          );
+        }
       },
     });
   }
