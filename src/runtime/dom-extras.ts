@@ -249,7 +249,7 @@ export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement
  * @param hostElementPrototype the `Element` to be patched
  */
 export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
-  let descriptor = Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
+  let descriptor = globalThis.Node && Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
 
   if (!descriptor) {
     // for mock-doc
@@ -282,7 +282,7 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
     }
   }
 
-  let childNodesFn = Object.getOwnPropertyDescriptor(Node.prototype, 'childNodes');
+  let childNodesFn = globalThis.Node && Object.getOwnPropertyDescriptor(Node.prototype, 'childNodes');
   if (!childNodesFn) {
     // for mock-doc
     childNodesFn = Object.getOwnPropertyDescriptor(elm, 'childNodes');

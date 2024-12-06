@@ -150,8 +150,6 @@ export const validateConfig = (
   validatedConfig.extras.scriptDataOpts = !!validatedConfig.extras.scriptDataOpts;
   validatedConfig.extras.initializeNextTick = !!validatedConfig.extras.initializeNextTick;
   validatedConfig.extras.tagNameTransform = !!validatedConfig.extras.tagNameTransform;
-  // TODO(STENCIL-1086): remove this option when it's the default behavior
-  validatedConfig.extras.experimentalScopedSlotChanges = !!validatedConfig.extras.experimentalScopedSlotChanges;
 
   // TODO(STENCIL-914): remove when `experimentalSlotFixes` is the default behavior
   // If the user set `experimentalSlotFixes` and any individual slot fix flags to `false`, we need to log a warning
@@ -181,11 +179,14 @@ export const validateConfig = (
     validatedConfig.extras.cloneNodeFix = true;
     validatedConfig.extras.slotChildNodesFix = true;
     validatedConfig.extras.scopedSlotTextContentFix = true;
+    validatedConfig.extras.experimentalScopedSlotChanges = true;
   } else {
     validatedConfig.extras.appendChildSlotFix = !!validatedConfig.extras.appendChildSlotFix;
     validatedConfig.extras.cloneNodeFix = !!validatedConfig.extras.cloneNodeFix;
     validatedConfig.extras.slotChildNodesFix = !!validatedConfig.extras.slotChildNodesFix;
     validatedConfig.extras.scopedSlotTextContentFix = !!validatedConfig.extras.scopedSlotTextContentFix;
+    // TODO(STENCIL-1086): remove this option when it's the default behavior
+    validatedConfig.extras.experimentalScopedSlotChanges = !!validatedConfig.extras.experimentalScopedSlotChanges;
   }
 
   setBooleanConfig(
