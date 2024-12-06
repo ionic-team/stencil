@@ -102,7 +102,6 @@ describe('hydrate, shadow child', () => {
           <mock:shadow-root>
             <slot></slot>
           </mock:shadow-root>
-          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -285,7 +284,6 @@ describe('hydrate, shadow child', () => {
             <header></header>
             <slot></slot>
           </mock:shadow-root>
-          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -417,7 +415,6 @@ describe('hydrate, shadow child', () => {
             <slot></slot>
             <footer></footer>
           </mock:shadow-root>
-          <!---->
           light-dom
         </cmp-b>
       </cmp-a>
@@ -428,7 +425,11 @@ describe('hydrate, shadow child', () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {
       render() {
-        return <Host></Host>;
+        return (
+          <Host>
+            <slot />
+          </Host>
+        );
       }
     }
     @Component({ tag: 'cmp-b', shadow: true })
@@ -469,15 +470,17 @@ describe('hydrate, shadow child', () => {
     expect(serverHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated" s-id="1">
         <!--r.1-->
-        <cmp-b class="hydrated" s-id="2">
+        <!--o.0.2-->
+        <!--s.1.0.0.0.-->
+        <cmp-b c-id="0.2" class="hydrated" s-id="2" s-sn="">
           <!--r.2-->
-          <!--o.0.1.-->
-          <!--o.0.2.-->
+          <!--o.0.4.-->
+          <!--o.0.5.-->
           <section c-id="2.0.0.0">
             <!--s.2.1.1.0.-->
-            <!--t.0.1-->
+            <!--t.0.4-->
             cmp-b-top-text
-            <cmp-c class="hydrated" c-id="0.2" s-id="3">
+            <cmp-c c-id="0.5" class="hydrated" s-id="3" s-sn="">
               <!--r.3-->
               <article c-id="3.0.0.0">
                 <!--t.3.1.1.0-->
@@ -497,18 +500,16 @@ describe('hydrate, shadow child', () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a class=\"hydrated\">
         <!--r.1-->
-        <cmp-b class="hydrated">
+        <cmp-b class=\"hydrated\">
           <mock:shadow-root>
             <section>
               <slot></slot>
             </section>
           </mock:shadow-root>
-          <!---->
           cmp-b-top-text
-          <!---->
-          <cmp-c class="hydrated">
+          <cmp-c class=\"hydrated\">
             <mock:shadow-root>
               <article>
                 cmp-c

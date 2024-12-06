@@ -67,7 +67,7 @@ export function serializeNodeToHtml(elm: Node | MockNode, serializationOptions: 
       ? Array.from((elm as MockDocument).body.childNodes)
       : opts.outerHtml
         ? [elm]
-        : Array.from(elm.childNodes as NodeList);
+        : Array.from(getChildNodes(elm));
 
   for (let i = 0, ii = children.length; i < ii; i++) {
     const child = children[i];
@@ -130,7 +130,10 @@ function* streamToHtml(
        * ToDo(https://github.com/ionic-team/stencil/issues/4111): the shadow root class is `#document-fragment`
        * and has no mode attribute. We should consider adding a mode attribute.
        */
-      if (tag === 'template') {
+      if (
+        tag === 'template' &&
+        (!(node as Element).getAttribute || !(node as Element).getAttribute('shadowrootmode'))
+      ) {
         const mode = ` shadowrootmode="open"`;
         yield mode;
         output.currentLineWidth += mode.length;
@@ -242,12 +245,13 @@ function* streamToHtml(
         yield* streamToHtml(shadowRoot, opts, output);
         output.indent = output.indent - (opts.indentSpaces ?? 0);
 
+        const childNodes = getChildNodes(node);
         if (
           opts.newLines &&
-          (node.childNodes.length === 0 ||
-            (node.childNodes.length === 1 &&
-              node.childNodes[0].nodeType === NODE_TYPES.TEXT_NODE &&
-              node.childNodes[0].nodeValue?.trim() === ''))
+          (childNodes.length === 0 ||
+            (childNodes.length === 1 &&
+              childNodes[0].nodeType === NODE_TYPES.TEXT_NODE &&
+              childNodes[0].nodeValue?.trim() === ''))
         ) {
           yield '\n';
           output.currentLineWidth = 0;
@@ -262,7 +266,9 @@ function* streamToHtml(
       if (opts.excludeTagContent == null || opts.excludeTagContent.includes(tagName) === false) {
         const tag = tagName === shadowRootTag ? 'template' : tagName;
         const childNodes =
-          tagName === 'template' ? ((node as any as HTMLTemplateElement).content.childNodes as any) : node.childNodes;
+          tagName === 'template'
+            ? ((node as any as HTMLTemplateElement).content.childNodes as any)
+            : getChildNodes(node);
         const childNodeLength = childNodes.length;
 
         if (childNodeLength > 0) {
@@ -523,6 +529,17 @@ function isWithinWhitespaceSensitive(node: Node | MockNode) {
     _node = _node.parentNode;
   }
   return false;
+}
+
+/**
+ * Normalizes the `childNodes` of a node due to if `experimentalSlotFixes` is enabled, `
+ * childNodes` will only return 'slotted' / lightDOM nodes
+ *
+ * @param node to return `childNodes` from
+ * @returns a node list of child nodes
+ */
+function getChildNodes(node: Node | MockNode) {
+  return ((node as any).__childNodes || node.childNodes) as NodeList;
 }
 
 // TODO(STENCIL-1299): Audit this list, remove unsupported/deprecated elements

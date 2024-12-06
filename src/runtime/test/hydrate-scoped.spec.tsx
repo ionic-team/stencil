@@ -44,9 +44,7 @@ describe('hydrate scoped', () => {
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated">
         <!--r.1-->
-        <!---->
         <article>
-          <!--s.1.1.1.0.-->
           88mph
         </article>
       </cmp-a>
@@ -97,9 +95,7 @@ describe('hydrate scoped', () => {
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated">
         <!--r.1-->
-        <!---->
-        <article>
-          <!--s.1.1.1.0.-->
+        <article class="sc-cmp-a sc-cmp-a-s">
           88mph
         </article>
       </cmp-a>
@@ -133,7 +129,6 @@ describe('hydrate scoped', () => {
       </cmp-a>
     `);
 
-    // @ts-ignore
     const clientHydrated = await newSpecPage({
       components: [CmpA],
       html: serverHydrated.root.outerHTML,
