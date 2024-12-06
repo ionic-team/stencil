@@ -101,6 +101,7 @@ export const setValue = (ref: d.RuntimeRef, propName: string, newVal: any, cmpMe
         // but only if we've already rendered, otherwise just chill out
         // queue that we need to do an update, but don't worry about queuing
         // up millions cuz this function ensures it only runs once
+        if (instance[propName] !== newVal) instance[propName] = newVal;
         scheduleUpdate(hostRef, false);
       }
     }
