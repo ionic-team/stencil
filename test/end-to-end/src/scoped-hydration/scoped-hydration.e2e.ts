@@ -14,6 +14,7 @@ async function getElementOrder(page: E2EPage, parent: string) {
 
 describe('`scoped: true` hydration checks', () => {
   beforeAll(async () => {
+    // @ts-ignore may not be existing when project hasn't been built
     const mod = await import('../../hydrate');
     renderToString = mod.renderToString;
   });
