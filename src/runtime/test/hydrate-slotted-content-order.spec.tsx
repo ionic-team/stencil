@@ -32,7 +32,7 @@ describe("hydrated components' slotted node order", () => {
       hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
-    <cmp-a class=\"hydrated\" s-id=\"1\">
+    <cmp-a class="hydrated" s-id="1">
       <!--r.1-->
       <!--o.0.1.-->
       <!--o.0.2.-->
@@ -40,19 +40,19 @@ describe("hydrated components' slotted node order", () => {
       <!--o.0.4.-->
       <!--o.0.5.-->
       <!--o.0.6.-->
-      <main c-id=\"1.0.0.0\">
+      <main c-id="1.0.0.0">
         <!--s.1.1.1.0.-->
-        <p c-id=\"0.1\" s-sn=\"\">
+        <p c-id="0.1" s-sn="">
           slotted item 1
         </p>
         <!--c.0.2-->
         <!-- a comment -->
-        <p c-id=\"0.3\" s-sn=\"\">
+        <p c-id="0.3" s-sn="">
           slotted item 2
         </p>
         <!--t.0.4-->
         A text node
-        <p c-id=\"0.5\" s-sn=\"\">
+        <p c-id="0.5" s-sn="">
           slotted item 3
         </p>
         <!--c.0.6-->
@@ -67,7 +67,7 @@ describe("hydrated components' slotted node order", () => {
     });
 
     expect(clientHydrated.root).toEqualHtml(`
-      <cmp-a class=\"hydrated\">
+      <cmp-a class="hydrated">
         <mock:shadow-root>
           <main>
             <slot></slot>
@@ -126,20 +126,20 @@ describe("hydrated components' slotted node order", () => {
       hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
-    <cmp-a class=\"hydrated\" s-id=\"1\">
+    <cmp-a class="hydrated" s-id="1">
       <!--r.1-->
       <!--o.0.1.-->
       <!--o.0.2.-->
       <!--o.0.3.-->
       <!--o.0.4.-->
-      <main c-id=\"1.0.0.0\">
-        <aside c-id=\"1.1.1.0\">
+      <main c-id="1.0.0.0">
+        <aside c-id="1.1.1.0">
           <!--s.1.2.2.0.second-->
-          <p c-id=\"0.3\" slot=\"second\">
+          <p c-id="0.3" slot="second">
             second slot
           </p>
         </aside>
-        <section c-id=\"1.3.1.1\">
+        <section c-id="1.3.1.1">
           <!--s.1.4.2.0.-->
           <!--c.0.1-->
           <!-- comment node -->
@@ -158,10 +158,10 @@ describe("hydrated components' slotted node order", () => {
     });
 
     expect(clientHydrated.root.outerHTML).toEqualHtml(`
-      <cmp-a class=\"hydrated\"><template shadowrootmode="open">
+      <cmp-a class="hydrated"><template shadowrootmode="open">
         <main>
           <aside>
-            <slot name=\"second\"></slot>
+            <slot name="second"></slot>
           </aside>
           <section>
             <slot></slot>
@@ -169,7 +169,7 @@ describe("hydrated components' slotted node order", () => {
         </main></template>
         <!-- comment node -->
         Default slot
-        <p slot=\"second\">
+        <p slot="second">
           second slot
         </p>
         <!-- another comment node -->
@@ -180,7 +180,7 @@ describe("hydrated components' slotted node order", () => {
 
     expect(nodeOrEle(childNodes[0])).toBe(` comment node `);
     expect(nodeOrEle(childNodes[1])).toBe(` Default slot `);
-    expect(nodeOrEle(childNodes[2])).toBe(`<p slot=\"second\">second slot</p>`);
+    expect(nodeOrEle(childNodes[2])).toBe(`<p slot="second">second slot</p>`);
     expect(nodeOrEle(childNodes[3])).toBe(` another comment node `);
   });
 
@@ -221,16 +221,16 @@ describe("hydrated components' slotted node order", () => {
       hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
-    <cmp-a class=\"hydrated\" s-id=\"1\">
+    <cmp-a class="hydrated" s-id="1">
       <!--r.1-->
       <!--o.0.1.-->
       <!--o.0.2.-->
       <!--o.0.3.-->
       <!--o.0.4.-->
       <!--o.0.5.-->
-      <main c-id=\"1.0.0.0\">
+      <main c-id="1.0.0.0">
         <!--s.1.1.1.0.-->
-        <p c-id=\"0.1\" s-sn=\"\">
+        <p c-id="0.1" s-sn="">
           slotted item 1a
         </p>
         <!--c.0.2-->
@@ -239,15 +239,15 @@ describe("hydrated components' slotted node order", () => {
         A text node
         <!--c.0.4-->
         <!-- another comment a-->
-        <cmp-b c-id=\"0.5\" class=\"hydrated\" s-id=\"2\" s-sn=\"\">
+        <cmp-b c-id="0.5" class="hydrated" s-id="2" s-sn="">
           <!--r.2-->
           <!--o.0.6.-->
           <!--o.0.7.-->
           <!--o.0.8.-->
           <!--o.0.9.-->
-          <section c-id=\"2.0.0.0\">
+          <section c-id="2.0.0.0">
             <!--s.2.1.1.0.-->
-            <p c-id=\"0.6\" s-sn=\"\">
+            <p c-id="0.6" s-sn="">
               slotted item 1b
             </p>
             <!--c.0.7-->
@@ -302,7 +302,7 @@ describe("hydrated components' slotted node order", () => {
       hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
-    <cmp-a class=\"hydrated\" s-id=\"1\">
+    <cmp-a class="hydrated" s-id="1">
       <!--r.1-->
       <!--o.0.1.c-->
       <!--o.0.2.c-->
@@ -310,19 +310,19 @@ describe("hydrated components' slotted node order", () => {
       <!--o.0.4.c-->
       <!--o.0.5.c-->
       <!--o.0.6.c-->
-      <main c-id=\"1.0.0.0\">
+      <main c-id="1.0.0.0">
         <!--s.1.1.1.0.-->
-        <p c-id=\"0.1\" s-sn=\"\">
+        <p c-id="0.1" s-sn="">
           slotted item 1
         </p>
         <!--c.0.2-->
         <!-- a comment -->
-        <p c-id=\"0.3\" s-sn=\"\">
+        <p c-id="0.3" s-sn="">
           slotted item 2
         </p>
         <!--t.0.4-->
         A text node
-        <p c-id=\"0.5\" s-sn=\"\">
+        <p c-id="0.5" s-sn="">
           slotted item 3
         </p>
         <!--c.0.6-->
@@ -340,9 +340,9 @@ describe("hydrated components' slotted node order", () => {
     patchPseudoShadowDom(clientHydrated.root);
 
     expect(clientHydrated.root.outerHTML).toEqualHtml(`
-      <cmp-a class=\"hydrated\">
+      <cmp-a class="hydrated">
         <!--r.1-->
-        <main>
+        <main class="sc-cmp-a sc-cmp-a-s">
           <p>
             slotted item 1
           </p>
@@ -397,20 +397,20 @@ describe("hydrated components' slotted node order", () => {
       hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
-    <cmp-a class=\"hydrated\" s-id=\"1\">
+    <cmp-a class="hydrated" s-id="1">
       <!--r.1-->
       <!--o.0.1-->
       <!--o.0.2-->
       <!--o.0.3-->
       <!--o.0.4-->
-      <main c-id=\"1.0.0.0\">
-        <aside c-id=\"1.1.1.0\">
+      <main c-id="1.0.0.0">
+        <aside c-id="1.1.1.0">
           <!--s.1.2.2.0.second-->
-          <p c-id=\"0.3\" slot=\"second\">
+          <p c-id="0.3" slot="second">
             second slot
           </p>
         </aside>
-        <section c-id=\"1.3.1.1\">
+        <section c-id="1.3.1.1">
           <!--s.1.4.2.0.-->
           <!--c.0.1-->
           <!-- comment node -->
@@ -435,7 +435,7 @@ describe("hydrated components' slotted node order", () => {
 
     expect(nodeOrEle(childNodes[0])).toBe(` comment node `);
     expect(nodeOrEle(childNodes[1])).toBe(` Default slot `);
-    expect(nodeOrEle(childNodes[2])).toBe(`<p slot=\"second\">second slot</p>`);
+    expect(nodeOrEle(childNodes[2])).toBe(`<p slot="second">second slot</p>`);
     expect(nodeOrEle(childNodes[3])).toBe(` another comment node `);
   });
 
@@ -476,16 +476,16 @@ describe("hydrated components' slotted node order", () => {
       hydrateServerSide: true,
     });
     expect(serverHydrated.root).toEqualHtml(`
-    <cmp-a class=\"hydrated\" s-id=\"1\">
+    <cmp-a class="hydrated" s-id="1">
       <!--r.1-->
       <!--o.0.1-->
       <!--o.0.2-->
       <!--o.0.3-->
       <!--o.0.4-->
       <!--o.0.5-->
-      <main c-id=\"1.0.0.0\">
+      <main c-id="1.0.0.0">
         <!--s.1.1.1.0.-->
-        <p c-id=\"0.1\" s-sn=\"\">
+        <p c-id="0.1" s-sn="">
           slotted item 1a
         </p>
         <!--c.0.2-->
@@ -494,15 +494,15 @@ describe("hydrated components' slotted node order", () => {
         A text node
         <!--c.0.4-->
         <!-- another comment a-->
-        <cmp-b c-id=\"0.5\" class=\"hydrated\" s-id=\"2\" s-sn=\"\">
+        <cmp-b c-id="0.5" class="hydrated" s-id="2" s-sn="">
           <!--r.2-->
           <!--o.0.6-->
           <!--o.0.7-->
           <!--o.0.8-->
           <!--o.0.9-->
-          <section c-id=\"2.0.0.0\">
+          <section c-id="2.0.0.0">
             <!--s.2.1.1.0.-->
-            <p c-id=\"0.6\" s-sn=\"\">
+            <p c-id="0.6" s-sn="">
               slotted item 1b
             </p>
             <!--c.0.7-->

@@ -95,7 +95,7 @@ describe('hydrate scoped', () => {
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class="hydrated">
         <!--r.1-->
-        <article>
+        <article class="sc-cmp-a sc-cmp-a-s">
           88mph
         </article>
       </cmp-a>
