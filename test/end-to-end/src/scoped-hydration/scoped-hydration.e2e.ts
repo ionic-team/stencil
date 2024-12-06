@@ -1,5 +1,6 @@
 import { newE2EPage, E2EPage } from '@stencil/core/testing';
 
+// @ts-ignore may not be existing when project hasn't been built
 type HydrateModule = typeof import('../../hydrate');
 let renderToString: HydrateModule['renderToString'];
 
