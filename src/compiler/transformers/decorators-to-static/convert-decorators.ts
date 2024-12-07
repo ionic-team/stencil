@@ -309,7 +309,7 @@ export const filterDecorators = (
 
 /**
  * This updates a Stencil component class declaration AST node to handle any
- * class fields with Stencil-specific decorators (`@State`, `@Prop`, etc). 
+ * class fields with Stencil-specific decorators (`@State`, `@Prop`, etc).
  *
  * **Note**: this function will modify a constructor if one is already present on
  * the class or define a new one otherwise.

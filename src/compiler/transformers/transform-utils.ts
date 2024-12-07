@@ -4,7 +4,6 @@ import ts from 'typescript';
 import type * as d from '../../declarations';
 import { StencilStaticGetter } from './decorators-to-static/decorators-constants';
 import { addToLibrary, findTypeWithName, getHomeModule, getOriginalTypeName } from './type-library';
-import { HOST_REF_ARG } from './component-lazy/constants';
 
 export const getScriptTarget = () => {
   // using a fn so the browser compiler doesn't require the global ts for startup
@@ -967,54 +966,8 @@ export const updateConstructor = (
   const constructorMethod = classMembers[constructorIndex];
 
   if (constructorIndex >= 0 && ts.isConstructorDeclaration(constructorMethod)) {
-    const constructorBodyStatements: ts.NodeArray<ts.Statement> = ts.factory.createNodeArray(constructorMethod.body?.statements.map(
-      st => {
-        if (ts.isExpressionStatement(st)) {
-          const expression = st.expression;
-          if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
-            const left = expression.left;
-            if (ts.isPropertyAccessExpression(left)) {
-              const propName = left.name.getText();
-              const defaultValue = expression.right;
-
-              const createCallExpression = (prop: string, accessor: 'has' | 'get') => (
-                ts.factory.createCallExpression(
-                  ts.factory.createPropertyAccessExpression(
-                    ts.factory.createPropertyAccessExpression(
-                      ts.factory.createIdentifier(HOST_REF_ARG),
-                      ts.factory.createIdentifier('$instanceValues$'),
-                    ),
-                    ts.factory.createIdentifier(accessor)
-                  ),
-                  undefined,
-                  [
-                    ts.factory.createStringLiteral(prop)
-                  ]
-                )
-              )
-
-              const prop = classNode.members.find(m => ts.isPropertyDeclaration(m) && m.name.getText() === propName);
-              if (prop) {
-                return ts.factory.createExpressionStatement(
-                  ts.factory.createBinaryExpression(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createThis(), left.name),
-                    ts.SyntaxKind.EqualsToken,
-                    ts.factory.createConditionalExpression(
-                      createCallExpression(propName, 'has'),
-                      ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-                      createCallExpression(propName, 'get'),
-                      ts.factory.createToken(ts.SyntaxKind.ColonToken),
-                      defaultValue,
-                    )
-                  )
-                );
-              }
-            }
-          }
-        }
-        return st
-      }
-    ))
+    const constructorBodyStatements: ts.NodeArray<ts.Statement> =
+      constructorMethod.body?.statements ?? ts.factory.createNodeArray();
     const hasSuper = constructorBodyStatements.some((s) => s.kind === ts.SyntaxKind.SuperKeyword);
 
     if (!hasSuper && needsSuper(classNode)) {

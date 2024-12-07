@@ -3,7 +3,7 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
-import { updateConstructor } from '../transform-utils';
+import { retrieveTsModifiers, updateConstructor } from '../transform-utils';
 import { createLazyAttachInternalsBinding } from './attach-internals';
 import { HOST_REF_ARG } from './constants';
 
@@ -25,6 +25,7 @@ export const updateLazyComponentConstructor = (
   const cstrMethodArgs = [
     ts.factory.createParameterDeclaration(undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
   ];
+  addConstructorInitialProxyValues(classMembers, classNode);
 
   const cstrStatements = [
     registerInstanceStatement(moduleFile),
@@ -34,6 +35,123 @@ export const updateLazyComponentConstructor = (
 
   updateConstructor(classNode, classMembers, cstrStatements, cstrMethodArgs);
 };
+
+/**
+ * With a ts config of `target: '2022', useDefineForClassFields: true`
+ * compiled stencil classes now look like:
+ * ```ts
+ * class MyComponent {
+ *  constructor(hostRef) {
+ *    registerInstance(this, hostRef);
+ *    this.prop1 = 'value1';
+ *    this.prop2 = 'value2';
+ *  }
+ *  prop1: string;
+ *  prop2: string;
+ *  // ^^ These initial values are a problem for lazy components.
+ *  // The incoming, initial values from the proxied element is ignored.
+ * }
+ * ```
+ *
+ * To combat this, if we find initial static prop values,
+ * We change the constructor to:
+ *
+ * ```ts
+ * class MyComponent {
+ *  constructor(hostRef) {
+ *    registerInstance(this, hostRef);
+ *    this.prop1 = hostRef.$instanceValues$.has('prop1') ? hostRef.$instanceValues$.get('prop1') : 'value1';
+ *    this.prop2 = hostRef.$instanceValues$.has('prop2') ? hostRef.$instanceValues$.get('prop2') : 'value2';
+ *  }
+ *  prop1: string;
+ *  prop2: string;
+ * }
+ * ```
+ *
+ * @param classMembers
+ * @param classNode
+ * @param cstrMethodArgs
+ */
+const addConstructorInitialProxyValues = (classMembers: ts.ClassElement[], classNode: ts.ClassDeclaration) => {
+  const constructorIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
+  const constructorMethod = classMembers[constructorIndex];
+  let didUpdate = false;
+
+  if (constructorIndex >= 0 && ts.isConstructorDeclaration(constructorMethod)) {
+    const updatedStatements: ts.NodeArray<ts.Statement> = ts.factory.createNodeArray(
+      constructorMethod.body?.statements.map((st) => {
+        if (ts.isExpressionStatement(st)) {
+          const expression = st.expression;
+
+          if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
+            const left = expression.left;
+
+            if (ts.isPropertyAccessExpression(left)) {
+              // we found a statement that might need updating e.g. `this.prop1 = 'value1'`
+
+              const propName = left.name.getText();
+              const defaultValue = expression.right;
+
+              // comb through the class' body members to find a corresponding, 'modern' prop initializer
+              const prop = classNode.members.find((m) => ts.isPropertyDeclaration(m) && m.name.getText() === propName);
+
+              if (prop) {
+                // we found what we were looking for, update the statement
+                didUpdate = true;
+                return ts.factory.createExpressionStatement(
+                  ts.factory.createBinaryExpression(
+                    ts.factory.createPropertyAccessExpression(ts.factory.createThis(), left.name),
+                    ts.SyntaxKind.EqualsToken,
+                    ts.factory.createConditionalExpression(
+                      createCallExpression(propName, 'has'),
+                      ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+                      createCallExpression(propName, 'get'),
+                      ts.factory.createToken(ts.SyntaxKind.ColonToken),
+                      defaultValue,
+                    ),
+                  ),
+                );
+              }
+            }
+          }
+        }
+        // didn't find what we were looking for, return the original statement
+        return st;
+      }),
+    );
+
+    if (didUpdate) {
+      classMembers[constructorIndex] = ts.factory.updateConstructorDeclaration(
+        constructorMethod,
+        undefined,
+        [],
+        ts.factory.updateBlock(constructorMethod?.body, updatedStatements),
+      );
+    }
+  }
+  return classMembers;
+};
+
+/**
+ * Creates a call expression as either::
+ * `hostRef.$instanceValues$.has('prop1')` or `hostRef.$instanceValues$.get('prop1')`
+ *
+ * @param prop
+ * @param accessor
+ * @returns
+ */
+const createCallExpression = (prop: string, methodName: 'has' | 'get') =>
+  ts.factory.createCallExpression(
+    ts.factory.createPropertyAccessExpression(
+      ts.factory.createPropertyAccessExpression(
+        ts.factory.createIdentifier(HOST_REF_ARG),
+        ts.factory.createIdentifier('$instanceValues$'),
+      ),
+      ts.factory.createIdentifier(methodName),
+    ),
+    undefined,
+    [ts.factory.createStringLiteral(prop)],
+  );
 
 /**
  * Create a statement containing an expression calling the `registerInstance`

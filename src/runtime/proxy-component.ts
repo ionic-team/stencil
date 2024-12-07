@@ -217,7 +217,7 @@ export const proxyComponent = (
           //  TODO(STENCIL-16) we should think about whether or not we actually want to be reflecting the attributes to
           //  properties here given that this goes against best practices outlined here
           //  https://developers.google.com/web/fundamentals/web-components/best-practices#avoid-reentrancy
-          if (this.hasOwnProperty(propName)) {
+          if (this.hasOwnProperty(propName) && BUILD.lazyLoad) {
             newValue = this[propName];
             delete this[propName];
           } else if (
@@ -262,9 +262,9 @@ export const proxyComponent = (
           const propDesc = Object.getOwnPropertyDescriptor(prototype, propName);
           // test whether this property either has no 'getter' or if it does, does it also have a 'setter'
           // before attempting to write back to component props
-          // if (!propDesc.get || !!propDesc.set) {
+          if (!propDesc.get || !!propDesc.set) {
             this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
-          // }
+          }
         });
       };
 
