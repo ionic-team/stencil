@@ -67,16 +67,16 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
 
   const originalConnectedCallback = Cstr.prototype.connectedCallback;
   const originalDisconnectedCallback = Cstr.prototype.disconnectedCallback;
-  let hasHostListenerAttached = false;
   Object.assign(Cstr.prototype, {
+    __hasHostListenerAttached: false,
     __registerHost() {
       registerHost(this, cmpMeta);
     },
     connectedCallback() {
-      if (!hasHostListenerAttached) {
+      if (!this.__hasHostListenerAttached) {
         const hostRef = getHostRef(this);
         addHostEventListeners(this, hostRef, cmpMeta.$listeners$, false);
-        hasHostListenerAttached = true;
+        this.__hasHostListenerAttached = true;
       }
 
       connectedCallback(this);
