@@ -106,6 +106,12 @@ export namespace Components {
     }
     interface NestedScopeCmp {
     }
+    interface NonShadowChild {
+    }
+    interface NonShadowForwardedSlot {
+    }
+    interface NonShadowWrapper {
+    }
     interface PathAliasCmp {
     }
     interface PrerenderCmp {
@@ -132,6 +138,10 @@ export namespace Components {
     interface ScopedCarList {
         "cars": CarData[];
         "selected": CarData;
+    }
+    interface ShadowChild {
+    }
+    interface ShadowWrapper {
     }
     interface SlotCmp {
     }
@@ -363,6 +373,24 @@ declare global {
         prototype: HTMLNestedScopeCmpElement;
         new (): HTMLNestedScopeCmpElement;
     };
+    interface HTMLNonShadowChildElement extends Components.NonShadowChild, HTMLStencilElement {
+    }
+    var HTMLNonShadowChildElement: {
+        prototype: HTMLNonShadowChildElement;
+        new (): HTMLNonShadowChildElement;
+    };
+    interface HTMLNonShadowForwardedSlotElement extends Components.NonShadowForwardedSlot, HTMLStencilElement {
+    }
+    var HTMLNonShadowForwardedSlotElement: {
+        prototype: HTMLNonShadowForwardedSlotElement;
+        new (): HTMLNonShadowForwardedSlotElement;
+    };
+    interface HTMLNonShadowWrapperElement extends Components.NonShadowWrapper, HTMLStencilElement {
+    }
+    var HTMLNonShadowWrapperElement: {
+        prototype: HTMLNonShadowWrapperElement;
+        new (): HTMLNonShadowWrapperElement;
+    };
     interface HTMLPathAliasCmpElement extends Components.PathAliasCmp, HTMLStencilElement {
     }
     var HTMLPathAliasCmpElement: {
@@ -406,6 +434,18 @@ declare global {
     var HTMLScopedCarListElement: {
         prototype: HTMLScopedCarListElement;
         new (): HTMLScopedCarListElement;
+    };
+    interface HTMLShadowChildElement extends Components.ShadowChild, HTMLStencilElement {
+    }
+    var HTMLShadowChildElement: {
+        prototype: HTMLShadowChildElement;
+        new (): HTMLShadowChildElement;
+    };
+    interface HTMLShadowWrapperElement extends Components.ShadowWrapper, HTMLStencilElement {
+    }
+    var HTMLShadowWrapperElement: {
+        prototype: HTMLShadowWrapperElement;
+        new (): HTMLShadowWrapperElement;
     };
     interface HTMLSlotCmpElement extends Components.SlotCmp, HTMLStencilElement {
     }
@@ -459,11 +499,16 @@ declare global {
         "nested-cmp-child": HTMLNestedCmpChildElement;
         "nested-cmp-parent": HTMLNestedCmpParentElement;
         "nested-scope-cmp": HTMLNestedScopeCmpElement;
+        "non-shadow-child": HTMLNonShadowChildElement;
+        "non-shadow-forwarded-slot": HTMLNonShadowForwardedSlotElement;
+        "non-shadow-wrapper": HTMLNonShadowWrapperElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prerender-cmp": HTMLPrerenderCmpElement;
         "prop-cmp": HTMLPropCmpElement;
         "scoped-car-detail": HTMLScopedCarDetailElement;
         "scoped-car-list": HTMLScopedCarListElement;
+        "shadow-child": HTMLShadowChildElement;
+        "shadow-wrapper": HTMLShadowWrapperElement;
         "slot-cmp": HTMLSlotCmpElement;
         "slot-cmp-container": HTMLSlotCmpContainerElement;
         "slot-parent-cmp": HTMLSlotParentCmpElement;
@@ -545,6 +590,12 @@ declare namespace LocalJSX {
     }
     interface NestedScopeCmp {
     }
+    interface NonShadowChild {
+    }
+    interface NonShadowForwardedSlot {
+    }
+    interface NonShadowWrapper {
+    }
     interface PathAliasCmp {
     }
     interface PrerenderCmp {
@@ -572,6 +623,10 @@ declare namespace LocalJSX {
         "cars"?: CarData[];
         "onCarSelected"?: (event: ScopedCarListCustomEvent<CarData>) => void;
         "selected"?: CarData;
+    }
+    interface ShadowChild {
+    }
+    interface ShadowWrapper {
     }
     interface SlotCmp {
     }
@@ -610,11 +665,16 @@ declare namespace LocalJSX {
         "nested-cmp-child": NestedCmpChild;
         "nested-cmp-parent": NestedCmpParent;
         "nested-scope-cmp": NestedScopeCmp;
+        "non-shadow-child": NonShadowChild;
+        "non-shadow-forwarded-slot": NonShadowForwardedSlot;
+        "non-shadow-wrapper": NonShadowWrapper;
         "path-alias-cmp": PathAliasCmp;
         "prerender-cmp": PrerenderCmp;
         "prop-cmp": PropCmp;
         "scoped-car-detail": ScopedCarDetail;
         "scoped-car-list": ScopedCarList;
+        "shadow-child": ShadowChild;
+        "shadow-wrapper": ShadowWrapper;
         "slot-cmp": SlotCmp;
         "slot-cmp-container": SlotCmpContainer;
         "slot-parent-cmp": SlotParentCmp;
@@ -658,6 +718,9 @@ declare module "@stencil/core" {
             "nested-cmp-child": LocalJSX.NestedCmpChild & JSXBase.HTMLAttributes<HTMLNestedCmpChildElement>;
             "nested-cmp-parent": LocalJSX.NestedCmpParent & JSXBase.HTMLAttributes<HTMLNestedCmpParentElement>;
             "nested-scope-cmp": LocalJSX.NestedScopeCmp & JSXBase.HTMLAttributes<HTMLNestedScopeCmpElement>;
+            "non-shadow-child": LocalJSX.NonShadowChild & JSXBase.HTMLAttributes<HTMLNonShadowChildElement>;
+            "non-shadow-forwarded-slot": LocalJSX.NonShadowForwardedSlot & JSXBase.HTMLAttributes<HTMLNonShadowForwardedSlotElement>;
+            "non-shadow-wrapper": LocalJSX.NonShadowWrapper & JSXBase.HTMLAttributes<HTMLNonShadowWrapperElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;
@@ -666,6 +729,8 @@ declare module "@stencil/core" {
              * Component that helps display a list of cars
              */
             "scoped-car-list": LocalJSX.ScopedCarList & JSXBase.HTMLAttributes<HTMLScopedCarListElement>;
+            "shadow-child": LocalJSX.ShadowChild & JSXBase.HTMLAttributes<HTMLShadowChildElement>;
+            "shadow-wrapper": LocalJSX.ShadowWrapper & JSXBase.HTMLAttributes<HTMLShadowWrapperElement>;
             "slot-cmp": LocalJSX.SlotCmp & JSXBase.HTMLAttributes<HTMLSlotCmpElement>;
             "slot-cmp-container": LocalJSX.SlotCmpContainer & JSXBase.HTMLAttributes<HTMLSlotCmpContainerElement>;
             "slot-parent-cmp": LocalJSX.SlotParentCmp & JSXBase.HTMLAttributes<HTMLSlotParentCmpElement>;

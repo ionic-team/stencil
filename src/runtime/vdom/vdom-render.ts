@@ -775,7 +775,7 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
                 childNode.hidden = true;
                 break;
               }
-            } else {
+            } else if (slotName === siblingNode['s-sn']) {
               // this is a default fallback slot node
               // any element or text node (with content)
               // should hide the default fallback slot node

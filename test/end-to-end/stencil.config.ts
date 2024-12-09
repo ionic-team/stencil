@@ -61,4 +61,7 @@ export const config: Config = {
   hashFileNames: false,
   buildEs5: 'prod',
   sourceMap: true,
+  extras: {
+    experimentalSlotFixes: true,
+  },
 };
