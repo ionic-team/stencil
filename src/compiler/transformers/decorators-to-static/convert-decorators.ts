@@ -2,20 +2,11 @@ import { augmentDiagnosticWithNode, buildError } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import {
-  retrieveTsDecorators,
-  retrieveTsModifiers,
-  tsPropDeclNameAsString,
-  updateConstructor,
-} from '../transform-utils';
+import { retrieveTsDecorators, retrieveTsModifiers, updateConstructor } from '../transform-utils';
 import { attachInternalsDecoratorsToStatic } from './attach-internals';
 import { componentDecoratorToStatic } from './component-decorator';
 import { isDecoratorNamed } from './decorator-utils';
-import {
-  CLASS_DECORATORS_TO_REMOVE,
-  CONSTRUCTOR_DEFINED_MEMBER_DECORATORS,
-  MEMBER_DECORATORS_TO_REMOVE,
-} from './decorators-constants';
+import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { ImportAliasMap } from './import-alias-map';
@@ -163,20 +154,11 @@ const visitClassDeclaration = (
     );
   }
 
-  // We call the `handleClassFields` method which handles transforming any
-  // class fields, removing them from the class and adding statements to the
-  // class' constructor which instantiate them there instead.
-  const updatedClassFields = handleClassFields(
-    classNode,
-    decoratedMembers,
-    filteredMethodsAndFields,
-    typeChecker,
-    importAliasMap,
-  );
-
   validateMethods(diagnostics, classMembers);
 
   const currentDecorators = retrieveTsDecorators(classNode);
+  const updatedClassFields: ts.ClassElement[] = updateConstructor(classNode, filteredMethodsAndFields, []);
+
   return ts.factory.updateClassDeclaration(
     classNode,
     [
@@ -305,88 +287,4 @@ export const filterDecorators = (
 
   // return the node's original decorators, or undefined
   return decorators;
-};
-
-/**
- * This updates a Stencil component class declaration AST node to handle any
- * class fields with Stencil-specific decorators (`@State`, `@Prop`, etc).
- *
- * **Note**: this function will modify a constructor if one is already present on
- * the class or define a new one otherwise.
- *
- * @param classNode a TypeScript AST node for a Stencil component class
- * @param originalClassMembers the class members that we need to check for Stencil-specific decorators.
- * @param updatedClassMembers the class members to use for the update.
- * @param typeChecker a reference to the {@link ts.TypeChecker}
- * @param importAliasMap a map of Stencil decorator names to their import names
- * @returns a list of updated class elements which can be inserted into the class
- */
-function handleClassFields(
-  classNode: ts.ClassDeclaration,
-  originalClassMembers: ts.ClassElement[],
-  updatedClassMembers: ts.ClassElement[],
-  typeChecker: ts.TypeChecker,
-  importAliasMap: ImportAliasMap,
-): ts.ClassElement[] {
-  const statements: ts.ExpressionStatement[] = [];
-
-  for (const member of originalClassMembers) {
-    if (!shouldInitializeInConstructor(member, importAliasMap)) {
-      continue;
-    }
-    if (!ts.isPropertyDeclaration(member)) {
-      continue;
-    }
-
-    const memberName = tsPropDeclNameAsString(member, typeChecker);
-
-    // this is a class field that we'll need to handle, so lets push a statement for
-    // initializing the value onto our statements list
-    statements.push(
-      ts.factory.createExpressionStatement(
-        ts.factory.createBinaryExpression(
-          ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier(memberName)),
-          ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-          // if the member has no initializer we should default to setting it to
-          // just 'undefined'
-          member.initializer ?? ts.factory.createIdentifier('undefined'),
-        ),
-      ),
-    );
-  }
-
-  if (statements.length === 0) {
-    // we didn't encounter any class fields we need to update, so we can
-    // just return the list of class members (no need to create an empty
-    // constructor)
-    return updatedClassMembers;
-  } else {
-    // create or update a constructor which contains the initializing statements
-    // we created above
-    return updateConstructor(classNode, updatedClassMembers, statements);
-  }
-}
-
-/**
- * Check whether a given class element should be rewritten from a class field
- * to a constructor-initialized value. This is basically the case for fields
- * decorated with `@Prop` and `@State`. See {@link handleClassFields} for more
- * details.
- *
- * @param member the member to check
- * @param importAliasMap a map of Stencil decorator names to their import names
- * @returns whether this should be rewritten or not
- */
-const shouldInitializeInConstructor = (member: ts.ClassElement, importAliasMap: ImportAliasMap): boolean => {
-  const currentDecorators = retrieveTsDecorators(member);
-  if (currentDecorators === undefined) {
-    // decorators have already been removed from this element, indicating that
-    // we don't need to do anything
-    return false;
-  }
-  const filteredDecorators = filterDecorators(
-    currentDecorators,
-    CONSTRUCTOR_DEFINED_MEMBER_DECORATORS.map((decorator) => importAliasMap.get(decorator)),
-  );
-  return currentDecorators !== filteredDecorators;
 };

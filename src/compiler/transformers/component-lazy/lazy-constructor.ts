@@ -3,7 +3,7 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
-import { retrieveTsModifiers, updateConstructor } from '../transform-utils';
+import { type ConvertIdentifier, updateConstructor } from '../transform-utils';
 import { createLazyAttachInternalsBinding } from './attach-internals';
 import { HOST_REF_ARG } from './constants';
 
@@ -46,8 +46,8 @@ export const updateLazyComponentConstructor = (
  *    this.prop1 = 'value1';
  *    this.prop2 = 'value2';
  *  }
- *  prop1: string;
- *  prop2: string;
+ *  prop1 = 'value2';
+ *  prop2 = 'value1';
  *  // ^^ These initial values are a problem for lazy components.
  *  // The incoming, initial values from the proxied element is ignored.
  * }
@@ -63,14 +63,14 @@ export const updateLazyComponentConstructor = (
  *    this.prop1 = hostRef.$instanceValues$.has('prop1') ? hostRef.$instanceValues$.get('prop1') : 'value1';
  *    this.prop2 = hostRef.$instanceValues$.has('prop2') ? hostRef.$instanceValues$.get('prop2') : 'value2';
  *  }
- *  prop1: string;
- *  prop2: string;
+ *  prop1 = 'value2';
+ *  prop2 = 'value1';
  * }
  * ```
  *
- * @param classMembers
- * @param classNode
- * @param cstrMethodArgs
+ * @param classMembers children content of the class
+ * @param classNode the parental class node
+ * @returns potentially updated children content of the class
  */
 const addConstructorInitialProxyValues = (classMembers: ts.ClassElement[], classNode: ts.ClassDeclaration) => {
   const constructorIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
@@ -89,11 +89,11 @@ const addConstructorInitialProxyValues = (classMembers: ts.ClassElement[], class
             if (ts.isPropertyAccessExpression(left)) {
               // we found a statement that might need updating e.g. `this.prop1 = 'value1'`
 
-              const propName = left.name.getText();
+              const propName = getText(left.name);
               const defaultValue = expression.right;
 
               // comb through the class' body members to find a corresponding, 'modern' prop initializer
-              const prop = classNode.members.find((m) => ts.isPropertyDeclaration(m) && m.name.getText() === propName);
+              const prop = classNode.members.find((m) => ts.isPropertyDeclaration(m) && getText(m.name) === propName);
 
               if (prop) {
                 // we found what we were looking for, update the statement
@@ -136,9 +136,9 @@ const addConstructorInitialProxyValues = (classMembers: ts.ClassElement[], class
  * Creates a call expression as either::
  * `hostRef.$instanceValues$.has('prop1')` or `hostRef.$instanceValues$.get('prop1')`
  *
- * @param prop
- * @param accessor
- * @returns
+ * @param prop the property name to check for
+ * @param methodName the method to call on the instance values object
+ * @returns a new call expression
  */
 const createCallExpression = (prop: string, methodName: 'has' | 'get') =>
   ts.factory.createCallExpression(
@@ -152,6 +152,16 @@ const createCallExpression = (prop: string, methodName: 'has' | 'get') =>
     undefined,
     [ts.factory.createStringLiteral(prop)],
   );
+
+/**
+ * `sourceFile` doesn't get set in our tests' during an after-transformer visit,
+ * (which is required for ts' `getText()` to work) so we'll use an internal property
+ * @param node any ts node
+ * @returns the node's text content
+ */
+const getText = (node: ts.Node) => {
+  return node.getSourceFile() ? node.getText() : (node as any as ConvertIdentifier).__escapedText;
+};
 
 /**
  * Create a statement containing an expression calling the `registerInstance`

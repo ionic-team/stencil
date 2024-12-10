@@ -965,6 +965,8 @@ export const updateConstructor = (
   const constructorIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
   const constructorMethod = classMembers[constructorIndex];
 
+  if (constructorIndex < 0 && !statements?.length && !needsSuper(classNode)) return classMembers;
+
   if (constructorIndex >= 0 && ts.isConstructorDeclaration(constructorMethod)) {
     const constructorBodyStatements: ts.NodeArray<ts.Statement> =
       constructorMethod.body?.statements ?? ts.factory.createNodeArray();
