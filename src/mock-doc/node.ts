@@ -240,7 +240,7 @@ export class MockElement extends MockNode {
         if ('process' in globalThis && globalThis.process.env.__STENCIL_SPEC_TESTS__) {
           console.error(
             `NOTE: Property ${String(prop)} was accessed on ElementInternals, but this property is not implemented.
-  Testing components with ElementInternals is fully supported in e2e tests.`
+  Testing components with ElementInternals is fully supported in e2e tests.`,
           );
         }
       },
