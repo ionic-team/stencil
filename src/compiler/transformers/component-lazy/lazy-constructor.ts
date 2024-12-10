@@ -3,7 +3,7 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
-import { type ConvertIdentifier, updateConstructor } from '../transform-utils';
+import { type ConvertIdentifier, getStaticValue, updateConstructor } from '../transform-utils';
 import { createLazyAttachInternalsBinding } from './attach-internals';
 import { HOST_REF_ARG } from './constants';
 
@@ -25,10 +25,10 @@ export const updateLazyComponentConstructor = (
   const cstrMethodArgs = [
     ts.factory.createParameterDeclaration(undefined, undefined, ts.factory.createIdentifier(HOST_REF_ARG)),
   ];
-  addConstructorInitialProxyValues(classMembers, classNode);
 
   const cstrStatements = [
     registerInstanceStatement(moduleFile),
+    ...addConstructorInitialProxyValues(classNode),
     ...addCreateEvents(moduleFile, cmp),
     ...createLazyAttachInternalsBinding(cmp),
   ];
@@ -38,13 +38,22 @@ export const updateLazyComponentConstructor = (
 
 /**
  * With a ts config of `target: '2022', useDefineForClassFields: true`
- * compiled stencil classes now look like:
+ * compiled Stencil components went from:
+ *
+ * ```ts
+ * class MyComponent {
+ *   constructor(hostRef) {
+ *     registerInstance(this, hostRef);
+ *     this.prop1 = 'value1';
+ *     this.prop2 = 'value2';
+ *   }
+ * }
+ * ```
+ * To:
  * ```ts
  * class MyComponent {
  *  constructor(hostRef) {
  *    registerInstance(this, hostRef);
- *    this.prop1 = 'value1';
- *    this.prop2 = 'value2';
  *  }
  *  prop1 = 'value2';
  *  prop2 = 'value1';
@@ -53,7 +62,7 @@ export const updateLazyComponentConstructor = (
  * }
  * ```
  *
- * To combat this, if we find initial static prop values,
+ * To combat this, if we find 'modern', initial static prop values,
  * We change the constructor to:
  *
  * ```ts
@@ -68,68 +77,43 @@ export const updateLazyComponentConstructor = (
  * }
  * ```
  *
- * @param classMembers children content of the class
  * @param classNode the parental class node
- * @returns potentially updated children content of the class
+ * @returns potentially new statements to add to the constructor
  */
-const addConstructorInitialProxyValues = (classMembers: ts.ClassElement[], classNode: ts.ClassDeclaration) => {
-  const constructorIndex = classMembers.findIndex((m) => m.kind === ts.SyntaxKind.Constructor);
-  const constructorMethod = classMembers[constructorIndex];
-  let didUpdate = false;
+const addConstructorInitialProxyValues = (classNode: ts.ClassDeclaration) => {
+  const parsedProps: { [key: string]: d.ComponentCompilerProperty } = getStaticValue(classNode.members, 'properties');
+  if (!parsedProps) return [];
 
-  if (constructorIndex >= 0 && ts.isConstructorDeclaration(constructorMethod)) {
-    const updatedStatements: ts.NodeArray<ts.Statement> = ts.factory.createNodeArray(
-      constructorMethod.body?.statements.map((st) => {
-        if (ts.isExpressionStatement(st)) {
-          const expression = st.expression;
+  const propNames = Object.keys(parsedProps);
+  const newStatements: ts.Statement[] = [];
 
-          if (ts.isBinaryExpression(expression) && expression.operatorToken.kind === ts.SyntaxKind.EqualsToken) {
-            const left = expression.left;
+  for (const propName of propNames) {
+    // comb through the class' body members to find a corresponding, 'modern' prop initializer
+    const prop = classNode.members.find((m) => ts.isPropertyDeclaration(m) && getText(m.name) === propName) as
+      | ts.PropertyDeclaration
+      | undefined;
+    if (!prop) continue;
 
-            if (ts.isPropertyAccessExpression(left)) {
-              // we found a statement that might need updating e.g. `this.prop1 = 'value1'`
+    // we found what we were looking for, create a new statement to add to the constructor
+    const defaultValue = prop.initializer || ts.factory.createIdentifier('undefined');
 
-              const propName = getText(left.name);
-              const defaultValue = expression.right;
-
-              // comb through the class' body members to find a corresponding, 'modern' prop initializer
-              const prop = classNode.members.find((m) => ts.isPropertyDeclaration(m) && getText(m.name) === propName);
-
-              if (prop) {
-                // we found what we were looking for, update the statement
-                didUpdate = true;
-                return ts.factory.createExpressionStatement(
-                  ts.factory.createBinaryExpression(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createThis(), left.name),
-                    ts.SyntaxKind.EqualsToken,
-                    ts.factory.createConditionalExpression(
-                      createCallExpression(propName, 'has'),
-                      ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-                      createCallExpression(propName, 'get'),
-                      ts.factory.createToken(ts.SyntaxKind.ColonToken),
-                      defaultValue,
-                    ),
-                  ),
-                );
-              }
-            }
-          }
-        }
-        // didn't find what we were looking for, return the original statement
-        return st;
-      }),
+    newStatements.push(
+      ts.factory.createExpressionStatement(
+        ts.factory.createBinaryExpression(
+          ts.factory.createPropertyAccessExpression(ts.factory.createThis(), propName),
+          ts.SyntaxKind.EqualsToken,
+          ts.factory.createConditionalExpression(
+            createCallExpression(propName, 'has'),
+            ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+            createCallExpression(propName, 'get'),
+            ts.factory.createToken(ts.SyntaxKind.ColonToken),
+            defaultValue,
+          ),
+        ),
+      ),
     );
-
-    if (didUpdate) {
-      classMembers[constructorIndex] = ts.factory.updateConstructorDeclaration(
-        constructorMethod,
-        undefined,
-        [],
-        ts.factory.updateBlock(constructorMethod?.body, updatedStatements),
-      );
-    }
   }
-  return classMembers;
+  return newStatements;
 };
 
 /**
