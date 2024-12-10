@@ -11,6 +11,7 @@ import { BUILD } from '@app-data';
 import { isMemberInElement, plt, win } from '@platform';
 import { isComplexType } from '@utils';
 
+import type * as d from '../../declarations';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 /**
@@ -29,7 +30,7 @@ import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
  * @param flags bitflags for Vdom variables
  */
 export const setAccessor = (
-  elm: HTMLElement,
+  elm: d.RenderNode,
   memberName: string,
   oldValue: any,
   newValue: any,
@@ -44,6 +45,11 @@ export const setAccessor = (
       const classList = elm.classList;
       const oldClasses = parseClassList(oldValue);
       const newClasses = parseClassList(newValue);
+      // for `scoped: true` components, new nodes after initial hydration
+      // from SSR don't have the slotted class added. Let's add that now
+      if (elm['s-si'] && newClasses.indexOf(elm['s-si']) < 0) {
+        newClasses.push(elm['s-si']);
+      }
       classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
       classList.add(...newClasses.filter((c) => c && !oldClasses.includes(c)));
     } else if (BUILD.vdomStyle && memberName === 'style') {
