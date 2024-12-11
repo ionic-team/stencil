@@ -1,3 +1,22 @@
+# 🐣 [4.23.0](https://github.com/ionic-team/stencil/compare/v4.22.3...v4.23.0) (2024-12-11)
+
+
+### Bug Fixes
+
+* `patchChildSlotNodes` & `scopedSlotTextContentFix` not being applied ([#6055](https://github.com/ionic-team/stencil/issues/6055)) ([a15bc5d](https://github.com/ionic-team/stencil/commit/a15bc5da60fb579aa80a38369d5464db17c40c38)), closes [#6054](https://github.com/ionic-team/stencil/issues/6054)
+* Change hasHostListenerAttached from var to protoype property ([#6074](https://github.com/ionic-team/stencil/issues/6074)) ([ee4aa0b](https://github.com/ionic-team/stencil/commit/ee4aa0b4bcc2162d7745f188b8e754cb5d7abda2)), closes [#6066](https://github.com/ionic-team/stencil/issues/6066)
+* **mock-doc:** don't show error message for SSR workflows ([#6075](https://github.com/ionic-team/stencil/issues/6075)) ([84a3607](https://github.com/ionic-team/stencil/commit/84a36072dbda4591105ec2bab1e3ac79d38c47ad)), closes [#6073](https://github.com/ionic-team/stencil/issues/6073)
+* rewrite SSR client-side hydration ([#6067](https://github.com/ionic-team/stencil/issues/6067)) ([ec243c2](https://github.com/ionic-team/stencil/commit/ec243c250c6b8f6fc25835ec2db3c7f157c84947)), closes [#6065](https://github.com/ionic-team/stencil/issues/6065), [#6064](https://github.com/ionic-team/stencil/issues/6064), [#6063](https://github.com/ionic-team/stencil/issues/6063), [#5198](https://github.com/ionic-team/stencil/issues/5198)
+* **runtime:** ensure Node is defined ([#6061](https://github.com/ionic-team/stencil/issues/6061)) ([1f5a13f](https://github.com/ionic-team/stencil/commit/1f5a13f07a138e27d9b937c03999837b30e8afc0)), closes [ionic-team/stencil-ds-output-targets#537](https://github.com/ionic-team/stencil-ds-output-targets/issues/537)
+* stop 'experimentalScopedSlotChanges' warning msg on startup ([#6068](https://github.com/ionic-team/stencil/issues/6068)) ([d362700](https://github.com/ionic-team/stencil/commit/d362700ab85c0fc33c4df5d4e0431d1209ac0548)), closes [#6054](https://github.com/ionic-team/stencil/issues/6054)
+
+
+### Features
+
+* prop get set new ([#6050](https://github.com/ionic-team/stencil/issues/6050)) ([7ecb599](https://github.com/ionic-team/stencil/commit/7ecb59993481a2f522916a9d504c5a4738c3f545))
+
+
+
 ## 🐤 [4.22.3](https://github.com/ionic-team/stencil/compare/v4.22.2...v4.22.3) (2024-11-21)
 
 
