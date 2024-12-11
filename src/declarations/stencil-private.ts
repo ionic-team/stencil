@@ -686,6 +686,7 @@ export interface ComponentCompilerStaticProperty {
   defaultValue?: string;
   getter: boolean;
   setter: boolean;
+  ogPropName?: string;
 }
 
 /**

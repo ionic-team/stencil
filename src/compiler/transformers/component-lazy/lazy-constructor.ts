@@ -3,7 +3,7 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addCoreRuntimeApi, REGISTER_INSTANCE, RUNTIME_APIS } from '../core-runtime-apis';
 import { addCreateEvents } from '../create-event';
-import { type ConvertIdentifier, getStaticValue, updateConstructor } from '../transform-utils';
+import { getStaticValue, updateConstructor } from '../transform-utils';
 import { createLazyAttachInternalsBinding } from './attach-internals';
 import { HOST_REF_ARG } from './constants';
 
@@ -89,18 +89,36 @@ const addConstructorInitialProxyValues = (classNode: ts.ClassDeclaration) => {
 
   for (const propName of propNames) {
     // comb through the class' body members to find a corresponding, 'modern' prop initializer
-    const prop = classNode.members.find((m) => ts.isPropertyDeclaration(m) && getText(m.name) === propName) as
-      | ts.PropertyDeclaration
-      | undefined;
+    const dynamicPropName = parsedProps[propName].ogPropName || '';
+
+    // looking for `[example]` or `example` class property declarations
+    const prop = classNode.members.find((m) => {
+      return (
+        ts.isPropertyDeclaration(m) &&
+        ((ts.isComputedPropertyName(m.name) && m.name.expression.getText() === dynamicPropName) ||
+          m.name.getText() === propName)
+      );
+    }) as any as ts.PropertyDeclaration;
+
     if (!prop) continue;
 
     // we found what we were looking for, create a new statement to add to the constructor
     const defaultValue = prop.initializer || ts.factory.createIdentifier('undefined');
 
+    let accessExpression: ts.ElementAccessExpression | ts.PropertyAccessExpression;
+    if (ts.isComputedPropertyName(prop.name) && dynamicPropName) {
+      accessExpression = ts.factory.createElementAccessExpression(
+        ts.factory.createThis(),
+        ts.factory.createIdentifier(dynamicPropName),
+      );
+    } else {
+      accessExpression = ts.factory.createPropertyAccessExpression(ts.factory.createThis(), propName);
+    }
+
     newStatements.push(
       ts.factory.createExpressionStatement(
         ts.factory.createBinaryExpression(
-          ts.factory.createPropertyAccessExpression(ts.factory.createThis(), propName),
+          accessExpression,
           ts.SyntaxKind.EqualsToken,
           ts.factory.createConditionalExpression(
             createCallExpression(propName, 'has'),
@@ -136,16 +154,6 @@ const createCallExpression = (prop: string, methodName: 'has' | 'get') =>
     undefined,
     [ts.factory.createStringLiteral(prop)],
   );
-
-/**
- * `sourceFile` doesn't get set in our tests' during an after-transformer visit,
- * (which is required for ts' `getText()` to work) so we'll use an internal property
- * @param node any ts node
- * @returns the node's text content
- */
-const getText = (node: ts.Node) => {
-  return node.getSourceFile() ? node.getText() : (node as any as ConvertIdentifier).__escapedText;
-};
 
 /**
  * Create a statement containing an expression calling the `registerInstance`

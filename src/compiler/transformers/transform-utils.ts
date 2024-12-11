@@ -1054,10 +1054,10 @@ const createConstructorBodyWithSuper = (): ts.ExpressionStatement => {
  * @param typeChecker a reference to the {@link ts.TypeChecker}
  * @returns the name of the property in string form
  */
-export const tsPropDeclNameAsString = (
+export const tsPropDeclName = (
   node: ts.PropertyDeclaration | ts.GetAccessorDeclaration,
   typeChecker: ts.TypeChecker,
-): string => {
+): { staticName: string; dynamicName: string } => {
   const declarationName: ts.DeclarationName = ts.getNameOfDeclaration(node);
 
   // The name of a class field declaration can be a computed property name,
@@ -1081,15 +1081,18 @@ export const tsPropDeclNameAsString = (
   // ```
   //
   // we can just call `.getText` on the name itself.
-  let memberName = declarationName.getText();
+  let staticName = declarationName.getText();
+  let dynamicName;
+
   if (ts.isComputedPropertyName(declarationName)) {
+    dynamicName = declarationName.expression.getText();
     const type = typeChecker.getTypeAtLocation(declarationName.expression);
     if (type != null && type.isLiteral()) {
-      memberName = type.value.toString();
+      staticName = type.value.toString();
     }
   }
 
-  return memberName;
+  return { staticName, dynamicName };
 };
 
 /**

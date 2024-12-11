@@ -12,7 +12,7 @@ import {
   retrieveTsDecorators,
   retrieveTsModifiers,
   serializeSymbol,
-  tsPropDeclNameAsString,
+  tsPropDeclName,
   typeToString,
 } from '../transform-utils';
 import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
@@ -74,7 +74,7 @@ const parsePropDecorator = (
   const decoratorParams = getDecoratorParameters<d.PropOptions>(propDecorator, typeChecker);
   const propOptions: d.PropOptions = decoratorParams[0] || {};
 
-  const propName = tsPropDeclNameAsString(prop, typeChecker);
+  const { staticName: propName, dynamicName: ogPropName } = tsPropDeclName(prop, typeChecker);
 
   if (isMemberPrivate(prop)) {
     const err = buildError(diagnostics);
@@ -106,6 +106,7 @@ const parsePropDecorator = (
     getter: ts.isGetAccessor(prop),
     setter: !!foundSetter,
   };
+  if (ogPropName && ogPropName !== propName) propMeta.ogPropName = ogPropName;
 
   // prop can have an attribute if type is NOT "unknown"
   if (typeStr !== 'unknown') {
