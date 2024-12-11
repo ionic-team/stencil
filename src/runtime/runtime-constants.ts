@@ -54,6 +54,7 @@ export const CONTENT_REF_ID = 'r';
 export const ORG_LOCATION_ID = 'o';
 export const SLOT_NODE_ID = 's';
 export const TEXT_NODE_ID = 't';
+export const COMMENT_NODE_ID = 'c';
 
 export const HYDRATE_ID = 's-id';
 export const HYDRATED_STYLE_ID = 'sty-id';

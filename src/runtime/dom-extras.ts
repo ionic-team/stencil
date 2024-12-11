@@ -287,8 +287,14 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
     // for mock-doc
     childNodesFn = Object.getOwnPropertyDescriptor(elm, 'childNodes');
   }
-
   if (childNodesFn) Object.defineProperty(elm, '__childNodes', childNodesFn);
+
+  let childrenFn = Object.getOwnPropertyDescriptor(Element.prototype, 'children');
+  if (!childrenFn) {
+    // for mock-doc
+    childrenFn = Object.getOwnPropertyDescriptor(elm, 'children');
+  }
+  if (childrenFn) Object.defineProperty(elm, '__children', childrenFn);
 
   Object.defineProperty(elm, 'children', {
     get() {
@@ -330,9 +336,15 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
  * @param newChild a node that's going to be added to the component
  * @param slotNode the slot node that the node will be added to
  * @param prepend move the slotted location node to the beginning of the host
+ * @param position an ordered position to add the ref node which mirrors the lightDom nodes' order. Used during SSR hydration
  *  (the order of the slot location nodes determines the order of the slotted nodes in our patched accessors)
  */
-export const addSlotRelocateNode = (newChild: d.RenderNode, slotNode: d.RenderNode, prepend?: boolean) => {
+export const addSlotRelocateNode = (
+  newChild: d.RenderNode,
+  slotNode: d.RenderNode,
+  prepend?: boolean,
+  position?: number,
+) => {
   let slottedNodeLocation: d.RenderNode;
   // does newChild already have a slot location node?
   if (newChild['s-ol'] && newChild['s-ol'].isConnected) {
@@ -342,13 +354,33 @@ export const addSlotRelocateNode = (newChild: d.RenderNode, slotNode: d.RenderNo
     slottedNodeLocation['s-nr'] = newChild;
   }
 
+  if (!slotNode['s-cr'] || !slotNode['s-cr'].parentNode) return;
+
   const parent = slotNode['s-cr'].parentNode as any;
-  const appendMethod = prepend ? parent.__prepend : parent.__appendChild;
+  const appendMethod = prepend ? parent.__prepend || parent.prepend : parent.__appendChild || parent.appendChild;
+
+  if (typeof position !== 'undefined') {
+    if (BUILD.hydrateClientSide) {
+      slottedNodeLocation['s-oo'] = position;
+      const childNodes = (parent.__childNodes || parent.childNodes) as NodeListOf<d.RenderNode>;
+      const slotRelocateNodes: d.RenderNode[] = [slottedNodeLocation];
+      childNodes.forEach((n) => {
+        if (n['s-nr']) slotRelocateNodes.push(n);
+      });
+
+      slotRelocateNodes.sort((a, b) => {
+        if (!a['s-oo'] || a['s-oo'] < b['s-oo']) return -1;
+        else if (!b['s-oo'] || b['s-oo'] < a['s-oo']) return 1;
+        return 0;
+      });
+      slotRelocateNodes.forEach((n) => appendMethod.call(parent, n));
+    }
+  } else {
+    appendMethod.call(parent, slottedNodeLocation);
+  }
 
   newChild['s-ol'] = slottedNodeLocation;
   newChild['s-sh'] = slotNode['s-hn'];
-
-  appendMethod.call(parent, slottedNodeLocation);
 };
 
 /**
