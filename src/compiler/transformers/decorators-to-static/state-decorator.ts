@@ -1,6 +1,6 @@
 import ts from 'typescript';
 
-import { createStaticGetter, retrieveTsDecorators, tsPropDeclNameAsString } from '../transform-utils';
+import { createStaticGetter, retrieveTsDecorators, tsPropDeclName } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
 /**
@@ -55,7 +55,7 @@ const stateDecoratorToStatic = (
     return null;
   }
 
-  const stateName = tsPropDeclNameAsString(prop, typeChecker);
+  const { staticName: stateName } = tsPropDeclName(prop, typeChecker);
 
   return ts.factory.createPropertyAssignment(
     ts.factory.createStringLiteral(stateName),

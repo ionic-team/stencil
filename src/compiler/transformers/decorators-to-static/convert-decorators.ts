@@ -2,20 +2,11 @@ import { augmentDiagnosticWithNode, buildError } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import {
-  retrieveTsDecorators,
-  retrieveTsModifiers,
-  tsPropDeclNameAsString,
-  updateConstructor,
-} from '../transform-utils';
+import { retrieveTsDecorators, retrieveTsModifiers, updateConstructor } from '../transform-utils';
 import { attachInternalsDecoratorsToStatic } from './attach-internals';
 import { componentDecoratorToStatic } from './component-decorator';
 import { isDecoratorNamed } from './decorator-utils';
-import {
-  CLASS_DECORATORS_TO_REMOVE,
-  CONSTRUCTOR_DEFINED_MEMBER_DECORATORS,
-  MEMBER_DECORATORS_TO_REMOVE,
-} from './decorators-constants';
+import { CLASS_DECORATORS_TO_REMOVE, MEMBER_DECORATORS_TO_REMOVE } from './decorators-constants';
 import { elementDecoratorsToStatic } from './element-decorator';
 import { eventDecoratorsToStatic } from './event-decorator';
 import { ImportAliasMap } from './import-alias-map';
@@ -163,14 +154,11 @@ const visitClassDeclaration = (
     );
   }
 
-  // We call the `handleClassFields` method which handles transforming any
-  // class fields, removing them from the class and adding statements to the
-  // class' constructor which instantiate them there instead.
-  const updatedClassFields = handleClassFields(classNode, filteredMethodsAndFields, typeChecker, importAliasMap);
-
   validateMethods(diagnostics, classMembers);
 
   const currentDecorators = retrieveTsDecorators(classNode);
+  const updatedClassFields: ts.ClassElement[] = updateConstructor(classNode, filteredMethodsAndFields, []);
+
   return ts.factory.updateClassDeclaration(
     classNode,
     [
@@ -232,7 +220,7 @@ const removeStencilMethodDecorators = (
       } else if (ts.isGetAccessor(member)) {
         return ts.factory.updateGetAccessorDeclaration(
           member,
-          ts.canHaveModifiers(member) ? ts.getModifiers(member) : undefined,
+          [...(newDecorators ?? []), ...(retrieveTsModifiers(member) ?? [])],
           member.name,
           member.parameters,
           member.type,
@@ -243,25 +231,15 @@ const removeStencilMethodDecorators = (
         err.messageText = 'A get accessor should be decorated before a set accessor';
         augmentDiagnosticWithNode(err, member);
       } else if (ts.isPropertyDeclaration(member)) {
-        if (shouldInitializeInConstructor(member, importAliasMap)) {
-          // if the current class member is decorated with either 'State' or
-          // 'Prop' we need to modify the property declaration to transform it
-          // from a class field but we handle this in the `handleClassFields`
-          // method below, so we just want to return the class member here
-          // untouched.
-          return member;
-        } else {
-          // update the property to remove decorators
-          const modifiers = retrieveTsModifiers(member);
-          return ts.factory.updatePropertyDeclaration(
-            member,
-            [...(newDecorators ?? []), ...(modifiers ?? [])],
-            member.name,
-            member.questionToken,
-            member.type,
-            member.initializer,
-          );
-        }
+        const modifiers = retrieveTsModifiers(member);
+        return ts.factory.updatePropertyDeclaration(
+          member,
+          [...(newDecorators ?? []), ...(modifiers ?? [])],
+          member.name,
+          member.questionToken,
+          member.type,
+          member.initializer,
+        );
       } else {
         const err = buildError(diagnostics);
         err.messageText = 'Unknown class member encountered!';
@@ -308,169 +286,4 @@ export const filterDecorators = (
 
   // return the node's original decorators, or undefined
   return decorators;
-};
-
-/**
- * This updates a Stencil component class declaration AST node to handle any
- * class fields with Stencil-specific decorators (`@State`, `@Prop`, etc). For
- * reasons explained below, we need to remove these fields from the class and
- * add code to the class's constructor to instantiate them manually.
- *
- * When a class field is decorated with a Stencil-defined decorator, we rely on
- * defining our own setters and getters (using `Object.defineProperty`) to
- * implement the behavior we want. Unfortunately, in ES2022 and newer versions
- * of the EcmaScript standard the behavior for class fields like the following
- * is incompatible with using manually-defined getters and setters:
- *
- * ```ts
- * class MyClass {
- *   foo = "bar"
- * }
- * ```
- *
- * In ES2022+ if we try to use `Object.defineProperty` on this class's
- * prototype in order to define a `set` and `get` function for the
- * property `foo` it will not override the default behavior of the
- * instance field `foo`, so doing something like the following:
- *
- * ```ts
- * Object.defineProperty(MyClass.prototype, "foo", {
- *   get() {
- *     return "Foo is: " + this.foo
- *   }
- * });
- * ```
- *
- * and then calling `myClassInstance.foo` will _not_ return `"Foo is: bar"` but
- * just `"bar"`. This is because the standard ECMAScript behavior is now to use
- * the internals of `Object.defineProperty` on a class instance to instantiate
- * fields, and that call at instantiation-time overrides what's set on the
- * prototype. For details, see the accepted ECMAScript proposal for this
- * behavior:
- *
- * https://github.com/tc39/proposal-class-fields#public-fields-created-with-objectdefineproperty
- *
- * Why is this important? With `target` set to an ECMAScript version prior to
- * ES2022 TypeScript by default would emit a class which instantiated the field
- * in its constructor, something like this:
- *
- * ```ts
- * class CompiledMyClass {
- *   constructor() {
- *     this.foo = "bar"
- *   }
- * }
- * ```
- *
- * This plays nicely with later using `Object.defineProperty` on the prototype
- * to define getters and setters, or simply with defining them right on the
- * class (see the code in `proxyComponent`, `proxyCustomElement`, and friends).
- *
- * However, with a `target` of ES2022 or higher (e.g. `ESNext`) default
- * behavior for TypeScript is instead to emit code like this:
- *
- * ```ts
- * class CompiledMyClass {
- *   foo = "bar"
- * }
- * ```
- *
- * This output is more correct because the compiled code 1) more closely
- * resembles the TypeScript source and 2) is using standard JS syntax instead
- * of desugaring it. There is an announcement in the release notes for
- * TypeScript v3.7 which explains some helpful background about the change,
- * and about the `useDefineForClassFields` TypeScript option which lets you
- * opt-in to the old output:
- *
- * https://www.typescriptlang.org/docs/handbook/release-notes/typescript-3-7.html#the-usedefineforclassfields-flag-and-the-declare-property-modifier
- *
- * For our use-case, however, the ES2022+ behavior doesn't work, since we need
- * to be able to define getters and setters on these fields. We could require
- * that the TypeScript configuration used for Stencil have the
- * `useDefineForClassFields` setting set to `false`, but that would have the
- * undesirable side-effect that class fields which are _not_
- * decorated with a Stencil decorator would also be instantiated in the
- * constructor.
- *
- * So instead, we take matters into our own hands. When we encounter a class
- * field which is decorated with a Stencil decorator we remove it from the
- * class and add a statement to the constructor to instantiate it with the
- * correct default value.
- *
- * **Note**: this function will modify a constructor if one is already present on
- * the class or define a new one otherwise.
- *
- * @param classNode a TypeScript AST node for a Stencil component class
- * @param classMembers the class members that we need to update
- * @param typeChecker a reference to the {@link ts.TypeChecker}
- * @param importAliasMap a map of Stencil decorator names to their import names
- * @returns a list of updated class elements which can be inserted into the class
- */
-function handleClassFields(
-  classNode: ts.ClassDeclaration,
-  classMembers: ts.ClassElement[],
-  typeChecker: ts.TypeChecker,
-  importAliasMap: ImportAliasMap,
-): ts.ClassElement[] {
-  const statements: ts.ExpressionStatement[] = [];
-  const updatedClassMembers: ts.ClassElement[] = [];
-
-  for (const member of classMembers) {
-    if (shouldInitializeInConstructor(member, importAliasMap) && ts.isPropertyDeclaration(member)) {
-      const memberName = tsPropDeclNameAsString(member, typeChecker);
-
-      // this is a class field that we'll need to handle, so lets push a statement for
-      // initializing the value onto our statements list
-      statements.push(
-        ts.factory.createExpressionStatement(
-          ts.factory.createBinaryExpression(
-            ts.factory.createPropertyAccessExpression(ts.factory.createThis(), ts.factory.createIdentifier(memberName)),
-            ts.factory.createToken(ts.SyntaxKind.EqualsToken),
-            // if the member has no initializer we should default to setting it to
-            // just 'undefined'
-            member.initializer ?? ts.factory.createIdentifier('undefined'),
-          ),
-        ),
-      );
-    } else {
-      // if it's not a class field that is decorated with a Stencil decorator then
-      // we just push it onto our class member list
-      updatedClassMembers.push(member);
-    }
-  }
-
-  if (statements.length === 0) {
-    // we didn't encounter any class fields we need to update, so we can
-    // just return the list of class members (no need to create an empty
-    // constructor)
-    return updatedClassMembers;
-  } else {
-    // create or update a constructor which contains the initializing statements
-    // we created above
-    return updateConstructor(classNode, updatedClassMembers, statements);
-  }
-}
-
-/**
- * Check whether a given class element should be rewritten from a class field
- * to a constructor-initialized value. This is basically the case for fields
- * decorated with `@Prop` and `@State`. See {@link handleClassFields} for more
- * details.
- *
- * @param member the member to check
- * @param importAliasMap a map of Stencil decorator names to their import names
- * @returns whether this should be rewritten or not
- */
-const shouldInitializeInConstructor = (member: ts.ClassElement, importAliasMap: ImportAliasMap): boolean => {
-  const currentDecorators = retrieveTsDecorators(member);
-  if (currentDecorators === undefined) {
-    // decorators have already been removed from this element, indicating that
-    // we don't need to do anything
-    return false;
-  }
-  const filteredDecorators = filterDecorators(
-    currentDecorators,
-    CONSTRUCTOR_DEFINED_MEMBER_DECORATORS.map((decorator) => importAliasMap.get(decorator)),
-  );
-  return currentDecorators !== filteredDecorators;
 };
