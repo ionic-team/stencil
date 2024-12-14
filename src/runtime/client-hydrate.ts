@@ -1,5 +1,6 @@
 import { BUILD } from '@app-data';
 import { doc, plt } from '@platform';
+
 import type * as d from '../declarations';
 import { addSlotRelocateNode, patchNextPrev } from './dom-extras';
 import { createTime } from './profile';
