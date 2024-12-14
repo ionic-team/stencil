@@ -30,8 +30,6 @@ export const updateModule = (
   const emitFileName = basename(emitFilePath);
   emitFilePath = normalizePath(join(srcDirPath, emitFileName));
 
-  // if (prevModuleFile.cmps.length > 0) console.log('BEFORE', prevModuleFile.staticSourceFileText, 'AFTER', sourceFileText)
-
   const moduleFile = createModule(tsSourceFile, sourceFileText, emitFilePath);
   if (prevModuleFile?.cmps) moduleFile.cmps = prevModuleFile.cmps;
 
