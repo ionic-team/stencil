@@ -85,14 +85,15 @@ export const registerHost = (hostElement: d.HostElement, cmpMeta: d.ComponentRun
 export const isMemberInElement = (elm: any, memberName: string) => memberName in elm;
 
 /**
- * - Re-wires component prototype `get` / `set` with instance `@State` decorated fields.
- * - Makes sure the initial value from the Element is synced to the instance `@State` / `@Prop` decorated fields.
+ * - Re-wires component prototype `get` / `set` with instance `@State` / `@Prop` decorated fields.
+ * - Makes sure the initial value from the `Element` is synced to the instance `@Prop` decorated fields.
  *
+ * Background:
  * During component init, Stencil loops through any `@Prop()` or `@State()` decorated properties
  * and sets up getters and setters for each (within `src/runtime/proxy-component.ts`) on a component prototype.
  *
- * These accessors sync-up class instances with their `Element` and orchestrates re-renders.
- * With modern JS compiled classes (e.g. `target: 'es2022'`) compiled Stencil components went from:
+ * These accessors sync-up class instances with their `Element` and controls re-renders.
+ * With modern JS, compiled classes (e.g. `target: 'es2022'`) compiled Stencil components went from:
  *
  * ```ts
  * class MyComponent {
@@ -110,7 +111,7 @@ export const isMemberInElement = (elm: any, memberName: string) => memberName in
  * ```
  *
  * @param instance - class instance to re-wire
- * @param hostRef - component reference
+ * @param hostRef - component reference meta
  */
 const reWireGetterSetter = (instance: any, hostRef: d.HostRef) => {
   const cmpMeta = hostRef.$cmpMeta$;
