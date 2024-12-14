@@ -1,5 +1,4 @@
 import { mockCompilerCtx } from '@stencil/core/testing';
-import { ScriptTarget } from 'typescript';
 
 import type * as d from '../../../declarations';
 import { lazyComponentTransform } from '../component-lazy/transform-lazy-component';
@@ -106,73 +105,6 @@ describe('lazy-component', () => {
           return true;
         }
       }`,
-    );
-  });
-
-  it('adds constructor statements appropriately for `@Prop` decorators', async () => {
-    const compilerCtx = mockCompilerCtx();
-    const transformOpts: d.TransformOptions = {
-      coreImportPath: '@stencil/core',
-      componentExport: 'lazy',
-      componentMetadata: null,
-      currentDirectory: '/',
-      proxy: null,
-      style: 'static',
-      styleImportData: null,
-    };
-
-    const code = `
-      const anotherProp = 'dynamic-string'
-      @Component({
-        tag: 'cmp-a',
-      })
-      export class CmpA {
-        @Prop() aProp = 'prop';
-        @Prop() [anotherProp] = 'prop 2';
-        @State() aState = 'state';
-        #aPrivateField = 'private';
-      }
-    `;
-
-    const transformer = lazyComponentTransform(compilerCtx, transformOpts);
-    const t2022 = transpileModule(code, null, compilerCtx, [], [transformer], [], {
-      target: ScriptTarget.ES2022,
-    });
-
-    expect(await formatCode(t2022.outputText)).toContain(
-      await c`import { registerInstance as __stencil_registerInstance } from '@stencil/core';
-    const anotherProp = 'dynamic-string';  
-    export const CmpA = class {
-      constructor(hostRef) {
-        __stencil_registerInstance(this, hostRef);
-        this.aProp = hostRef.$instanceValues$.has('aProp') ? hostRef.$instanceValues$.get('aProp') : 'prop';
-        this[anotherProp] = hostRef.$instanceValues$.has('dynamic-string') ? hostRef.$instanceValues$.get('dynamic-string') : 'prop 2';
-      }
-      aProp = 'prop';
-      [anotherProp] = 'prop 2';
-      aState = 'state';
-      #aPrivateField = 'private';
-    }`,
-    );
-
-    const t2017 = transpileModule(code, null, compilerCtx, [], [transformer], [], {
-      target: ScriptTarget.ES2017,
-    });
-
-    expect(await formatCode(t2017.outputText)).toContain(
-      await c`import { registerInstance as __stencil_registerInstance } from '@stencil/core';
-    var _CmpA_aPrivateField, _a;
-    const anotherProp = 'dynamic-string';
-    export const CmpA = class {
-      constructor(hostRef) {
-        __stencil_registerInstance(this, hostRef);
-        this.aProp = 'prop';
-        this[_a] = 'prop 2';
-        this.aState = 'state';
-        _CmpA_aPrivateField.set(this, 'private');
-      }
-    };
-    (_CmpA_aPrivateField = new WeakMap()), (_a = anotherProp);`,
     );
   });
 

@@ -5,6 +5,7 @@ import ts from 'typescript';
 import type * as d from '../../../declarations';
 import { addComponentMetaStatic } from '../add-component-meta-static';
 import { setComponentBuildConditionals } from '../component-build-conditionals';
+import { detectModernPropDeclarations } from '../detect-modern-prop-decls';
 import { getComponentTagName, getStaticValue, isInternal, isStaticGetter, serializeSymbol } from '../transform-utils';
 import { parseAttachInternals } from './attach-internals';
 import { parseCallExpression } from './call-expression';
@@ -120,6 +121,7 @@ export const parseStaticComponentMeta = (
     hasMember: false,
     hasMethod: false,
     hasMode: false,
+    hasModernPropertyDecls: false,
     hasAttribute: false,
     hasProp: false,
     hasPropNumber: false,
@@ -167,6 +169,7 @@ export const parseStaticComponentMeta = (
   };
   visitComponentChildNode(cmpNode);
   parseClassMethods(cmpNode, cmp);
+  detectModernPropDeclarations(cmpNode, cmp);
 
   cmp.htmlAttrNames = unique(cmp.htmlAttrNames);
   cmp.htmlTagNames = unique(cmp.htmlTagNames);
@@ -178,7 +181,11 @@ export const parseStaticComponentMeta = (
   }
 
   // add to module map
-  moduleFile.cmps.push(cmp);
+  const foundIndex = moduleFile.cmps.findIndex(
+    (c) => c.tagName === cmp.tagName && c.sourceFilePath === cmp.sourceFilePath,
+  );
+  if (foundIndex > -1) moduleFile.cmps[foundIndex] = cmp;
+  else moduleFile.cmps.push(cmp);
 
   // add to node map
   compilerCtx.nodeMap.set(cmpNode, cmp);
