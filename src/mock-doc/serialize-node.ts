@@ -136,7 +136,7 @@ function* streamToHtml(
         /**
          * If the node is a shadow root, we want to add the `shadowrootmode` attribute
          */
-        'host' in node
+        ('host' in node || node.nodeName.toLocaleLowerCase() === shadowRootTag)
       ) {
         const mode = ` shadowrootmode="open"`;
         yield mode;
