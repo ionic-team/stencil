@@ -126,6 +126,23 @@ function* streamToHtml(
       yield '<' + tag;
       output.currentLineWidth += tag.length + 1;
 
+      /**
+       * ToDo(https://github.com/ionic-team/stencil/issues/4111): the shadow root class is `#document-fragment`
+       * and has no mode attribute. We should consider adding a mode attribute.
+       */
+      if (
+        tag === 'template' &&
+        (!(node as Element).getAttribute || !(node as Element).getAttribute('shadowrootmode')) &&
+        /**
+         * If the node is a shadow root, we want to add the `shadowrootmode` attribute
+         */
+        'host' in node
+      ) {
+        const mode = ` shadowrootmode="open"`;
+        yield mode;
+        output.currentLineWidth += mode.length;
+      }
+
       const attrsLength = (node as HTMLElement).attributes.length;
       const attributes =
         opts.prettyHtml && attrsLength > 1
