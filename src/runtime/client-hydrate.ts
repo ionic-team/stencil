@@ -163,8 +163,10 @@ export const initializeClientHydrate = (
         // Create our 'Original Location' node
         addSlotRelocateNode(slottedItem.node, slottedItem.slot, false, slottedItem.node['s-oo']);
 
-        // patch this node for accessors like `nextSibling` (et al)
-        patchNextPrev(slottedItem.node);
+        if (BUILD.experimentalSlotFixes) {
+          // patch this node for accessors like `nextSibling` (et al)
+          patchNextPrev(slottedItem.node);
+        }
       }
 
       if (hostEle.shadowRoot && slottedItem.node.parentElement !== hostEle) {

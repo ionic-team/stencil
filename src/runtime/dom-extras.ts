@@ -330,9 +330,9 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
  * Especially relevant when rendering components via SSR... Frameworks will often try to reconcile their
  * VDOM with the real DOM by stepping through nodes with 'nextSibling' et al.
  * - `nextSibling`
- * - `nextSiblingElement`
+ * - `nextElementSibling`
  * - `previousSibling`
- * - `previousSiblingElement`
+ * - `previousElementSibling`
  *
  * @param node the slotted node to be patched
  */
@@ -342,9 +342,9 @@ export const patchNextPrev = (node: Node) => {
   patchNextSibling(node);
   patchPreviousSibling(node);
 
-  if (node instanceof Element) {
-    patchNextElementSibling(node);
-    patchPreviousElementSibling(node);
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    patchNextElementSibling(node as Element);
+    patchPreviousElementSibling(node as Element);
   }
 };
 
@@ -378,7 +378,7 @@ const patchNextSibling = (node: Node) => {
  * Required during during testing / mock environnement.
  */
 const patchNextElementSibling = (element: Element) => {
-  if (!element || (element as any).__nextElementSibling || !element.nextElementSibling) return;
+  if (!element || (element as any).__nextElementSibling) return;
 
   patchHostOriginalAccessor('nextElementSibling', element);
   Object.defineProperty(element, 'nextElementSibling', {
@@ -422,13 +422,14 @@ const patchPreviousSibling = (node: Node) => {
  * Required during during testing / mock environnement.
  */
 const patchPreviousElementSibling = (element: Element) => {
-  if (!element || (element as any).__previousElementSibling || !element.previousElementSibling) return;
+  if (!element || (element as any).__previousElementSibling) return;
 
   patchHostOriginalAccessor('previousElementSibling', element);
   Object.defineProperty(element, 'previousElementSibling', {
     get: function () {
       const parentNodes = this['s-ol']?.parentNode.children;
       const index = parentNodes?.indexOf(this);
+
       if (parentNodes && index > -1) {
         return parentNodes[index - 1];
       }
