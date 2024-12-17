@@ -8,9 +8,9 @@ export class HydratedSiblingAccessors {
   render() {
     return (
       <div>
-        Hidden text Node
+        Internal text node before slot
         <slot />
-        <span>Hidden span element</span>
+        <div>Internal element before second slot, after first slot</div>
         <slot name="second-slot">Second slot fallback text</slot>
       </div>
     );
