@@ -166,7 +166,7 @@ describe('serializeNodeToHtml', () => {
     doc.body.innerHTML = input;
 
     const output = serializeNodeToHtml(doc.body);
-    expect(output).toBe(`<template shadowrootmode="open">text</template>`);
+    expect(output).toBe(`<template>text</template>`);
   });
 
   it('svg', () => {
