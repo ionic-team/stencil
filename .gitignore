@@ -59,3 +59,4 @@ test/wdio/test-components-no-external-runtime
 test/wdio/www-global-script/
 test/wdio/www-prerender-script
 test/wdio/www-invisible-prehydration/
+test/wdio/test-ts-target-output

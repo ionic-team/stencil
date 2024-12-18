@@ -2,12 +2,7 @@ import { buildError } from '@utils';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
-import {
-  convertValueToLiteral,
-  createStaticGetter,
-  retrieveTsDecorators,
-  tsPropDeclNameAsString,
-} from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, retrieveTsDecorators, tsPropDeclName } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
 /**
@@ -56,7 +51,7 @@ export const attachInternalsDecoratorsToStatic = (
 
   const [decoratedProp] = attachInternalsMembers;
 
-  const name = tsPropDeclNameAsString(decoratedProp, typeChecker);
+  const { staticName: name } = tsPropDeclName(decoratedProp, typeChecker);
 
   newMembers.push(createStaticGetter('attachInternalsMemberName', convertValueToLiteral(name)));
 };

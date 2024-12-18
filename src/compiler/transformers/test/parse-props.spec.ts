@@ -1,4 +1,5 @@
 import { getStaticGetter, transpileModule } from './transpile';
+import { c, formatCode } from './utils';
 
 describe('parse props', () => {
   it('prop optional', () => {
@@ -789,5 +790,64 @@ describe('parse props', () => {
     });
     expect(t.property?.type).toBe('string');
     expect(t.property?.attribute).toBe('val');
+  });
+
+  it('deals appropriately with dynamic property names', async () => {
+    // we're looking for `ogPropName` to be set on the dynamic prop
+
+    const t = transpileModule(`
+      const dynVal = 'val2';
+       @Component({tag: 'cmp-a'})
+       export class CmpA {
+         @Prop() val = 'good';
+         @Prop() [dynVal] = 'nice';
+       }
+     `);
+
+    expect(await formatCode(t.outputText)).toBe(
+      await c`var _a;
+    const dynVal = 'val2';
+    export class CmpA {
+      constructor() {
+        this.val = 'good';
+        this[_a] = 'nice';
+      }
+      static get is() {
+        return 'cmp-a';
+      }
+      static get properties() {
+        return {
+          val: {
+            type: 'string',
+            mutable: false,
+            complexType: { original: 'string', resolved: 'string', references: {} },
+            required: false,
+            optional: false,
+            docs: { tags: [], text: '' },
+            getter: false,
+            setter: false,
+            attribute: 'val',
+            reflect: false,
+            defaultValue: \"'good'\",
+          },
+          val2: {
+            type: 'string',
+            mutable: false,
+            complexType: { original: 'string', resolved: 'string', references: {} },
+            required: false,
+            optional: false,
+            docs: { tags: [], text: '' },
+            getter: false,
+            setter: false,
+            ogPropName: 'dynVal',
+            attribute: 'val-2',
+            reflect: false,
+            defaultValue: \"'nice'\",
+          },
+        };
+      }
+    }
+    _a = dynVal;`,
+    );
   });
 });
