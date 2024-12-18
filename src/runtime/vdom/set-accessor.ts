@@ -45,10 +45,14 @@ export const setAccessor = (
       const classList = elm.classList;
       const oldClasses = parseClassList(oldValue);
       const newClasses = parseClassList(newValue);
-      // for `scoped: true` components, new nodes after initial hydration
-      // from SSR don't have the slotted class added. Let's add that now
+
       if (elm['s-si'] && newClasses.indexOf(elm['s-si']) < 0) {
-        newClasses.push(elm['s-si']);
+        // for `scoped: true` components, new nodes after initial hydration
+        // from SSR don't have the slotted class added. Let's add that now
+        oldClasses.forEach((c) => {
+          if (c.startsWith(elm['s-si'])) newClasses.push(c);
+        });
+        elm['s-si'] = undefined;
       }
       classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
       classList.add(...newClasses.filter((c) => c && !oldClasses.includes(c)));

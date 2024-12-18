@@ -620,19 +620,6 @@ export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode, isInitialRe
   // need to have the same element tag, and same key to be the same
   if (leftVNode.$tag$ === rightVNode.$tag$) {
     if (BUILD.slotRelocation && leftVNode.$tag$ === 'slot') {
-      // We are not considering the same node if:
-      if (
-        // The component gets hydrated and no VDOM has been initialized.
-        // Here the comparison can't happen as $name$ property is not set for `leftNode`.
-        '$nodeId$' in leftVNode &&
-        isInitialRender &&
-        // `leftNode` is not from type HTMLComment which would cause many
-        // hydration comments to be removed
-        leftVNode.$elm$.nodeType !== 8
-      ) {
-        return false;
-      }
-
       return leftVNode.$name$ === rightVNode.$name$;
     }
     // this will be set if JSX tags in the build have `key` attrs set on them
@@ -642,6 +629,11 @@ export const isSameVnode = (leftVNode: d.VNode, rightVNode: d.VNode, isInitialRe
     // keep around.
     if (BUILD.vdomKey && !isInitialRender) {
       return leftVNode.$key$ === rightVNode.$key$;
+    }
+    // if we're comparing the same node and it's the initial render,
+    // let's set the $key$ property to the rightVNode so we don't cause re-renders
+    if (isInitialRender && !leftVNode.$key$ && rightVNode.$key$) {
+      leftVNode.$key$ = rightVNode.$key$;
     }
     return true;
   }
@@ -957,7 +949,7 @@ export const insertBefore = (parent: Node, newNode: Node, reference?: Node): Nod
   const inserted = parent?.insertBefore(newNode, reference);
 
   if (BUILD.scoped) {
-    updateElementScopeIds(newNode as d.RenderNode, parent as d.RenderNode);
+    // updateElementScopeIds(newNode as d.RenderNode, parent as d.RenderNode);
   }
 
   return inserted;
@@ -986,7 +978,7 @@ const findScopeIds = (element: d.RenderNode): string[] => {
  * @param iterateChildNodes iterate child nodes
  */
 const updateElementScopeIds = (element: d.RenderNode, parent: d.RenderNode, iterateChildNodes = false) => {
-  if (element && parent && element.nodeType === NODE_TYPE.ElementNode) {
+  if (element && parent && element.nodeType === NODE_TYPE.ElementNode && typeof element['s-sn'] === 'undefined') {
     const scopeIds = new Set(findScopeIds(parent).filter(Boolean));
     if (scopeIds.size) {
       element.classList?.add(...(element['s-scs'] = Array.from(scopeIds)));

@@ -271,6 +271,8 @@ const clientHydrate = (
               shadowRootNodes,
               slottedNodes,
             );
+            childVNode.$tag$ = 'slot';
+            childVNode.$name$ = slotName;
           }
           childVNode.$elm$['s-sn'] = slotName;
           childVNode.$elm$.removeAttribute('s-sn');
@@ -388,7 +390,8 @@ const clientHydrate = (
           childVNode.$tag$ = 'slot';
 
           // Add the slot name
-          const slotName = (node['s-sn'] = childVNode.$name$ = childIdSplt[5] || '');
+          const slotName = (node['s-sn'] = childIdSplt[5] || '');
+          childVNode.$name$ = slotName || null;
           // add the `<slot>` node to the VNode tree and prepare any slotted any child nodes
           addSlot(
             slotName,
