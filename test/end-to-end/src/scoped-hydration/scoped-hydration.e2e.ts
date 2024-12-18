@@ -106,4 +106,73 @@ describe('`scoped: true` hydration checks', () => {
       'Text node 1 Comment 1 Slotted element 1 Slotted element 2 Comment 2 Text node 2',
     );
   });
+
+  it('Steps through only "lightDOM" nodes', async () => {
+    const { html } = await renderToString(
+      `<hydrated-sibling-accessors>
+         <p>First slot element</p>
+         Default slot text node
+         <p slot="second-slot">Second slot element</p>
+         <!-- Default slot comment node  -->
+      </hydrated-sibling-accessors>`,
+      {
+        serializeShadowRoot: true,
+      },
+    );
+    const page = await newE2EPage({ html, url: 'https://stencil.com' });
+
+    let root: HTMLElement;
+    await page.evaluate(() => {
+      (window as any).root = document.querySelector('hydrated-sibling-accessors');
+    });
+    expect(await page.evaluate(() => root.firstChild.nextSibling.textContent)).toBe('First slot element');
+    expect(await page.evaluate(() => root.firstChild.nextSibling.nextSibling.textContent)).toBe(
+      ' Default slot text node  ',
+    );
+    expect(await page.evaluate(() => root.firstChild.nextSibling.nextSibling.nextSibling.textContent)).toBe(
+      'Second slot element',
+    );
+    expect(await page.evaluate(() => root.firstChild.nextSibling.nextSibling.nextSibling.nextSibling.textContent)).toBe(
+      ' Default slot comment node  ',
+    );
+
+    expect(await page.evaluate(() => root.lastChild.previousSibling.textContent)).toBe(' Default slot comment node  ');
+    expect(await page.evaluate(() => root.lastChild.previousSibling.previousSibling.textContent)).toBe(
+      'Second slot element',
+    );
+    expect(await page.evaluate(() => root.lastChild.previousSibling.previousSibling.previousSibling.textContent)).toBe(
+      ' Default slot text node  ',
+    );
+    expect(
+      await page.evaluate(
+        () => root.lastChild.previousSibling.previousSibling.previousSibling.previousSibling.textContent,
+      ),
+    ).toBe('First slot element');
+  });
+
+  it('Steps through only "lightDOM" elements', async () => {
+    const { html } = await renderToString(
+      `<hydrated-sibling-accessors>
+         <p>First slot element</p>
+         Default slot text node
+         <p slot="second-slot">Second slot element</p>
+         <!-- Default slot comment node  -->
+      </hydrated-sibling-accessors>`,
+      {
+        serializeShadowRoot: true,
+      },
+    );
+    const page = await newE2EPage({ html, url: 'https://stencil.com' });
+
+    let root: HTMLElement;
+    await page.evaluate(() => {
+      (window as any).root = document.querySelector('hydrated-sibling-accessors');
+    });
+    expect(await page.evaluate(() => root.children[0].textContent)).toBe('First slot element');
+    expect(await page.evaluate(() => root.children[0].nextElementSibling.textContent)).toBe('Second slot element');
+    expect(await page.evaluate(() => !root.children[0].nextElementSibling.nextElementSibling)).toBe(true);
+    expect(await page.evaluate(() => root.children[0].nextElementSibling.previousElementSibling.textContent)).toBe(
+      'First slot element',
+    );
+  });
 });

@@ -1465,9 +1465,65 @@ export interface RenderNode extends HostElement {
   /**
    * On a `scoped: true` component
    * with `experimentalSlotFixes` flag enabled,
-   * returns the internal `childNodes` of the scoped element
+   * returns the internal `childNodes` of the component
    */
   readonly __childNodes?: NodeListOf<ChildNode>;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the internal `children` of the component
+   */
+  readonly __children?: HTMLCollectionOf<Element>;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the internal `firstChild` of the component
+   */
+  readonly __firstChild?: ChildNode;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the internal `lastChild` of the component
+   */
+  readonly __lastChild?: ChildNode;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the internal `textContent` of the component
+   */
+  __textContent?: string;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * gives access to the original `append` method
+   */
+  __append?: (...nodes: (Node | string)[]) => void;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * gives access to the original `prepend` method
+   */
+  __prepend?: (...nodes: (Node | string)[]) => void;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * gives access to the original `appendChild` method
+   */
+  __appendChild?: <T extends Node>(newChild: T) => T;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * gives access to the original `removeChild` method
+   */
+  __removeChild?: <T extends Node>(child: T) => T;
 }
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];

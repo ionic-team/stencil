@@ -2,7 +2,7 @@ import { BUILD } from '@app-data';
 import { doc, plt } from '@platform';
 
 import type * as d from '../declarations';
-import { addSlotRelocateNode } from './dom-extras';
+import { addSlotRelocateNode, patchNextPrev } from './dom-extras';
 import { createTime } from './profile';
 import {
   COMMENT_NODE_ID,
@@ -162,6 +162,11 @@ export const initializeClientHydrate = (
         }
         // Create our 'Original Location' node
         addSlotRelocateNode(slottedItem.node, slottedItem.slot, false, slottedItem.node['s-oo']);
+
+        if (BUILD.experimentalSlotFixes) {
+          // patch this node for accessors like `nextSibling` (et al)
+          patchNextPrev(slottedItem.node);
+        }
       }
 
       if (hostEle.shadowRoot && slottedItem.node.parentElement !== hostEle) {
