@@ -81,8 +81,10 @@ export const proxyComponent = (
           Object.defineProperty(prototype, memberName, {
             get(this: d.RuntimeRef) {
               if (BUILD.lazyLoad) {
-                // no getter - let's set value now
-                if ((cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Getter) === 0) return getValue(this, memberName);
+                if ((cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Getter) === 0) {
+                  // no getter - let's set value now
+                  return getValue(this, memberName);
+                }
                 const ref = getHostRef(this);
                 const instance = ref ? ref.$lazyInstance$ : prototype;
                 if (!instance) return;
@@ -125,12 +127,19 @@ export const proxyComponent = (
               // Lazy class instance or native component-element only:
               // we have an original setter, so we need to set our value via that.
 
-              // get the current value on the element
+              // do we have a value already on the host element? 
               const currentValue = ref.$hostElement$[memberName as keyof d.HostElement];
-              if (!ref.$instanceValues$.get(memberName) && currentValue) {
-                // the prop `set()` doesn't fire during `constructor()`,
-                // so no initial value gets set (in instanceValues).
-                // This would mean watchers fire even though the value hasn't changed.
+              if (!currentValue && ref.$instanceValues$.get(memberName)) {
+                // no host value but a value already set on the hostRef, 
+                // this means the setter was added at run-time (e.g. via a decorator). 
+                // We want any value set on the element to override the default class instance value.
+                newValue = ref.$instanceValues$.get(memberName);
+              } else if (!ref.$instanceValues$.get(memberName) && currentValue) {
+                // on init get make sure the hostRef matches the element (via prop / attr)
+
+                // the prop `set()` doesn't necessarily fire during `constructor()`,
+                // so no initial value gets set in the hostRef.
+                // This means watchers fire even though the value hasn't changed.
                 // So if there's a current value and no initial value, let's set it now.
                 ref.$instanceValues$.set(memberName, currentValue);
               }
@@ -148,7 +157,7 @@ export const proxyComponent = (
             }
 
             if (BUILD.lazyLoad) {
-              // Lazy class instance OR lazy element with no setter only:
+              // Lazy class instance OR lazy element with no setter:
               // set the element value directly now
               if (
                 (flags & PROXY_FLAGS.isElementConstructor) === 0 ||
@@ -158,15 +167,17 @@ export const proxyComponent = (
                 return;
               }
 
-              // lazy element with a setter only:
+              // lazy element with a setter:
               // we might need to wait for the lazy class instance to be ready
               // before we can set it's value via it's setter function
               const setterSetVal = () => {
                 const currentValue = ref.$lazyInstance$[memberName];
                 if (!ref.$instanceValues$.get(memberName) && currentValue) {
+                  // on init get make sure the hostRef matches class instance
+
                   // the prop `set()` doesn't fire during `constructor()`:
-                  // no initial value gets set (in instanceValues)
-                  // meaning watchers fire even though the value hasn't changed.
+                  // no initial value gets set in the hostRef.
+                  // This means watchers fire even though the value hasn't changed.
                   // So if there's a current value and no initial value, let's set it now.
                   ref.$instanceValues$.set(memberName, currentValue);
                 }
@@ -184,8 +195,6 @@ export const proxyComponent = (
               }
             }
           },
-          configurable: true,
-          enumerable: true,
         });
       } else if (
         BUILD.lazyLoad &&
