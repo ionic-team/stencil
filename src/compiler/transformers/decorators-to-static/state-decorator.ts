@@ -1,6 +1,6 @@
 import ts from 'typescript';
 
-import { createStaticGetter, retrieveTsDecorators, tsPropDeclNameAsString } from '../transform-utils';
+import { convertValueToLiteral, createStaticGetter, retrieveTsDecorators, tsPropDeclName } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
 /**
@@ -55,10 +55,9 @@ const stateDecoratorToStatic = (
     return null;
   }
 
-  const stateName = tsPropDeclNameAsString(prop, typeChecker);
+  const { staticName: stateName, dynamicName: ogPropName } = tsPropDeclName(prop, typeChecker);
+  const meta: any = {};
+  if (ogPropName && ogPropName !== stateName) meta.ogPropName = ogPropName;
 
-  return ts.factory.createPropertyAssignment(
-    ts.factory.createStringLiteral(stateName),
-    ts.factory.createObjectLiteralExpression([], true),
-  );
+  return ts.factory.createPropertyAssignment(ts.factory.createStringLiteral(stateName), convertValueToLiteral(meta));
 };

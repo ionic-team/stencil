@@ -44,24 +44,6 @@ describe('convert-decorators', () => {
     );
   });
 
-  it('should initialize decorated class fields to undefined, if nothing provided', async () => {
-    const t = transpileModule(`
-    @Component({tag: 'cmp-a'})
-      export class CmpA {
-        @Prop() val?: string;
-      }
-    `);
-
-    // we test the whole output here to ensure that the field has been
-    // removed from the class body correctly and replaced with an initializer
-    // in the constructor
-    expect(await formatCode(t.outputText)).toContain(
-      `  constructor() {
-    this.val = undefined;
-  }`,
-    );
-  });
-
   it('should get the correct literal for a computed property enum used for a `@Prop`', async () => {
     const t = transpileModule(`
       enum MyEnum {
@@ -209,8 +191,8 @@ describe('convert-decorators', () => {
     expect(await formatCode(t.outputText)).toBe(
       await c`export class CmpA extends Foobar {
         constructor() {
-          super();
           this.count = 0;
+          super();
         }
         static get states() {
           return { "count": {} };
@@ -255,7 +237,6 @@ describe('convert-decorators', () => {
 
     expect(await formatCode(t.outputText)).toContain(
       `  constructor() {
-    this.count = undefined;
     console.log('boop');
   }`,
     );
@@ -280,7 +261,6 @@ describe('convert-decorators', () => {
     // wins.
     expect(await formatCode(t.outputText)).toContain(
       `  constructor() {
-    this.count = undefined;
     this.count = 3;
   }`,
     );
@@ -322,8 +302,8 @@ describe('convert-decorators', () => {
 
     expect(await formatCode(t.outputText)).toContain(
       `  constructor() {
-    super();
     this.foo = 'bar';
+    super();
     console.log('hello!');
   }`,
     );
