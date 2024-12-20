@@ -103,7 +103,6 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
     }
 
     cmpTags.add(Cstr.COMPILER_META.tagName);
-    Cstr.isProxied = false;
 
     proxyComponentLifeCycles(Cstr);
 
