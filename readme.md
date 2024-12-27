@@ -27,6 +27,9 @@
   <a href="https://chat.stenciljs.com">
     <img src="https://img.shields.io/discord/520266681499779082?color=7289DA&label=%23stencil&logo=discord&logoColor=white" alt="Official Ionic Discord" />
   </a>
+  <a href="https://gurubase.io/g/stencil">
+    <img src="https://img.shields.io/badge/Gurubase-Ask%20Stencil%20Guru-006BFF" alt="Ask Stencil Guru" />
+  </a>
 </p>
 
 <h2 align="center">
