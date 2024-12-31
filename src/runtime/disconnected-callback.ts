@@ -39,14 +39,14 @@ export const disconnectedCallback = async (elm: d.HostElement) => {
   /**
    * Remove the element from the `rootAppliedStyles` WeakMap
    */
-  if(rootAppliedStyles.has(elm)) {
+  if (rootAppliedStyles.has(elm)) {
     rootAppliedStyles.delete(elm);
   }
 
   /**
    * Remove the shadow root from the `rootAppliedStyles` WeakMap
    */
-  if(elm.shadowRoot && rootAppliedStyles.has(elm.shadowRoot as unknown as Element)) {
+  if (elm.shadowRoot && rootAppliedStyles.has(elm.shadowRoot as unknown as Element)) {
     rootAppliedStyles.delete(elm.shadowRoot as unknown as Element);
   }
 };
