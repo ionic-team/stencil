@@ -58,3 +58,8 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
   elm['s-rc'] = [];
   hostRefs.set(elm, hostRef);
 };
+
+/**
+ * Ignore potential detached nodes when testing as we often enough reload the page.
+ */
+export const hostRefCleanup = (): void => {};

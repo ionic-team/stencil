@@ -6,7 +6,7 @@ import type * as d from '../declarations';
 import { createTime } from './profile';
 import { HYDRATED_STYLE_ID, NODE_TYPE, SLOT_FB_CSS } from './runtime-constants';
 
-const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
+export const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
 
 /**
  * Register the styles for a component by creating a stylesheet and then
