@@ -141,6 +141,7 @@ export interface BuildFeatures {
   propBoolean: boolean;
   propNumber: boolean;
   propString: boolean;
+  modernPropertyDecls: boolean;
 
   // lifecycle events
   lifecycle: boolean;
@@ -564,6 +565,7 @@ export interface ComponentCompilerFeatures {
   hasMember: boolean;
   hasMethod: boolean;
   hasMode: boolean;
+  hasModernPropertyDecls: boolean;
   hasProp: boolean;
   hasPropBoolean: boolean;
   hasPropNumber: boolean;
@@ -686,6 +688,7 @@ export interface ComponentCompilerStaticProperty {
   defaultValue?: string;
   getter: boolean;
   setter: boolean;
+  ogPropName?: string;
 }
 
 /**

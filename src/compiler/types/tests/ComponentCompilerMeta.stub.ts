@@ -47,6 +47,7 @@ export const stubComponentCompilerMeta = (
   hasMember: false,
   hasMethod: false,
   hasMode: false,
+  hasModernPropertyDecls: false,
   hasProp: false,
   hasPropBoolean: false,
   hasPropMutable: false,
