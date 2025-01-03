@@ -582,9 +582,7 @@ function addSlot(
     if (childVNode.$depth$ === '0') {
       shadowRootNodes[childVNode.$index$ as any] = childVNode.$elm$;
     }
-  }
-
-  if (!shadowRootNodes) {
+  } else {
     /* NON-SHADOW */
     const slot = childVNode.$elm$ as d.RenderNode;
 
