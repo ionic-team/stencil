@@ -284,8 +284,8 @@ const clientHydrate = (
           $index$: childIdSplt[3],
           $tag$: node.tagName.toLowerCase(),
           $elm$: node,
-          // If we don't add the initial classes to the VNode, the first `vdom-render.ts`patch
-          // reconciliation won't try to reconcile them. Classes set on the node will be blown away.
+          // If we don't add the initial classes to the VNode, the first `vdom-render.ts` patch
+          // won't try to reconcile them. Classes set on the node will be blown away.
           $attrs$: { class: node.className || '' },
         });
 
