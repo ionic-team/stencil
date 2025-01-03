@@ -75,7 +75,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
           // This is only happening on native shadow-dom, do not needs CSS var shim
           styleElm.innerHTML = style;
         } else {
-          styleElm = doc.createElement('style');
+          styleElm = document.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`) || doc.createElement('style');
           styleElm.innerHTML = style;
 
           // Apply CSP nonce to the style tag if it exists
@@ -197,10 +197,6 @@ export const attachStyles = (hostRef: d.HostRef) => {
     // DOM WRITE!!
     elm['s-sc'] = scopeId;
     elm.classList.add(scopeId + '-h');
-
-    if (BUILD.scoped && flags & CMP_FLAGS.scopedCssEncapsulation) {
-      elm.classList.add(scopeId + '-s');
-    }
   }
   endAttachStyles();
 };

@@ -52,6 +52,9 @@ export function createElement(ownerDocument: any, tagName: string): any {
 
     case 'ul':
       return new MockUListElement(ownerDocument);
+
+    case 'slot-fb':
+      return new MockHTMLElement(ownerDocument, tagName);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {

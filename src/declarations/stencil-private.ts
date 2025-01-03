@@ -1147,6 +1147,10 @@ export interface HostElement extends HTMLElement {
    */
   ['s-hmr']?: (versionId: string) => void;
 
+  /**
+   * A list of nested nested hydration promises that
+   * must be resolved for the top, ancestor component to be fully hydrated
+   */
   ['s-p']?: Promise<void>[];
 
   componentOnReady?: () => Promise<this>;
@@ -1392,9 +1396,10 @@ export interface RenderNode extends HostElement {
   ['s-cn']?: boolean;
 
   /**
-   * Is a slot reference node:
-   * This is a node that represents where a slot
-   * was originally located.
+   * Is a `slot` node when `shadow: false` (or `scoped: true`).
+   *
+   * This is a node (either empty text-node or `<slot-fb>` element)
+   * that represents where a `<slot>` is located in the original JSX.
    */
   ['s-sr']?: boolean;
 

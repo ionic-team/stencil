@@ -1,8 +1,9 @@
 import { BUILD } from '@app-data';
 import { doc, plt } from '@platform';
+import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
-import { addSlotRelocateNode, patchNextPrev } from './dom-extras';
+import { patchNextPrev } from './dom-extras';
 import { createTime } from './profile';
 import {
   COMMENT_NODE_ID,
@@ -13,7 +14,9 @@ import {
   ORG_LOCATION_ID,
   SLOT_NODE_ID,
   TEXT_NODE_ID,
+  VNODE_FLAGS,
 } from './runtime-constants';
+import { addSlotRelocateNode } from './slot-polyfill-utils';
 import { newVNode } from './vdom/h';
 
 /**
@@ -49,6 +52,17 @@ export const initializeClientHydrate = (
   // The root VNode for this component
   const vnode: d.VNode = newVNode(tagName, null);
   vnode.$elm$ = hostElm;
+
+  let scopeId: string;
+  if (BUILD.scoped) {
+    const cmpMeta = hostRef.$cmpMeta$;
+    if (cmpMeta && cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation && hostElm['s-sc']) {
+      scopeId = hostElm['s-sc'];
+      hostElm.classList.add(scopeId + '-h');
+    } else if (hostElm['s-sc']) {
+      delete hostElm['s-sc'];
+    }
+  }
 
   if (!plt.$orgLocNodes$) {
     // This is the first pass over of this whole document;
@@ -94,20 +108,36 @@ export const initializeClientHydrate = (
       }
     }
 
+    if (childRenderNode.$tag$ === 'slot') {
+      if (childRenderNode.$children$) {
+        childRenderNode.$flags$ |= VNODE_FLAGS.isSlotFallback;
+
+        if (!childRenderNode.$elm$.childNodes.length) {
+          // idiosyncrasy with slot fallback nodes during SSR + `serializeShadowRoot: false`:
+          // the slot node is created here (in `addSlot()`) via a comment node,
+          // but the children aren't moved into it. Let's do that now
+          childRenderNode.$children$.forEach((c) => {
+            childRenderNode.$elm$.appendChild(c.$elm$);
+          });
+        }
+      } else {
+        childRenderNode.$flags$ |= VNODE_FLAGS.isSlotReference;
+      }
+    }
+
     if (orgLocationNode && orgLocationNode.isConnected) {
       if (shadowRoot && orgLocationNode['s-en'] === '') {
         // if this node is within a shadowDOM, with an original location home
         // we're safe to move it now
         orgLocationNode.parentNode.insertBefore(node, orgLocationNode.nextSibling);
       }
-      // Remove original location / slot reference comment now regardless:
-      // 1) Stops SSR frameworks complaining about mismatches
-      // 2) is un-required for non-shadow, slotted nodes as we'll add all the meta nodes we need when we deal with *all* slotted nodes ↓↓↓
+      // Remove original location / slot reference comment now.
+      // we'll handle it via `addSlotRelocateNode` later
       orgLocationNode.parentNode.removeChild(orgLocationNode);
 
       if (!shadowRoot) {
         // Add the Original Order of this node.
-        // We'll use it later to make sure slotted nodes get added in the correct order
+        // We'll use it to make sure slotted nodes get added in the correct order
         node['s-oo'] = parseInt(childRenderNode.$nodeId$);
       }
     }
@@ -116,14 +146,15 @@ export const initializeClientHydrate = (
   }
 
   const hosts: d.HostElement[] = [];
-  let snIndex = 0;
   const snLen = slottedNodes.length;
+  let snIndex = 0;
   let slotGroup: SlottedNodes;
   let snGroupIdx: number;
   let snGroupLen: number;
   let slottedItem: SlottedNodes[0];
 
-  // Loops through all the slotted nodes we found while stepping through this component
+  // Loops through all the slotted nodes we found while stepping through this component.
+  // creates slot relocation nodes (non-shadow) or moves nodes to their new home (shadow)
   for (snIndex; snIndex < snLen; snIndex++) {
     slotGroup = slottedNodes[snIndex];
 
@@ -157,8 +188,7 @@ export const initializeClientHydrate = (
         } else {
           // If all else fails - just set the CR as the first child
           // (9/10 if node['s-cr'] hasn't been set, the node will be at the element root)
-          const hostChildren = (hostEle as any).__childNodes || hostEle.childNodes;
-          slottedItem.slot['s-cr'] = hostChildren[0] as d.RenderNode;
+          slottedItem.slot['s-cr'] = ((hostEle as any).__childNodes || hostEle.childNodes)[0];
         }
         // Create our 'Original Location' node
         addSlotRelocateNode(slottedItem.node, slottedItem.slot, false, slottedItem.node['s-oo']);
@@ -174,6 +204,13 @@ export const initializeClientHydrate = (
         hostEle.appendChild(slottedItem.node);
       }
     }
+  }
+
+  if (BUILD.scoped && scopeId && slotNodes.length) {
+    slotNodes.forEach((slot) => {
+      // Host is `scoped: true` - add the slotted scoped class to the slot parent
+      slot.$elm$.parentElement.classList.add(scopeId + '-s');
+    });
   }
 
   if (BUILD.shadowDom && shadowRoot) {
@@ -247,9 +284,9 @@ const clientHydrate = (
           $index$: childIdSplt[3],
           $tag$: node.tagName.toLowerCase(),
           $elm$: node,
-          // If we don't add the initial classes to the VNode, the first `vdom-render.ts` reconciliation will fail:
-          // client side changes before componentDidLoad will be ignored, `set-accessor.ts` will just take the element's initial classes
-          $attrs$: { class: node.className },
+          // If we don't add the initial classes to the VNode, the first `vdom-render.ts` patch
+          // won't try to reconcile them. Classes set on the node will be blown away.
+          $attrs$: { class: node.className || '' },
         });
 
         childRenderNodes.push(childVNode);
@@ -258,6 +295,13 @@ const clientHydrate = (
         // This is a new child VNode so ensure its parent VNode has the VChildren array
         if (!parentVNode.$children$) {
           parentVNode.$children$ = [];
+        }
+
+        if (BUILD.scoped && scopeId) {
+          // Host is `scoped: true` - add that flag to the child.
+          // It's used in 'set-accessor.ts' to make sure our scoped class is present
+          node['s-si'] = scopeId;
+          childVNode.$attrs$.class += ' ' + scopeId;
         }
 
         // Test if this element was 'slotted' or is a 'slot' (with fallback). Recreate node attributes
@@ -276,6 +320,12 @@ const clientHydrate = (
               shadowRootNodes,
               slottedNodes,
             );
+
+            if (BUILD.scoped && scopeId) {
+              // Host is `scoped: true` - a slot-fb node
+              // never goes through 'set-accessor.ts' so add the class now
+              node.classList.add(scopeId);
+            }
           }
           childVNode.$elm$['s-sn'] = slotName;
           childVNode.$elm$.removeAttribute('s-sn');
@@ -284,10 +334,6 @@ const clientHydrate = (
           // add our child VNode to a specific index of the VNode's children
           parentVNode.$children$[childVNode.$index$ as any] = childVNode;
         }
-
-        // Host is `scoped: true` - add that flag to the child.
-        // It's used in 'set-accessor.ts' to make sure our scoped class is present
-        if (scopeId) node['s-si'] = scopeId;
 
         // This is now the new parent VNode for all the next child checks
         parentVNode = childVNode;
@@ -390,10 +436,10 @@ const clientHydrate = (
         if (childNodeType === SLOT_NODE_ID) {
           // Comment refers to a slot node:
           // `${SLOT_NODE_ID}.${hostId}.${nodeId}.${depth}.${index}.${slotName}`;
-          childVNode.$tag$ = 'slot';
 
           // Add the slot name
-          const slotName = (node['s-sn'] = childVNode.$name$ = childIdSplt[5] || '');
+          const slotName = (node['s-sn'] = childIdSplt[5] || '');
+
           // add the `<slot>` node to the VNode tree and prepare any slotted any child nodes
           addSlot(
             slotName,
@@ -502,6 +548,8 @@ function addSlot(
   slottedNodes: SlottedNodes[],
 ) {
   node['s-sr'] = true;
+  childVNode.$name$ = slotName || null;
+  childVNode.$tag$ = 'slot';
 
   // Find this slots' current host parent (as dictated by the VDOM tree).
   // Important because where it is now in the constructed SSR markup might be different to where to *should* be
@@ -604,4 +652,5 @@ interface RenderNodeData extends d.VNode {
   $nodeId$: string;
   $depth$: string;
   $index$: string;
+  $elm$: d.RenderNode;
 }

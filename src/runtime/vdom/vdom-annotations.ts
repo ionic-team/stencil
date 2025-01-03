@@ -66,7 +66,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
             }
             const commentBeforeTextNode = doc.createComment(childId);
             commentBeforeTextNode.nodeValue = `${TEXT_NODE_ID}.${childId}`;
-            insertBefore(nodeRef.parentNode, commentBeforeTextNode, nodeRef);
+            insertBefore(nodeRef.parentNode, commentBeforeTextNode as any, nodeRef);
           } else if (nodeRef.nodeType === NODE_TYPE.CommentNode) {
             const commentBeforeTextNode = doc.createComment(childId);
             commentBeforeTextNode.nodeValue = `${COMMENT_NODE_ID}.${childId}`;
@@ -240,7 +240,7 @@ const insertChildVNodeAnnotations = (
       const textNodeId = `${TEXT_NODE_ID}.${childId}`;
 
       const commentBeforeTextNode = doc.createComment(textNodeId);
-      insertBefore(parentNode, commentBeforeTextNode, childElm);
+      insertBefore(parentNode, commentBeforeTextNode as any, childElm);
     }
   } else if (childElm.nodeType === NODE_TYPE.CommentNode) {
     if (childElm['s-sr']) {

@@ -270,6 +270,7 @@ describe('hydrate, shadow parent', () => {
         <mock:shadow-root>
           <cmp-b class="hydrated">
             <!--r.2-->
+            <!--s.2.0.0.0.-->
             cmp-a-light-dom
           </cmp-b>
         </mock:shadow-root>
@@ -498,6 +499,7 @@ describe('hydrate, shadow parent', () => {
         </mock:shadow-root>
         <cmp-b class="hydrated">
           <!--r.2-->
+          <!--s.2.0.0.0.-->
           cmp-a-light-dom
         </cmp-b>
       </cmp-a>
@@ -507,6 +509,7 @@ describe('hydrate, shadow parent', () => {
       <cmp-a class="hydrated">
         <cmp-b class="hydrated">
             <!--r.2-->
+            <!--s.2.0.0.0.-->
             cmp-a-light-dom
         </cmp-b>
       </cmp-a>

@@ -134,5 +134,5 @@ const setContentReference = (elm: d.HostElement) => {
     BUILD.isDebug ? `content-ref (host=${elm.localName})` : '',
   ) as any);
   contentRefElm['s-cn'] = true;
-  insertBefore(elm, contentRefElm, elm.firstChild);
+  insertBefore(elm, contentRefElm, elm.firstChild as d.RenderNode);
 };
