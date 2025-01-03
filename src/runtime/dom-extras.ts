@@ -254,16 +254,11 @@ export const patchSlotInsertAdjacentElement = (HostElementPrototype: HTMLElement
 
 /**
  * Patches the text content of an unnamed slotted node inside a scoped component
+ *
  * @param hostElementPrototype the `Element` to be patched
  */
 export const patchTextContent = (hostElementPrototype: HTMLElement): void => {
-  let descriptor = globalThis.Node && Object.getOwnPropertyDescriptor(Node.prototype, 'textContent');
-
-  if (!descriptor) {
-    // for mock-doc
-    descriptor = Object.getOwnPropertyDescriptor(hostElementPrototype, 'textContent');
-  }
-  if (descriptor) Object.defineProperty(hostElementPrototype, '__textContent', descriptor);
+  patchHostOriginalAccessor('textContent', hostElementPrototype);
 
   Object.defineProperty(hostElementPrototype, 'textContent', {
     get: function () {
@@ -290,20 +285,7 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
     }
   }
 
-  let childNodesFn = globalThis.Node && Object.getOwnPropertyDescriptor(Node.prototype, 'childNodes');
-  if (!childNodesFn) {
-    // for mock-doc
-    childNodesFn = Object.getOwnPropertyDescriptor(elm, 'childNodes');
-  }
-  if (childNodesFn) Object.defineProperty(elm, '__childNodes', childNodesFn);
-
-  let childrenFn = Object.getOwnPropertyDescriptor(Element.prototype, 'children');
-  if (!childrenFn) {
-    // for mock-doc
-    childrenFn = Object.getOwnPropertyDescriptor(elm, 'children');
-  }
-  if (childrenFn) Object.defineProperty(elm, '__children', childrenFn);
-
+  patchHostOriginalAccessor('children', elm);
   Object.defineProperty(elm, 'children', {
     get() {
       return this.childNodes.filter((n: any) => n.nodeType === 1);
@@ -316,8 +298,21 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
     },
   });
 
-  if (!childNodesFn) return;
+  patchHostOriginalAccessor('firstChild', elm);
+  Object.defineProperty(elm, 'firstChild', {
+    get() {
+      return this.childNodes[0];
+    },
+  });
 
+  patchHostOriginalAccessor('lastChild', elm);
+  Object.defineProperty(elm, 'lastChild', {
+    get() {
+      return this.childNodes[this.childNodes.length - 1];
+    },
+  });
+
+  patchHostOriginalAccessor('childNodes', elm);
   Object.defineProperty(elm, 'childNodes', {
     get() {
       if (
@@ -334,3 +329,155 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
     },
   });
 };
+
+/// SLOTTED NODES ///
+
+/**
+ * Patches sibling accessors of a 'slotted' node within a non-shadow component.
+ * Meaning whilst stepping through a non-shadow element's nodes, only the mock 'lightDOM' nodes are returned.
+ * Especially relevant when rendering components via SSR... Frameworks will often try to reconcile their
+ * VDOM with the real DOM by stepping through nodes with 'nextSibling' et al.
+ * - `nextSibling`
+ * - `nextElementSibling`
+ * - `previousSibling`
+ * - `previousElementSibling`
+ *
+ * @param node the slotted node to be patched
+ */
+export const patchNextPrev = (node: Node) => {
+  if (!node || (node as any).__nextSibling || !globalThis.Node) return;
+
+  patchNextSibling(node);
+  patchPreviousSibling(node);
+
+  if (node.nodeType === Node.ELEMENT_NODE) {
+    patchNextElementSibling(node as Element);
+    patchPreviousElementSibling(node as Element);
+  }
+};
+
+/**
+ * Patches the `nextSibling` accessor of a non-shadow slotted node
+ *
+ * @param node the slotted node to be patched
+ * Required during during testing / mock environnement.
+ */
+const patchNextSibling = (node: Node) => {
+  // already been patched? return
+  if (!node || (node as any).__nextSibling) return;
+
+  patchHostOriginalAccessor('nextSibling', node);
+  Object.defineProperty(node, 'nextSibling', {
+    get: function () {
+      const parentNodes = this['s-ol']?.parentNode.childNodes;
+      const index = parentNodes?.indexOf(this);
+      if (parentNodes && index > -1) {
+        return parentNodes[index + 1];
+      }
+      return this.__nextSibling;
+    },
+  });
+};
+
+/**
+ * Patches the `nextElementSibling` accessor of a non-shadow slotted node
+ *
+ * @param element the slotted element node to be patched
+ * Required during during testing / mock environnement.
+ */
+const patchNextElementSibling = (element: Element) => {
+  if (!element || (element as any).__nextElementSibling) return;
+
+  patchHostOriginalAccessor('nextElementSibling', element);
+  Object.defineProperty(element, 'nextElementSibling', {
+    get: function () {
+      const parentEles = this['s-ol']?.parentNode.children;
+      const index = parentEles?.indexOf(this);
+      if (parentEles && index > -1) {
+        return parentEles[index + 1];
+      }
+      return this.__nextElementSibling;
+    },
+  });
+};
+
+/**
+ * Patches the `previousSibling` accessor of a non-shadow slotted node
+ *
+ * @param node the slotted node to be patched
+ * Required during during testing / mock environnement.
+ */
+const patchPreviousSibling = (node: Node) => {
+  if (!node || (node as any).__previousSibling) return;
+
+  patchHostOriginalAccessor('previousSibling', node);
+  Object.defineProperty(node, 'previousSibling', {
+    get: function () {
+      const parentNodes = this['s-ol']?.parentNode.childNodes;
+      const index = parentNodes?.indexOf(this);
+      if (parentNodes && index > -1) {
+        return parentNodes[index - 1];
+      }
+      return this.__previousSibling;
+    },
+  });
+};
+
+/**
+ * Patches the `previousElementSibling` accessor of a non-shadow slotted node
+ *
+ * @param element the slotted element node to be patched
+ * Required during during testing / mock environnement.
+ */
+const patchPreviousElementSibling = (element: Element) => {
+  if (!element || (element as any).__previousElementSibling) return;
+
+  patchHostOriginalAccessor('previousElementSibling', element);
+  Object.defineProperty(element, 'previousElementSibling', {
+    get: function () {
+      const parentNodes = this['s-ol']?.parentNode.children;
+      const index = parentNodes?.indexOf(this);
+
+      if (parentNodes && index > -1) {
+        return parentNodes[index - 1];
+      }
+      return this.__previousElementSibling;
+    },
+  });
+};
+
+/// UTILS ///
+
+const validElementPatches = ['children', 'nextElementSibling', 'previousElementSibling'] as const;
+const validNodesPatches = [
+  'childNodes',
+  'firstChild',
+  'lastChild',
+  'nextSibling',
+  'previousSibling',
+  'textContent',
+] as const;
+
+/**
+ * Patches a node or element; making it's original accessor method available under a new name.
+ * e.g. `nextSibling` -> `__nextSibling`
+ *
+ * @param accessorName - the name of the accessor to patch
+ * @param node - the node to patch
+ */
+function patchHostOriginalAccessor(
+  accessorName: (typeof validElementPatches)[number] | (typeof validNodesPatches)[number],
+  node: Node,
+) {
+  let accessor;
+  if (validElementPatches.includes(accessorName as any)) {
+    accessor = Object.getOwnPropertyDescriptor(Element.prototype, accessorName);
+  } else if (validNodesPatches.includes(accessorName as any)) {
+    accessor = Object.getOwnPropertyDescriptor(Node.prototype, accessorName);
+  }
+  if (!accessor) {
+    // for mock-doc
+    accessor = Object.getOwnPropertyDescriptor(node, accessorName);
+  }
+  if (accessor) Object.defineProperty(node, '__' + accessorName, accessor);
+}

@@ -80,6 +80,8 @@ export namespace Components {
          */
         "methodThatFiresMyWindowEvent": (value: number) => Promise<void>;
     }
+    interface HydratedSiblingAccessors {
+    }
     interface ImportAssets {
     }
     interface ListenCmp {
@@ -339,6 +341,12 @@ declare global {
         prototype: HTMLEventCmpElement;
         new (): HTMLEventCmpElement;
     };
+    interface HTMLHydratedSiblingAccessorsElement extends Components.HydratedSiblingAccessors, HTMLStencilElement {
+    }
+    var HTMLHydratedSiblingAccessorsElement: {
+        prototype: HTMLHydratedSiblingAccessorsElement;
+        new (): HTMLHydratedSiblingAccessorsElement;
+    };
     interface HTMLImportAssetsElement extends Components.ImportAssets, HTMLStencilElement {
     }
     var HTMLImportAssetsElement: {
@@ -501,6 +509,7 @@ declare global {
         "empty-cmp-shadow": HTMLEmptyCmpShadowElement;
         "env-data": HTMLEnvDataElement;
         "event-cmp": HTMLEventCmpElement;
+        "hydrated-sibling-accessors": HTMLHydratedSiblingAccessorsElement;
         "import-assets": HTMLImportAssetsElement;
         "listen-cmp": HTMLListenCmpElement;
         "method-cmp": HTMLMethodCmpElement;
@@ -584,6 +593,8 @@ declare namespace LocalJSX {
         "onMy-event-with-options"?: (event: EventCmpCustomEvent<{ mph: number }>) => void;
         "onMyDocumentEvent"?: (event: EventCmpCustomEvent<any>) => void;
         "onMyWindowEvent"?: (event: EventCmpCustomEvent<number>) => void;
+    }
+    interface HydratedSiblingAccessors {
     }
     interface ImportAssets {
     }
@@ -670,6 +681,7 @@ declare namespace LocalJSX {
         "empty-cmp-shadow": EmptyCmpShadow;
         "env-data": EnvData;
         "event-cmp": EventCmp;
+        "hydrated-sibling-accessors": HydratedSiblingAccessors;
         "import-assets": ImportAssets;
         "listen-cmp": ListenCmp;
         "method-cmp": MethodCmp;
@@ -724,6 +736,7 @@ declare module "@stencil/core" {
             "empty-cmp-shadow": LocalJSX.EmptyCmpShadow & JSXBase.HTMLAttributes<HTMLEmptyCmpShadowElement>;
             "env-data": LocalJSX.EnvData & JSXBase.HTMLAttributes<HTMLEnvDataElement>;
             "event-cmp": LocalJSX.EventCmp & JSXBase.HTMLAttributes<HTMLEventCmpElement>;
+            "hydrated-sibling-accessors": LocalJSX.HydratedSiblingAccessors & JSXBase.HTMLAttributes<HTMLHydratedSiblingAccessorsElement>;
             "import-assets": LocalJSX.ImportAssets & JSXBase.HTMLAttributes<HTMLImportAssetsElement>;
             "listen-cmp": LocalJSX.ListenCmp & JSXBase.HTMLAttributes<HTMLListenCmpElement>;
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
