@@ -19,6 +19,35 @@ describe('`scoped: true` hydration checks', () => {
     renderToString = mod.renderToString;
   });
 
+  it('does not add multiple style tags', async () => {
+    const { html } = await renderToString(
+      `
+        <non-shadow-child></non-shadow-child> 
+      `,
+    );
+    const page = await newE2EPage({ html, url: 'https://stencil.com' });
+    const styles = await page.findAll('style');
+    expect(styles.length).toBe(3);
+    expect(styles[0].textContent).toContain(`.sc-non-shadow-child-h`);
+    expect(styles[1].textContent).not.toContain(`.sc-non-shadow-child-h`);
+    expect(styles[2].textContent).not.toContain(`.sc-non-shadow-child-h`);
+  });
+
+  it('maintains order of multiple slots', async () => {
+    const { html } = await renderToString(
+      `
+        <non-shadow-multi-slots>
+          <p>Default slot element</p>
+          <p slot="second-slot">Second slot element</p>
+        </non-shadow-multi-slots> 
+      `,
+    );
+    const page = await newE2EPage({ html, url: 'https://stencil.com' });
+    const { internal } = await getElementOrder(page, 'non-shadow-multi-slots');
+    expect(internal.length).toBe(7);
+    expect(internal).toEqual(['DIV', 'P', 'DIV', 'DIV', 'SLOT-FB', 'P', 'DIV']);
+  });
+
   it('shows fallback slot when no content is slotted', async () => {
     const { html } = await renderToString(
       `

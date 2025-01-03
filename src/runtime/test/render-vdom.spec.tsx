@@ -855,7 +855,7 @@ describe('render-vdom', () => {
         includeAnnotations: true,
       });
       expect(root).toEqualHtml(`
-    <cmp-a class="hydrated sc-cmp-a-h sc-cmp-a-s">
+    <cmp-a class="hydrated sc-cmp-a-h">
       <svg class="sc-cmp-a"></svg>
     </cmp-a>
     `);
@@ -865,7 +865,7 @@ describe('render-vdom', () => {
       await waitForChanges();
 
       expect(root).toEqualHtml(`
-      <cmp-a class="hydrated sc-cmp-a-h sc-cmp-a-s">
+      <cmp-a class="hydrated sc-cmp-a-h">
         <svg class="manual hello sc-cmp-a"></svg>
       </cmp-a>
       `);

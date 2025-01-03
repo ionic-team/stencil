@@ -110,6 +110,8 @@ export namespace Components {
     }
     interface NonShadowForwardedSlot {
     }
+    interface NonShadowMultiSlots {
+    }
     interface NonShadowWrapper {
     }
     interface PathAliasCmp {
@@ -385,6 +387,12 @@ declare global {
         prototype: HTMLNonShadowForwardedSlotElement;
         new (): HTMLNonShadowForwardedSlotElement;
     };
+    interface HTMLNonShadowMultiSlotsElement extends Components.NonShadowMultiSlots, HTMLStencilElement {
+    }
+    var HTMLNonShadowMultiSlotsElement: {
+        prototype: HTMLNonShadowMultiSlotsElement;
+        new (): HTMLNonShadowMultiSlotsElement;
+    };
     interface HTMLNonShadowWrapperElement extends Components.NonShadowWrapper, HTMLStencilElement {
     }
     var HTMLNonShadowWrapperElement: {
@@ -501,6 +509,7 @@ declare global {
         "nested-scope-cmp": HTMLNestedScopeCmpElement;
         "non-shadow-child": HTMLNonShadowChildElement;
         "non-shadow-forwarded-slot": HTMLNonShadowForwardedSlotElement;
+        "non-shadow-multi-slots": HTMLNonShadowMultiSlotsElement;
         "non-shadow-wrapper": HTMLNonShadowWrapperElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prerender-cmp": HTMLPrerenderCmpElement;
@@ -594,6 +603,8 @@ declare namespace LocalJSX {
     }
     interface NonShadowForwardedSlot {
     }
+    interface NonShadowMultiSlots {
+    }
     interface NonShadowWrapper {
     }
     interface PathAliasCmp {
@@ -667,6 +678,7 @@ declare namespace LocalJSX {
         "nested-scope-cmp": NestedScopeCmp;
         "non-shadow-child": NonShadowChild;
         "non-shadow-forwarded-slot": NonShadowForwardedSlot;
+        "non-shadow-multi-slots": NonShadowMultiSlots;
         "non-shadow-wrapper": NonShadowWrapper;
         "path-alias-cmp": PathAliasCmp;
         "prerender-cmp": PrerenderCmp;
@@ -720,6 +732,7 @@ declare module "@stencil/core" {
             "nested-scope-cmp": LocalJSX.NestedScopeCmp & JSXBase.HTMLAttributes<HTMLNestedScopeCmpElement>;
             "non-shadow-child": LocalJSX.NonShadowChild & JSXBase.HTMLAttributes<HTMLNonShadowChildElement>;
             "non-shadow-forwarded-slot": LocalJSX.NonShadowForwardedSlot & JSXBase.HTMLAttributes<HTMLNonShadowForwardedSlotElement>;
+            "non-shadow-multi-slots": LocalJSX.NonShadowMultiSlots & JSXBase.HTMLAttributes<HTMLNonShadowMultiSlotsElement>;
             "non-shadow-wrapper": LocalJSX.NonShadowWrapper & JSXBase.HTMLAttributes<HTMLNonShadowWrapperElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;

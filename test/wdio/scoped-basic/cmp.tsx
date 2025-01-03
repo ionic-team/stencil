@@ -9,7 +9,7 @@ import { Component, h } from '@stencil/core';
       color: grey;
     }
 
-    div {
+    span {
       color: red;
     }
 
@@ -22,7 +22,7 @@ import { Component, h } from '@stencil/core';
 export class ScopedBasic {
   render() {
     return [
-      <div>scoped</div>,
+      <span>scoped</span>,
       <p>
         <slot />
       </p>,
