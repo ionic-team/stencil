@@ -502,6 +502,7 @@ describe('hydrate, shadow child', () => {
     expect(clientHydrated.root).toEqualHtml(`
       <cmp-a class=\"hydrated\">
         <!--r.1-->
+        <!--s.1.0.0.0.-->
         <cmp-b class=\"hydrated\">
           <mock:shadow-root>
             <section>

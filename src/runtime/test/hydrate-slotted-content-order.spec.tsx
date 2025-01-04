@@ -340,9 +340,10 @@ describe("hydrated components' slotted node order", () => {
     patchPseudoShadowDom(clientHydrated.root);
 
     expect(clientHydrated.root.outerHTML).toEqualHtml(`
-      <cmp-a class="hydrated">
+      <cmp-a class="hydrated sc-cmp-a-h">
         <!--r.1-->
         <main class="sc-cmp-a sc-cmp-a-s">
+          <!--s.1.1.1.0.-->
           <p>
             slotted item 1
           </p>

@@ -796,8 +796,8 @@ describe('scoped slot', () => {
       html: `<fallback-test><span>Content</span></fallback-test>`,
     });
 
-    expect(root.firstElementChild.children[1].nodeName).toBe('SLOT-FB');
-    expect(root.firstElementChild.children[1]).toHaveAttribute('hidden');
+    expect(root.firstElementChild.children[0].nodeName).toBe('SLOT-FB');
+    expect(root.firstElementChild.children[0]).toHaveAttribute('hidden');
   });
 
   it("should hide the slot's fallback content for a non-shadow component when slot content passed in", async () => {
@@ -818,7 +818,7 @@ describe('scoped slot', () => {
       html: `<fallback-test><span>Content</span></fallback-test>`,
     });
 
-    expect(root.firstElementChild.children[1].nodeName).toBe('SLOT-FB');
-    expect(root.firstElementChild.children[1]).toHaveAttribute('hidden');
+    expect(root.firstElementChild.children[0].nodeName).toBe('SLOT-FB');
+    expect(root.firstElementChild.children[0]).toHaveAttribute('hidden');
   });
 });
