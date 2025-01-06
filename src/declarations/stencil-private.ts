@@ -1147,6 +1147,10 @@ export interface HostElement extends HTMLElement {
    */
   ['s-hmr']?: (versionId: string) => void;
 
+  /**
+   * A list of nested nested hydration promises that
+   * must be resolved for the top, ancestor component to be fully hydrated
+   */
   ['s-p']?: Promise<void>[];
 
   componentOnReady?: () => Promise<this>;
@@ -1392,9 +1396,10 @@ export interface RenderNode extends HostElement {
   ['s-cn']?: boolean;
 
   /**
-   * Is a slot reference node:
-   * This is a node that represents where a slot
-   * was originally located.
+   * Is a `slot` node when `shadow: false` (or `scoped: true`).
+   *
+   * This is a node (either empty text-node or `<slot-fb>` element)
+   * that represents where a `<slot>` is located in the original JSX.
    */
   ['s-sr']?: boolean;
 
@@ -1468,9 +1473,65 @@ export interface RenderNode extends HostElement {
   /**
    * On a `scoped: true` component
    * with `experimentalSlotFixes` flag enabled,
-   * returns the internal `childNodes` of the scoped element
+   * returns the internal `childNodes` of the component
    */
   readonly __childNodes?: NodeListOf<ChildNode>;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the internal `children` of the component
+   */
+  readonly __children?: HTMLCollectionOf<Element>;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the internal `firstChild` of the component
+   */
+  readonly __firstChild?: ChildNode;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the internal `lastChild` of the component
+   */
+  readonly __lastChild?: ChildNode;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the internal `textContent` of the component
+   */
+  __textContent?: string;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * gives access to the original `append` method
+   */
+  __append?: (...nodes: (Node | string)[]) => void;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * gives access to the original `prepend` method
+   */
+  __prepend?: (...nodes: (Node | string)[]) => void;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * gives access to the original `appendChild` method
+   */
+  __appendChild?: <T extends Node>(newChild: T) => T;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * gives access to the original `removeChild` method
+   */
+  __removeChild?: <T extends Node>(child: T) => T;
 }
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];

@@ -44,14 +44,23 @@ export const setAccessor = (
     if (BUILD.vdomClass && memberName === 'class') {
       const classList = elm.classList;
       const oldClasses = parseClassList(oldValue);
-      const newClasses = parseClassList(newValue);
-      // for `scoped: true` components, new nodes after initial hydration
-      // from SSR don't have the slotted class added. Let's add that now
-      if (elm['s-si'] && newClasses.indexOf(elm['s-si']) < 0) {
+      let newClasses = parseClassList(newValue);
+
+      if (elm['s-si']) {
+        // for `scoped: true` components, new nodes after initial hydration
+        // from SSR don't have the slotted class added. Let's add that now
         newClasses.push(elm['s-si']);
+        oldClasses.forEach((c) => {
+          if (c.startsWith(elm['s-si'])) newClasses.push(c);
+        });
+        newClasses = [...new Set(newClasses)];
+
+        classList.add(...newClasses);
+        delete elm['s-si'];
+      } else {
+        classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
+        classList.add(...newClasses.filter((c) => c && !oldClasses.includes(c)));
       }
-      classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
-      classList.add(...newClasses.filter((c) => c && !oldClasses.includes(c)));
     } else if (BUILD.vdomStyle && memberName === 'style') {
       // update style attribute, css properties and values
       if (BUILD.updatable) {
@@ -198,6 +207,18 @@ const parseClassListRegex = /\s/;
  * @param value className string, e.g. "foo bar baz"
  * @returns list of classes, e.g. ["foo", "bar", "baz"]
  */
-const parseClassList = (value: string | undefined | null): string[] => (!value ? [] : value.split(parseClassListRegex));
+const parseClassList = (value: string | SVGAnimatedString | undefined | null): string[] => {
+  // Can't use `value instanceof SVGAnimatedString` because it'll break in non-browser environments
+  // see https://developer.mozilla.org/docs/Web/API/SVGAnimatedString for more information
+  if (typeof value === 'object' && 'baseVal' in value) {
+    value = value.baseVal;
+  }
+
+  if (!value) {
+    return [];
+  }
+
+  return value.split(parseClassListRegex);
+};
 const CAPTURE_EVENT_SUFFIX = 'Capture';
 const CAPTURE_EVENT_REGEX = new RegExp(CAPTURE_EVENT_SUFFIX + '$');

@@ -1,4 +1,4 @@
-export const isDef = (v: any) => v != null;
+export const isDef = (v: any) => v != null && v !== undefined;
 
 /**
  * Convert a string from PascalCase to dash-case

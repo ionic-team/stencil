@@ -80,6 +80,8 @@ export namespace Components {
          */
         "methodThatFiresMyWindowEvent": (value: number) => Promise<void>;
     }
+    interface HydratedSiblingAccessors {
+    }
     interface ImportAssets {
     }
     interface ListenCmp {
@@ -109,6 +111,8 @@ export namespace Components {
     interface NonShadowChild {
     }
     interface NonShadowForwardedSlot {
+    }
+    interface NonShadowMultiSlots {
     }
     interface NonShadowWrapper {
     }
@@ -337,6 +341,12 @@ declare global {
         prototype: HTMLEventCmpElement;
         new (): HTMLEventCmpElement;
     };
+    interface HTMLHydratedSiblingAccessorsElement extends Components.HydratedSiblingAccessors, HTMLStencilElement {
+    }
+    var HTMLHydratedSiblingAccessorsElement: {
+        prototype: HTMLHydratedSiblingAccessorsElement;
+        new (): HTMLHydratedSiblingAccessorsElement;
+    };
     interface HTMLImportAssetsElement extends Components.ImportAssets, HTMLStencilElement {
     }
     var HTMLImportAssetsElement: {
@@ -384,6 +394,12 @@ declare global {
     var HTMLNonShadowForwardedSlotElement: {
         prototype: HTMLNonShadowForwardedSlotElement;
         new (): HTMLNonShadowForwardedSlotElement;
+    };
+    interface HTMLNonShadowMultiSlotsElement extends Components.NonShadowMultiSlots, HTMLStencilElement {
+    }
+    var HTMLNonShadowMultiSlotsElement: {
+        prototype: HTMLNonShadowMultiSlotsElement;
+        new (): HTMLNonShadowMultiSlotsElement;
     };
     interface HTMLNonShadowWrapperElement extends Components.NonShadowWrapper, HTMLStencilElement {
     }
@@ -493,6 +509,7 @@ declare global {
         "empty-cmp-shadow": HTMLEmptyCmpShadowElement;
         "env-data": HTMLEnvDataElement;
         "event-cmp": HTMLEventCmpElement;
+        "hydrated-sibling-accessors": HTMLHydratedSiblingAccessorsElement;
         "import-assets": HTMLImportAssetsElement;
         "listen-cmp": HTMLListenCmpElement;
         "method-cmp": HTMLMethodCmpElement;
@@ -501,6 +518,7 @@ declare global {
         "nested-scope-cmp": HTMLNestedScopeCmpElement;
         "non-shadow-child": HTMLNonShadowChildElement;
         "non-shadow-forwarded-slot": HTMLNonShadowForwardedSlotElement;
+        "non-shadow-multi-slots": HTMLNonShadowMultiSlotsElement;
         "non-shadow-wrapper": HTMLNonShadowWrapperElement;
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prerender-cmp": HTMLPrerenderCmpElement;
@@ -576,6 +594,8 @@ declare namespace LocalJSX {
         "onMyDocumentEvent"?: (event: EventCmpCustomEvent<any>) => void;
         "onMyWindowEvent"?: (event: EventCmpCustomEvent<number>) => void;
     }
+    interface HydratedSiblingAccessors {
+    }
     interface ImportAssets {
     }
     interface ListenCmp {
@@ -593,6 +613,8 @@ declare namespace LocalJSX {
     interface NonShadowChild {
     }
     interface NonShadowForwardedSlot {
+    }
+    interface NonShadowMultiSlots {
     }
     interface NonShadowWrapper {
     }
@@ -659,6 +681,7 @@ declare namespace LocalJSX {
         "empty-cmp-shadow": EmptyCmpShadow;
         "env-data": EnvData;
         "event-cmp": EventCmp;
+        "hydrated-sibling-accessors": HydratedSiblingAccessors;
         "import-assets": ImportAssets;
         "listen-cmp": ListenCmp;
         "method-cmp": MethodCmp;
@@ -667,6 +690,7 @@ declare namespace LocalJSX {
         "nested-scope-cmp": NestedScopeCmp;
         "non-shadow-child": NonShadowChild;
         "non-shadow-forwarded-slot": NonShadowForwardedSlot;
+        "non-shadow-multi-slots": NonShadowMultiSlots;
         "non-shadow-wrapper": NonShadowWrapper;
         "path-alias-cmp": PathAliasCmp;
         "prerender-cmp": PrerenderCmp;
@@ -712,6 +736,7 @@ declare module "@stencil/core" {
             "empty-cmp-shadow": LocalJSX.EmptyCmpShadow & JSXBase.HTMLAttributes<HTMLEmptyCmpShadowElement>;
             "env-data": LocalJSX.EnvData & JSXBase.HTMLAttributes<HTMLEnvDataElement>;
             "event-cmp": LocalJSX.EventCmp & JSXBase.HTMLAttributes<HTMLEventCmpElement>;
+            "hydrated-sibling-accessors": LocalJSX.HydratedSiblingAccessors & JSXBase.HTMLAttributes<HTMLHydratedSiblingAccessorsElement>;
             "import-assets": LocalJSX.ImportAssets & JSXBase.HTMLAttributes<HTMLImportAssetsElement>;
             "listen-cmp": LocalJSX.ListenCmp & JSXBase.HTMLAttributes<HTMLListenCmpElement>;
             "method-cmp": LocalJSX.MethodCmp & JSXBase.HTMLAttributes<HTMLMethodCmpElement>;
@@ -720,6 +745,7 @@ declare module "@stencil/core" {
             "nested-scope-cmp": LocalJSX.NestedScopeCmp & JSXBase.HTMLAttributes<HTMLNestedScopeCmpElement>;
             "non-shadow-child": LocalJSX.NonShadowChild & JSXBase.HTMLAttributes<HTMLNonShadowChildElement>;
             "non-shadow-forwarded-slot": LocalJSX.NonShadowForwardedSlot & JSXBase.HTMLAttributes<HTMLNonShadowForwardedSlotElement>;
+            "non-shadow-multi-slots": LocalJSX.NonShadowMultiSlots & JSXBase.HTMLAttributes<HTMLNonShadowMultiSlotsElement>;
             "non-shadow-wrapper": LocalJSX.NonShadowWrapper & JSXBase.HTMLAttributes<HTMLNonShadowWrapperElement>;
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;
