@@ -1,3 +1,16 @@
+## 🌯 [4.23.1](https://github.com/ionic-team/stencil/compare/v4.23.0...v4.23.1) (2025-01-06)
+
+
+### Bug Fixes
+
+* correctly handle svg class attribute within `parseClassList` ([#6085](https://github.com/ionic-team/stencil/issues/6085)) ([5d29255](https://github.com/ionic-team/stencil/commit/5d2925593410fc53ef2fc989c3d33ceb4cf9b503))
+* **mock-doc:** don't force template tags to have a shadowroot ([#6078](https://github.com/ionic-team/stencil/issues/6078)) ([b63039f](https://github.com/ionic-team/stencil/commit/b63039f10c2c4e01114e2d11bc29b60ba1e486d9))
+* runtime decorators ([#6076](https://github.com/ionic-team/stencil/issues/6076)) ([9e6483a](https://github.com/ionic-team/stencil/commit/9e6483a3f41718c46f13cdc1528c8138110688d0))
+* **scoped:** fixes for `<slot />` and slotted nodes ([#6082](https://github.com/ionic-team/stencil/issues/6082)) ([13ee704](https://github.com/ionic-team/stencil/commit/13ee7049d3e30ee17135965ad7e2c6172e637c09))
+* **SSR:** patch `scoped: true` SSR-ed, slotted nodes next/prev sibling accessors ([#6057](https://github.com/ionic-team/stencil/issues/6057)) ([af102ce](https://github.com/ionic-team/stencil/commit/af102ce8c7faaf1f999c09faefb4aeb55145dade))
+
+
+
 # 🐣 [4.23.0](https://github.com/ionic-team/stencil/compare/v4.22.3...v4.23.0) (2024-12-11)
 
 
