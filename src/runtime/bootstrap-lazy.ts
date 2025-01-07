@@ -166,10 +166,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
            * references used as keys in the `hostRef` object can be properly
            * garbage collected.
            */
-          const hostRef = getHostRef(this);
-          if (hostRef?.$vnode$?.$elm$ && hostRef.$vnode$.$elm$.nodeType === NODE_TYPE.ElementNode && !isNodeAttached(hostRef.$vnode$.$elm$)) {
-            delete hostRef.$vnode$.$elm$;
-          }
+          plt.raf(() => {
+            const hostRef = getHostRef(this);
+            if (hostRef?.$vnode$?.$elm$ && hostRef.$vnode$.$elm$.nodeType === NODE_TYPE.ElementNode && !isNodeAttached(hostRef.$vnode$.$elm$)) {
+              delete hostRef.$vnode$.$elm$;
+            }
+          })
         }
 
         componentOnReady() {
