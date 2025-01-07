@@ -16,7 +16,7 @@ import {
 import { hmrStart } from './hmr-component';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
-import { HYDRATED_CSS, NODE_TYPE, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
+import { HYDRATED_CSS, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
 import { appDidLoad } from './update-component';
 export { setNonce } from '@platform';
 
@@ -169,9 +169,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           plt.raf(() => {
             const hostRef = getHostRef(this);
             if (
-              hostRef?.$vnode$?.$elm$ &&
-              hostRef.$vnode$.$elm$.nodeType === NODE_TYPE.ElementNode &&
-              !isNodeAttached(hostRef.$vnode$.$elm$)
+              hostRef?.$vnode$?.$elm$ instanceof Node &&
+              hostRef.$vnode$.$elm$.isConnected
             ) {
               delete hostRef.$vnode$.$elm$;
             }
@@ -276,12 +275,3 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   // Fallback appLoad event
   endBootstrap();
 };
-
-/**
- * Check if a node is attached to the DOM
- * @param node an element or document
- * @returns true if the node is attached to the DOM
- */
-function isNodeAttached(node: Node): boolean {
-  return node === document || node === document.documentElement || document.contains(node);
-}
