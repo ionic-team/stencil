@@ -16,7 +16,7 @@ import {
 import { hmrStart } from './hmr-component';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
-import { HYDRATED_CSS, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
+import { HYDRATED_CSS, NODE_TYPE, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
 import { appDidLoad } from './update-component';
 export { setNonce } from '@platform';
 
@@ -161,15 +161,15 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           plt.jmp(() => disconnectedCallback(this));
 
           /**
-           * Manually remove references from `hostRefs` to prevent memory leaks.
+           * Clear up references within the `$vnode$` object to the DOM
+           * node that was removed. This is necessary to ensure that these
+           * references used as keys in the `hostRef` object can be properly
+           * garbage collected.
            */
-          setTimeout(() => {
-            const hostRef = getHostRef(this);
-            if (hostRef?.$vnode$) {
-              hostRef.$vnode$.$children$ = (hostRef.$vnode$.$children$ || [])
-                .filter((child) => isNodeAttached(child.$elm$));
-            }
-          }, 100);
+          const hostRef = getHostRef(this);
+          if (hostRef?.$vnode$?.$elm$ && hostRef.$vnode$.$elm$.nodeType === NODE_TYPE.ElementNode && !isNodeAttached(hostRef.$vnode$.$elm$)) {
+            delete hostRef.$vnode$.$elm$;
+          }
         }
 
         componentOnReady() {
