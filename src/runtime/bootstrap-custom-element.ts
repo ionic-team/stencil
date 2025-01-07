@@ -1,5 +1,14 @@
 import { BUILD } from '@app-data';
-import { addHostEventListeners, deleteHostRef, forceUpdate, getHostRef, plt, registerHost, styles, supportsShadow } from '@platform';
+import {
+  addHostEventListeners,
+  deleteHostRef,
+  forceUpdate,
+  getHostRef,
+  plt,
+  registerHost,
+  styles,
+  supportsShadow,
+} from '@platform';
 import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
@@ -101,7 +110,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
         if (this instanceof Node && !this.isConnected) {
           deleteHostRef(this);
         }
-      })
+      });
     },
     __attachShadow() {
       if (supportsShadow) {
