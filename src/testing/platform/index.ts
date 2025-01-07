@@ -1,6 +1,6 @@
 export { Build } from './testing-build';
 export { modeResolutionChain, styles } from './testing-constants';
-export { getHostRef, hostRefCleanup, registerHost, registerInstance } from './testing-host-ref';
+export { getHostRef, registerHost, registerInstance } from './testing-host-ref';
 export { consoleDevError, consoleDevInfo, consoleDevWarn, consoleError, setErrorHandler } from './testing-log';
 export {
   isMemberInElement,
