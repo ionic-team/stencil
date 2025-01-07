@@ -168,10 +168,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
            */
           plt.raf(() => {
             const hostRef = getHostRef(this);
-            if (
-              hostRef?.$vnode$?.$elm$ instanceof Node &&
-              hostRef.$vnode$.$elm$.isConnected
-            ) {
+            if (hostRef?.$vnode$?.$elm$ instanceof Node && hostRef.$vnode$.$elm$.isConnected) {
               delete hostRef.$vnode$.$elm$;
             }
           });
