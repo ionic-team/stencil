@@ -12,6 +12,17 @@ export const getHostRef = (elm: d.RuntimeRef | undefined): d.HostRef | undefined
 };
 
 /**
+ * Given a {@link d.RuntimeRef} remove the corresponding {@link d.HostRef} from
+ * the {@link hostRefs} WeakMap. This is necessary when calling `registerInstance`
+ * within the constructor of a lazy-loaded component. These references aren't
+ * removed automatically, hence we have to do it manually.
+ *
+ * @param ref the runtime ref of interest
+ * @returns — true if the element was successfully removed, or false if it was not present.
+ */
+export const deleteHostRef = (ref: d.RuntimeRef) => hostRefs.delete(ref);
+
+/**
  * Add the provided `hostRef` instance to the global {@link hostRefs} map, using the provided `lazyInstance` as a key.
  * @param lazyInstance a Stencil component instance
  * @param hostRef an optional reference to Stencil's tracking data for the component. If none is provided, one will be created.
