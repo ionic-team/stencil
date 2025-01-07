@@ -38,16 +38,10 @@ export const getHostRef = (ref: d.RuntimeRef): d.HostRef | undefined => hostRefs
  * @param hostRef that instances `HostRef` object
  */
 export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
-<<<<<<< HEAD
   hostRefs.set((hostRef.$lazyInstance$ = lazyInstance), hostRef);
   if (BUILD.modernPropertyDecls && (BUILD.state || BUILD.prop)) {
     reWireGetterSetter(lazyInstance, hostRef);
   }
-=======
-  hostRef.$lazyInstance$ = lazyInstance;
-  hostRefKeys.push(lazyInstance);
-  return hostRefs.set(lazyInstance, hostRef);
->>>>>>> fb8335e25 (prettier)
 };
 
 /**
