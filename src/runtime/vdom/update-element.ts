@@ -1,5 +1,4 @@
 import { BUILD } from '@app-data';
-import { EMPTY_OBJ } from '@utils';
 
 import type * as d from '../../declarations';
 import { NODE_TYPE } from '../runtime-constants';
@@ -24,8 +23,8 @@ export const updateElement = (oldVnode: d.VNode | null, newVnode: d.VNode, isSvg
     newVnode.$elm$.nodeType === NODE_TYPE.DocumentFragment && newVnode.$elm$.host
       ? newVnode.$elm$.host
       : (newVnode.$elm$ as any);
-  const oldVnodeAttrs = (oldVnode && oldVnode.$attrs$) || EMPTY_OBJ;
-  const newVnodeAttrs = newVnode.$attrs$ || EMPTY_OBJ;
+  const oldVnodeAttrs = (oldVnode && oldVnode.$attrs$) || {};
+  const newVnodeAttrs = newVnode.$attrs$ || {};
 
   if (BUILD.updatable) {
     // remove attributes no longer present on the vnode by setting them to undefined

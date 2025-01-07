@@ -121,12 +121,6 @@ export const enum CMP_FLAGS {
 export const DEFAULT_STYLE_MODE = '$';
 
 /**
- * Reusable empty obj/array
- * Don't add values to these!!
- */
-export const EMPTY_OBJ: Record<never, never> = {};
-
-/**
  * Namespaces
  */
 export const SVG_NS = 'http://www.w3.org/2000/svg';

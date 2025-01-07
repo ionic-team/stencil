@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
+import { deleteHostRef, doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
 import { addHostEventListeners } from '@runtime';
 import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
@@ -159,6 +159,14 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
         disconnectedCallback() {
           plt.jmp(() => disconnectedCallback(this));
+
+          /**
+           * Manually remove references from `hostRefs` to prevent memory leaks.
+           */
+          setTimeout(() => {
+            deleteHostRef(getHostRef(this).$lazyInstance$);
+            deleteHostRef(this)
+          }, 0)
         }
 
         componentOnReady() {
