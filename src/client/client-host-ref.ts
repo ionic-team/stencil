@@ -23,17 +23,6 @@ const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = /*@__PURE__*/ BUILD.hotModule
   : new WeakMap();
 
 /**
- * Given a {@link d.RuntimeRef} remove the corresponding {@link d.HostRef} from
- * the {@link hostRefs} WeakMap. This is necessary when calling `registerInstance`
- * within the constructor of a lazy-loaded component. These references aren't
- * removed automatically, hence we have to do it manually.
- *
- * @param ref the runtime ref of interest
- * @returns — true if the element was successfully removed, or false if it was not present.
- */
-export const deleteHostRef = (ref: d.RuntimeRef) => hostRefs.delete(ref);
-
-/**
  * Given a {@link d.RuntimeRef} retrieve the corresponding {@link d.HostRef}
  *
  * @param ref the runtime ref of interest

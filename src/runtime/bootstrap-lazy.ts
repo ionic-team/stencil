@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { deleteHostRef, doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
+import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
 import { addHostEventListeners } from '@runtime';
 import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
@@ -165,9 +165,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
            */
           setTimeout(() => {
             const hostRef = getHostRef(this);
-            delete hostRef.$vnode$;
-            deleteHostRef(this);
-          }, 0);
+            if (hostRef?.$vnode$) {
+              hostRef.$vnode$.$children$ = (hostRef.$vnode$.$children$ || [])
+                .filter((child) => isNodeAttached(child.$elm$));
+            }
+          }, 100);
         }
 
         componentOnReady() {
@@ -268,3 +270,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   // Fallback appLoad event
   endBootstrap();
 };
+
+/**
+ * Check if a node is attached to the DOM
+ * @param node an element or document
+ * @returns true if the node is attached to the DOM
+ */
+function isNodeAttached(node: Node): boolean {
+  return node === document || node === document.documentElement || document.contains(node);
+}
