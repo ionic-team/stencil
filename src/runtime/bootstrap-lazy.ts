@@ -164,7 +164,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
            * Manually remove references from `hostRefs` to prevent memory leaks.
            */
           setTimeout(() => {
-            deleteHostRef(getHostRef(this).$lazyInstance$);
+            const hostRef = getHostRef(this);
+            delete hostRef.$vnode$;
             deleteHostRef(this);
           }, 0);
         }
