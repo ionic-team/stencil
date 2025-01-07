@@ -165,8 +165,8 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
            */
           setTimeout(() => {
             deleteHostRef(getHostRef(this).$lazyInstance$);
-            deleteHostRef(this)
-          }, 0)
+            deleteHostRef(this);
+          }, 0);
         }
 
         componentOnReady() {
