@@ -148,8 +148,6 @@ export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta
   return hostRefs.set(elm, hostRef);
 };
 
-export const hostRefCleanup = (): void => {};
-
 export const Build: d.UserBuildConditionals = {
   isDev: false,
   isBrowser: false,

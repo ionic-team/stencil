@@ -7,12 +7,11 @@ import { rootAppliedStyles } from './styles';
 import { safeCall } from './update-component';
 
 const disconnectInstance = (instance: any) => {
-  const callbackResult: unknown[] = [];
   if (BUILD.lazyLoad && BUILD.disconnectedCallback) {
-    callbackResult.push(safeCall(instance, 'disconnectedCallback'));
+    safeCall(instance, 'disconnectedCallback');
   }
   if (BUILD.cmpDidUnload) {
-    callbackResult.push(safeCall(instance, 'componentDidUnload'));
+    safeCall(instance, 'componentDidUnload');
   }
 };
 
