@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
+import { deleteHostRef, doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
 import { addHostEventListeners } from '@runtime';
 import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
@@ -169,7 +169,11 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
           plt.raf(() => {
             const hostRef = getHostRef(this);
             if (hostRef?.$vnode$?.$elm$ instanceof Node && !hostRef.$vnode$.$elm$.isConnected) {
-              delete hostRef.$vnode$.$elm$;
+              delete hostRef.$vnode$;
+              deleteHostRef(hostRef.$lazyInstance$);
+            }
+            if (this instanceof Node && !this.isConnected) {
+              deleteHostRef(this);
             }
           });
         }

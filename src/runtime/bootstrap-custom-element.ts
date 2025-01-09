@@ -105,7 +105,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
       plt.raf(() => {
         const hostRef = getHostRef(this);
         if (hostRef?.$vnode$?.$elm$ instanceof Node && !hostRef.$vnode$.$elm$.isConnected) {
-          delete hostRef.$vnode$.$elm$;
+          delete hostRef.$vnode$;
         }
         if (this instanceof Node && !this.isConnected) {
           deleteHostRef(this);
