@@ -170,7 +170,12 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
             const hostRef = getHostRef(this);
             if (hostRef?.$vnode$?.$elm$ instanceof Node && !hostRef.$vnode$.$elm$.isConnected) {
               delete hostRef.$vnode$;
-              deleteHostRef(hostRef.$lazyInstance$);
+
+              /**
+               * delete the lazy instance after a timeout to ensure that any
+               * pending state updates have been processed
+               */
+              setTimeout(() => deleteHostRef(hostRef.$lazyInstance$), 100)
             }
             if (this instanceof Node && !this.isConnected) {
               deleteHostRef(this);
