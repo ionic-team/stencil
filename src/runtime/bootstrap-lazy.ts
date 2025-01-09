@@ -175,7 +175,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
                * delete the lazy instance after a timeout to ensure that any
                * pending state updates have been processed
                */
-              setTimeout(() => deleteHostRef(hostRef.$lazyInstance$), 100)
+              setTimeout(() => deleteHostRef(hostRef.$lazyInstance$), 100);
             }
             if (this instanceof Node && !this.isConnected) {
               deleteHostRef(this);
