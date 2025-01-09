@@ -13,12 +13,15 @@ describe('dom-reattach', function () {
         </>
       ),
     });
+    console.log('[test] render component');
 
     const element = document.querySelector('dom-reattach');
     function reattach() {
       if (showElement) {
+        console.log('[test] remove element');
         element.remove();
       } else {
+        console.log('[test] add element');
         document.body.appendChild(element);
       }
       showElement = !showElement;
@@ -30,7 +33,7 @@ describe('dom-reattach', function () {
 componentDidLoad: 1
 disconnectedCallback: ${disconnectCount}`;
 
-    // await expect($('dom-reattach')).toHaveText(lifecycleTextWithDisconnectCount(0));
+    await expect($('dom-reattach')).toHaveText(lifecycleTextWithDisconnectCount(0));
 
     await $('button').click();
     await expect($('dom-reattach')).not.toExist();
