@@ -178,7 +178,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
                */
               setTimeout(() => {
                 console.log('[btl]: delete hostRef.$lazyInstance$', hostRef.$lazyInstance$);
-                deleteHostRef(hostRef.$lazyInstance$)
+                // deleteHostRef(hostRef.$lazyInstance$)
               }, 100);
             }
           });
