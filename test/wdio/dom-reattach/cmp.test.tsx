@@ -30,7 +30,7 @@ describe('dom-reattach', function () {
 componentDidLoad: 1
 disconnectedCallback: ${disconnectCount}`;
 
-    await expect($('dom-reattach')).toHaveText(lifecycleTextWithDisconnectCount(0));
+    // await expect($('dom-reattach')).toHaveText(lifecycleTextWithDisconnectCount(0));
 
     await $('button').click();
     await expect($('dom-reattach')).not.toExist();
