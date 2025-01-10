@@ -43,8 +43,7 @@ describe('shadow-dom-slot-nested', () => {
     } = await article.getCSSProperty('color');
     expect(hexArticle).toBe('#008000');
 
-    const children = article.$$('*').filter(
-      async (elem) => await elem.getTagName() === 'shadow-dom-slot-nested');
+    const children = article.$$('*').filter(async (elem) => (await elem.getTagName()) === 'shadow-dom-slot-nested');
     await expect(children).toBeElementsArrayOfSize(3);
 
     const testShadowNested = async function (i: number) {
