@@ -1,5 +1,6 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, expect } from '@wdio/globals';
 
 /**
  * Tests for the patched `removeChild()` method on `scoped` components.
@@ -9,6 +10,7 @@ describe('remove-child-patch', () => {
 
   beforeEach(async () => {
     render({
+      components: [],
       template: () => (
         <>
           <remove-child-patch>
