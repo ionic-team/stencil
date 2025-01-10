@@ -1,10 +1,27 @@
 import { Component, Element, h, Prop, State } from '@stencil/core';
 
-const customDecoratedProps = new Map<string, PropertyDescriptor | undefined>();
+function Clamp(lowerBound: number, upperBound: number, descriptor?: PropertyDescriptor): any {
+  const clamp = (value: number) => Math.max(lowerBound, Math.min(value, upperBound));
 
-function CustomDecorator(): PropertyDecorator {
-  return (_target: Object, propertyKey: string | symbol, descriptor?: PropertyDescriptor) => {
-    customDecoratedProps.set(propertyKey.toString(), descriptor);
+  return <T,>(target: T, propertyKey: string) => {
+    descriptor = descriptor || Object.getOwnPropertyDescriptor(target, propertyKey);
+    // preserve any existing getter/setter
+    const ogGet = descriptor === null || descriptor === void 0 ? void 0 : descriptor.get;
+    const ogSet = descriptor === null || descriptor === void 0 ? void 0 : descriptor.set;
+    const key = Symbol() as keyof T;
+
+    return {
+      get(): number {
+        if (ogGet) return clamp(ogGet.call(this));
+        return clamp((this as unknown as T)[key] as number);
+      },
+      set(newValue: number) {
+        if (ogSet) ogSet.call(this, newValue);
+        ((this as unknown as T)[key] as number) = newValue;
+      },
+      configurable: true,
+      enumerable: true,
+    };
   };
 }
 
@@ -12,36 +29,29 @@ function CustomDecorator(): PropertyDecorator {
   tag: 'ts-target-props',
 })
 export class TsTargetProps {
-  constructor() {
-    customDecoratedProps.forEach((_descriptor, key) => {
-      // @ts-ignore
-      this.el[`__${key}`] = () => this[key] + ' decorated!';
-    });
-  }
-
   @Element() el: HTMLElement;
 
   @Prop() basicProp: string = 'basicProp';
 
-  @CustomDecorator()
+  @Clamp(-5, 25)
   @Prop()
-  decoratedProp: string = 'decoratedProp';
+  decoratedProp: number = -10;
 
-  private _decoratedGetterSetterProp: string = 'decoratedGetterSetterProp';
-  @CustomDecorator()
+  private _decoratedGetterSetterProp: number = 1000;
+  @Clamp(0, 999)
   @Prop()
   get decoratedGetterSetterProp() {
-    return this._decoratedGetterSetterProp;
+    return this._decoratedGetterSetterProp || 0;
   }
-  set decoratedGetterSetterProp(value: string) {
+  set decoratedGetterSetterProp(value: number) {
     this._decoratedGetterSetterProp = value;
   }
 
   @State() basicState: string = 'basicState';
 
-  @CustomDecorator()
+  @Clamp(0, 10)
   @State()
-  decoratedState: string = 'decoratedState';
+  decoratedState: number = 11;
 
   render() {
     return (
@@ -62,7 +72,7 @@ export class TsTargetProps {
         <div class="decoratedState">{this.decoratedState}</div>
         <button
           onClick={() => {
-            this.decoratedState += ' changed ';
+            this.decoratedState -= 100;
           }}
         >
           Change decoratedState

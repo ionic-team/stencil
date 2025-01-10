@@ -1,6 +1,23 @@
 import { Component, h, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
+function Clamp(lowerBound: number, upperBound: number): any {
+  const clamp = (value: number) => Math.max(lowerBound, Math.min(value, upperBound));
+  return () => {
+    const key = Symbol();
+    return {
+      get() {
+        return this[key];
+      },
+      set(newValue: number) {
+        this[key] = clamp(newValue);
+      },
+      configurable: true,
+      enumerable: true,
+    };
+  };
+}
+
 describe('prop', () => {
   it('"value" attribute', async () => {
     @Component({ tag: 'cmp-a' })
@@ -39,27 +56,31 @@ describe('prop', () => {
       set accessor(newVal) {
         this._accessor = newVal;
       }
+      @Clamp(0, 10)
+      @Prop()
+      clamped = 5;
       render() {
-        return `${this.boolFalse}-${this.boolTrue}-${this.str}-${this.num}-${this.accessor}`;
+        return `${this.boolFalse}-${this.boolTrue}-${this.str}-${this.num}-${this.accessor}-${this.clamped}`;
       }
     }
 
     const { root } = await newSpecPage({
       components: [CmpA],
-      html: `<cmp-a bool-false="true" bool-true="false" str="attr" num="99" accessor="accessed!"></cmp-a>`,
+      html: `<cmp-a bool-false="true" bool-true="false" str="attr" num="99" accessor="accessed!" clamped="11"></cmp-a>`,
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a bool-false="true" bool-true="false" str="attr" num="99" accessor="accessed!">
-        true-false-attr-99-accessed!
+      <cmp-a bool-false="true" bool-true="false" str="attr" num="99" accessor="accessed!" clamped="11">
+        true-false-attr-99-accessed!-10
       </cmp-a>
     `);
 
-    expect(root.textContent).toBe('true-false-attr-99-accessed!');
+    expect(root.textContent).toBe('true-false-attr-99-accessed!-10');
     expect(root.boolFalse).toBe(true);
     expect(root.boolTrue).toBe(false);
     expect(root.str).toBe('attr');
     expect(root.num).toBe(99);
+    expect(root.clamped).toBe(10);
     expect(root.accessor).toBe('accessed!');
   });
 
@@ -78,8 +99,11 @@ describe('prop', () => {
       set accessor(newVal) {
         this._accessor = newVal;
       }
+      @Clamp(0, 5)
+      @Prop()
+      clamped = 11;
       render() {
-        return `${this.boolFalse}-${this.boolTrue}-${this.str}-${this.num}-${this.accessor}`;
+        return `${this.boolFalse}-${this.boolTrue}-${this.str}-${this.num}-${this.accessor}-${this.clamped}`;
       }
     }
 
@@ -89,15 +113,16 @@ describe('prop', () => {
     });
 
     expect(root).toEqualHtml(`
-      <cmp-a>false-true-string-88-accessor</cmp-a>
+      <cmp-a>false-true-string-88-accessor-5</cmp-a>
     `);
 
-    expect(root.textContent).toBe('false-true-string-88-accessor');
+    expect(root.textContent).toBe('false-true-string-88-accessor-5');
     expect(root.boolFalse).toBe(false);
     expect(root.boolTrue).toBe(true);
     expect(root.str).toBe('string');
     expect(root.num).toBe(88);
     expect(root.accessor).toBe('accessor');
+    expect(root.clamped).toBe(5);
   });
 
   it('only update on even numbers', async () => {

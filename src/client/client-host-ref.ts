@@ -117,24 +117,19 @@ const reWireGetterSetter = (instance: any, hostRef: d.HostRef) => {
   const members = Object.entries(cmpMeta.$members$ ?? {});
 
   members.map(([memberName, [memberFlags]]) => {
-    if (
-      BUILD.state &&
-      BUILD.prop &&
-      (memberFlags & MEMBER_FLAGS.Getter) === 0 &&
-      (memberFlags & MEMBER_FLAGS.Prop || memberFlags & MEMBER_FLAGS.State)
-    ) {
+    if ((BUILD.state || BUILD.prop) && (memberFlags & MEMBER_FLAGS.Prop || memberFlags & MEMBER_FLAGS.State)) {
       const ogValue = instance[memberName];
 
       // Get the original Stencil prototype `get` / `set`
-      const lazyDescriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(instance), memberName);
+      const ogDescriptor = Object.getOwnPropertyDescriptor(Object.getPrototypeOf(instance), memberName);
 
       // Re-wire original accessors to the new instance
       Object.defineProperty(instance, memberName, {
         get() {
-          return lazyDescriptor.get.call(this);
+          return ogDescriptor.get.call(this);
         },
         set(newValue) {
-          lazyDescriptor.set.call(this, newValue);
+          ogDescriptor.set.call(this, newValue);
         },
         configurable: true,
         enumerable: true,

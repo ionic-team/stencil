@@ -70,19 +70,19 @@ export const proxyComponent = (
           ((!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && memberFlags & MEMBER_FLAGS.State))
       ) {
         // preserve any getters / setters that already exist on the prototype;
-        // we'll call them our new accessors. On a lazy component, this would only be called on the class instance.
+        // we'll call them via our new accessors. On a lazy component, this would only be called on the class instance.
         const { get: origGetter, set: origSetter } = Object.getOwnPropertyDescriptor(prototype, memberName) || {};
         if (origGetter) cmpMeta.$members$[memberName][0] |= MEMBER_FLAGS.Getter;
         if (origSetter) cmpMeta.$members$[memberName][0] |= MEMBER_FLAGS.Setter;
 
         if (flags & PROXY_FLAGS.isElementConstructor || !origGetter) {
-          // if it's an Element (native or not)
+          // if it's an Element (native or proxy)
           // OR it's a lazy class instance and doesn't have a getter
           Object.defineProperty(prototype, memberName, {
             get(this: d.RuntimeRef) {
               if (BUILD.lazyLoad) {
                 if ((cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Getter) === 0) {
-                  // no getter - let's set value now
+                  // no getter - let's return value now
                   return getValue(this, memberName);
                 }
                 const ref = getHostRef(this);
@@ -127,11 +127,15 @@ export const proxyComponent = (
               // Lazy class instance or native component-element only:
               // we have an original setter, so we need to set our value via that.
 
-              // do we have a value already on the host element? 
-              const currentValue = ref.$hostElement$[memberName as keyof d.HostElement];
-              if (!currentValue && ref.$instanceValues$.get(memberName)) {
-                // no host value but a value already set on the hostRef, 
-                // this means the setter was added at run-time (e.g. via a decorator). 
+              // do we have a value already?
+              const currentValue =
+                memberFlags & MEMBER_FLAGS.State
+                  ? this[memberName as keyof d.RuntimeRef]
+                  : ref.$hostElement$[memberName as keyof d.HostElement];
+
+              if (typeof currentValue === 'undefined' && ref.$instanceValues$.get(memberName)) {
+                // no host value but a value already set on the hostRef,
+                // this means the setter was added at run-time (e.g. via a decorator).
                 // We want any value set on the element to override the default class instance value.
                 newValue = ref.$instanceValues$.get(memberName);
               } else if (!ref.$instanceValues$.get(memberName) && currentValue) {
@@ -145,29 +149,50 @@ export const proxyComponent = (
               }
               // this sets the value via the `set()` function which
               // *might* not end up changing the underlying value
-              origSetter.apply(this, [parsePropertyValue(newValue, cmpMeta.$members$[memberName][0])]);
-              setValue(this, memberName, ref.$hostElement$[memberName as keyof d.HostElement], cmpMeta);
+              origSetter.apply(this, [parsePropertyValue(newValue, memberFlags)]);
+              // if it's a State property, we need to get the value from the instance
+              newValue =
+                memberFlags & MEMBER_FLAGS.State
+                  ? this[memberName as keyof d.RuntimeRef]
+                  : ref.$hostElement$[memberName as keyof d.HostElement];
+              setValue(this, memberName, newValue, cmpMeta);
               return;
             }
 
             if (!BUILD.lazyLoad) {
-              // we can the value directly now if it's a native component-element
+              // we can set the value directly now if it's a native component-element
               setValue(this, memberName, newValue, cmpMeta);
               return;
             }
 
             if (BUILD.lazyLoad) {
-              // Lazy class instance OR lazy element with no setter:
+              // Lazy class instance OR proxy Element with no setter:
               // set the element value directly now
               if (
                 (flags & PROXY_FLAGS.isElementConstructor) === 0 ||
                 (cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Setter) === 0
               ) {
                 setValue(this, memberName, newValue, cmpMeta);
+                // if this is a value set on an Element *before* the instance has initialised (e.g. via an html attr)...
+                if (flags & PROXY_FLAGS.isElementConstructor && !ref.$lazyInstance$) {
+                  // wait for lazy instance...
+                  ref.$onReadyPromise$.then(() => {
+                    // check if this instance member has a setter *or* we're testing
+                    // ('cos testing can re-use the same instance across tests but resets the flags)
+                    if (
+                      cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Setter &&
+                      ref.$lazyInstance$[memberName] !== ref.$instanceValues$.get(memberName)
+                    ) {
+                      // this catches cases where there's a run-time only setter (e.g. via a decorator)
+                      // *and* no initial value, so the initial setter never gets called
+                      ref.$lazyInstance$[memberName] = newValue;
+                    }
+                  });
+                }
                 return;
               }
 
-              // lazy element with a setter:
+              // lazy element with a setter:s
               // we might need to wait for the lazy class instance to be ready
               // before we can set it's value via it's setter function
               const setterSetVal = () => {
@@ -183,7 +208,7 @@ export const proxyComponent = (
                 }
                 // this sets the value via the `set()` function which
                 // might not end up changing the underlying value
-                ref.$lazyInstance$[memberName] = parsePropertyValue(newValue, cmpMeta.$members$[memberName][0]);
+                ref.$lazyInstance$[memberName] = parsePropertyValue(newValue, memberFlags);
                 setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta);
               };
 

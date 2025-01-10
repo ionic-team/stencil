@@ -4,72 +4,72 @@ import { render } from '@wdio/browser-runner/stencil';
 import { setupIFrameTest } from '../util.js';
 
 const testSuites = async (browser) => {
-  await $('ts-target-props').waitForStable();
+  const ele = await $('ts-target-props');
+  await ele.waitForDisplayed({ timeout: 5000 });
 
   return {
-    defaultValue: (root: HTMLElement) => {
-      expect(root.querySelector('.basicProp').textContent).toBe('basicProp');
-      expect(root.querySelector('.decoratedProp').textContent).toBe('decoratedProp');
-      expect(root.querySelector('.decoratedGetterSetterProp').textContent).toBe('decoratedGetterSetterProp');
-      expect(root.querySelector('.basicState').textContent).toBe('basicState');
-      expect(root.querySelector('.decoratedState').textContent).toBe('decoratedState');
+    defaultValue: async () => {
+      expect(await $('.basicProp').getText()).toBe('basicProp');
+      expect(await $('.decoratedProp').getText()).toBe('-5');
+      expect(await $('.decoratedGetterSetterProp').getText()).toBe('999');
+      expect(await $('.basicState').getText()).toBe('basicState');
+      expect(await $('.decoratedState').getText()).toBe('10');
     },
-    viaAttributes: async (root: HTMLElement) => {
-      root.setAttribute('decorated-prop', 'decoratedProp via attribute');
-      root.setAttribute('decorated-getter-setter-prop', 'decoratedGetterSetterProp via attribute');
-      root.setAttribute('basic-prop', 'basicProp via attribute');
-      root.setAttribute('basic-state', 'basicState via attribute');
-      root.setAttribute('decorated-state', 'decoratedState via attribute');
+    viaAttributes: async () => {
+      await browser.execute(() => {
+        const elm = document.querySelector('ts-target-props');
+        elm.setAttribute('decorated-prop', '200');
+        elm.setAttribute('decorated-getter-setter-prop', '-5');
+        elm.setAttribute('basic-prop', 'basicProp via attribute');
+        elm.setAttribute('basic-state', 'basicState via attribute');
+        elm.setAttribute('decorated-state', 'decoratedState via attribute');
+        return;
+      });
 
-      await $('ts-target-props').waitForStable();
-
-      expect(root.querySelector('.basicProp').textContent).toBe('basicProp via attribute');
-      expect(root.querySelector('.decoratedProp').textContent).toBe('decoratedProp via attribute');
-      expect(root.querySelector('.decoratedGetterSetterProp').textContent).toBe(
-        'decoratedGetterSetterProp via attribute',
-      );
-      expect(root.querySelector('.basicState').textContent).toBe('basicState');
-      expect(root.querySelector('.decoratedState').textContent).toBe('decoratedState');
+      expect(await $('.basicProp').getText()).toBe('basicProp via attribute');
+      expect(await $('.decoratedProp').getText()).toBe('25');
+      expect(await $('.decoratedGetterSetterProp').getText()).toBe('0');
+      expect(await $('.basicState').getText()).toBe('basicState');
+      expect(await $('.decoratedState').getText()).toBe('10');
     },
-    viaProps: async (root: HTMLElement) => {
+    viaProps: async (nativeElement: boolean = false) => {
       await browser.execute(() => {
         const elm = document.querySelector('ts-target-props');
         elm.basicProp = 'basicProp via prop';
-        elm.decoratedProp = 'decoratedProp via prop';
-        elm.decoratedGetterSetterProp = 'decoratedGetterSetterProp via prop';
+        elm.decoratedProp = -3;
+        elm.decoratedGetterSetterProp = 543;
         // @ts-ignore
         elm.basicState = 'basicState via prop';
         // @ts-ignore
-        elm.decoratedState = 'decoratedState via prop';
+        elm.decoratedState = 3;
+        return;
       });
-      await $('ts-target-props').waitForStable();
 
-      expect(root.querySelector('.basicProp').textContent).toBe('basicProp via prop');
-      expect(root.querySelector('.decoratedProp').textContent).toBe('decoratedProp via prop');
-      expect(root.querySelector('.decoratedGetterSetterProp').textContent).toBe('decoratedGetterSetterProp via prop');
-      expect(root.querySelector('.basicState').textContent).toBe('basicState');
-      expect(root.querySelector('.decoratedState').textContent).toBe('decoratedState');
+      expect(await $('.basicProp').getText()).toBe('basicProp via prop');
+      expect(await $('.decoratedProp').getText()).toBe('-3');
+      expect(await $('.decoratedGetterSetterProp').getText()).toBe('543');
+      expect(await $('.decoratedState').getText()).toBe('10');
+
+      // you can change internal state via prop within native elements because the class instance === the element
+      const basicStateMatch = !nativeElement ? 'basicState' : 'basicState via prop';
+      expect(await $('.basicState').getText()).toBe(basicStateMatch);
+      const decoratedStateMatch = !nativeElement ? '10' : '3';
+      expect(await $('.decoratedState').getText()).toBe(decoratedStateMatch);
     },
-    reflectsStateChanges: async (root: HTMLElement) => {
-      const buttons = root.querySelectorAll('button');
-      expect(root.querySelector('.basicState').textContent).toBe('basicState');
-      expect(root.querySelector('.decoratedState').textContent).toBe('decoratedState');
+    reflectsStateChanges: async (nativeElement: boolean = false) => {
+      const buttons = await $$('button');
+      const basicStateMatch = !nativeElement ? 'basicState' : 'basicState via prop';
+      expect(await $('.basicState').getText()).toBe(basicStateMatch);
+      const decoratedStateMatch = !nativeElement ? '10' : '3';
+      expect(await $('.decoratedState').getText()).toBe(decoratedStateMatch);
+
       buttons[0].click();
-      expect(root.querySelector('.basicState').textContent).toBe('basicState changed');
+      await $('ts-target-props').waitForStable();
+      expect(await $('.basicState').getText()).toBe('basicState changed');
+
       buttons[1].click();
-      expect(root.querySelector('.decoratedState').textContent).toBe('decoratedState changed');
-    },
-    decorators: (root: HTMLElement) => {
-      const buttons = root.querySelectorAll('button');
-      // @ts-ignore
-      expect(root.__decoratedProp()).toBe('decoratedProp decorated!');
-      // @ts-ignore
-      expect(root.__decoratedGetterSetterProp()).toBe('decoratedGetterSetterProp decorated!');
-      // @ts-ignore
-      expect(root.__decoratedState()).toBe('decoratedState decorated!');
-      buttons[1].click();
-      // @ts-ignore
-      expect(root.__decoratedState()).toBe('decoratedState changed  decorated!');
+      await $('ts-target-props').waitForStable();
+      expect(await $('.decoratedState').getText()).toBe('0');
     },
   };
 };
@@ -78,12 +78,12 @@ describe('Checks class properties and runtime decorators of different es targets
   describe('default / control - 2017 dist output', () => {
     it('renders default values', async () => {
       render({ template: () => <ts-target-props /> });
-      (await testSuites(browser)).defaultValue(document.querySelector('ts-target-props'));
+      await (await testSuites(browser)).defaultValue();
     });
 
     it('re-renders values via attributes', async () => {
       render({ template: () => <ts-target-props /> });
-      (await testSuites(browser)).viaAttributes(document.querySelector('ts-target-props'));
+      await (await testSuites(browser)).viaAttributes();
     });
 
     it('re-renders values via props', async () => {
@@ -91,85 +91,71 @@ describe('Checks class properties and runtime decorators of different es targets
         html: `
         <ts-target-props></ts-target-props>`,
       });
-      (await testSuites(browser)).viaProps(document.querySelector('ts-target-props'));
+      await (await testSuites(browser)).viaProps();
     });
 
     it('reflects internal state changes to the dom', async () => {
       render({ template: () => <ts-target-props /> });
-      (await testSuites(browser)).reflectsStateChanges(document.querySelector('ts-target-props'));
-    });
-
-    it('makes sure decorators "work"', async () => {
-      render({ template: () => <ts-target-props /> });
-      (await testSuites(browser)).decorators(document.querySelector('ts-target-props'));
+      await (await testSuites(browser)).reflectsStateChanges();
     });
   });
 
   describe('es2022 dist output', () => {
-    let iframe: HTMLElement;
+    before(async () => {
+      await browser.switchToParentFrame();
+      const frameContent = await setupIFrameTest('/ts-target-props/es2022.dist.html', 'es2022-dist');
+      const frameEle = await browser.$('#es2022-dist');
+      frameEle.waitUntil(async () => !!frameContent.querySelector('.basicState'), { timeout: 5000 });
+      await browser.switchToFrame(frameEle);
+    });
 
     it('renders default values', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).defaultValue(iframe.querySelector('ts-target-props'));
+      const { defaultValue } = await testSuites(browser);
+      await defaultValue();
     });
 
     it('re-renders values via attributes', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).viaAttributes(iframe.querySelector('ts-target-props'));
+      const { viaAttributes } = await testSuites(browser);
+      await viaAttributes();
     });
 
     it('re-renders values via props', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).viaProps(iframe.querySelector('ts-target-props'));
+      const { viaProps } = await testSuites(browser);
+      await viaProps();
     });
 
     it('reflects internal state changes to the dom', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).reflectsStateChanges(iframe.querySelector('ts-target-props'));
-    });
-
-    it('makes sure decorators "work"', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).decorators(iframe.querySelector('ts-target-props'));
+      const { reflectsStateChanges } = await testSuites(browser);
+      await reflectsStateChanges();
     });
   });
 
   describe('es2022 dist-custom-elements output', () => {
-    let iframe: HTMLElement;
+    before(async () => {
+      await browser.switchToParentFrame();
+      await setupIFrameTest('/ts-target-props/es2022.custom-element.html', 'es2022-custom-elements');
+      const frameEle = await browser.$('iframe#es2022-custom-elements');
+      await browser.switchToFrame(frameEle);
+    });
 
     it('renders default values', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).defaultValue(iframe.querySelector('ts-target-props'));
+      const { defaultValue } = await testSuites(browser);
+      await defaultValue();
     });
 
     it('re-renders values via attributes', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).viaAttributes(iframe.querySelector('ts-target-props'));
+      const { viaAttributes } = await testSuites(browser);
+      await viaAttributes();
     });
 
     it('re-renders values via props', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).viaProps(iframe.querySelector('ts-target-props'));
+      const { viaProps } = await testSuites(browser);
+      await viaProps(true);
     });
 
     it('reflects internal state changes to the dom', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).reflectsStateChanges(iframe.querySelector('ts-target-props'));
-    });
-
-    it('makes sure decorators "work"', async () => {
-      iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).decorators(iframe.querySelector('ts-target-props'));
+      const { reflectsStateChanges } = await testSuites(browser);
+      await reflectsStateChanges();
     });
   });
 });
