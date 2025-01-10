@@ -1,3 +1,12 @@
+## 🌮 [4.23.2](https://github.com/ionic-team/stencil/compare/v4.23.1...v4.23.2) (2025-01-10)
+
+
+### Bug Fixes
+
+* **runtime:** clear up rootAppliedStyles ([#6087](https://github.com/ionic-team/stencil/issues/6087)) ([c4a9c9e](https://github.com/ionic-team/stencil/commit/c4a9c9e7bd168d6e0e6b6d83ad338c0179c1e731)), refs [@ionic-team/ionic-framework#28189](https://github.com/ionic-team/ionic-framework/issues/28189), closes [#5181](https://github.com/ionic-team/stencil/issues/5181), closes [#5172](https://github.com/ionic-team/stencil/issues/5172), closes [#3607](https://github.com/ionic-team/stencil/issues/3607), closes [#3158](https://github.com/ionic-team/stencil/issues/3158)
+
+
+
 ## 🌯 [4.23.1](https://github.com/ionic-team/stencil/compare/v4.23.0...v4.23.1) (2025-01-06)
 
 
