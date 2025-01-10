@@ -1,3 +1,12 @@
+## 🌮 [4.23.2](https://github.com/ionic-team/stencil/compare/v4.23.1...v4.23.2) (2025-01-10)
+
+
+### Bug Fixes
+
+* **runtime:** clear up rootAppliedStyles ([#6087](https://github.com/ionic-team/stencil/issues/6087)) ([c4a9c9e](https://github.com/ionic-team/stencil/commit/c4a9c9e7bd168d6e0e6b6d83ad338c0179c1e731))
+
+
+
 ## 🌯 [4.23.1](https://github.com/ionic-team/stencil/compare/v4.23.0...v4.23.1) (2025-01-06)
 
 
