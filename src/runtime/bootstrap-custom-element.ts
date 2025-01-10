@@ -100,7 +100,8 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
       }
 
       /**
-       * Clean up `hostRefs` WeakMap when the element is disconnected
+       * Clean up Node references lingering around in `hostRef` objects
+       * to ensure GC can clean up the memory.
        */
       plt.raf(() => {
         const hostRef = getHostRef(this);
