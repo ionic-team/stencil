@@ -3,6 +3,7 @@ import { getHostRef, plt } from '@platform';
 
 import type * as d from '../declarations';
 import { PLATFORM_FLAGS } from './runtime-constants';
+import { rootAppliedStyles } from './styles';
 import { safeCall } from './update-component';
 
 const disconnectInstance = (instance: any) => {
@@ -32,5 +33,19 @@ export const disconnectedCallback = async (elm: d.HostElement) => {
     } else if (hostRef?.$onReadyPromise$) {
       hostRef.$onReadyPromise$.then(() => disconnectInstance(hostRef.$lazyInstance$));
     }
+  }
+
+  /**
+   * Remove the element from the `rootAppliedStyles` WeakMap
+   */
+  if (rootAppliedStyles.has(elm)) {
+    rootAppliedStyles.delete(elm);
+  }
+
+  /**
+   * Remove the shadow root from the `rootAppliedStyles` WeakMap
+   */
+  if (elm.shadowRoot && rootAppliedStyles.has(elm.shadowRoot as unknown as Element)) {
+    rootAppliedStyles.delete(elm.shadowRoot as unknown as Element);
   }
 };

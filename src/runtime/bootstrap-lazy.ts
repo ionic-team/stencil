@@ -159,6 +159,19 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
 
         disconnectedCallback() {
           plt.jmp(() => disconnectedCallback(this));
+
+          /**
+           * Clear up references within the `$vnode$` object to the DOM
+           * node that was removed. This is necessary to ensure that these
+           * references used as keys in the `hostRef` object can be properly
+           * garbage collected.
+           */
+          plt.raf(() => {
+            const hostRef = getHostRef(this);
+            if (hostRef?.$vnode$?.$elm$ instanceof Node && !hostRef.$vnode$.$elm$.isConnected) {
+              delete hostRef.$vnode$.$elm$;
+            }
+          });
         }
 
         componentOnReady() {
