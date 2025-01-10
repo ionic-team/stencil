@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { deleteHostRef, doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
+import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
 import { addHostEventListeners } from '@runtime';
 import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
