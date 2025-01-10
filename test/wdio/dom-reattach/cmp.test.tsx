@@ -13,15 +13,12 @@ describe('dom-reattach', function () {
         </>
       ),
     });
-    console.log('[test] render component');
 
     const element = document.querySelector('dom-reattach');
     function reattach() {
       if (showElement) {
-        console.log('[test] remove element');
         element.remove();
       } else {
-        console.log('[test] add element');
         document.body.appendChild(element);
       }
       showElement = !showElement;
