@@ -85,7 +85,12 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
         // we'll do this for both the element and the component instance.
         // this makes sure attribute values take priority over default values.
         function getter(this: d.RuntimeRef) {
-          return parsedAttrValue ? parsedAttrValue : origGetter ? origGetter.apply(this) : getValue(this, memberName);
+          console.log('getter', memberName, parsedAttrValue, origGetter);
+          return ![undefined, null].includes(parsedAttrValue)
+            ? parsedAttrValue
+            : origGetter
+              ? origGetter.apply(this)
+              : getValue(this, memberName);
         }
         Object.defineProperty(elm, memberName, {
           get: getter,
