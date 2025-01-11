@@ -23,7 +23,7 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
       root.setAttribute('basic-state', 'basicState via attribute');
       root.setAttribute('decorated-state', 'decoratedState via attribute');
 
-      await browser.pause(20);
+      await browser.pause(100);
 
       expect(getTxt('.basicProp')).toBe('basicProp via attribute');
       expect(getTxt('.decoratedProp')).toBe('25');
@@ -40,7 +40,7 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
       // @ts-ignore
       root.decoratedState = 3;
 
-      await browser.pause(20);
+      await browser.pause(100);
 
       expect(getTxt('.basicProp')).toBe('basicProp via prop');
       expect(getTxt('.decoratedProp')).toBe('-3');
@@ -58,11 +58,11 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
       expect(getTxt('.decoratedState')).toBe('10');
 
       buttons[0].click();
-      await browser.pause(20);
+      await browser.pause(100);
       expect(getTxt('.basicState')).toBe('basicState changed');
 
       buttons[1].click();
-      await browser.pause(20);
+      await browser.pause(100);
       expect(getTxt('.decoratedState')).toBe('0');
     },
   };
