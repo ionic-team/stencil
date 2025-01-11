@@ -1,9 +1,13 @@
+import 'webdriverio';
+
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, browser } from '@wdio/globals';
 
 import { setupIFrameTest } from '../util.js';
+import { TsTargetProps } from './cmp.js';
 
-const testSuites = async (browser) => {
+const testSuites = async () => {
   await $('ts-target-props').waitForStable();
 
   return {
@@ -77,31 +81,43 @@ const testSuites = async (browser) => {
 describe('Checks class properties and runtime decorators of different es targets', () => {
   describe('default / control - 2017 dist output', () => {
     it('renders default values', async () => {
-      render({ template: () => <ts-target-props /> });
-      (await testSuites(browser)).defaultValue(document.querySelector('ts-target-props'));
+      render({
+        template: () => <ts-target-props />,
+        components: [TsTargetProps],
+      });
+      (await testSuites()).defaultValue(document.querySelector('ts-target-props'));
     });
 
     it('re-renders values via attributes', async () => {
-      render({ template: () => <ts-target-props /> });
-      (await testSuites(browser)).viaAttributes(document.querySelector('ts-target-props'));
+      render({
+        template: () => <ts-target-props />,
+        components: [TsTargetProps],
+      });
+      (await testSuites()).viaAttributes(document.querySelector('ts-target-props'));
     });
 
     it('re-renders values via props', async () => {
       render({
-        html: `
-        <ts-target-props></ts-target-props>`,
+        html: `<ts-target-props></ts-target-props>`,
+        components: [TsTargetProps],
       });
-      (await testSuites(browser)).viaProps(document.querySelector('ts-target-props'));
+      (await testSuites()).viaProps(document.querySelector('ts-target-props'));
     });
 
     it('reflects internal state changes to the dom', async () => {
-      render({ template: () => <ts-target-props /> });
-      (await testSuites(browser)).reflectsStateChanges(document.querySelector('ts-target-props'));
+      render({
+        template: () => <ts-target-props />,
+        components: [TsTargetProps],
+      });
+      (await testSuites()).reflectsStateChanges(document.querySelector('ts-target-props'));
     });
 
     it('makes sure decorators "work"', async () => {
-      render({ template: () => <ts-target-props /> });
-      (await testSuites(browser)).decorators(document.querySelector('ts-target-props'));
+      render({
+        template: () => <ts-target-props />,
+        components: [TsTargetProps],
+      });
+      (await testSuites()).decorators(document.querySelector('ts-target-props'));
     });
   });
 
@@ -110,32 +126,32 @@ describe('Checks class properties and runtime decorators of different es targets
 
     it('renders default values', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).defaultValue(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).defaultValue(iframe.querySelector('ts-target-props'));
     });
 
     it('re-renders values via attributes', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).viaAttributes(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).viaAttributes(iframe.querySelector('ts-target-props'));
     });
 
     it('re-renders values via props', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).viaProps(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).viaProps(iframe.querySelector('ts-target-props'));
     });
 
     it('reflects internal state changes to the dom', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).reflectsStateChanges(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).reflectsStateChanges(iframe.querySelector('ts-target-props'));
     });
 
     it('makes sure decorators "work"', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.dist.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).decorators(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).decorators(iframe.querySelector('ts-target-props'));
     });
   });
 
@@ -144,32 +160,32 @@ describe('Checks class properties and runtime decorators of different es targets
 
     it('renders default values', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).defaultValue(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).defaultValue(iframe.querySelector('ts-target-props'));
     });
 
     it('re-renders values via attributes', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).viaAttributes(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).viaAttributes(iframe.querySelector('ts-target-props'));
     });
 
     it('re-renders values via props', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).viaProps(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).viaProps(iframe.querySelector('ts-target-props'));
     });
 
     it('reflects internal state changes to the dom', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).reflectsStateChanges(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).reflectsStateChanges(iframe.querySelector('ts-target-props'));
     });
 
     it('makes sure decorators "work"', async () => {
       iframe = await setupIFrameTest('/ts-target-props/es2022.custom-element.html');
-      browser.switchToFrame(iframe);
-      (await testSuites(browser)).decorators(iframe.querySelector('ts-target-props'));
+      browser.switchFrame($(iframe));
+      (await testSuites()).decorators(iframe.querySelector('ts-target-props'));
     });
   });
 });
