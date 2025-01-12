@@ -191,7 +191,7 @@ export const proxyComponent = (
                 return;
               }
 
-              // lazy element with a setter:s
+              // lazy element with a setter
               // we might need to wait for the lazy class instance to be ready
               // before we can set it's value via it's setter function
               const setterSetVal = () => {
