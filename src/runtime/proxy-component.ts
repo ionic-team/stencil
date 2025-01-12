@@ -177,8 +177,7 @@ export const proxyComponent = (
                 if (flags & PROXY_FLAGS.isElementConstructor && !ref.$lazyInstance$) {
                   // wait for lazy instance...
                   ref.$onReadyPromise$.then(() => {
-                    // check if this instance member has a setter *or* we're testing
-                    // ('cos testing can re-use the same instance across tests but resets the flags)
+                    // check if this instance member has a setter doesn't match what's already on the element
                     if (
                       cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Setter &&
                       ref.$lazyInstance$[memberName] !== ref.$instanceValues$.get(memberName)
