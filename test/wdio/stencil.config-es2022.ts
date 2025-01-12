@@ -22,5 +22,5 @@ export const config: Config = {
       indexHtml: 'ts-target-props/es2022.index.html',
     },
   ],
-  sourceMap: false,
+  sourceMap: true,
 };

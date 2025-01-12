@@ -186,7 +186,7 @@ describe('watch', () => {
         return this._prop1;
       }
       set prop1(newProp: number) {
-        if (typeof newProp !== 'number') return;
+        if (isNaN(newProp)) return;
         this._prop1 = newProp;
       }
 
@@ -217,7 +217,8 @@ describe('watch', () => {
     expect(rootInstance.method1).toHaveBeenLastCalledWith(100, 1, 'prop1');
 
     // guard has prevented the watch from being called
-    rootInstance.prop1 = 'bye';
+    root.prop1 = 'bye';
+    expect(root.prop1).toBe(100);
     expect(rootInstance.method1).toHaveBeenCalledTimes(1);
     expect(rootInstance.method1).toHaveBeenLastCalledWith(100, 1, 'prop1');
   });

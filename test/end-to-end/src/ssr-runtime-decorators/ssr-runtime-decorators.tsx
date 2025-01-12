@@ -26,9 +26,9 @@ function Clamp(lowerBound: number, upperBound: number, descriptor?: PropertyDesc
 }
 
 @Component({
-  tag: 'ts-target-props',
+  tag: 'runtime-decorators',
 })
-export class TsTargetProps {
+export class RunTimeDecorators {
   @Element() el: HTMLElement;
 
   @Prop() basicProp: string = 'basicProp';

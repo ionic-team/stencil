@@ -8,8 +8,8 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface TsTargetProps {
         "basicProp": string;
-        "decoratedGetterSetterProp": string;
-        "decoratedProp": string;
+        "decoratedGetterSetterProp": number;
+        "decoratedProp": number;
     }
 }
 declare global {
@@ -26,8 +26,8 @@ declare global {
 declare namespace LocalJSX {
     interface TsTargetProps {
         "basicProp"?: string;
-        "decoratedGetterSetterProp"?: string;
-        "decoratedProp"?: string;
+        "decoratedGetterSetterProp"?: number;
+        "decoratedProp"?: number;
     }
     interface IntrinsicElements {
         "ts-target-props": TsTargetProps;

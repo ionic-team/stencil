@@ -157,7 +157,7 @@ export const setAccessor = (
                 elm.setAttribute(memberName, n);
               }
             }
-          } else {
+          } else if ((elm as any)[memberName] !== newValue) {
             (elm as any)[memberName] = newValue;
           }
         } catch (e) {

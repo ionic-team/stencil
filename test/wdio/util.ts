@@ -12,7 +12,7 @@ export declare namespace SomeTypes {
   type String = string;
 }
 
-export async function setupIFrameTest(htmlFile: string): Promise<HTMLElement> {
+export async function setupIFrameTest(htmlFile: string, id?: string): Promise<HTMLElement> {
   const oldFrame = document.querySelector('iframe');
   if (oldFrame) {
     document.body.removeChild(oldFrame);
@@ -30,6 +30,7 @@ export async function setupIFrameTest(htmlFile: string): Promise<HTMLElement> {
    * Note: prefixes the absolute path to the html file with `/@fs` is a ViteJS (https://vitejs.dev/)
    * feature which allows to serve static content from files this way
    */
+  if (id) iframe.id = id;
   iframe.src = `/@fs${htmlFilePath}`;
   iframe.width = '600px';
   iframe.height = '600px';

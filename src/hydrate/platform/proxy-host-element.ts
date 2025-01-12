@@ -5,7 +5,9 @@ import { CMP_FLAGS, MEMBER_FLAGS } from '@utils';
 
 import type * as d from '../../declarations';
 
-export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta): void {
+export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructor): void {
+  const cmpMeta = cstr.cmpMeta;
+
   if (typeof elm.componentOnReady !== 'function') {
     elm.componentOnReady = componentOnReady;
   }
@@ -32,11 +34,9 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
 
     const members = Object.entries(cmpMeta.$members$);
 
-    members.forEach(([memberName, m]) => {
-      const memberFlags = m[0];
-
+    members.forEach(([memberName, [memberFlags, metaAttributeName]]) => {
       if (memberFlags & MEMBER_FLAGS.Prop) {
-        const attributeName = m[1] || memberName;
+        const attributeName = metaAttributeName || memberName;
         let attrValue = elm.getAttribute(attributeName);
 
         /**
@@ -57,8 +57,17 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
           }
         }
 
+        const { get: origGetter, set: origSetter } =
+          Object.getOwnPropertyDescriptor((cstr as any).prototype, memberName) || {};
+        let parsedAttrValue: any;
+
         if (attrValue != null) {
-          const parsedAttrValue = parsePropertyValue(attrValue, memberFlags);
+          parsedAttrValue = parsePropertyValue(attrValue, memberFlags);
+          if (origSetter) {
+            // we have an original setter, so let's set the value via that.
+            origSetter.apply(elm, [parsedAttrValue]);
+            parsedAttrValue = origGetter ? origGetter.apply(elm) : parsedAttrValue;
+          }
           hostRef?.$instanceValues$?.set(memberName, parsedAttrValue);
         }
 
@@ -71,16 +80,29 @@ export function proxyHostElement(elm: d.HostElement, cmpMeta: d.ComponentRuntime
           delete (elm as any)[memberName];
         }
 
-        // create the getter/setter on the host element for this property name
+        // if we have a parsed value from an attribute use that first.
+        // otherwise if we have a getter already applied, use that.
+        // we'll do this for both the element and the component instance.
+        // this makes sure attribute values take priority over default values.
+        function getter(this: d.RuntimeRef) {
+          return ![undefined, null].includes(parsedAttrValue)
+            ? parsedAttrValue
+            : origGetter
+              ? origGetter.apply(this)
+              : getValue(this, memberName);
+        }
         Object.defineProperty(elm, memberName, {
-          get(this: d.RuntimeRef) {
-            // proxyComponent, get value
-            return getValue(this, memberName);
-          },
+          get: getter,
           set(this: d.RuntimeRef, newValue) {
             // proxyComponent, set value
             setValue(this, memberName, newValue, cmpMeta);
           },
+          configurable: true,
+          enumerable: true,
+        });
+
+        Object.defineProperty((cstr as any).prototype, memberName, {
+          get: getter,
           configurable: true,
           enumerable: true,
         });
