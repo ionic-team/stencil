@@ -1065,7 +1065,7 @@ render() {
           ) {
             let orgLocationNode = nodeToRelocate['s-ol']?.previousSibling as d.RenderNode | null;
             while (orgLocationNode) {
-              let refNode = orgLocationNode['s-nr'] ?? null;
+              let refNode = orgLocationNode['s-nr'] as d.RenderNode ?? null;
 
               if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
                 refNode = refNode.nextSibling as d.RenderNode | null;

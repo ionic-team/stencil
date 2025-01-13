@@ -1441,7 +1441,7 @@ export interface RenderNode extends HostElement {
    * This is a reference for a original location node
    * back to the node that's been moved around.
    */
-  ['s-nr']?: RenderNode;
+  ['s-nr']?: PatchedSlotNode | RenderNode;
 
   /**
    * Original Order:
@@ -1526,12 +1526,50 @@ export interface RenderNode extends HostElement {
    */
   __appendChild?: <T extends Node>(newChild: T) => T;
 
+  __insertBefore?: <T extends Node>(node: T, child: Node | null) => T;
+
   /**
    * On a `scoped: true` component
    * with `experimentalSlotFixes` flag enabled,
    * gives access to the original `removeChild` method
    */
   __removeChild?: <T extends Node>(child: T) => T;
+}
+
+export interface PatchedSlotNode extends Node {
+  /**
+   * Slot name
+   */
+  ['s-sn']?: string;
+  
+  /**
+   * Original Location Reference:
+   * A reference pointing to the comment
+   * which represents the original location
+   * before it was moved to its slot.
+   */
+  ['s-ol']?: RenderNode;
+
+  /**
+   * Slot host tag name:
+   * This is the tag name of the element where this node
+   * has been moved to during slot relocation.
+   *
+   * This allows us to check if the node has been moved and prevent
+   * us from thinking a node _should_ be moved when it may already be in
+   * its final destination.
+   *
+   * This value is set to `undefined` whenever the node is put back into its original location.
+   */
+  ['s-sh']?: string;
+
+  /**
+   * Is a `slot` node when `shadow: false` (or `scoped: true`).
+   *
+   * This is a node (either empty text-node or `<slot-fb>` element)
+   * that represents where a `<slot>` is located in the original JSX.
+   */
+  ['s-sr']?: boolean;
 }
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];

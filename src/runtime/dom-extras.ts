@@ -14,6 +14,7 @@ import {
 } from './slot-polyfill-utils';
 import { insertBefore } from './vdom/vdom-render';
 
+
 export const patchPseudoShadowDom = (hostElementPrototype: HTMLElement) => {
   patchCloneNode(hostElementPrototype);
   patchSlotAppendChild(hostElementPrototype);
@@ -22,6 +23,7 @@ export const patchPseudoShadowDom = (hostElementPrototype: HTMLElement) => {
   patchSlotInsertAdjacentElement(hostElementPrototype);
   patchSlotInsertAdjacentHTML(hostElementPrototype);
   patchSlotInsertAdjacentText(hostElementPrototype);
+  patchInsertBefore(hostElementPrototype);
   patchTextContent(hostElementPrototype);
   patchChildSlotNodes(hostElementPrototype);
   patchSlotRemoveChild(hostElementPrototype);
@@ -220,6 +222,58 @@ export const patchSlotInsertAdjacentHTML = (HostElementPrototype: HTMLElement) =
 export const patchSlotInsertAdjacentText = (HostElementPrototype: HTMLElement) => {
   HostElementPrototype.insertAdjacentText = function (this: d.HostElement, position: InsertPosition, text: string) {
     this.insertAdjacentHTML(position, text);
+  };
+};
+
+/**
+ * Patches the `insertBefore` of a non-shadow component.
+ * The *current* node to insert before may not be in the root of our component.
+ * This tries to find where the *current* node lives within the component and insert the new node before it
+ * @param HostElementPrototype the custom element prototype to patch
+ */
+const patchInsertBefore = (HostElementPrototype: HTMLElement) => {
+  const eleProto: d.RenderNode = HostElementPrototype
+  if (eleProto.__insertBefore) return;
+
+  eleProto.__insertBefore = HostElementPrototype.insertBefore;
+
+  HostElementPrototype.insertBefore = function<T extends d.PatchedSlotNode>(this: d.RenderNode, newChild: T, currentChild: d.RenderNode) {
+    const slotName = (newChild['s-sn'] = getSlotName(newChild));
+    const slotNode = getHostSlotNodes(this.__childNodes, slotName)[0];
+    const slottedNodes = this.__childNodes ? this.childNodes : getSlottedChildNodes(this.childNodes);
+
+    if (slotNode) {
+      let found = false;
+
+      slottedNodes.forEach((childNode) => {
+        if (childNode === currentChild || currentChild === null) {
+          // we found the node in our list of other 'lightDOM' / slotted nodes
+          found = true;
+          addSlotRelocateNode(newChild, slotNode);
+          if (currentChild === null) {
+            this.__append(newChild);
+            return;
+          }
+
+          if (slotName === currentChild['s-sn']) {
+            // current child ('slot before' node) is 'in' the same slot
+            const insertBefore =
+              (currentChild.parentNode as d.RenderNode).__insertBefore || currentChild.parentNode.insertBefore;
+            insertBefore.call(currentChild.parentNode, newChild, currentChild);
+          } else {
+            // current child is not in the same slot as 'slot before' node
+            // so just toss the node in wherever
+            this.__append(newChild);
+          }
+          return;
+        }
+      });
+      
+      if (found) {
+        return newChild;
+      }
+    }
+    return (this as d.RenderNode).__insertBefore(newChild, currentChild);
   };
 };
 
