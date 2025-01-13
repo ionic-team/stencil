@@ -66,7 +66,7 @@ export async function newSpecPage(opts: NewSpecPageOptions): Promise<SpecPage> {
       setSupportsShadowDom(false);
     } else {
       setSupportsShadowDom(true);
-    .
+    }
   }
   BUILD.cssAnnotations = opts.includeAnnotations;
 
