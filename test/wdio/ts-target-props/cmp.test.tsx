@@ -5,6 +5,7 @@ import { setupIFrameTest } from '../util.js';
 
 const testSuites = async (root: HTMLTsTargetPropsElement) => {
   function getTxt(selector: string) {
+    browser.waitUntil(() => !!root.querySelector(selector), { timeout: 3000 });
     return root.querySelector(selector).textContent.trim();
   }
 
