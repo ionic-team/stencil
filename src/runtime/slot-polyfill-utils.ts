@@ -45,6 +45,9 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
 
 /**
  * Get's the child nodes of a component that are actually slotted.
+ * It does this by using root nodes of a component; for each slotted node there is a
+ * corresponding slot location node which points to the slotted node (via `['s-nr']`).
+ *
  * This is only required until all patches are unified / switched on all the time (then we can rely on `childNodes`)
  * either under 'experimentalSlotFixes' or on by default
  * @param childNodes all 'internal' child nodes of the component
@@ -68,7 +71,7 @@ export const getSlottedChildNodes = (childNodes: NodeListOf<ChildNode>): d.Patch
  * @param slotName the name of the slot to match on.
  * @returns a reference to the slot node that matches the provided name, `null` otherwise
  */
-export function getHostSlotNodes (childNodes: NodeListOf<ChildNode>, hostName: string, slotName?: string) {
+export function getHostSlotNodes(childNodes: NodeListOf<ChildNode>, hostName: string, slotName?: string) {
   let i = 0;
   let slottedNodes: d.RenderNode[] = [];
   let childNode: d.RenderNode;
@@ -144,6 +147,7 @@ export const addSlotRelocateNode = (
   position?: number,
 ) => {
   let slottedNodeLocation: d.RenderNode;
+
   // does newChild already have a slot location node?
   if (newChild['s-ol'] && newChild['s-ol'].isConnected) {
     slottedNodeLocation = newChild['s-ol'];

@@ -182,7 +182,7 @@ export class MockNode {
 
   remove() {
     if (this.parentNode != null) {
-      this.parentNode.removeChild(this);
+      (this as any).__parentNode ? (this as any).__parentNode.removeChild(this) : this.parentNode.removeChild(this);
     }
   }
 

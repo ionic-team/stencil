@@ -1404,7 +1404,7 @@ export interface RenderNode extends HostElement {
   ['s-sr']?: boolean;
 
   /**
-   * Slot name
+   * Slot name of either the slot itself or the slotted node
    */
   ['s-sn']?: string;
 
@@ -1526,6 +1526,11 @@ export interface RenderNode extends HostElement {
    */
   __appendChild?: <T extends Node>(newChild: T) => T;
 
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * gives access to the original `insertBefore` method
+   */
   __insertBefore?: <T extends Node>(node: T, child: Node | null) => T;
 
   /**
@@ -1541,7 +1546,7 @@ export interface PatchedSlotNode extends Node {
    * Slot name
    */
   ['s-sn']?: string;
-  
+
   /**
    * Original Location Reference:
    * A reference pointing to the comment
@@ -1570,6 +1575,41 @@ export interface PatchedSlotNode extends Node {
    * that represents where a `<slot>` is located in the original JSX.
    */
   ['s-sr']?: boolean;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the actual `parentNode` of the component
+   */
+  __parentNode?: RenderNode;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the actual `nextSibling` of the component
+   */
+  __nextSibling?: RenderNode;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the actual `previousSibling` of the component
+   */
+  __previousSibling?: RenderNode;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the actual `nextElementSibling` of the component
+   */
+  __nextElementSibling?: RenderNode;
+
+  /**
+   * On a `scoped: true` component
+   * with `experimentalSlotFixes` flag enabled,
+   * returns the actual `nextElementSibling` of the component
+   */
+  __previousElementSibling?: RenderNode;
 }
 
 export type LazyBundlesRuntimeData = LazyBundleRuntimeData[];
