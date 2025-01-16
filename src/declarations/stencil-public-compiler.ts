@@ -2018,7 +2018,7 @@ export interface TestingConfig extends JestConfig {
    * The browser channel to use for e2e tests (stable, beta, dev or canary).
    * @default 'chrome'
    */
-  browserChannel?: 'chrome' | 'chrome-beta' | 'chrome-dev' | 'chrome-canary'
+  browserChannel?: 'chrome' | 'chrome-beta' | 'chrome-dev' | 'chrome-canary';
 
   /**
    * Whether to run browser e2e tests in headless mode.
