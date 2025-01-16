@@ -172,7 +172,7 @@ describe('parseFlags', () => {
     });
 
     it('parses a boolean-string flag as a string with a string arg using equality', () => {
-      const args = [`--${cliArg}=new`];
+      const args = [`--${cliArg}=shell`];
       const flags = parseFlags(args);
       expect(flags.headless).toBe('shell');
       expect(flags.knownArgs).toEqual([`--${cliArg}`, 'shell']);
