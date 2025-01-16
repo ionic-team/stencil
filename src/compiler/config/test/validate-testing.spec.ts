@@ -104,7 +104,7 @@ describe('validateTesting', () => {
         userConfig.flags = { ...flags, e2e: true, headless: undefined };
       });
 
-      it.each<boolean | 'new'>([false, 'new'])(
+      it.each<boolean | 'shell'>([false, 'shell'])(
         'uses %s browserHeadless mode from testing config',
         (browserHeadlessValue) => {
           userConfig.testing = { browserHeadless: browserHeadlessValue };

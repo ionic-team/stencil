@@ -331,13 +331,7 @@ async function waitForChanges(page: E2EPageInternal) {
       return;
     }
 
-    if (typeof (page as any).waitForTimeout === 'function') {
-      await page.waitForTimeout(100);
-    } else {
-      // in puppeteer v15, `waitFor` has been removed. this is kept only for puppeteer v14 and below support
-      await (page as any).waitFor(100);
-    }
-
+    await new Promise(r => setTimeout(r, 100));
     await Promise.all(page._e2eElements.map((elm) => elm.e2eSync()));
   } catch (e) {}
 }
@@ -345,13 +339,12 @@ async function waitForChanges(page: E2EPageInternal) {
 function consoleMessage(c: ConsoleMessage) {
   const msg = serializeConsoleMessage(c);
   const type = c.type();
-  const normalizedType = type === 'warning' ? 'warn' : type;
-  if (normalizedType === 'debug') {
+  if (type === 'debug') {
     // Skip debug messages
     return;
   }
-  if (typeof (console as any)[normalizedType] === 'function') {
-    (console as any)[normalizedType](msg);
+  if (typeof (console as any)[type] === 'function') {
+    (console as any)[type](msg);
   } else {
     console.log(type, msg);
   }

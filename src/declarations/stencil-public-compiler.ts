@@ -2034,7 +2034,7 @@ export interface TestingConfig extends JestConfig {
    *
    * @default new
    */
-  browserHeadless?: boolean | 'new';
+  browserHeadless?: boolean | 'shell';
 
   /**
    * Slows down e2e browser operations by the specified amount of milliseconds.
