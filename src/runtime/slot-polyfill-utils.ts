@@ -78,14 +78,18 @@ export function getHostSlotNodes(childNodes: NodeListOf<ChildNode>, hostName: st
 
   for (; i < childNodes.length; i++) {
     childNode = childNodes[i] as any;
-    if (childNode['s-sr'] && childNode['s-hn'] === hostName && (!slotName || childNode['s-sn'] === slotName)) {
+    if (
+      childNode['s-sr'] &&
+      childNode['s-hn'] === hostName &&
+      (slotName === undefined || childNode['s-sn'] === slotName)
+    ) {
       slottedNodes.push(childNode);
       if (typeof slotName !== 'undefined') return slottedNodes;
     }
     slottedNodes = [...slottedNodes, ...getHostSlotNodes(childNode.childNodes, hostName, slotName)];
   }
   return slottedNodes;
-};
+}
 
 /**
  * Get slotted child nodes of a slot node
