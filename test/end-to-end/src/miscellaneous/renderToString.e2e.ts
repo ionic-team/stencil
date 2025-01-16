@@ -122,7 +122,7 @@ describe('renderToString', () => {
      * expect the scoped component styles to be injected before custom styles
      */
     expect(html.replaceAll(/\n[ ]*/g, '')).toContain(
-      '.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style><style class="vjs-styles-defaults">.video-js {width: 300px;height: 150px;}.vjs-fluid {padding-top: 56.25%}</style> <style>.myComponent {display: none;}</style> </head>',
+      '.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style><style class="vjs-styles-defaults">.video-js {width: 300px;height: 150px;}.vjs-fluid:not(.vjs-audio-only-mode) {padding-top: 56.25%}</style> <style>.myComponent {display: none;}</style> </head>',
     );
   });
 
@@ -156,7 +156,7 @@ describe('renderToString', () => {
      * renders hydration styles and custom link tag within the head tag
      */
     expect(html.replaceAll(/\n[ ]*/g, '')).toContain(
-      '<head><meta charset="utf-8"><style sty-id="sc-scoped-car-list">.sc-scoped-car-list-h{display:block;margin:10px;padding:10px;border:1px solid blue}ul.sc-scoped-car-list{display:block;margin:0;padding:0}li.sc-scoped-car-list{list-style:none;margin:0;padding:20px}.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style><style class="vjs-styles-defaults">.video-js {width: 300px;height: 150px;}.vjs-fluid {padding-top: 56.25%}</style> <link rel="stylesheet" href="whatever.css"> </head>',
+      '<head><meta charset="utf-8"><style sty-id="sc-scoped-car-list">.sc-scoped-car-list-h{display:block;margin:10px;padding:10px;border:1px solid blue}ul.sc-scoped-car-list{display:block;margin:0;padding:0}li.sc-scoped-car-list{list-style:none;margin:0;padding:20px}.selected.sc-scoped-car-list{font-weight:bold;background:rgb(255, 255, 210)}</style><style class="vjs-styles-defaults">.video-js {width: 300px;height: 150px;}.vjs-fluid:not(.vjs-audio-only-mode) {padding-top: 56.25%}</style> <link rel="stylesheet" href="whatever.css"> </head>',
     );
   });
 });

@@ -33,7 +33,7 @@
     "lodash-es": "^4.17.15",
     "rollup-plugin-css-only": "^2.1.0",
     "rollup-plugin-node-builtins": "^2.1.2",
-    "tsx": "^4.15.7",
+    "tsx": "^4.19.2",
     "video.js": "^7.10.2",
     "why-is-node-running": "^2.2.0"
   },
