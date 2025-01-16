@@ -38,6 +38,13 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     testing.browserWaitUntil = 'load';
   }
 
+  /**
+   * ensure we always test on stable Chrome
+   */
+  if (!isString(testing.browserChannel)) {
+    testing.browserChannel = 'chrome';
+  }
+
   testing.browserArgs = testing.browserArgs || [];
   addTestingConfigOption(testing.browserArgs, '--font-render-hinting=medium');
   addTestingConfigOption(testing.browserArgs, '--incognito');
