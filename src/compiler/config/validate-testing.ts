@@ -20,25 +20,39 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     configPathDir = config.rootDir!;
   }
 
-  if (typeof config.flags.headless === 'boolean' || config.flags.headless === 'new') {
+  if (typeof config.flags.headless === 'boolean' || config.flags.headless === 'shell') {
     testing.browserHeadless = config.flags.headless;
-  } else if (typeof testing.browserHeadless !== 'boolean' && testing.browserHeadless !== 'new') {
-    testing.browserHeadless = true;
+  } else if (typeof testing.browserHeadless !== 'boolean' && testing.browserHeadless !== 'shell') {
+    testing.browserHeadless = 'shell';
+  }
+
+  /**
+   * Using the deprecated `browserHeadless: true` flag causes Chrome to crash when running tests.
+   * Ensure users don't run into this by throwing a deliberate error.
+   */
+  if (typeof testing.browserHeadless === 'boolean' && testing.browserHeadless) {
+    throw new Error(`Setting "browserHeadless" config to \`true\` is not supported anymore, please set it to "shell"!`);
   }
 
   if (!testing.browserWaitUntil) {
     testing.browserWaitUntil = 'load';
   }
 
+  /**
+   * ensure we always test on stable Chrome
+   */
+  if (!isString(testing.browserChannel)) {
+    testing.browserChannel = 'chrome';
+  }
+
   testing.browserArgs = testing.browserArgs || [];
   addTestingConfigOption(testing.browserArgs, '--font-render-hinting=medium');
   addTestingConfigOption(testing.browserArgs, '--incognito');
-
   if (config.flags.ci) {
     addTestingConfigOption(testing.browserArgs, '--no-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
-    testing.browserHeadless = testing.browserHeadless === 'new' ? 'new' : true;
+    testing.browserHeadless = 'shell';
   } else if (config.flags.devtools || testing.browserDevtools) {
     testing.browserDevtools = true;
     testing.browserHeadless = false;
