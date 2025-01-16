@@ -15,6 +15,8 @@ import { initPageScreenshot } from './puppeteer-screenshot';
 
 declare const global: JestEnvironmentGlobal;
 
+const DEFAULT_LOAD_TIMEOUT = 10 * 1000; // 10s
+
 // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
 const env: E2EProcessEnv = process.env as E2EProcessEnv;
 export async function newE2EPage(opts: NewE2EPageOptions = {}): Promise<E2EPage> {
@@ -267,7 +269,7 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: WaitF
 }
 
 async function waitForStencil(page: E2EPage, options: WaitForOptions) {
-  const timeout = typeof options.timeout === 'number' ? options.timeout : 4750;
+  const timeout = typeof options.timeout === 'number' ? options.timeout : DEFAULT_LOAD_TIMEOUT;
   try {
     await page.waitForFunction('window.stencilAppLoaded', { timeout });
   } catch (e) {
