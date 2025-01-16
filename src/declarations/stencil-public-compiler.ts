@@ -2015,6 +2015,12 @@ export interface TestingConfig extends JestConfig {
   browserWSEndpoint?: string;
 
   /**
+   * The browser channel to use for e2e tests (stable, beta, dev or canary).
+   * @default 'chrome'
+   */
+  browserChannel?: 'chrome' | 'chrome-beta' | 'chrome-dev' | 'chrome-canary'
+
+  /**
    * Whether to run browser e2e tests in headless mode.
    *
    * Starting with Chrome v112, a new headless mode was introduced.
@@ -2024,7 +2030,9 @@ export interface TestingConfig extends JestConfig {
    * To use the "old" headless mode, a boolean value of `true` must be provided.
    * To use "headful" mode, a boolean value of `false` must be provided.
    *
-   * Defaults to true.
+   * Defaults to 'new'.
+   *
+   * @default new
    */
   browserHeadless?: boolean | 'new';
 

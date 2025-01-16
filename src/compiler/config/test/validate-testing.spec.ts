@@ -65,24 +65,31 @@ describe('validateTesting', () => {
 
   describe('browserHeadless', () => {
     describe("using 'headless' value from cli", () => {
-      it.each([false, true, 'new'])('sets browserHeadless to %s', (headless) => {
+      it.each([false, 'new'])('sets browserHeadless to %s', (headless) => {
         userConfig.flags = { ...flags, e2e: true, headless };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.testing.browserHeadless).toBe(headless);
       });
 
-      it('defaults to true outside of CI', () => {
+      it('throws if browser headless is set to deprecated value `true`', () => {
+        userConfig.flags = { ...flags, e2e: true, headless: true };
+        expect(() => validateConfig(userConfig, mockLoadConfigInit())).toThrow(
+          'Setting "browserHeadless" config to `true` is not supported anymore, please set it to "new"!'
+        )
+      });
+
+      it('defaults to "new" outside of CI', () => {
         userConfig.flags = { ...flags, e2e: true };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe(true);
+        expect(config.testing.browserHeadless).toBe('new');
       });
     });
 
     describe('with ci enabled', () => {
-      it("forces using the old headless mode when 'headless: false'", () => {
+      it("forces using the new headless mode when 'headless: false'", () => {
         userConfig.flags = { ...flags, ci: true, e2e: true, headless: false };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe(true);
+        expect(config.testing.browserHeadless).toBe('new');
       });
 
       it('allows the new headless mode to be used', () => {
@@ -97,7 +104,7 @@ describe('validateTesting', () => {
         userConfig.flags = { ...flags, e2e: true, headless: undefined };
       });
 
-      it.each<boolean | 'new'>([false, true, 'new'])(
+      it.each<boolean | 'new'>([false, 'new'])(
         'uses %s browserHeadless mode from testing config',
         (browserHeadlessValue) => {
           userConfig.testing = { browserHeadless: browserHeadlessValue };
@@ -105,6 +112,13 @@ describe('validateTesting', () => {
           expect(config.testing.browserHeadless).toBe(browserHeadlessValue);
         },
       );
+
+      it('throws if browser headless is set to deprecated value `true`', () => {
+        userConfig.testing = { browserHeadless: true };
+        expect(() => validateConfig(userConfig, mockLoadConfigInit())).toThrow(
+          'Setting "browserHeadless" config to `true` is not supported anymore, please set it to "new"!'
+        )
+      });
 
       it('defaults the headless mode to true when browserHeadless is not provided', () => {
         userConfig.testing = {};

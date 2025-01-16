@@ -21,9 +21,17 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
   }
 
   if (typeof config.flags.headless === 'boolean' || config.flags.headless === 'new') {
+    /**
+     * Using the deprecated `browserHeadless: true` flag causes Chrome to crash when running tests.
+     * Ensure users don't run into this by throwing a deliberate error.
+     */
+    if (typeof testing.browserHeadless === 'boolean' && testing.browserHeadless) {
+      throw new Error(`Setting "browserHeadless" config to \`true\` is not supported anymore, please set it to "new"!`)
+    }
+
     testing.browserHeadless = config.flags.headless;
   } else if (typeof testing.browserHeadless !== 'boolean' && testing.browserHeadless !== 'new') {
-    testing.browserHeadless = true;
+    testing.browserHeadless = 'new';
   }
 
   if (!testing.browserWaitUntil) {
@@ -38,7 +46,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     addTestingConfigOption(testing.browserArgs, '--no-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
-    testing.browserHeadless = testing.browserHeadless === 'new' ? 'new' : true;
+    testing.browserHeadless = 'new';
   } else if (config.flags.devtools || testing.browserDevtools) {
     testing.browserDevtools = true;
     testing.browserHeadless = false;
