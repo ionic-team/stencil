@@ -1,6 +1,31 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
+
+// @ts-ignore may not be existing when project hasn't been built
+type HydrateModule = typeof import('../../hydrate');
+let renderToString: HydrateModule['renderToString'];
+
+// describe('renderToString', () => {
+//   before(async () => {
+//     // @ts-ignore may not be existing when project hasn't been built
+//     const mod = await import('/hydrate/index.mjs');
+//     renderToString = mod.renderToString;
+//   });
+
+//   beforeEach(async () => {
+//     const { html } = await renderToString(`<page-list last-page="5" current-page="1"></page-list>`, {
+//       serializeShadowRoot: true,
+//       prettyHtml: true,
+//       fullDocument: false,
+//     });
+//     const stage = document.createElement('div');
+//     stage.setAttribute('id', 'stage');
+//     stage.setHTMLUnsafe(html);
+//     document.body.appendChild(stage);
+//   });
+
+
 import { setupIFrameTest } from '../util.js';
 
 const testSuites = async (browser) => {
@@ -71,6 +96,9 @@ const testSuites = async (browser) => {
       // @ts-ignore
       expect(root.__decoratedState()).toBe('decoratedState changed  decorated!');
     },
+    ssrHydrate: (html: string) => {
+      
+    }
   };
 };
 
