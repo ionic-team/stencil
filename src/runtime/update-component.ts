@@ -11,7 +11,15 @@ import { renderVdom } from './vdom/vdom-render';
 
 export const attachToAncestor = (hostRef: d.HostRef, ancestorComponent?: d.HostElement) => {
   if (BUILD.asyncLoading && ancestorComponent && !hostRef.$onRenderResolve$ && ancestorComponent['s-p']) {
-    ancestorComponent['s-p'].push(new Promise((r) => (hostRef.$onRenderResolve$ = r)));
+    const index = ancestorComponent['s-p'].push(
+      new Promise(
+        (r) =>
+          (hostRef.$onRenderResolve$ = () => {
+            ancestorComponent['s-p'].splice(index - 1, 1);
+            r();
+          }),
+      ),
+    );
   }
 };
 
