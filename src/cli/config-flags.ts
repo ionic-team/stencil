@@ -177,11 +177,8 @@ export const STRING_NUMBER_CLI_FLAGS = ['maxWorkers'] as const;
 export const BOOLEAN_STRING_CLI_FLAGS = [
   /**
    * `headless` is an argument passed through to Puppeteer (which is passed to Chrome) for end-to-end testing.
-   * Prior to Chrome v112, `headless` was treated like a boolean flag. Starting with Chrome v112, 'new' is an accepted
-   * option to support Chrome's new headless mode. In order to support this option in Stencil, both the boolean and
-   * string versions of the flag must be accepted.
    *
-   * {@see https://developer.chrome.com/articles/new-headless/}
+   * {@see https://developer.chrome.com/blog/chrome-headless-shell/}
    */
   'headless',
 ] as const;
