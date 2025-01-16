@@ -133,6 +133,11 @@ export namespace Components {
          */
         "mode"?: any;
     }
+    interface RuntimeDecorators {
+        "basicProp": string;
+        "decoratedGetterSetterProp": number;
+        "decoratedProp": number;
+    }
     interface ScopedCarDetail {
         "car": CarData;
     }
@@ -425,6 +430,12 @@ declare global {
         prototype: HTMLPropCmpElement;
         new (): HTMLPropCmpElement;
     };
+    interface HTMLRuntimeDecoratorsElement extends Components.RuntimeDecorators, HTMLStencilElement {
+    }
+    var HTMLRuntimeDecoratorsElement: {
+        prototype: HTMLRuntimeDecoratorsElement;
+        new (): HTMLRuntimeDecoratorsElement;
+    };
     interface HTMLScopedCarDetailElement extends Components.ScopedCarDetail, HTMLStencilElement {
     }
     var HTMLScopedCarDetailElement: {
@@ -523,6 +534,7 @@ declare global {
         "path-alias-cmp": HTMLPathAliasCmpElement;
         "prerender-cmp": HTMLPrerenderCmpElement;
         "prop-cmp": HTMLPropCmpElement;
+        "runtime-decorators": HTMLRuntimeDecoratorsElement;
         "scoped-car-detail": HTMLScopedCarDetailElement;
         "scoped-car-list": HTMLScopedCarListElement;
         "shadow-child": HTMLShadowChildElement;
@@ -635,6 +647,11 @@ declare namespace LocalJSX {
          */
         "mode"?: any;
     }
+    interface RuntimeDecorators {
+        "basicProp"?: string;
+        "decoratedGetterSetterProp"?: number;
+        "decoratedProp"?: number;
+    }
     interface ScopedCarDetail {
         "car"?: CarData;
     }
@@ -695,6 +712,7 @@ declare namespace LocalJSX {
         "path-alias-cmp": PathAliasCmp;
         "prerender-cmp": PrerenderCmp;
         "prop-cmp": PropCmp;
+        "runtime-decorators": RuntimeDecorators;
         "scoped-car-detail": ScopedCarDetail;
         "scoped-car-list": ScopedCarList;
         "shadow-child": ShadowChild;
@@ -750,6 +768,7 @@ declare module "@stencil/core" {
             "path-alias-cmp": LocalJSX.PathAliasCmp & JSXBase.HTMLAttributes<HTMLPathAliasCmpElement>;
             "prerender-cmp": LocalJSX.PrerenderCmp & JSXBase.HTMLAttributes<HTMLPrerenderCmpElement>;
             "prop-cmp": LocalJSX.PropCmp & JSXBase.HTMLAttributes<HTMLPropCmpElement>;
+            "runtime-decorators": LocalJSX.RuntimeDecorators & JSXBase.HTMLAttributes<HTMLRuntimeDecoratorsElement>;
             "scoped-car-detail": LocalJSX.ScopedCarDetail & JSXBase.HTMLAttributes<HTMLScopedCarDetailElement>;
             /**
              * Component that helps display a list of cars
