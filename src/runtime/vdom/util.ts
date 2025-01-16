@@ -19,7 +19,7 @@ export function toVNode(node: Node): d.VNode | null {
     const vnode: d.VNode = newVNode(node.nodeName.toLowerCase(), null);
     vnode.$elm$ = node;
 
-    const childNodes = node.childNodes;
+    const childNodes = (node as any).__childNodes || node.childNodes;
     let childVnode: d.VNode;
 
     for (let i = 0, l = childNodes.length; i < l; i++) {

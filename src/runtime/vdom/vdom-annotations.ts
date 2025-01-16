@@ -38,7 +38,7 @@ export const insertVdomAnnotations = (doc: Document, staticComponents: string[])
 
     orgLocationNodes.forEach((orgLocationNode) => {
       if (orgLocationNode != null && orgLocationNode['s-nr']) {
-        const nodeRef = orgLocationNode['s-nr'];
+        const nodeRef = orgLocationNode['s-nr'] as d.RenderNode;
 
         let hostId = nodeRef['s-host-id'];
         let nodeId = nodeRef['s-node-id'];

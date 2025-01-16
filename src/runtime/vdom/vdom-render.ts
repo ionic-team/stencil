@@ -8,9 +8,10 @@
  */
 import { BUILD } from '@app-data';
 import { consoleDevError, doc, plt, supportsShadow } from '@platform';
-import { CMP_FLAGS, HTML_NS, isDef, SVG_NS } from '@utils';
+import { CMP_FLAGS, HTML_NS, isDef, NODE_TYPES, SVG_NS } from '@utils';
 
 import type * as d from '../../declarations';
+import { patchParentNode } from '../dom-extras';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
 import { isNodeLocatedInSlot, updateFallbackSlotVisibility } from '../slot-polyfill-utils';
 import { h, isHost, newVNode } from './h';
@@ -853,12 +854,29 @@ export const nullifyVNodeRefs = (vNode: d.VNode) => {
  * @param reference anchor element
  * @returns inserted node
  */
-export const insertBefore = (parent: Node, newNode: d.RenderNode, reference?: d.RenderNode): Node => {
+export const insertBefore = (
+  parent: Node,
+  newNode: d.RenderNode,
+  reference?: d.RenderNode | d.PatchedSlotNode,
+): Node => {
   if (BUILD.scoped && typeof newNode['s-sn'] === 'string' && !!newNode['s-sr'] && !!newNode['s-cr']) {
+    // this is a slot node
     addRemoveSlotScopedClass(newNode['s-cr'], newNode, parent as d.RenderNode, newNode.parentElement);
+  } else if (BUILD.experimentalSlotFixes && typeof newNode['s-sn'] === 'string') {
+    // this is a slotted node.
+    if (parent.getRootNode().nodeType !== NODE_TYPES.DOCUMENT_FRAGMENT_NODE) {
+      // we don't need to patch this node if it's nested in a shadow root
+      patchParentNode(newNode);
+    }
+    // potentially use the patched insertBefore method. This will correctly slot the new node
+    return parent.insertBefore(newNode, reference);
   }
-  const inserted = parent?.insertBefore(newNode, reference);
-  return inserted;
+
+  if (BUILD.experimentalSlotFixes && (parent as d.RenderNode).__insertBefore) {
+    return (parent as d.RenderNode).__insertBefore(newNode, reference) as d.RenderNode;
+  } else {
+    return parent?.insertBefore(newNode, reference) as d.RenderNode;
+  }
 };
 
 /**
@@ -1065,9 +1083,13 @@ render() {
           ) {
             let orgLocationNode = nodeToRelocate['s-ol']?.previousSibling as d.RenderNode | null;
             while (orgLocationNode) {
-              let refNode = orgLocationNode['s-nr'] ?? null;
+              let refNode = (orgLocationNode['s-nr'] as d.RenderNode) ?? null;
 
-              if (refNode && refNode['s-sn'] === nodeToRelocate['s-sn'] && parentNodeRef === refNode.parentNode) {
+              if (
+                refNode &&
+                refNode['s-sn'] === nodeToRelocate['s-sn'] &&
+                parentNodeRef === ((refNode as d.PatchedSlotNode).__parentNode || refNode.parentNode)
+              ) {
                 refNode = refNode.nextSibling as d.RenderNode | null;
 
                 // If the refNode is the same node to be relocated or another element's slot reference, keep searching to find the
@@ -1086,10 +1108,9 @@ render() {
             }
           }
 
-          if (
-            (!insertBeforeNode && parentNodeRef !== nodeToRelocate.parentNode) ||
-            nodeToRelocate.nextSibling !== insertBeforeNode
-          ) {
+          const parent = (nodeToRelocate as d.PatchedSlotNode).__parentNode || nodeToRelocate.parentNode;
+          const nextSibling = (nodeToRelocate as d.PatchedSlotNode).__nextSibling || nodeToRelocate.nextSibling;
+          if ((!insertBeforeNode && parentNodeRef !== parent) || nextSibling !== insertBeforeNode) {
             // we've checked that it's worth while to relocate
             // since that the node to relocate
             // has a different next sibling or parent relocated

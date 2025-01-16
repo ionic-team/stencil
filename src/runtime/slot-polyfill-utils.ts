@@ -45,15 +45,18 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
 
 /**
  * Get's the child nodes of a component that are actually slotted.
- * This is only required until all patches are unified
+ * It does this by using root nodes of a component; for each slotted node there is a
+ * corresponding slot location node which points to the slotted node (via `['s-nr']`).
+ *
+ * This is only required until all patches are unified / switched on all the time (then we can rely on `childNodes`)
  * either under 'experimentalSlotFixes' or on by default
  * @param childNodes all 'internal' child nodes of the component
  * @returns An array of slotted reference nodes.
  */
-export const getSlottedChildNodes = (childNodes: NodeListOf<d.RenderNode>) => {
+export const getSlottedChildNodes = (childNodes: NodeListOf<ChildNode>): d.PatchedSlotNode[] => {
   const result = [];
   for (let i = 0; i < childNodes.length; i++) {
-    const slottedNode = childNodes[i]['s-nr'];
+    const slottedNode = ((childNodes[i] as d.RenderNode)['s-nr'] as d.PatchedSlotNode) || undefined;
     if (slottedNode && slottedNode.isConnected) {
       result.push(slottedNode);
     }
@@ -68,21 +71,25 @@ export const getSlottedChildNodes = (childNodes: NodeListOf<d.RenderNode>) => {
  * @param slotName the name of the slot to match on.
  * @returns a reference to the slot node that matches the provided name, `null` otherwise
  */
-export const getHostSlotNodes = (childNodes: NodeListOf<ChildNode>, hostName: string, slotName?: string) => {
+export function getHostSlotNodes(childNodes: NodeListOf<ChildNode>, hostName: string, slotName?: string) {
   let i = 0;
   let slottedNodes: d.RenderNode[] = [];
   let childNode: d.RenderNode;
 
   for (; i < childNodes.length; i++) {
     childNode = childNodes[i] as any;
-    if (childNode['s-sr'] && childNode['s-hn'] === hostName && (!slotName || childNode['s-sn'] === slotName)) {
+    if (
+      childNode['s-sr'] &&
+      childNode['s-hn'] === hostName &&
+      (slotName === undefined || childNode['s-sn'] === slotName)
+    ) {
       slottedNodes.push(childNode);
       if (typeof slotName !== 'undefined') return slottedNodes;
     }
     slottedNodes = [...slottedNodes, ...getHostSlotNodes(childNode.childNodes, hostName, slotName)];
   }
   return slottedNodes;
-};
+}
 
 /**
  * Get slotted child nodes of a slot node
@@ -138,12 +145,13 @@ export const isNodeLocatedInSlot = (nodeToRelocate: d.RenderNode, slotName: stri
  *  (the order of the slot location nodes determines the order of the slotted nodes in our patched accessors)
  */
 export const addSlotRelocateNode = (
-  newChild: d.RenderNode,
+  newChild: d.PatchedSlotNode,
   slotNode: d.RenderNode,
   prepend?: boolean,
   position?: number,
 ) => {
   let slottedNodeLocation: d.RenderNode;
+
   // does newChild already have a slot location node?
   if (newChild['s-ol'] && newChild['s-ol'].isConnected) {
     slottedNodeLocation = newChild['s-ol'];
@@ -181,5 +189,5 @@ export const addSlotRelocateNode = (
   newChild['s-sh'] = slotNode['s-hn'];
 };
 
-export const getSlotName = (node: d.RenderNode) =>
+export const getSlotName = (node: d.PatchedSlotNode) =>
   node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';

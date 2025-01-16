@@ -1,13 +1,13 @@
 import { Component, h, Host } from '@stencil/core';
 import { newSpecPage, SpecPage } from '@stencil/core/testing';
 
-import { patchNextPrev, patchPseudoShadowDom } from '../../runtime/dom-extras';
+import { patchPseudoShadowDom, patchSlottedNode } from '../../runtime/dom-extras';
 
 describe('dom-extras - patches for non-shadow dom methods and accessors', () => {
   let specPage: SpecPage;
 
   const nodeOrEleContent = (node: Node | Element) => {
-    return (node as Element)?.outerHTML || node?.nodeValue.trim();
+    return (node as Element)?.outerHTML || node?.nodeValue?.trim();
   };
 
   beforeEach(async () => {
@@ -102,7 +102,7 @@ describe('dom-extras - patches for non-shadow dom methods and accessors', () => 
   });
 
   it('patches nextSibling / previousSibling accessors of slotted nodes', async () => {
-    specPage.root.childNodes.forEach((node: Node) => patchNextPrev(node));
+    specPage.root.childNodes.forEach((node: Node) => patchSlottedNode(node));
     expect(nodeOrEleContent(specPage.root.firstChild)).toBe('Some default slot, slotted text');
     expect(nodeOrEleContent(specPage.root.firstChild.nextSibling)).toBe('<span>a default slot, slotted element</span>');
     expect(nodeOrEleContent(specPage.root.firstChild.nextSibling.nextSibling)).toBe(``);
@@ -122,12 +122,22 @@ describe('dom-extras - patches for non-shadow dom methods and accessors', () => 
   });
 
   it('patches nextElementSibling / previousElementSibling accessors of slotted nodes', async () => {
-    specPage.root.childNodes.forEach((node: Node) => patchNextPrev(node));
+    specPage.root.childNodes.forEach((node: Node) => patchSlottedNode(node));
     expect(nodeOrEleContent(specPage.root.children[0].nextElementSibling)).toBe(
       '<div slot="second-slot"> a second slot, slotted element <span>nested element in the second slot<span></span></span></div>',
     );
     expect(nodeOrEleContent(specPage.root.children[0].nextElementSibling.previousElementSibling)).toBe(
       '<span>a default slot, slotted element</span>',
     );
+  });
+
+  it('patches parentNode of slotted nodes', async () => {
+    specPage.root.childNodes.forEach((node: Node) => patchSlottedNode(node));
+    expect(specPage.root.children[0].parentNode.tagName).toBe('CMP-A');
+    expect(specPage.root.children[1].parentNode.tagName).toBe('CMP-A');
+    expect(specPage.root.childNodes[0].parentNode.tagName).toBe('CMP-A');
+    expect(specPage.root.childNodes[1].parentNode.tagName).toBe('CMP-A');
+    expect(specPage.root.children[0].__parentNode.tagName).toBe('DIV');
+    expect(specPage.root.childNodes[0].__parentNode.tagName).toBe('DIV');
   });
 });
