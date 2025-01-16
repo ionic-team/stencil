@@ -50,7 +50,6 @@ export async function startPuppeteerBrowser(config: ValidatedConfig) {
   // connection options will be used regardless whether a new browser instance is created or we attach to a
   // pre-existing instance
   const connectOpts: puppeteer.ConnectOptions = {
-    ignoreHTTPSErrors: true,
     slowMo: config.testing.browserSlowMo,
   };
 
@@ -61,8 +60,9 @@ export async function startPuppeteerBrowser(config: ValidatedConfig) {
       ...connectOpts,
     });
   } else {
-    const launchOpts: puppeteer.BrowserLaunchArgumentOptions & puppeteer.LaunchOptions & puppeteer.ConnectOptions = {
+    const launchOpts: puppeteer.LaunchOptions & puppeteer.ConnectOptions = {
       args: config.testing.browserArgs,
+      channel: config.testing.browserChannel,
       headless: config.testing.browserHeadless,
       devtools: config.testing.browserDevtools,
       ...connectOpts,
@@ -96,7 +96,6 @@ export async function connectBrowser() {
 
   const connectOpts: puppeteer.ConnectOptions = {
     browserWSEndpoint: wsEndpoint,
-    ignoreHTTPSErrors: true,
   };
 
   const puppeteer = require(env.__STENCIL_PUPPETEER_MODULE__);
