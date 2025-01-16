@@ -31,7 +31,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
    * Ensure users don't run into this by throwing a deliberate error.
    */
   if (typeof testing.browserHeadless === 'boolean' && testing.browserHeadless) {
-    throw new Error(`Setting "browserHeadless" config to \`true\` is not supported anymore, please set it to "new"!`);
+    throw new Error(`Setting "browserHeadless" config to \`true\` is not supported anymore, please set it to "shell"!`);
   }
 
   if (!testing.browserWaitUntil) {

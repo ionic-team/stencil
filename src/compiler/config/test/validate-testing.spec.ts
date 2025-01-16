@@ -65,7 +65,7 @@ describe('validateTesting', () => {
 
   describe('browserHeadless', () => {
     describe("using 'headless' value from cli", () => {
-      it.each([false, 'new'])('sets browserHeadless to %s', (headless) => {
+      it.each([false, 'shell'])('sets browserHeadless to %s', (headless) => {
         userConfig.flags = { ...flags, e2e: true, headless };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
         expect(config.testing.browserHeadless).toBe(headless);
@@ -78,24 +78,24 @@ describe('validateTesting', () => {
         );
       });
 
-      it('defaults to "new" outside of CI', () => {
+      it('defaults to "shell" outside of CI', () => {
         userConfig.flags = { ...flags, e2e: true };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe('new');
+        expect(config.testing.browserHeadless).toBe('shell');
       });
     });
 
     describe('with ci enabled', () => {
-      it("forces using the new headless mode when 'headless: false'", () => {
+      it("forces using the shell headless mode when 'headless: false'", () => {
         userConfig.flags = { ...flags, ci: true, e2e: true, headless: false };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe('new');
+        expect(config.testing.browserHeadless).toBe('shell');
       });
 
-      it('allows the new headless mode to be used', () => {
-        userConfig.flags = { ...flags, ci: true, e2e: true, headless: 'new' };
+      it('allows the shell headless mode to be used', () => {
+        userConfig.flags = { ...flags, ci: true, e2e: true, headless: 'shell' };
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe('new');
+        expect(config.testing.browserHeadless).toBe('shell');
       });
     });
 
@@ -120,10 +120,10 @@ describe('validateTesting', () => {
         );
       });
 
-      it('defaults the headless mode to "new" when browserHeadless is not provided', () => {
+      it('defaults the headless mode to "shell" when browserHeadless is not provided', () => {
         userConfig.testing = {};
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe('new');
+        expect(config.testing.browserHeadless).toBe('shell');
       });
     });
   });
