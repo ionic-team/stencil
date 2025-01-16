@@ -20,5 +20,5 @@ export const config: Config = {
       dir: 'hydrate',
     },
   ],
-  sourceMap: false,
+  sourceMap: true,
 };

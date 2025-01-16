@@ -12,6 +12,11 @@ import { getValue, setValue } from './set-value';
  * constructor, including getters and setters for the `@Prop` and `@State`
  * decorators, callbacks for when attributes change, and so on.
  *
+ * On a lazy loaded component, this is wired up to both the class instance
+ * and the element separately. A `hostRef` keeps the 2 in sync.
+ *
+ * On a traditional component, this is wired up to the element only.
+ *
  * @param Cstr the constructor for a component that we need to process
  * @param cmpMeta metadata collected previously about the component
  * @param flags a number used to store a series of bit flags
@@ -57,110 +62,164 @@ export const proxyComponent = (
     // It's better to have a const than two Object.entries()
     const members = Object.entries(cmpMeta.$members$ ?? {});
     members.map(([memberName, [memberFlags]]) => {
+      // is this member a `@Prop` or it's a `@State`
+      // AND either native component-element or it's a lazy class instance
       if (
         (BUILD.prop || BUILD.state) &&
         (memberFlags & MEMBER_FLAGS.Prop ||
           ((!BUILD.lazyLoad || flags & PROXY_FLAGS.proxyState) && memberFlags & MEMBER_FLAGS.State))
       ) {
-        if ((memberFlags & MEMBER_FLAGS.Getter) === 0) {
-          // proxyComponent - prop
+        // preserve any getters / setters that already exist on the prototype;
+        // we'll call them via our new accessors. On a lazy component, this would only be called on the class instance.
+        const { get: origGetter, set: origSetter } = Object.getOwnPropertyDescriptor(prototype, memberName) || {};
+        if (origGetter) cmpMeta.$members$[memberName][0] |= MEMBER_FLAGS.Getter;
+        if (origSetter) cmpMeta.$members$[memberName][0] |= MEMBER_FLAGS.Setter;
+
+        if (flags & PROXY_FLAGS.isElementConstructor || !origGetter) {
+          // if it's an Element (native or proxy)
+          // OR it's a lazy class instance and doesn't have a getter
           Object.defineProperty(prototype, memberName, {
             get(this: d.RuntimeRef) {
-              // proxyComponent, get value
-              return getValue(this, memberName);
-            },
-            set(this: d.RuntimeRef, newValue) {
-              // only during dev time
-              if (BUILD.isDev) {
-                const ref = getHostRef(this);
-                if (
-                  // we are proxying the instance (not element)
-                  (flags & PROXY_FLAGS.isElementConstructor) === 0 &&
-                  // the element is not constructing
-                  (ref && ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
-                  // the member is a prop
-                  (memberFlags & MEMBER_FLAGS.Prop) !== 0 &&
-                  // the member is not mutable
-                  (memberFlags & MEMBER_FLAGS.Mutable) === 0
-                ) {
-                  consoleDevWarn(
-                    `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`,
-                  );
+              if (BUILD.lazyLoad) {
+                if ((cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Getter) === 0) {
+                  // no getter - let's return value now
+                  return getValue(this, memberName);
                 }
+                const ref = getHostRef(this);
+                const instance = ref ? ref.$lazyInstance$ : prototype;
+                if (!instance) return;
+                return instance[memberName];
               }
-              // proxyComponent, set value
-              setValue(this, memberName, newValue, cmpMeta);
+              if (!BUILD.lazyLoad) {
+                return origGetter ? origGetter.apply(this) : getValue(this, memberName);
+              }
             },
             configurable: true,
             enumerable: true,
           });
-        } else if (flags & PROXY_FLAGS.isElementConstructor && memberFlags & MEMBER_FLAGS.Getter) {
-          if (BUILD.lazyLoad) {
-            // lazily maps the element get / set to the class get / set
-            // proxyComponent - lazy prop getter
-            Object.defineProperty(prototype, memberName, {
-              get(this: d.RuntimeRef) {
-                const ref = getHostRef(this);
-                const instance = BUILD.lazyLoad && ref ? ref.$lazyInstance$ : prototype;
-                if (!instance) return;
-
-                return instance[memberName];
-              },
-              configurable: true,
-              enumerable: true,
-            });
-          }
-          if (memberFlags & MEMBER_FLAGS.Setter) {
-            // proxyComponent - lazy and non-lazy. Catches original set to fire updates (for @Watch)
-            const origSetter = Object.getOwnPropertyDescriptor(prototype, memberName).set;
-            Object.defineProperty(prototype, memberName, {
-              set(this: d.RuntimeRef, newValue) {
-                // non-lazy setter - amends original set to fire update
-                const ref = getHostRef(this);
-                if (origSetter) {
-                  const currentValue = ref.$hostElement$[memberName as keyof d.HostElement];
-                  if (!ref.$instanceValues$.get(memberName) && currentValue) {
-                    // the prop `set()` doesn't fire during `constructor()`:
-                    // no initial value gets set (in instanceValues)
-                    // meaning watchers fire even though the value hasn't changed.
-                    // So if there's a current value and no initial value, let's set it now.
-                    ref.$instanceValues$.set(memberName, currentValue);
-                  }
-                  // this sets the value via the `set()` function which
-                  // might not end up changing the underlying value
-                  origSetter.apply(this, [parsePropertyValue(newValue, cmpMeta.$members$[memberName][0])]);
-                  setValue(this, memberName, ref.$hostElement$[memberName as keyof d.HostElement], cmpMeta);
-                  return;
-                }
-                if (!ref) return;
-
-                // we need to wait for the lazy instance to be ready
-                // before we can set it's value via it's setter function
-                const setterSetVal = () => {
-                  const currentValue = ref.$lazyInstance$[memberName];
-                  if (!ref.$instanceValues$.get(memberName) && currentValue) {
-                    // the prop `set()` doesn't fire during `constructor()`:
-                    // no initial value gets set (in instanceValues)
-                    // meaning watchers fire even though the value hasn't changed.
-                    // So if there's a current value and no initial value, let's set it now.
-                    ref.$instanceValues$.set(memberName, currentValue);
-                  }
-                  // this sets the value via the `set()` function which
-                  // might not end up changing the underlying value
-                  ref.$lazyInstance$[memberName] = parsePropertyValue(newValue, cmpMeta.$members$[memberName][0]);
-                  setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta);
-                };
-
-                // If there's a value from an attribute, (before the class is defined), queue & set async
-                if (ref.$lazyInstance$) {
-                  setterSetVal();
-                } else {
-                  ref.$onReadyPromise$.then(() => setterSetVal());
-                }
-              },
-            });
-          }
         }
+
+        Object.defineProperty(prototype, memberName, {
+          set(this: d.RuntimeRef, newValue) {
+            const ref = getHostRef(this);
+
+            // only during dev
+            if (BUILD.isDev) {
+              if (
+                // we are proxying the instance (not element)
+                (flags & PROXY_FLAGS.isElementConstructor) === 0 &&
+                // if the class has a setter, then the Element can update instance values, so ignore
+                (cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Setter) === 0 &&
+                // the element is not constructing
+                (ref && ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
+                // the member is a prop
+                (cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Prop) !== 0 &&
+                // the member is not mutable
+                (cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Mutable) === 0
+              ) {
+                consoleDevWarn(
+                  `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`,
+                );
+              }
+            }
+
+            if (origSetter) {
+              // Lazy class instance or native component-element only:
+              // we have an original setter, so we need to set our value via that.
+
+              // do we have a value already?
+              const currentValue =
+                memberFlags & MEMBER_FLAGS.State
+                  ? this[memberName as keyof d.RuntimeRef]
+                  : ref.$hostElement$[memberName as keyof d.HostElement];
+
+              if (typeof currentValue === 'undefined' && ref.$instanceValues$.get(memberName)) {
+                // no host value but a value already set on the hostRef,
+                // this means the setter was added at run-time (e.g. via a decorator).
+                // We want any value set on the element to override the default class instance value.
+                newValue = ref.$instanceValues$.get(memberName);
+              } else if (!ref.$instanceValues$.get(memberName) && currentValue) {
+                // on init get make sure the hostRef matches the element (via prop / attr)
+
+                // the prop `set()` doesn't necessarily fire during `constructor()`,
+                // so no initial value gets set in the hostRef.
+                // This means watchers fire even though the value hasn't changed.
+                // So if there's a current value and no initial value, let's set it now.
+                ref.$instanceValues$.set(memberName, currentValue);
+              }
+              // this sets the value via the `set()` function which
+              // *might* not end up changing the underlying value
+              origSetter.apply(this, [parsePropertyValue(newValue, memberFlags)]);
+              // if it's a State property, we need to get the value from the instance
+              newValue =
+                memberFlags & MEMBER_FLAGS.State
+                  ? this[memberName as keyof d.RuntimeRef]
+                  : ref.$hostElement$[memberName as keyof d.HostElement];
+              setValue(this, memberName, newValue, cmpMeta);
+              return;
+            }
+
+            if (!BUILD.lazyLoad) {
+              // we can set the value directly now if it's a native component-element
+              setValue(this, memberName, newValue, cmpMeta);
+              return;
+            }
+
+            if (BUILD.lazyLoad) {
+              // Lazy class instance OR proxy Element with no setter:
+              // set the element value directly now
+              if (
+                (flags & PROXY_FLAGS.isElementConstructor) === 0 ||
+                (cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Setter) === 0
+              ) {
+                setValue(this, memberName, newValue, cmpMeta);
+                // if this is a value set on an Element *before* the instance has initialized (e.g. via an html attr)...
+                if (flags & PROXY_FLAGS.isElementConstructor && !ref.$lazyInstance$) {
+                  // wait for lazy instance...
+                  ref.$onReadyPromise$.then(() => {
+                    // check if this instance member has a setter doesn't match what's already on the element
+                    if (
+                      cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Setter &&
+                      ref.$lazyInstance$[memberName] !== ref.$instanceValues$.get(memberName)
+                    ) {
+                      // this catches cases where there's a run-time only setter (e.g. via a decorator)
+                      // *and* no initial value, so the initial setter never gets called
+                      ref.$lazyInstance$[memberName] = newValue;
+                    }
+                  });
+                }
+                return;
+              }
+
+              // lazy element with a setter
+              // we might need to wait for the lazy class instance to be ready
+              // before we can set it's value via it's setter function
+              const setterSetVal = () => {
+                const currentValue = ref.$lazyInstance$[memberName];
+                if (!ref.$instanceValues$.get(memberName) && currentValue) {
+                  // on init get make sure the hostRef matches class instance
+
+                  // the prop `set()` doesn't fire during `constructor()`:
+                  // no initial value gets set in the hostRef.
+                  // This means watchers fire even though the value hasn't changed.
+                  // So if there's a current value and no initial value, let's set it now.
+                  ref.$instanceValues$.set(memberName, currentValue);
+                }
+                // this sets the value via the `set()` function which
+                // might not end up changing the underlying value
+                ref.$lazyInstance$[memberName] = parsePropertyValue(newValue, memberFlags);
+                setValue(this, memberName, ref.$lazyInstance$[memberName], cmpMeta);
+              };
+
+              if (ref.$lazyInstance$) {
+                setterSetVal();
+              } else {
+                // the class is yet to be loaded / defined so queue an async call
+                ref.$onReadyPromise$.then(() => setterSetVal());
+              }
+            }
+          },
+        });
       } else if (
         BUILD.lazyLoad &&
         BUILD.method &&
@@ -262,8 +321,9 @@ export const proxyComponent = (
           const propDesc = Object.getOwnPropertyDescriptor(prototype, propName);
           // test whether this property either has no 'getter' or if it does, does it also have a 'setter'
           // before attempting to write back to component props
-          if (!propDesc.get || !!propDesc.set) {
-            this[propName] = newValue === null && typeof this[propName] === 'boolean' ? false : newValue;
+          newValue = newValue === null && typeof this[propName] === 'boolean' ? (false as any) : newValue;
+          if (newValue !== this[propName] && (!propDesc.get || !!propDesc.set)) {
+            this[propName] = newValue;
           }
         });
       };

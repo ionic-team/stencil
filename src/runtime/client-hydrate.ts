@@ -3,7 +3,7 @@ import { doc, plt } from '@platform';
 import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
-import { patchNextPrev } from './dom-extras';
+import { patchSlottedNode } from './dom-extras';
 import { createTime } from './profile';
 import {
   COMMENT_NODE_ID,
@@ -195,7 +195,7 @@ export const initializeClientHydrate = (
 
         if (BUILD.experimentalSlotFixes) {
           // patch this node for accessors like `nextSibling` (et al)
-          patchNextPrev(slottedItem.node);
+          patchSlottedNode(slottedItem.node);
         }
       }
 
