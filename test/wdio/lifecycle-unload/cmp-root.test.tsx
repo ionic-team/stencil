@@ -30,7 +30,7 @@ describe('lifecycle-unload', function () {
     expect(unload.children.length).toBe(0);
 
     await $('button').click();
-
+    await browser.waitUntil(() => !document.body.querySelector('lifecycle-unload-a'), { timeout: 5000 });
     const cmpA = document.body.querySelector('lifecycle-unload-a');
     expect(cmpA).toBe(null);
 
