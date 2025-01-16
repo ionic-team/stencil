@@ -120,10 +120,10 @@ describe('validateTesting', () => {
         );
       });
 
-      it('defaults the headless mode to true when browserHeadless is not provided', () => {
+      it('defaults the headless mode to "new" when browserHeadless is not provided', () => {
         userConfig.testing = {};
         const { config } = validateConfig(userConfig, mockLoadConfigInit());
-        expect(config.testing.browserHeadless).toBe(true);
+        expect(config.testing.browserHeadless).toBe('new');
       });
     });
   });
