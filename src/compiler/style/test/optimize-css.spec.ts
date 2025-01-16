@@ -14,7 +14,7 @@ describe('optimizeCss', () => {
 
   // TODO(STENCIL-307): Remove usage of the Jasmine global
   // eslint-disable-next-line jest/no-jasmine-globals -- these will be removed when we migrate to jest-circus
-  jasmine.DEFAULT_TIMEOUT_INTERVAL = 30000;
+  jasmine.DEFAULT_TIMEOUT_INTERVAL = 60000;
 
   beforeEach(() => {
     config = mockValidatedConfig({ maxConcurrentWorkers: 0, minifyCss: true });

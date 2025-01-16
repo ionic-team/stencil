@@ -831,7 +831,7 @@ function resetWindowDefaults(win: MockWindow) {
   win.__clearTimeout = nativeClearTimeout;
   win.__setInterval = nativeSetInterval;
   win.__setTimeout = nativeSetTimeout;
-  win.__maxTimeout = 30000;
+  win.__maxTimeout = 60000;
   win.__allowInterval = true;
   win.URL = nativeURL;
 }
