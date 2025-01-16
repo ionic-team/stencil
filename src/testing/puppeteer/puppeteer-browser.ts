@@ -95,7 +95,7 @@ export async function connectBrowser() {
   }
 
   const connectOpts: puppeteer.ConnectOptions = {
-    browserWSEndpoint: wsEndpoint
+    browserWSEndpoint: wsEndpoint,
   };
 
   const puppeteer = require(env.__STENCIL_PUPPETEER_MODULE__);

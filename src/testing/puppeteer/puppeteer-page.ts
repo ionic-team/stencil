@@ -267,11 +267,11 @@ async function e2eSetContent(page: E2EPageInternal, html: string, options: WaitF
 }
 
 async function waitForStencil(page: E2EPage, options: WaitForOptions) {
+  const timeout = typeof options.timeout === 'number' ? options.timeout : 4750;
   try {
-    const timeout = typeof options.timeout === 'number' ? options.timeout : 4750;
     await page.waitForFunction('window.stencilAppLoaded', { timeout });
   } catch (e) {
-    throw new Error(`App did not load in allowed time. Please ensure the content loads a stencil application.`);
+    throw new Error(`App did not load within ${timeout}ms. Please ensure the content loads a stencil application.`);
   }
 }
 
@@ -331,7 +331,7 @@ async function waitForChanges(page: E2EPageInternal) {
       return;
     }
 
-    await new Promise(r => setTimeout(r, 100));
+    await new Promise((r) => setTimeout(r, 100));
     await Promise.all(page._e2eElements.map((elm) => elm.e2eSync()));
   } catch (e) {}
 }

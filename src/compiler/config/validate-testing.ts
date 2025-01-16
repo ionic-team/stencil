@@ -48,10 +48,8 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
   testing.browserArgs = testing.browserArgs || [];
   addTestingConfigOption(testing.browserArgs, '--font-render-hinting=medium');
   addTestingConfigOption(testing.browserArgs, '--incognito');
-  addTestingConfigOption(testing.browserArgs, '--disable-features=site-per-process');
   if (config.flags.ci) {
     addTestingConfigOption(testing.browserArgs, '--no-sandbox');
-    addTestingConfigOption(testing.browserArgs, '--disable-gpu');
     addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
     testing.browserHeadless = 'shell';

@@ -74,7 +74,7 @@ describe('validateTesting', () => {
       it('throws if browser headless is set to deprecated value `true`', () => {
         userConfig.flags = { ...flags, e2e: true, headless: true };
         expect(() => validateConfig(userConfig, mockLoadConfigInit())).toThrow(
-          'Setting "browserHeadless" config to `true` is not supported anymore, please set it to "new"!',
+          'Setting "browserHeadless" config to `true` is not supported anymore, please set it to "shell"!',
         );
       });
 
@@ -116,7 +116,7 @@ describe('validateTesting', () => {
       it('throws if browser headless is set to deprecated value `true`', () => {
         userConfig.testing = { browserHeadless: true };
         expect(() => validateConfig(userConfig, mockLoadConfigInit())).toThrow(
-          'Setting "browserHeadless" config to `true` is not supported anymore, please set it to "new"!',
+          'Setting "browserHeadless" config to `true` is not supported anymore, please set it to "shell"!',
         );
       });
 
