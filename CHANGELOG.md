@@ -10,8 +10,11 @@
 ### Features
 
 * **runtime:** `@Prop` / `@State` now work with runtime decorators ([#6084](https://github.com/ionic-team/stencil/issues/6084)) ([82fc857](https://github.com/ionic-team/stencil/commit/82fc857518883cc75b265f2381e36777e8047840))
-* **slot-polyfill:** patch insertBefore & slotted node parentNode ([#6096](https://github.com/ionic-team/stencil/issues/6096)) ([efb40d5](https://github.com/ionic-team/stencil/commit/efb40d598d3c5e5d4ae58780e03ea0ae9816b211))
+* **slot-polyfill:** patch insertBefore & slotted node parentNode ([#6096](https://github.com/ionic-team/stencil/issues/6096)) ([efb40d5](https://github.com/ionic-team/stencil/commit/efb40d598d3c5e5d4ae58780e03ea0ae9816b211)), closes [#6043](https://github.com/ionic-team/stencil/issues/6043)
 
+#### Thanks
+
+🎉# Thanks for @johnjenkins for their contributions! 🎉
 
 
 ## 🌮 [4.23.2](https://github.com/ionic-team/stencil/compare/v4.23.1...v4.23.2) (2025-01-10)
@@ -765,7 +768,7 @@ As we’ve made further enhancements to support declarative Shadow DOM, the Sten
 * **runtime:** properly type color-interpolation-filter ([#4530](https://github.com/ionic-team/stencil/issues/4530)) ([3ccf753](https://github.com/ionic-team/stencil/commit/3ccf753f13ced6fa1339850882919192e912da30))
 
 
-## Thanks
+### Thanks
 
 🎉 Thanks for @bdriguesdev for their contributions! 🎉
 
