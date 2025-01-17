@@ -7,8 +7,8 @@ import { setupIFrameTest } from '../util.js';
 type HydrateModule = typeof import('../../hydrate');
 
 const testSuites = async (root: HTMLTsTargetPropsElement) => {
-  function getTxt(selector: string) {
-    browser.waitUntil(() => !!root.querySelector(selector), { timeout: 3000 });
+  async function getTxt(selector: string) {
+    await browser.waitUntil(() => !!root.querySelector(selector), { timeout: 3000 });
     return root.querySelector(selector).textContent.trim();
   }
   function getTxtHtml(html: string, className: string) {
@@ -22,11 +22,11 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
 
   return {
     defaultValue: async () => {
-      expect(getTxt('.basicProp')).toBe('basicProp');
-      expect(getTxt('.decoratedProp')).toBe('-5');
-      expect(getTxt('.decoratedGetterSetterProp')).toBe('999');
-      expect(getTxt('.basicState')).toBe('basicState');
-      expect(getTxt('.decoratedState')).toBe('10');
+      expect(await getTxt('.basicProp')).toBe('basicProp');
+      expect(await getTxt('.decoratedProp')).toBe('-5');
+      expect(await getTxt('.decoratedGetterSetterProp')).toBe('999');
+      expect(await getTxt('.basicState')).toBe('basicState');
+      expect(await getTxt('.decoratedState')).toBe('10');
     },
     viaAttributes: async () => {
       root.setAttribute('decorated-prop', '200');
@@ -37,11 +37,11 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
 
       await browser.pause(100);
 
-      expect(getTxt('.basicProp')).toBe('basicProp via attribute');
-      expect(getTxt('.decoratedProp')).toBe('25');
-      expect(getTxt('.decoratedGetterSetterProp')).toBe('0');
-      expect(getTxt('.basicState')).toBe('basicState');
-      expect(getTxt('.decoratedState')).toBe('10');
+      expect(await getTxt('.basicProp')).toBe('basicProp via attribute');
+      expect(await getTxt('.decoratedProp')).toBe('25');
+      expect(await getTxt('.decoratedGetterSetterProp')).toBe('0');
+      expect(await getTxt('.basicState')).toBe('basicState');
+      expect(await getTxt('.decoratedState')).toBe('10');
     },
     viaProps: async (nativeElement: boolean = false) => {
       root.basicProp = 'basicProp via prop';
@@ -54,28 +54,28 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
 
       await browser.pause(100);
 
-      expect(getTxt('.basicProp')).toBe('basicProp via prop');
-      expect(getTxt('.decoratedProp')).toBe('-3');
-      expect(getTxt('.decoratedGetterSetterProp')).toBe('543');
+      expect(await getTxt('.basicProp')).toBe('basicProp via prop');
+      expect(await getTxt('.decoratedProp')).toBe('-3');
+      expect(await getTxt('.decoratedGetterSetterProp')).toBe('543');
 
       // you can change internal state via prop within native elements because the class instance === the element
       const basicStateMatch = !nativeElement ? 'basicState' : 'basicState via prop';
-      expect(getTxt('.basicState')).toBe(basicStateMatch);
+      expect(await getTxt('.basicState')).toBe(basicStateMatch);
       const decoratedStateMatch = !nativeElement ? '10' : '3';
-      expect(getTxt('.decoratedState')).toBe(decoratedStateMatch);
+      expect(await getTxt('.decoratedState')).toBe(decoratedStateMatch);
     },
     reflectsStateChanges: async () => {
-      const buttons = root.querySelectorAll('button');
-      expect(getTxt('.basicState')).toBe('basicState');
-      expect(getTxt('.decoratedState')).toBe('10');
+      expect(await getTxt('.basicState')).toBe('basicState');
+      expect(await getTxt('.decoratedState')).toBe('10');
 
+      const buttons = root.querySelectorAll('button');
       buttons[0].click();
       await browser.pause(100);
-      expect(getTxt('.basicState')).toBe('basicState changed');
+      expect(await getTxt('.basicState')).toBe('basicState changed');
 
       buttons[1].click();
       await browser.pause(100);
-      expect(getTxt('.decoratedState')).toBe('0');
+      expect(await getTxt('.decoratedState')).toBe('0');
     },
     ssrViaAttrs: async (hydrationModule: any) => {
       const renderToString: HydrateModule['renderToString'] = hydrationModule.renderToString;
@@ -94,11 +94,11 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
           fullDocument: false,
         },
       );
-      expect(getTxtHtml(html, 'basicProp')).toBe('basicProp via attribute');
-      expect(getTxtHtml(html, 'decoratedProp')).toBe('25');
-      expect(getTxtHtml(html, 'decoratedGetterSetterProp')).toBe('0');
-      expect(getTxtHtml(html, 'basicState')).toBe('basicState via attribute');
-      expect(getTxtHtml(html, 'decoratedState')).toBe('10');
+      expect(await getTxtHtml(html, 'basicProp')).toBe('basicProp pnpmvia attribute');
+      expect(await getTxtHtml(html, 'decoratedProp')).toBe('25');
+      expect(await getTxtHtml(html, 'decoratedGetterSetterProp')).toBe('0');
+      expect(await getTxtHtml(html, 'basicState')).toBe('basicState via attribute');
+      expect(await getTxtHtml(html, 'decoratedState')).toBe('10');
     },
     ssrViaProps: async (hydrationModule: any) => {
       const renderToString: HydrateModule['renderToString'] = hydrationModule.renderToString;
@@ -116,11 +116,11 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
           el.decoratedState = 3;
         },
       });
-      expect(getTxtHtml(html, 'basicProp')).toBe('basicProp via prop');
-      expect(getTxtHtml(html, 'decoratedProp')).toBe('-3');
-      expect(getTxtHtml(html, 'decoratedGetterSetterProp')).toBe('543');
-      expect(getTxtHtml(html, 'basicState')).toBe('basicState');
-      expect(getTxtHtml(html, 'decoratedState')).toBe('10');
+      expect(await getTxtHtml(html, 'basicProp')).toBe('basicProp via prop');
+      expect(await getTxtHtml(html, 'decoratedProp')).toBe('-3');
+      expect(await getTxtHtml(html, 'decoratedGetterSetterProp')).toBe('543');
+      expect(await getTxtHtml(html, 'basicState')).toBe('basicState');
+      expect(await getTxtHtml(html, 'decoratedState')).toBe('10');
     },
   };
 };
