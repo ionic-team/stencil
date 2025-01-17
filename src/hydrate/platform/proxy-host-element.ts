@@ -75,7 +75,7 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
           delete (elm as any)[memberName];
         }
 
-        if ([null, undefined].includes(attrPropVal)) {
+        if (attrPropVal !== undefined) {
           if (origSetter) {
             // we have an original setter, so let's set the value via that.
             origSetter.apply(elm, [attrPropVal]);
@@ -84,19 +84,11 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
           hostRef?.$instanceValues$?.set(memberName, attrPropVal);
         }
 
-        // if we have a parsed value from an attribute use that first.
-        // otherwise if we have a getter already applied, use that.
-        // we'll do this for both the element and the component instance.
-        // this makes sure attribute values take priority over default values.
-        function getter(this: d.RuntimeRef) {
-          return ![undefined, null].includes(attrPropVal)
-            ? attrPropVal
-            : origGetter
-              ? origGetter.apply(this)
-              : getValue(this, memberName);
-        }
+        // element
         Object.defineProperty(elm, memberName, {
-          get: getter,
+          get: function (this: any) {
+            return getValue(this, memberName);
+          },
           set(this: d.RuntimeRef, newValue) {
             // proxyComponent, set value
             setValue(this, memberName, newValue, cmpMeta);
@@ -105,8 +97,23 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
           enumerable: true,
         });
 
+        // instance
         Object.defineProperty((cstr as any).prototype, memberName, {
-          get: getter,
+          get: function (this: any) {
+            if (origGetter && attrPropVal === undefined && !getValue(this, memberName)) {
+              // if the initial value comes from an instance getter
+              // the element will never have the value set. So let's do that now.
+              setValue(this, memberName, origGetter.apply(this), cmpMeta);
+            }
+
+            // if we have a parsed value from an attribute / or userland prop use that first.
+            // otherwise if we have a getter already applied, use that.
+            return attrPropVal !== undefined
+              ? attrPropVal
+              : origGetter
+                ? origGetter.apply(this)
+                : getValue(this, memberName);
+          },
           configurable: true,
           enumerable: true,
         });
