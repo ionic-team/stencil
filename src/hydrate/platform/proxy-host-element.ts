@@ -59,25 +59,29 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
 
         const { get: origGetter, set: origSetter } =
           Object.getOwnPropertyDescriptor((cstr as any).prototype, memberName) || {};
-        let parsedAttrValue: any;
+
+        let attrPropVal: any;
 
         if (attrValue != null) {
-          parsedAttrValue = parsePropertyValue(attrValue, memberFlags);
-          if (origSetter) {
-            // we have an original setter, so let's set the value via that.
-            origSetter.apply(elm, [parsedAttrValue]);
-            parsedAttrValue = origGetter ? origGetter.apply(elm) : parsedAttrValue;
-          }
-          hostRef?.$instanceValues$?.set(memberName, parsedAttrValue);
+          attrPropVal = parsePropertyValue(attrValue, memberFlags);
         }
 
         const ownValue = (elm as any)[memberName];
         if (ownValue !== undefined) {
+          attrPropVal = ownValue;
           // we've got an actual value already set on the host element
           // let's add that to our instance values and pull it off the element
           // so the getter/setter kicks in instead, but still getting this value
-          hostRef?.$instanceValues$?.set(memberName, ownValue);
           delete (elm as any)[memberName];
+        }
+
+        if ([null, undefined].includes(attrPropVal)) {
+          if (origSetter) {
+            // we have an original setter, so let's set the value via that.
+            origSetter.apply(elm, [attrPropVal]);
+            attrPropVal = origGetter ? origGetter.apply(elm) : attrPropVal;
+          }
+          hostRef?.$instanceValues$?.set(memberName, attrPropVal);
         }
 
         // if we have a parsed value from an attribute use that first.
@@ -85,8 +89,8 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
         // we'll do this for both the element and the component instance.
         // this makes sure attribute values take priority over default values.
         function getter(this: d.RuntimeRef) {
-          return ![undefined, null].includes(parsedAttrValue)
-            ? parsedAttrValue
+          return ![undefined, null].includes(attrPropVal)
+            ? attrPropVal
             : origGetter
               ? origGetter.apply(this)
               : getValue(this, memberName);

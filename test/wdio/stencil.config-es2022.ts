@@ -17,7 +17,7 @@ export const config: Config = {
     },
     {
       type: 'dist-hydrate-script',
-      dir: 'hydrate',
+      dir: './test-ts-target-output/hydrate',
     },
   ],
   sourceMap: true,

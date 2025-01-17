@@ -1,37 +1,23 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 
+import { setupIFrameTest } from '../util.js';
 
 // @ts-ignore may not be existing when project hasn't been built
 type HydrateModule = typeof import('../../hydrate');
-let renderToString: HydrateModule['renderToString'];
-
-// describe('renderToString', () => {
-//   before(async () => {
-//     // @ts-ignore may not be existing when project hasn't been built
-//     const mod = await import('/hydrate/index.mjs');
-//     renderToString = mod.renderToString;
-//   });
-
-//   beforeEach(async () => {
-//     const { html } = await renderToString(`<page-list last-page="5" current-page="1"></page-list>`, {
-//       serializeShadowRoot: true,
-//       prettyHtml: true,
-//       fullDocument: false,
-//     });
-//     const stage = document.createElement('div');
-//     stage.setAttribute('id', 'stage');
-//     stage.setHTMLUnsafe(html);
-//     document.body.appendChild(stage);
-//   });
-
-
-import { setupIFrameTest } from '../util.js';
 
 const testSuites = async (root: HTMLTsTargetPropsElement) => {
   function getTxt(selector: string) {
     browser.waitUntil(() => !!root.querySelector(selector), { timeout: 3000 });
     return root.querySelector(selector).textContent.trim();
+  }
+  function getTxtHtml(html: string, className: string) {
+    const match = html.match(new RegExp(`<div class="${className}".*?>(.*?)</div>`, 'g'));
+    if (match && match[0]) {
+      const textMatch = match[0].match(new RegExp(`<div class="${className}".*?>(.*?)</div>`));
+      return textMatch ? textMatch[1].replace(/<!--.*?-->/g, '').trim() : null;
+    }
+    return null;
   }
 
   return {
@@ -91,9 +77,58 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
       await browser.pause(100);
       expect(getTxt('.decoratedState')).toBe('0');
     },
-    ssrHydrate: (html: string) => {
-      
-    }
+    ssrViaAttrs: async (hydrationModule: any) => {
+      const renderToString: HydrateModule['renderToString'] = hydrationModule.renderToString;
+
+      root.setAttribute('decorated-prop', '200');
+      root.setAttribute('decorated-getter-setter-prop', '-5');
+      root.setAttribute('basic-prop', 'basicProp via attribute');
+      root.setAttribute('basic-state', 'basicState via attribute');
+      root.setAttribute('decorated-state', 'decoratedState via attribute');
+
+      const { html } = await renderToString(
+        `
+        <ts-target-props
+          basic-prop="basicProp via attribute"
+          decorated-prop="200"
+          decorated-getter-setter-prop="-5"
+          basic-state="basicState via attribute"
+          decorated-state="decoratedState via attribute"
+        ></ts-target-props>
+      `,
+        {
+          serializeShadowRoot: true,
+          fullDocument: false,
+        },
+      );
+      expect(getTxtHtml(html, 'basicProp')).toBe('basicProp via attribute');
+      expect(getTxtHtml(html, 'decoratedProp')).toBe('25');
+      expect(getTxtHtml(html, 'decoratedGetterSetterProp')).toBe('0');
+      expect(getTxtHtml(html, 'basicState')).toBe('basicState via attribute');
+      expect(getTxtHtml(html, 'decoratedState')).toBe('10');
+    },
+    ssrViaProps: async (hydrationModule: any) => {
+      const renderToString: HydrateModule['renderToString'] = hydrationModule.renderToString;
+      const { html } = await renderToString(`<ts-target-props></ts-target-props>`, {
+        serializeShadowRoot: true,
+        fullDocument: false,
+        beforeHydrate: (doc: Document) => {
+          const el = doc.querySelector('ts-target-props');
+          el.basicProp = 'basicProp via prop';
+          el.decoratedProp = -3;
+          el.decoratedGetterSetterProp = 543;
+          // @ts-ignore
+          el.basicState = 'basicState via prop';
+          // @ts-ignore
+          el.decoratedState = 3;
+        },
+      });
+      expect(getTxtHtml(html, 'basicProp')).toBe('basicProp via prop');
+      expect(getTxtHtml(html, 'decoratedProp')).toBe('-3');
+      expect(getTxtHtml(html, 'decoratedGetterSetterProp')).toBe('543');
+      expect(getTxtHtml(html, 'basicState')).toBe('basicState');
+      expect(getTxtHtml(html, 'decoratedState')).toBe('10');
+    },
   };
 };
 
@@ -125,6 +160,12 @@ describe('Checks class properties and runtime decorators of different es targets
       await (await $('ts-target-props')).waitForStable();
       await (await testSuites(document.querySelector('ts-target-props'))).reflectsStateChanges();
     });
+
+    it('renders component during SSR hydration', async () => {
+      // @ts-ignore may not be existing when project hasn't been built
+      const mod = await import('/hydrate/index.mjs');
+      await (await testSuites(document.querySelector('ts-target-props'))).ssrViaProps(mod);
+    });
   });
 
   describe('es2022 dist output', () => {
@@ -154,6 +195,12 @@ describe('Checks class properties and runtime decorators of different es targets
     it('reflects internal state changes to the dom', async () => {
       const { reflectsStateChanges } = await testSuites(frameContent.querySelector('ts-target-props'));
       await reflectsStateChanges();
+    });
+
+    it('renders component during SSR hydration', async () => {
+      // @ts-ignore may not be existing when project hasn't been built
+      const mod = await import('/test-ts-target-output/hydrate/index.mjs');
+      await (await testSuites(document.querySelector('ts-target-props'))).ssrViaProps(mod);
     });
   });
 
