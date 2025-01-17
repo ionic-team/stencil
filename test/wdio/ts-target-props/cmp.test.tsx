@@ -79,13 +79,6 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
     },
     ssrViaAttrs: async (hydrationModule: any) => {
       const renderToString: HydrateModule['renderToString'] = hydrationModule.renderToString;
-
-      root.setAttribute('decorated-prop', '200');
-      root.setAttribute('decorated-getter-setter-prop', '-5');
-      root.setAttribute('basic-prop', 'basicProp via attribute');
-      root.setAttribute('basic-state', 'basicState via attribute');
-      root.setAttribute('decorated-state', 'decoratedState via attribute');
-
       const { html } = await renderToString(
         `
         <ts-target-props
