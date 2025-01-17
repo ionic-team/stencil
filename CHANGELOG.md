@@ -1,3 +1,19 @@
+# 🚜 [4.24.0](https://github.com/ionic-team/stencil/compare/v4.23.2...v4.24.0) (2025-01-17)
+
+
+### Bug Fixes
+
+* **runtime:** clean up ancestor nodes on resolve ([#6094](https://github.com/ionic-team/stencil/issues/6094)) ([2503dc5](https://github.com/ionic-team/stencil/commit/2503dc5293479f2fc161cdaee61846dffb4dcea6))
+* **testing:** update puppeteer, default to 'new' headless ([#6098](https://github.com/ionic-team/stencil/issues/6098)) ([6537869](https://github.com/ionic-team/stencil/commit/6537869f917449c59e88b8bf57f3dcfdf0f2d077))
+
+
+### Features
+
+* **runtime:** `@Prop` / `@State` now work with runtime decorators ([#6084](https://github.com/ionic-team/stencil/issues/6084)) ([82fc857](https://github.com/ionic-team/stencil/commit/82fc857518883cc75b265f2381e36777e8047840))
+* **slot-polyfill:** patch insertBefore & slotted node parentNode ([#6096](https://github.com/ionic-team/stencil/issues/6096)) ([efb40d5](https://github.com/ionic-team/stencil/commit/efb40d598d3c5e5d4ae58780e03ea0ae9816b211))
+
+
+
 ## 🌮 [4.23.2](https://github.com/ionic-team/stencil/compare/v4.23.1...v4.23.2) (2025-01-10)
 
 
