@@ -138,7 +138,6 @@ describe('prerender', () => {
 });
 
 function testScopedStyles(app: HTMLElement) {
-  
   const cmpScopedA = app.querySelector('cmp-scoped-a');
   const scopedAStyles = window.getComputedStyle(cmpScopedA);
   expect(scopedAStyles.backgroundColor).toBe('rgb(0, 128, 0)');
