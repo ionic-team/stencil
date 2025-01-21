@@ -1,4 +1,5 @@
 import { BUILD } from '@app-data';
+import { reWireGetterSetter } from '@utils/es2022-rewire-class-members';
 
 import type * as d from '../../declarations';
 
@@ -131,8 +132,13 @@ const hostRefs: WeakMap<d.RuntimeRef, d.HostRef> = new WeakMap();
 export const getHostRef = (ref: d.RuntimeRef) => hostRefs.get(ref);
 export const deleteHostRef = (ref: d.RuntimeRef) => hostRefs.delete(ref);
 
-export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) =>
-  hostRefs.set((hostRef.$lazyInstance$ = lazyInstance), hostRef);
+export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
+  const ref = hostRefs.set((hostRef.$lazyInstance$ = lazyInstance), hostRef);
+  if (BUILD.modernPropertyDecls && (BUILD.state || BUILD.prop)) {
+    reWireGetterSetter(lazyInstance, hostRef);
+  }
+  return ref;
+};
 
 export const registerHost = (elm: d.HostElement, cmpMeta: d.ComponentRuntimeMeta) => {
   const hostRef: d.HostRef = {

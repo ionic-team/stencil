@@ -59,40 +59,36 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
 
         const { get: origGetter, set: origSetter } =
           Object.getOwnPropertyDescriptor((cstr as any).prototype, memberName) || {};
-        let parsedAttrValue: any;
+
+        let attrPropVal: any;
 
         if (attrValue != null) {
-          parsedAttrValue = parsePropertyValue(attrValue, memberFlags);
-          if (origSetter) {
-            // we have an original setter, so let's set the value via that.
-            origSetter.apply(elm, [parsedAttrValue]);
-            parsedAttrValue = origGetter ? origGetter.apply(elm) : parsedAttrValue;
-          }
-          hostRef?.$instanceValues$?.set(memberName, parsedAttrValue);
+          attrPropVal = parsePropertyValue(attrValue, memberFlags);
         }
 
         const ownValue = (elm as any)[memberName];
         if (ownValue !== undefined) {
+          attrPropVal = ownValue;
           // we've got an actual value already set on the host element
           // let's add that to our instance values and pull it off the element
           // so the getter/setter kicks in instead, but still getting this value
-          hostRef?.$instanceValues$?.set(memberName, ownValue);
           delete (elm as any)[memberName];
         }
 
-        // if we have a parsed value from an attribute use that first.
-        // otherwise if we have a getter already applied, use that.
-        // we'll do this for both the element and the component instance.
-        // this makes sure attribute values take priority over default values.
-        function getter(this: d.RuntimeRef) {
-          return ![undefined, null].includes(parsedAttrValue)
-            ? parsedAttrValue
-            : origGetter
-              ? origGetter.apply(this)
-              : getValue(this, memberName);
+        if (attrPropVal !== undefined) {
+          if (origSetter) {
+            // we have an original setter, so let's set the value via that.
+            origSetter.apply(elm, [attrPropVal]);
+            attrPropVal = origGetter ? origGetter.apply(elm) : attrPropVal;
+          }
+          hostRef?.$instanceValues$?.set(memberName, attrPropVal);
         }
+
+        // element
         Object.defineProperty(elm, memberName, {
-          get: getter,
+          get: function (this: any) {
+            return getValue(this, memberName);
+          },
           set(this: d.RuntimeRef, newValue) {
             // proxyComponent, set value
             setValue(this, memberName, newValue, cmpMeta);
@@ -101,8 +97,23 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
           enumerable: true,
         });
 
+        // instance
         Object.defineProperty((cstr as any).prototype, memberName, {
-          get: getter,
+          get: function (this: any) {
+            if (origGetter && attrPropVal === undefined && !getValue(this, memberName)) {
+              // if the initial value comes from an instance getter
+              // the element will never have the value set. So let's do that now.
+              setValue(this, memberName, origGetter.apply(this), cmpMeta);
+            }
+
+            // if we have a parsed value from an attribute / or userland prop use that first.
+            // otherwise if we have a getter already applied, use that.
+            return attrPropVal !== undefined
+              ? attrPropVal
+              : origGetter
+                ? origGetter.apply(this)
+                : getValue(this, memberName);
+          },
           configurable: true,
           enumerable: true,
         });

@@ -15,7 +15,7 @@ import { initPageScreenshot } from './puppeteer-screenshot';
 
 declare const global: JestEnvironmentGlobal;
 
-const DEFAULT_LOAD_TIMEOUT = 10 * 1000; // 10s
+const DEFAULT_LOAD_TIMEOUT = 30 * 1000; // 30s
 
 // during E2E tests, we can safely assume that the current environment is a `E2EProcessEnv`
 const env: E2EProcessEnv = process.env as E2EProcessEnv;

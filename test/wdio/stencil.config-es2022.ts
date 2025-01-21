@@ -16,10 +16,8 @@ export const config: Config = {
       externalRuntime: false,
     },
     {
-      type: 'www',
-      dir: './test-ts-target-output/www',
-      serviceWorker: null,
-      indexHtml: 'ts-target-props/es2022.index.html',
+      type: 'dist-hydrate-script',
+      dir: './test-ts-target-output/hydrate',
     },
   ],
   sourceMap: true,
