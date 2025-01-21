@@ -523,9 +523,11 @@ describe('element', () => {
   });
 
   describe('slot', () => {
-    it('returns no nodes via `assignedNodes` when not within a custom element', () => {
+    it('returns no nodes via `assignedNodes` / `assignedElements` when not within a custom element', () => {
       const slot = doc.createElement('slot');
+      slot.innerHTML = 'invisible <div>Something</div> <!-- not here -->';
       expect(slot.assignedNodes().length).toEqual(0);
+      expect(slot.assignedElements().length).toEqual(0);
     });
 
     it('returns correct nodes with `assignedNodes`', () => {
