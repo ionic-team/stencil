@@ -42,6 +42,12 @@ export function createElement(ownerDocument: any, tagName: string): any {
     case 'script':
       return new MockScriptElement(ownerDocument);
 
+    case 'slot':
+      return new MockSlotElement(ownerDocument);
+
+    case 'slot-fb':
+      return new MockHTMLElement(ownerDocument, tagName);
+
     case 'style':
       return new MockStyleElement(ownerDocument);
 
@@ -53,12 +59,6 @@ export function createElement(ownerDocument: any, tagName: string): any {
 
     case 'ul':
       return new MockUListElement(ownerDocument);
-
-    case 'slot':
-      return new MockSlotElement(ownerDocument);
-
-    case 'slot-fb':
-      return new MockHTMLElement(ownerDocument, tagName);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -523,10 +523,6 @@ export class MockSlotElement extends MockHTMLElement {
     super(ownerDocument, 'slot');
   }
 
-  get name() {
-    return this.getAttribute('name') || '';
-  }
-
   assignedNodes(opts?: { flatten: boolean }): (MockNode | Node)[] {
     let nodesToReturn: (MockNode | Node)[] = [];
 
@@ -535,9 +531,10 @@ export class MockSlotElement extends MockHTMLElement {
 
     if (ownerHost.childNodes.length) {
       // try to find lightDOM nodes matching this slot's name (or lack of)
-      if (this.name) {
+      if ((this as any).name) {
         nodesToReturn = ownerHost.childNodes.filter(
-          (n) => n.nodeType === NODE_TYPES.ELEMENT_NODE && (n as MockElement).getAttribute('slot') === this.name,
+          (n) =>
+            n.nodeType === NODE_TYPES.ELEMENT_NODE && (n as MockElement).getAttribute('slot') === (this as any).name,
         );
       } else {
         // find elements that do not have a slot attribute or
@@ -576,8 +573,8 @@ export class MockSlotElement extends MockHTMLElement {
 
     if (ownerHost.children.length) {
       // try to find lightDOM elements matching this slot's name (or lack of)
-      if (this.name) {
-        elesToReturn = ownerHost.children.filter((n) => (n as MockElement).getAttribute('slot') == this.name);
+      if ((this as any).name) {
+        elesToReturn = ownerHost.children.filter((n) => (n as MockElement).getAttribute('slot') == (this as any).name);
       } else {
         elesToReturn = ownerHost.children.filter((n) => !(n as MockElement).getAttribute('slot'));
       }
@@ -601,6 +598,10 @@ export class MockSlotElement extends MockHTMLElement {
     );
   }
 }
+
+patchPropAttributes(MockSlotElement.prototype, {
+  name: String,
+});
 
 type CanvasContext = '2d' | 'webgl' | 'webgl2' | 'bitmaprenderer';
 export class CanvasRenderingContext {
