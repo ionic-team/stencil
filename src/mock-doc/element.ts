@@ -1,8 +1,9 @@
+import { NODE_TYPES } from './constants';
 import { cloneAttributes } from './attribute';
 import { getStyleElementText, MockCSSStyleSheet, setStyleElementText } from './css-style-sheet';
 import { createCustomElement } from './custom-element-registry';
 import { MockDocumentFragment } from './document-fragment';
-import { MockElement, MockHTMLElement } from './node';
+import { MockElement, MockHTMLElement, MockNode } from './node';
 
 export function createElement(ownerDocument: any, tagName: string): any {
   if (typeof tagName !== 'string' || tagName === '' || !/^[a-z0-9-_:]+$/i.test(tagName)) {
@@ -52,6 +53,9 @@ export function createElement(ownerDocument: any, tagName: string): any {
 
     case 'ul':
       return new MockUListElement(ownerDocument);
+
+    case 'slot':
+      return new MockSlotElement(ownerDocument);
 
     case 'slot-fb':
       return new MockHTMLElement(ownerDocument, tagName);
@@ -511,6 +515,67 @@ export class MockTitleElement extends MockHTMLElement {
 export class MockUListElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'ul');
+  }
+}
+
+export class MockSlotElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'slot');
+  }
+
+  get name() {
+    return this.getAttribute('name') || '';
+  }
+
+  assignedNodes(opts?: { flatten: boolean }): (MockNode | Node)[] {
+    let nodesToReturn: (MockNode | Node)[] = [];
+    const ownerHost = (this.getRootNode() as any).host as MockElement;
+    if (!ownerHost) return nodesToReturn;
+
+    if (this.name && ownerHost.childNodes.length) {
+      nodesToReturn = ownerHost.childNodes.filter(
+        (n) => n.nodeType === NODE_TYPES.ELEMENT_NODE && (n as MockElement).getAttribute('slot') === this.name,
+      );
+    } else if (ownerHost.childNodes.length) {
+      nodesToReturn = ownerHost.childNodes.filter(
+        (n) =>
+          (n.nodeType === NODE_TYPES.ELEMENT_NODE && !(n as MockElement).getAttribute('slot')) ||
+          n.nodeType !== NODE_TYPES.ELEMENT_NODE,
+      );
+    }
+    if (nodesToReturn.length) return nodesToReturn;
+    if (!opts?.flatten) return this.childNodes.filter((n) => !(n instanceof MockSlotElement));
+
+    return this.childNodes.reduce((acc, node) => {
+      if (node instanceof MockSlotElement) {
+        acc.push(...node.assignedNodes(opts));
+      } else {
+        acc.push(node);
+      }
+      return acc;
+    }, [] as (MockNode | Node)[]);
+  }
+  assignedElements(opts?: { flatten: boolean }): (Element | MockHTMLElement)[] {
+    let elesToReturn: (Element | MockHTMLElement)[] = [];
+    const ownerHost = (this.getRootNode() as any).host as MockElement;
+    if (!ownerHost) return elesToReturn;
+
+    if (this.name && ownerHost.children.length) {
+      elesToReturn = ownerHost.children.filter((n) => (n as MockElement).getAttribute('slot') == this.name);
+    } else if (ownerHost.children.length) {
+      elesToReturn = ownerHost.children.filter((n) => !(n as MockElement).getAttribute('slot'));
+    }
+    if (elesToReturn.length) return elesToReturn;
+    if (!opts?.flatten) return this.children.filter((n) => !(n instanceof MockSlotElement));
+
+    return this.children.reduce((acc, node) => {
+      if (node instanceof MockSlotElement) {
+        acc.push(...node.assignedElements(opts));
+      } else {
+        acc.push(node);
+      }
+      return acc;
+    }, [] as (MockElement | Element)[]);
   }
 }
 
