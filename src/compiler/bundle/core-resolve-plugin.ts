@@ -56,9 +56,9 @@ export const coreResolvePlugin = (
             external: true,
           };
         }
-        // importing @stencil/core/internal/client directly, so it shouldn't get
-        // the custom app-data conditionals
-        return internalClient;
+        // continue to add ?app-data=conditional - making a custom build
+        // based on component meta. Otherwise, rollup will duplicate the whole of Stencil Core
+        return internalClient + APP_DATA_CONDITIONAL;
       }
       if (id === STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID) {
         if (externalRuntime) {
