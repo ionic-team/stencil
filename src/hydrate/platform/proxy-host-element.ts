@@ -88,8 +88,8 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
           return ![undefined, null].includes(parsedAttrValue)
             ? parsedAttrValue
             : origGetter
-              ? origGetter.apply(this)
-              : getValue(this, memberName);
+            ? origGetter.apply(this)
+            : getValue(this, memberName);
         }
         Object.defineProperty(elm, memberName, {
           get: getter,
