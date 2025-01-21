@@ -529,63 +529,76 @@ export class MockSlotElement extends MockHTMLElement {
 
   assignedNodes(opts?: { flatten: boolean }): (MockNode | Node)[] {
     let nodesToReturn: (MockNode | Node)[] = [];
+
     const ownerHost = (this.getRootNode() as any).host as MockElement;
     if (!ownerHost) return nodesToReturn;
 
-    // try to find lightDOM nodes matching this slot's name (or lack of)
-    if (this.name && ownerHost.childNodes.length) {
-      nodesToReturn = ownerHost.childNodes.filter(
-        (n) => n.nodeType === NODE_TYPES.ELEMENT_NODE && (n as MockElement).getAttribute('slot') === this.name,
-      );
-    } else if (ownerHost.childNodes.length) {
-      // find elements that do not have a slot attribute or
-      // any other type of node
-      nodesToReturn = ownerHost.childNodes.filter(
-        (n) =>
-          (n.nodeType === NODE_TYPES.ELEMENT_NODE && !(n as MockElement).getAttribute('slot')) ||
-          n.nodeType !== NODE_TYPES.ELEMENT_NODE,
-      );
+    if (ownerHost.childNodes.length) {
+      // try to find lightDOM nodes matching this slot's name (or lack of)
+      if (this.name) {
+        nodesToReturn = ownerHost.childNodes.filter(
+          (n) => n.nodeType === NODE_TYPES.ELEMENT_NODE && (n as MockElement).getAttribute('slot') === this.name,
+        );
+      } else {
+        // find elements that do not have a slot attribute or
+        // any other type of node
+        nodesToReturn = ownerHost.childNodes.filter(
+          (n) =>
+            (n.nodeType === NODE_TYPES.ELEMENT_NODE && !(n as MockElement).getAttribute('slot')) ||
+            n.nodeType !== NODE_TYPES.ELEMENT_NODE,
+        );
+      }
+      if (nodesToReturn.length) return nodesToReturn;
     }
-    if (nodesToReturn.length) return nodesToReturn;
 
     // no flatten option? Return whatever's in this slot (without nested slots)
     if (!opts?.flatten) return this.childNodes.filter((n) => !(n instanceof MockSlotElement));
 
     // flatten option? Return all nodes in this slot (including anything within nested slots)
-    return this.childNodes.reduce((acc, node) => {
-      if (node instanceof MockSlotElement) {
-        acc.push(...node.assignedNodes(opts));
-      } else {
-        acc.push(node);
-      }
-      return acc;
-    }, [] as (MockNode | Node)[]);
+    return this.childNodes.reduce(
+      (acc, node) => {
+        if (node instanceof MockSlotElement) {
+          acc.push(...node.assignedNodes(opts));
+        } else {
+          acc.push(node);
+        }
+        return acc;
+      },
+      [] as (MockNode | Node)[],
+    );
   }
+
   assignedElements(opts?: { flatten: boolean }): (Element | MockHTMLElement)[] {
     let elesToReturn: (Element | MockHTMLElement)[] = [];
+
     const ownerHost = (this.getRootNode() as any).host as MockElement;
     if (!ownerHost) return elesToReturn;
 
-    // try to find lightDOM elements matching this slot's name (or lack of)
-    if (this.name && ownerHost.children.length) {
-      elesToReturn = ownerHost.children.filter((n) => (n as MockElement).getAttribute('slot') == this.name);
-    } else if (ownerHost.children.length) {
-      elesToReturn = ownerHost.children.filter((n) => !(n as MockElement).getAttribute('slot'));
+    if (ownerHost.children.length) {
+      // try to find lightDOM elements matching this slot's name (or lack of)
+      if (this.name) {
+        elesToReturn = ownerHost.children.filter((n) => (n as MockElement).getAttribute('slot') == this.name);
+      } else {
+        elesToReturn = ownerHost.children.filter((n) => !(n as MockElement).getAttribute('slot'));
+      }
+      if (elesToReturn.length) return elesToReturn;
     }
-    if (elesToReturn.length) return elesToReturn;
 
     // no flatten option? Return whatever elements are in this slot (without nested slots)
     if (!opts?.flatten) return this.children.filter((n) => !(n instanceof MockSlotElement));
 
     // flatten option? Return all elements in this slot (including anything within nested slots)
-    return this.children.reduce((acc, node) => {
-      if (node instanceof MockSlotElement) {
-        acc.push(...node.assignedElements(opts));
-      } else {
-        acc.push(node);
-      }
-      return acc;
-    }, [] as (MockElement | Element)[]);
+    return this.children.reduce(
+      (acc, node) => {
+        if (node instanceof MockSlotElement) {
+          acc.push(...node.assignedElements(opts));
+        } else {
+          acc.push(node);
+        }
+        return acc;
+      },
+      [] as (MockElement | Element)[],
+    );
   }
 }
 
