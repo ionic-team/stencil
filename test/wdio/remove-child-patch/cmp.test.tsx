@@ -70,7 +70,7 @@ describe('remove-child-patch', () => {
   it('should still be able to remove nodes not slotted', async () => {
     await expect($(host).$('div')).toBeExisting();
 
-    await browser.pause(3000)
+    await browser.pause(3000);
     const button = $('#remove-child-div-button');
     await button.click();
 
