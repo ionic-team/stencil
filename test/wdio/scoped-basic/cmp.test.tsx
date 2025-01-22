@@ -1,9 +1,12 @@
+/// <reference types="webdriverio" />
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, browser, expect } from '@wdio/globals';
 
 describe('scoped-basic', function () {
   beforeEach(() => {
     render({
+      components: [],
       template: () => <scoped-basic-root colormode="md"></scoped-basic-root>,
     });
   });
@@ -37,7 +40,7 @@ describe('scoped-basic', function () {
     await expect(scopedP).toHaveElementClass(expect.stringContaining('sc-scoped-basic'));
     await expect(scopedP).toHaveElementClass(expect.stringContaining('sc-scoped-basic-s'));
 
-    const scopedSlot = await scopedP.$('span');
+    const scopedSlot = await $('scoped-basic p span');
     await expect(scopedSlot).toHaveElementClass(expect.stringContaining('sc-scoped-basic-root-md'));
     await expect(scopedSlot).toHaveText('light');
 
