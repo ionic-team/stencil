@@ -33,7 +33,7 @@ export const removeCollectionImports = (compilerCtx: d.CompilerCtx): ts.Transfor
             if (isCollectionImport) {
               // turns out this is a side effect import is a collection,
               // we actually don't want to include this in the JS output
-              // we've already gather the types we needed, kthxbai
+              // we've already gathered the types we needed, kthxbai
               madeUpdates = true;
               statements.splice(i, 1);
             }

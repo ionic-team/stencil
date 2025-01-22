@@ -1,6 +1,7 @@
+import { isOutputTargetWww } from '@utils';
+
 import type * as d from '../../declarations';
 import { generateServiceWorker } from '../service-worker/generate-sw';
-import { isOutputTargetWww } from './output-utils';
 
 /**
  * Entrypoint to creating a service worker for every `www` output target
@@ -25,7 +26,7 @@ export const outputServiceWorkers = async (config: d.ValidatedConfig, buildCtx: 
     const workbox: d.Workbox = config.sys.lazyRequire.require(config.rootDir, 'workbox-build');
 
     await Promise.all(
-      wwwServiceOutputs.map((outputTarget) => generateServiceWorker(config, buildCtx, workbox, outputTarget))
+      wwwServiceOutputs.map((outputTarget) => generateServiceWorker(config, buildCtx, workbox, outputTarget)),
     );
   }
 };

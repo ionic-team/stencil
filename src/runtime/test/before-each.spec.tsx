@@ -65,7 +65,7 @@ describe('newSpecPage, spec testing', () => {
       (ev: CustomEvent) => {
         expect(ev.detail.init).toBeTruthy();
       },
-      false
+      false,
     );
     root.init();
     await page.waitForChanges();

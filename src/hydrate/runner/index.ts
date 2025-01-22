@@ -1,2 +1,2 @@
 export { createWindowFromHtml } from './create-window';
-export { hydrateDocument, renderToString, serializeDocumentToString } from './render';
+export { hydrateDocument, renderToString, serializeDocumentToString, streamToString } from './render';

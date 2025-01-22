@@ -15,7 +15,11 @@ import type { BundleOptions } from './bundle-interface';
  * @param config the Stencil configuration for the project
  * @returns the rollup plugin for handling TypeScript files.
  */
-export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleOptions, config: d.Config): Plugin => {
+export const typescriptPlugin = (
+  compilerCtx: d.CompilerCtx,
+  bundleOpts: BundleOptions,
+  config: d.ValidatedConfig,
+): Plugin => {
   return {
     name: `${bundleOpts.id}TypescriptPlugin`,
 
@@ -57,7 +61,9 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
           const tsResult = ts.transpileModule(mod.staticSourceFileText, {
             compilerOptions: config.tsCompilerOptions,
             fileName: mod.sourceFilePath,
-            transformers: { before: bundleOpts.customTransformers },
+            transformers: {
+              before: bundleOpts.customBeforeTransformers ?? [],
+            },
           });
           const sourceMap: d.SourceMap = tsResult.sourceMapText ? JSON.parse(tsResult.sourceMapText) : null;
           return { code: tsResult.outputText, map: sourceMap };
@@ -68,7 +74,7 @@ export const typescriptPlugin = (compilerCtx: d.CompilerCtx, bundleOpts: BundleO
   };
 };
 
-export const resolveIdWithTypeScript = (config: d.Config, compilerCtx: d.CompilerCtx): Plugin => {
+export const resolveIdWithTypeScript = (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx): Plugin => {
   return {
     name: `resolveIdWithTypeScript`,
 

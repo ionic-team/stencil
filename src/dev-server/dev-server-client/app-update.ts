@@ -119,7 +119,7 @@ const appHmr = (win: Window, hmr: d.HotModuleReplacement) => {
 
   if (results.updatedComponents.length > 0) {
     logBuild(
-      `Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`
+      `Updated component${results.updatedComponents.length > 1 ? 's' : ''}: ${results.updatedComponents.join(', ')}`,
     );
   }
 

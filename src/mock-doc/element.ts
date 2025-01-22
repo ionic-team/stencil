@@ -1,8 +1,9 @@
 import { cloneAttributes } from './attribute';
+import { NODE_TYPES } from './constants';
 import { getStyleElementText, MockCSSStyleSheet, setStyleElementText } from './css-style-sheet';
 import { createCustomElement } from './custom-element-registry';
 import { MockDocumentFragment } from './document-fragment';
-import { MockElement, MockHTMLElement } from './node';
+import { MockElement, MockHTMLElement, MockNode } from './node';
 
 export function createElement(ownerDocument: any, tagName: string): any {
   if (typeof tagName !== 'string' || tagName === '' || !/^[a-z0-9-_:]+$/i.test(tagName)) {
@@ -41,6 +42,12 @@ export function createElement(ownerDocument: any, tagName: string): any {
     case 'script':
       return new MockScriptElement(ownerDocument);
 
+    case 'slot':
+      return new MockSlotElement(ownerDocument);
+
+    case 'slot-fb':
+      return new MockHTMLElement(ownerDocument, tagName);
+
     case 'style':
       return new MockStyleElement(ownerDocument);
 
@@ -49,6 +56,9 @@ export function createElement(ownerDocument: any, tagName: string): any {
 
     case 'title':
       return new MockTitleElement(ownerDocument);
+
+    case 'ul':
+      return new MockUListElement(ownerDocument);
   }
 
   if (ownerDocument != null && tagName.includes('-')) {
@@ -88,7 +98,7 @@ export function createElementNS(ownerDocument: any, namespaceURI: string, tagNam
         return new MockSVGElement(ownerDocument, tagName);
     }
   } else {
-    return new MockElement(ownerDocument, tagName);
+    return new MockElement(ownerDocument, tagName, namespaceURI);
   }
 }
 
@@ -104,6 +114,9 @@ export class MockAnchorElement extends MockHTMLElement {
     this.setAttribute('href', value);
   }
   get pathname() {
+    if (!this.href) {
+      return '';
+    }
     return new URL(this.href).pathname;
   }
 }
@@ -120,8 +133,14 @@ patchPropAttributes(
   },
   {
     type: 'submit',
-  }
+  },
 );
+
+Object.defineProperty(MockButtonElement.prototype, 'form', {
+  get(this: MockElement) {
+    return this.hasAttribute('form') ? this.getAttribute('form') : null;
+  },
+});
 
 export class MockImageElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
@@ -198,7 +217,7 @@ patchPropAttributes(
   },
   {
     type: 'text',
-  }
+  },
 );
 
 export class MockFormElement extends MockHTMLElement {
@@ -377,6 +396,8 @@ export class MockStyleElement extends MockHTMLElement {
   }
 }
 export class MockSVGElement extends MockElement {
+  override __namespaceURI = 'http://www.w3.org/2000/svg';
+
   // SVGElement properties and methods
   get ownerSVGElement(): SVGSVGElement {
     return null;
@@ -491,47 +512,150 @@ export class MockTitleElement extends MockHTMLElement {
   }
 }
 
+export class MockUListElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'ul');
+  }
+}
+
+export class MockSlotElement extends MockHTMLElement {
+  constructor(ownerDocument: any) {
+    super(ownerDocument, 'slot');
+  }
+
+  assignedNodes(opts?: { flatten: boolean }): (MockNode | Node)[] {
+    let nodesToReturn: (MockNode | Node)[] = [];
+
+    const ownerHost = (this.getRootNode() as any).host as MockElement;
+    if (!ownerHost) return nodesToReturn;
+
+    if (ownerHost.childNodes.length) {
+      // try to find lightDOM nodes matching this slot's name (or lack of)
+      if ((this as any).name) {
+        nodesToReturn = ownerHost.childNodes.filter(
+          (n) =>
+            n.nodeType === NODE_TYPES.ELEMENT_NODE && (n as MockElement).getAttribute('slot') === (this as any).name,
+        );
+      } else {
+        // find elements that do not have a slot attribute or
+        // any other type of node
+        nodesToReturn = ownerHost.childNodes.filter(
+          (n) =>
+            (n.nodeType === NODE_TYPES.ELEMENT_NODE && !(n as MockElement).getAttribute('slot')) ||
+            n.nodeType !== NODE_TYPES.ELEMENT_NODE,
+        );
+      }
+      if (nodesToReturn.length) return nodesToReturn;
+    }
+
+    // no flatten option? Return whatever's in this slot (without nested slots)
+    if (!opts?.flatten) return this.childNodes.filter((n) => !(n instanceof MockSlotElement));
+
+    // flatten option? Return all nodes in this slot (including anything within nested slots)
+    return this.childNodes.reduce(
+      (acc, node) => {
+        if (node instanceof MockSlotElement) {
+          acc.push(...node.assignedNodes(opts));
+        } else {
+          acc.push(node);
+        }
+        return acc;
+      },
+      [] as (MockNode | Node)[],
+    );
+  }
+
+  assignedElements(opts?: { flatten: boolean }): (Element | MockHTMLElement)[] {
+    let elesToReturn: (Element | MockHTMLElement)[] = [];
+
+    const ownerHost = (this.getRootNode() as any).host as MockElement;
+    if (!ownerHost) return elesToReturn;
+
+    if (ownerHost.children.length) {
+      // try to find lightDOM elements matching this slot's name (or lack of)
+      if ((this as any).name) {
+        elesToReturn = ownerHost.children.filter((n) => (n as MockElement).getAttribute('slot') == (this as any).name);
+      } else {
+        elesToReturn = ownerHost.children.filter((n) => !(n as MockElement).getAttribute('slot'));
+      }
+      if (elesToReturn.length) return elesToReturn;
+    }
+
+    // no flatten option? Return whatever elements are in this slot (without nested slots)
+    if (!opts?.flatten) return this.children.filter((n) => !(n instanceof MockSlotElement));
+
+    // flatten option? Return all elements in this slot (including anything within nested slots)
+    return this.children.reduce(
+      (acc, node) => {
+        if (node instanceof MockSlotElement) {
+          acc.push(...node.assignedElements(opts));
+        } else {
+          acc.push(node);
+        }
+        return acc;
+      },
+      [] as (MockElement | Element)[],
+    );
+  }
+}
+
+patchPropAttributes(MockSlotElement.prototype, {
+  name: String,
+});
+
+type CanvasContext = '2d' | 'webgl' | 'webgl2' | 'bitmaprenderer';
+export class CanvasRenderingContext {
+  context: CanvasContext;
+  contextAttributes: WebGLContextAttributes;
+  constructor(context: CanvasContext, contextAttributes?: WebGLContextAttributes) {
+    this.context = context;
+    this.contextAttributes = contextAttributes;
+  }
+  fillRect() {
+    return;
+  }
+  clearRect() {}
+  getImageData(_: number, __: number, w: number, h: number) {
+    return {
+      data: new Array(w * h * 4),
+    };
+  }
+  toDataURL() {
+    return 'data:,'; // blank image
+  }
+  putImageData() {}
+  createImageData(): ImageData {
+    return {} as ImageData;
+  }
+  setTransform() {}
+  drawImage() {}
+  save() {}
+  fillText() {}
+  restore() {}
+  beginPath() {}
+  moveTo() {}
+  lineTo() {}
+  closePath() {}
+  stroke() {}
+  translate() {}
+  scale() {}
+  rotate() {}
+  arc() {}
+  fill() {}
+  measureText() {
+    return { width: 0 };
+  }
+  transform() {}
+  rect() {}
+  clip() {}
+}
+
 export class MockCanvasElement extends MockHTMLElement {
   constructor(ownerDocument: any) {
     super(ownerDocument, 'canvas');
   }
-  getContext() {
-    return {
-      fillRect() {
-        return;
-      },
-      clearRect() {},
-      getImageData: function (_: number, __: number, w: number, h: number) {
-        return {
-          data: new Array(w * h * 4),
-        };
-      },
-      putImageData() {},
-      createImageData: function (): any[] {
-        return [];
-      },
-      setTransform() {},
-      drawImage() {},
-      save() {},
-      fillText() {},
-      restore() {},
-      beginPath() {},
-      moveTo() {},
-      lineTo() {},
-      closePath() {},
-      stroke() {},
-      translate() {},
-      scale() {},
-      rotate() {},
-      arc() {},
-      fill() {},
-      measureText() {
-        return { width: 0 };
-      },
-      transform() {},
-      rect() {},
-      clip() {},
-    };
+  getContext(context: CanvasContext, contextAttributes?: WebGLContextAttributes): CanvasRenderingContext {
+    return new CanvasRenderingContext(context, contextAttributes);
   }
 }
 

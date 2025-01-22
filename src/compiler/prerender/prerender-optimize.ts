@@ -1,5 +1,4 @@
-import { catchError, flatOne, isString, unique } from '@utils';
-import { join } from 'path';
+import { catchError, flatOne, isString, join, unique } from '@utils';
 
 import type * as d from '../../declarations';
 import { injectModulePreloads } from '../html/inject-module-preloads';
@@ -39,7 +38,7 @@ export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: s
         link.parentNode.insertBefore(inlinedStyles, link);
         link.remove();
 
-        // mark inlinedStyle as treeshakable
+        // mark inlinedStyle as tree-shakable
         inlinedStyles.setAttribute('data-styles', '');
 
         // since it's no longer a critical resource
@@ -50,7 +49,7 @@ export const inlineExternalStyleSheets = async (sys: d.CompilerSystem, appDir: s
         // move <link rel="stylesheet"> to the end of <body>
         doc.body.appendChild(link);
       } catch (e) {}
-    })
+    }),
   );
 };
 
@@ -94,7 +93,7 @@ export const minifyScriptElements = async (doc: Document, addMinifiedAttr: boole
           scriptElm.setAttribute(dataMinifiedAttr, '');
         }
       }
-    })
+    }),
   );
 };
 
@@ -103,7 +102,7 @@ export const minifyStyleElements = async (
   appDir: string,
   doc: Document,
   currentUrl: URL,
-  addMinifiedAttr: boolean
+  addMinifiedAttr: boolean,
 ) => {
   const styleElms = Array.from(doc.querySelectorAll('style')).filter((styleElm) => {
     if (styleElm.hasAttribute(dataMinifiedAttr)) {
@@ -133,14 +132,14 @@ export const minifyStyleElements = async (
           styleElm.setAttribute(dataMinifiedAttr, '');
         }
       }
-    })
+    }),
   );
 };
 
 export const excludeStaticComponents = (
   doc: Document,
   hydrateOpts: d.PrerenderHydrateOptions,
-  hydrateResults: d.HydrateResults
+  hydrateResults: d.HydrateResults,
 ) => {
   const staticComponents = hydrateOpts.staticComponents.filter((tag) => {
     return hydrateResults.components.some((cmp) => cmp.tag === tag);
@@ -175,7 +174,7 @@ export const addModulePreloads = (
   doc: Document,
   hydrateOpts: d.PrerenderHydrateOptions,
   hydrateResults: d.HydrateResults,
-  componentGraph: Map<string, string[]>
+  componentGraph: Map<string, string[]>,
 ) => {
   if (!componentGraph) {
     return false;
@@ -186,7 +185,7 @@ export const addModulePreloads = (
   const cmpTags = hydrateResults.components.filter((cmp) => !staticComponents.includes(cmp.tag));
 
   const modulePreloads = unique(
-    flatOne(cmpTags.map((cmp) => getScopeId(cmp.tag, cmp.mode)).map((scopeId) => componentGraph.get(scopeId) || []))
+    flatOne(cmpTags.map((cmp) => getScopeId(cmp.tag, cmp.mode)).map((scopeId) => componentGraph.get(scopeId) || [])),
   );
 
   injectModulePreloads(doc, modulePreloads);
@@ -221,7 +220,7 @@ export const hashAssets = async (
   hydrateOpts: d.PrerenderHydrateOptions,
   appDir: string,
   doc: Document,
-  currentUrl: URL
+  currentUrl: URL,
 ) => {
   // do one at a time to prevent too many opened files and memory usage issues
   // hash id is cached in each worker, so shouldn't have to do this for every page
@@ -273,7 +272,7 @@ export const hashAssets = async (
   await hashAsset(sys, hydrateOpts, appDir, doc, currentUrl, 'picture > source', ['srcset']);
 
   const pageStates = Array.from(
-    doc.querySelectorAll('script[data-stencil-static="page.state"][type="application/json"]')
+    doc.querySelectorAll('script[data-stencil-static="page.state"][type="application/json"]'),
   ) as HTMLScriptElement[];
   if (pageStates.length > 0) {
     await Promise.all(
@@ -287,7 +286,7 @@ export const hashAssets = async (
           }
           pageStateScript.textContent = JSON.stringify(pageState);
         }
-      })
+      }),
     );
   }
 };
@@ -299,7 +298,7 @@ const hashAsset = async (
   doc: Document,
   currentUrl: URL,
   selector: string,
-  srcAttrs: string[]
+  srcAttrs: string[],
 ) => {
   const elms = Array.from(doc.querySelectorAll(selector));
 
@@ -332,7 +331,7 @@ const hashPageStateAstAssets = async (
   appDir: string,
   currentUrl: URL,
   pageStateScript: HTMLScriptElement,
-  node: any[]
+  node: any[],
 ) => {
   const tagName = node[0];
   const attrs = node[1];

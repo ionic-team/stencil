@@ -1,18 +1,18 @@
-import { normalizePath } from '@utils';
-import { isAbsolute, resolve } from 'path';
+import { normalizePath, resolve } from '@utils';
+import { isAbsolute } from 'path';
 import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { addExternalImport } from '../collections/add-external-import';
 
 export const parseModuleImport = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   moduleFile: d.Module,
   dirPath: string,
   importNode: ts.ImportDeclaration,
-  resolveCollections: boolean
+  resolveCollections: boolean,
 ) => {
   if (importNode.moduleSpecifier && ts.isStringLiteral(importNode.moduleSpecifier)) {
     let importPath = importNode.moduleSpecifier.text;
@@ -38,7 +38,7 @@ export const parseModuleImport = (
         moduleFile,
         moduleFile.sourceFilePath,
         importPath,
-        resolveCollections
+        resolveCollections,
       );
     }
   }

@@ -10,7 +10,7 @@ import { taskTelemetry } from './task-telemetry';
  * @param sys the abstraction for interfacing with the operating system
  */
 export const taskHelp = async (flags: ConfigFlags, logger: d.Logger, sys: d.CompilerSystem): Promise<void> => {
-  const prompt = logger.dim(sys.details.platform === 'windows' ? '>' : '$');
+  const prompt = logger.dim(sys.details?.platform === 'windows' ? '>' : '$');
 
   console.log(`
   ${logger.bold('Build:')} ${logger.dim('Build components for development or production.')}

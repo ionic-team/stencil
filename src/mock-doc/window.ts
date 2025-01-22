@@ -21,13 +21,16 @@ import { MockLocation } from './location';
 import { MockNavigator } from './navigator';
 import { MockElement, MockHTMLElement, MockNode, MockNodeList } from './node';
 import { MockPerformance, resetPerformance } from './performance';
+import { MockResizeObserver } from './resize-observer';
+import { MockShadowRoot } from './shadow-root';
 import { MockStorage } from './storage';
 
-const nativeClearInterval = clearInterval;
-const nativeClearTimeout = clearTimeout;
-const nativeSetInterval = setInterval;
-const nativeSetTimeout = setTimeout;
-const nativeURL = URL;
+const nativeClearInterval = globalThis.clearInterval;
+const nativeClearTimeout = globalThis.clearTimeout;
+const nativeSetInterval = globalThis.setInterval;
+const nativeSetTimeout = globalThis.setTimeout;
+const nativeURL = globalThis.URL;
+const nativeWindow = globalThis.window;
 
 export class MockWindow {
   __timeouts: Set<any>;
@@ -109,11 +112,11 @@ export class MockWindow {
   }
 
   cancelAnimationFrame(id: any) {
-    this.__clearTimeout(id);
+    this.__clearTimeout.call(nativeWindow || this, id);
   }
 
   cancelIdleCallback(id: any) {
-    this.__clearTimeout(id);
+    this.__clearTimeout.call(nativeWindow || this, id);
   }
 
   get CharacterData() {
@@ -133,11 +136,11 @@ export class MockWindow {
   }
 
   clearInterval(id: any) {
-    this.__clearInterval(id);
+    this.__clearInterval.call(nativeWindow || this, id);
   }
 
   clearTimeout(id: any) {
-    this.__clearTimeout(id);
+    this.__clearTimeout.call(nativeWindow || this, id);
   }
 
   close() {
@@ -184,6 +187,10 @@ export class MockWindow {
   }
   set DocumentFragment(docFragCstr: any) {
     this.__docFragCstr = docFragCstr;
+  }
+
+  get ShadowRoot() {
+    return MockShadowRoot;
   }
 
   get DocumentType() {
@@ -310,6 +317,10 @@ export class MockWindow {
     return MockIntersectionObserver;
   }
 
+  get ResizeObserver() {
+    return MockResizeObserver;
+  }
+
   get localStorage() {
     if (this.__localStorage == null) {
       this.__localStorage = new MockStorage();
@@ -337,9 +348,16 @@ export class MockWindow {
     }
   }
 
-  matchMedia() {
+  matchMedia(media: string) {
     return {
+      media,
       matches: false,
+      addListener: (_handler: (ev?: any) => void) => {},
+      removeListener: (_handler: (ev?: any) => void) => {},
+      addEventListener: (_type: string, _handler: (ev?: any) => void) => {},
+      removeEventListener: (_type: string, _handler: (ev?: any) => void) => {},
+      dispatchEvent: (_ev: any) => {},
+      onchange: null as ((this: MediaQueryList, ev: MediaQueryListEvent) => any) | null,
     };
   }
 
@@ -471,21 +489,25 @@ export class MockWindow {
       return intervalId;
     }
 
-    const timeoutId = this.__setTimeout(() => {
-      if (this.__timeouts) {
-        this.__timeouts.delete(timeoutId);
+    const timeoutId = this.__setTimeout.call(
+      nativeWindow || this,
+      () => {
+        if (this.__timeouts) {
+          this.__timeouts.delete(timeoutId);
 
-        try {
-          callback(...args);
-        } catch (e) {
-          if (this.console) {
-            this.console.error(e);
-          } else {
-            console.error(e);
+          try {
+            callback(...args);
+          } catch (e) {
+            if (this.console) {
+              this.console.error(e);
+            } else {
+              console.error(e);
+            }
           }
         }
-      }
-    }, ms) as any;
+      },
+      ms,
+    ) as any;
 
     if (this.__timeouts) {
       this.__timeouts.add(timeoutId);
@@ -501,21 +523,25 @@ export class MockWindow {
 
     ms = Math.min(ms, this.__maxTimeout);
 
-    const timeoutId = this.__setTimeout(() => {
-      if (this.__timeouts) {
-        this.__timeouts.delete(timeoutId);
+    const timeoutId = this.__setTimeout.call(
+      nativeWindow || this,
+      () => {
+        if (this.__timeouts) {
+          this.__timeouts.delete(timeoutId);
 
-        try {
-          callback(...args);
-        } catch (e) {
-          if (this.console) {
-            this.console.error(e);
-          } else {
-            console.error(e);
+          try {
+            callback(...args);
+          } catch (e) {
+            if (this.console) {
+              this.console.error(e);
+            } else {
+              console.error(e);
+            }
           }
         }
-      }
-    }, ms) as any as number;
+      },
+      ms,
+    ) as any as number;
 
     if (this.__timeouts) {
       this.__timeouts.add(timeoutId);
@@ -805,7 +831,7 @@ function resetWindowDefaults(win: MockWindow) {
   win.__clearTimeout = nativeClearTimeout;
   win.__setInterval = nativeSetInterval;
   win.__setTimeout = nativeSetTimeout;
-  win.__maxTimeout = 30000;
+  win.__maxTimeout = 60000;
   win.__allowInterval = true;
   win.URL = nativeURL;
 }
@@ -814,7 +840,7 @@ export function createWindow(html: string | boolean = null): Window {
   return new MockWindow(html) as any;
 }
 
-export function cloneWindow(srcWin: Window, opts: { customElementProxy?: boolean } = {}) {
+export function cloneWindow(srcWin: Window, opts: { customElementProxy?: boolean } = {}): MockWindow | null {
   if (srcWin == null) {
     return null;
   }
@@ -837,12 +863,12 @@ export function cloneWindow(srcWin: Window, opts: { customElementProxy?: boolean
 }
 
 export function cloneDocument(srcDoc: Document) {
-  if (srcDoc == null) {
+  if (srcDoc == null || !srcDoc.defaultView) {
     return null;
   }
 
   const dstWin = cloneWindow(srcDoc.defaultView);
-  return dstWin.document;
+  return dstWin?.document || null;
 }
 
 // TODO(STENCIL-345) - Evaluate reconciling MockWindow, Window differences

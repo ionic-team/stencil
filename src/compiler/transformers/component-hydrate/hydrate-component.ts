@@ -5,33 +5,33 @@ import { updateLazyComponentConstructor } from '../component-lazy/lazy-construct
 import { addLazyElementGetter } from '../component-lazy/lazy-element-getter';
 import { transformHostData } from '../host-data-transform';
 import { removeStaticMetaProperties } from '../remove-static-meta-properties';
+import { retrieveModifierLike } from '../transform-utils';
 import { addWatchers } from '../watcher-meta-transform';
 import { addHydrateRuntimeCmpMeta } from './hydrate-runtime-cmp-meta';
 
 export const updateHydrateComponentClass = (
   classNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ) => {
   return ts.factory.updateClassDeclaration(
     classNode,
-    classNode.decorators,
-    classNode.modifiers,
+    retrieveModifierLike(classNode),
     classNode.name,
     classNode.typeParameters,
     classNode.heritageClauses,
-    updateHydrateHostComponentMembers(classNode, moduleFile, cmp)
+    updateHydrateHostComponentMembers(classNode, moduleFile, cmp),
   );
 };
 
 const updateHydrateHostComponentMembers = (
   classNode: ts.ClassDeclaration,
   moduleFile: d.Module,
-  cmp: d.ComponentCompilerMeta
+  cmp: d.ComponentCompilerMeta,
 ) => {
   const classMembers = removeStaticMetaProperties(classNode);
 
-  updateLazyComponentConstructor(classMembers, moduleFile, cmp);
+  updateLazyComponentConstructor(classMembers, classNode, moduleFile, cmp);
   addLazyElementGetter(classMembers, moduleFile, cmp);
   addWatchers(classMembers, cmp);
   addHydrateRuntimeCmpMeta(classMembers, cmp);

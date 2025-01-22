@@ -18,7 +18,7 @@ export const validatePublicName = (
   memberName: string,
   decorator: string,
   memberType: string,
-  node: ts.Node
+  node: ts.Node,
 ): void => {
   if (RESERVED_PUBLIC_MEMBERS.has(memberName.toLowerCase())) {
     const warn = buildWarn(diagnostics);
@@ -34,6 +34,7 @@ export const validatePublicName = (
 };
 
 const HTML_ELEMENT_KEYS = [
+  'popover',
   'title',
   'lang',
   'translate',

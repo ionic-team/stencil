@@ -4,7 +4,7 @@ import type { Plugin, TransformPluginContext, TransformResult } from 'rollup';
 
 import type * as d from '../../declarations';
 
-export const extFormatPlugin = (config: d.Config): Plugin => {
+export const extFormatPlugin = (config: d.ValidatedConfig): Plugin => {
   return {
     name: 'extFormatPlugin',
 
@@ -25,11 +25,11 @@ export const extFormatPlugin = (config: d.Config): Plugin => {
 
       // didn't provide a ?format= param
       // check if it's a known extension we should format
-      if (FORMAT_TEXT_EXTS.includes(ext)) {
+      if (ext != null && FORMAT_TEXT_EXTS.includes(ext)) {
         return { code: formatText(code, filePath), map: null };
       }
 
-      if (FORMAT_URL_MIME[ext]) {
+      if (ext != null && FORMAT_URL_MIME[ext]) {
         return { code: formatUrl(config, this, code, filePath, ext), map: null };
       }
 
@@ -52,13 +52,13 @@ const formatText = (code: string, filePath: string) => {
 };
 
 const formatUrl = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   pluginCtx: TransformPluginContext,
   code: string,
   filePath: string,
-  ext: string
+  ext: string | null,
 ) => {
-  const mime = FORMAT_URL_MIME[ext];
+  const mime = ext != null ? FORMAT_URL_MIME[ext] : null;
   if (!mime) {
     pluginCtx.warn(`Unsupported url format for "${ext}" extension.`);
     return formatText('', filePath);

@@ -1,7 +1,7 @@
-import { isRootPath, normalizePath } from '@utils';
+import { createNodeLogger } from '@sys-api-node';
+import { isRootPath, join, normalizePath } from '@utils';
 import * as os from 'os';
-import { basename, dirname, join } from 'path';
-import platformPath from 'path-browserify';
+import path, { basename, dirname } from 'path';
 import * as process from 'process';
 
 import type {
@@ -22,10 +22,7 @@ import type {
 } from '../../declarations';
 import { version } from '../../version';
 import { buildEvents } from '../events';
-import { HAS_WEB_WORKER, IS_BROWSER_ENV, IS_WEB_WORKER_ENV } from './environment';
-import { createLogger } from './logger/console-logger';
 import { resolveModuleIdAsync } from './resolve/resolve-module-async';
-import { createWebWorkerMainController } from './worker/web-worker-main';
 
 /**
  * Create an in-memory `CompilerSystem` object, optionally using a supplied
@@ -40,21 +37,21 @@ import { createWebWorkerMainController } from './worker/web-worker-main';
  * @returns a complete CompilerSystem, ready for use!
  */
 export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
-  const logger = c?.logger ?? createLogger();
+  const logger = c?.logger ?? createNodeLogger();
   const items = new Map<string, FsItem>();
   const destroys = new Set<() => Promise<void> | void>();
 
-  const addDestory = (cb: () => void) => destroys.add(cb);
-  const removeDestory = (cb: () => void) => destroys.delete(cb);
+  const addDestroy = (cb: () => void) => destroys.add(cb);
+  const removeDestroy = (cb: () => void) => destroys.delete(cb);
   const events = buildEvents();
-  const hardwareConcurrency = (IS_BROWSER_ENV && navigator.hardwareConcurrency) || 1;
+  const hardwareConcurrency = 1;
 
   const destroy = async () => {
     const waits: Promise<void>[] = [];
     destroys.forEach((cb) => {
       try {
         const rtn = cb();
-        if (rtn && rtn.then) {
+        if (rtn && typeof rtn.then === 'function') {
           waits.push(rtn);
         }
       } catch (e) {
@@ -113,7 +110,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
   const createDirRecursiveSync = (
     p: string,
     opts: CompilerSystemCreateDirectoryOptions,
-    results: CompilerSystemCreateDirectoryResults
+    results: CompilerSystemCreateDirectoryResults,
   ) => {
     const parentDir = dirname(p);
 
@@ -146,10 +143,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
   const getCurrentDirectory = () => '/';
 
   const getCompilerExecutingPath = () => {
-    if (IS_WEB_WORKER_ENV) {
-      return location.href;
-    }
-    return sys.getRemoteModuleUrl({ moduleId: '@stencil/core', path: 'compiler/stencil.min.js' });
+    return sys.getRemoteModuleUrl({ moduleId: '@stencil/core', path: 'compiler/stencil.js' });
   };
 
   const isSymbolicLink = async (_p: string) => false;
@@ -301,15 +295,15 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
       error: null,
     };
 
-    remoreDirSyncRecursive(p, opts, results);
+    removeDirSyncRecursive(p, opts, results);
 
     return results;
   };
 
-  const remoreDirSyncRecursive = (
+  const removeDirSyncRecursive = (
     p: string,
     opts: CompilerSystemRemoveDirectoryOptions,
-    results: CompilerSystemRemoveDirectoryResults
+    results: CompilerSystemRemoveDirectoryResults,
   ) => {
     if (!results.error) {
       p = normalize(p);
@@ -321,7 +315,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
           const item = items.get(dirItemPath);
           if (item) {
             if (item.isDirectory) {
-              remoreDirSyncRecursive(dirItemPath, opts, results);
+              removeDirSyncRecursive(dirItemPath, opts, results);
             } else if (item.isFile) {
               const removeFileResults = removeFileSync(dirItemPath);
               if (removeFileResults.error) {
@@ -407,7 +401,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
       }
     };
 
-    addDestory(close);
+    addDestroy(close);
 
     if (item) {
       item.isDirectory = true;
@@ -427,7 +421,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
 
     return {
       close() {
-        removeDestory(close);
+        removeDestroy(close);
         close();
       },
     };
@@ -447,7 +441,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
       }
     };
 
-    addDestory(close);
+    addDestroy(close);
 
     if (item) {
       item.isDirectory = false;
@@ -467,7 +461,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
 
     return {
       close() {
-        removeDestory(close);
+        removeDestroy(close);
         close();
       },
     };
@@ -530,10 +524,10 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     typeof self !== 'undefined'
       ? self?.fetch
       : typeof window !== 'undefined'
-      ? window?.fetch
-      : typeof global !== 'undefined'
-      ? global?.fetch
-      : undefined;
+        ? window?.fetch
+        : typeof global !== 'undefined'
+          ? global?.fetch
+          : undefined;
 
   const writeFile = async (p: string, data: string) => writeFileSync(p, data);
 
@@ -586,7 +580,7 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     events,
     access,
     accessSync,
-    addDestory,
+    addDestroy,
     copyFile,
     createDir,
     createDirSync,
@@ -604,14 +598,14 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     isSymbolicLink,
     nextTick,
     normalizePath: normalize,
-    platformPath,
+    platformPath: path,
     readDir,
     readDirSync,
     readFile,
     readFileSync,
     realpath,
     realpathSync,
-    removeDestory,
+    removeDestroy,
     rename,
     fetch,
     resolvePath,
@@ -628,9 +622,8 @@ export const createSystem = (c?: { logger?: Logger }): CompilerSystem => {
     writeFile,
     writeFileSync,
     generateContentHash,
-    createWorkerController: HAS_WEB_WORKER
-      ? (maxConcurrentWorkers) => createWebWorkerMainController(sys, maxConcurrentWorkers)
-      : null,
+    // no threading when we're running in-memory
+    createWorkerController: null,
     details: {
       cpuModel: '',
       freemem: () => 0,

@@ -1,6 +1,6 @@
 import type * as d from '@stencil/core/internal';
-import { isIterable, isString, normalizePath } from '@utils';
-import { basename, dirname, relative } from 'path';
+import { isIterable, isString, normalizePath, relative } from '@utils';
+import { basename, dirname } from 'path';
 
 /**
  * An in-memory FS which proxies the underlying OS filesystem using a simple
@@ -66,9 +66,18 @@ export type FsItems = Map<string, FsItem>;
  * Options supported by write methods on the in-memory filesystem.
  */
 export interface FsWriteOptions {
+  /**
+   * only use the in-memory cache and do not write the file to disk
+   */
   inMemoryOnly?: boolean;
   clearFileCache?: boolean;
+  /**
+   * flush the write to disk immediately, skipping the in-memory cache
+   */
   immediateWrite?: boolean;
+  /**
+   * specify that the cache should be used
+   */
   useCache?: boolean;
   /**
    * An optional tag for the current output target for which this file is being
@@ -221,7 +230,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
   const emptyDirs = async (dirs: string[]): Promise<void> => {
     dirs = dirs
       .filter(isString)
-      .map(normalizePath)
+      .map((s) => normalizePath(s))
       .reduce((dirs, dir) => {
         if (!dirs.includes(dir)) {
           dirs.push(dir);
@@ -326,7 +335,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
     initPath: string,
     dirPath: string,
     opts: FsReaddirOptions,
-    collectedPaths: FsReaddirItem[]
+    collectedPaths: FsReaddirItem[],
   ) => {
     // used internally only so we could easily recursively drill down
     // loop through this directory and sub directories
@@ -367,7 +376,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
             // let's keep drilling down
             await readDirectory(initPath, absPath, opts, collectedPaths);
           }
-        })
+        }),
       );
     }
   };
@@ -522,7 +531,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
             return null;
           }
           return removeItem(item.absPath);
-        })
+        }),
       );
     } catch (e) {
       // do not throw error if the directory never existed
@@ -648,7 +657,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * @param filePath the filePath to write to
    * @param content what to write!
    * @param opts an optional object which controls how the file is written
-   * @return a Promise wrapping a write result object
+   * @returns a Promise wrapping a write result object
    */
   const writeFile = async (filePath: string, content: string, opts?: FsWriteOptions): Promise<FsWriteResults> => {
     if (typeof filePath !== 'string') {
@@ -724,7 +733,10 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
 
         if (results.changedContent) {
           await ensureDir(filePath, false);
-          await sys.writeFile(filePath, item.fileText);
+          const { error } = await sys.writeFile(filePath, item.fileText);
+          if (error) {
+            throw error;
+          }
         }
       }
     } else {
@@ -815,6 +827,15 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
    * only change the in-memory cache
    */
   const ensureDir = async (path: string, inMemoryOnly: boolean) => {
+    /**
+     * in case we write to disk immediately, there is no need to split
+     * all directories into separate calls, we can just use the recursive flag
+     */
+    if (!inMemoryOnly) {
+      await sys.createDir(dirname(path), { recursive: true });
+      return;
+    }
+
     const allDirs: string[] = [];
 
     while (true) {
@@ -889,7 +910,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         const [src, dest] = data;
         await sys.copyFile(src, dest);
         return [src, dest];
-      })
+      }),
     );
     return copiedFiles;
   };
@@ -908,7 +929,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
           throw new Error(`unable to writeFile without filePath`);
         }
         return commitWriteFile(filePath);
-      })
+      }),
     );
     return writtenFiles;
   };
@@ -948,7 +969,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         }
         await sys.removeFile(filePath);
         return filePath;
-      })
+      }),
     );
     return deletedFiles;
   };
@@ -1065,7 +1086,7 @@ export const createInMemoryFs = (sys: d.CompilerSystem) => {
         queueDeleteFromDisk: null,
         queueWriteToDisk: null,
         useCache: null,
-      })
+      }),
     );
     return item;
   };

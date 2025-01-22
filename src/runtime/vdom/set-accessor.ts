@@ -11,15 +11,31 @@ import { BUILD } from '@app-data';
 import { isMemberInElement, plt, win } from '@platform';
 import { isComplexType } from '@utils';
 
+import type * as d from '../../declarations';
 import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
+/**
+ * When running a VDom render set properties present on a VDom node onto the
+ * corresponding HTML element.
+ *
+ * Note that this function has special functionality for the `class`,
+ * `style`, `key`, and `ref` attributes, as well as event handlers (like
+ * `onClick`, etc). All others are just passed through as-is.
+ *
+ * @param elm the HTMLElement onto which attributes should be set
+ * @param memberName the name of the attribute to set
+ * @param oldValue the old value for the attribute
+ * @param newValue the new value for the attribute
+ * @param isSvg whether we're in an svg context or not
+ * @param flags bitflags for Vdom variables
+ */
 export const setAccessor = (
-  elm: HTMLElement,
+  elm: d.RenderNode,
   memberName: string,
   oldValue: any,
   newValue: any,
   isSvg: boolean,
-  flags: number
+  flags: number,
 ) => {
   if (oldValue !== newValue) {
     let isProp = isMemberInElement(elm, memberName);
@@ -28,9 +44,23 @@ export const setAccessor = (
     if (BUILD.vdomClass && memberName === 'class') {
       const classList = elm.classList;
       const oldClasses = parseClassList(oldValue);
-      const newClasses = parseClassList(newValue);
-      classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
-      classList.add(...newClasses.filter((c) => c && !oldClasses.includes(c)));
+      let newClasses = parseClassList(newValue);
+
+      if (elm['s-si']) {
+        // for `scoped: true` components, new nodes after initial hydration
+        // from SSR don't have the slotted class added. Let's add that now
+        newClasses.push(elm['s-si']);
+        oldClasses.forEach((c) => {
+          if (c.startsWith(elm['s-si'])) newClasses.push(c);
+        });
+        newClasses = [...new Set(newClasses)];
+
+        classList.add(...newClasses);
+        delete elm['s-si'];
+      } else {
+        classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
+        classList.add(...newClasses.filter((c) => c && !oldClasses.includes(c)));
+      }
     } else if (BUILD.vdomStyle && memberName === 'style') {
       // update style attribute, css properties and values
       if (BUILD.updatable) {
@@ -94,11 +124,20 @@ export const setAccessor = (
         // except for the first character, we keep the event name case
         memberName = ln[2] + memberName.slice(3);
       }
-      if (oldValue) {
-        plt.rel(elm, memberName, oldValue, false);
-      }
-      if (newValue) {
-        plt.ael(elm, memberName, newValue, false);
+      if (oldValue || newValue) {
+        // Need to account for "capture" events.
+        // If the event name ends with "Capture", we'll update the name to remove
+        // the "Capture" suffix and make sure the event listener is setup to handle the capture event.
+        const capture = memberName.endsWith(CAPTURE_EVENT_SUFFIX);
+        // Make sure we only replace the last instance of "Capture"
+        memberName = memberName.replace(CAPTURE_EVENT_REGEX, '');
+
+        if (oldValue) {
+          plt.rel(elm, memberName, oldValue, capture);
+        }
+        if (newValue) {
+          plt.ael(elm, memberName, newValue, capture);
+        }
       }
     } else if (BUILD.vdomPropOrAttr) {
       // Set property if it exists and it's not a SVG
@@ -112,12 +151,20 @@ export const setAccessor = (
             if (memberName === 'list') {
               isProp = false;
             } else if (oldValue == null || (elm as any)[memberName] != n) {
-              (elm as any)[memberName] = n;
+              if (typeof (elm as any).__lookupSetter__(memberName) === 'function') {
+                (elm as any)[memberName] = n;
+              } else {
+                elm.setAttribute(memberName, n);
+              }
             }
-          } else {
+          } else if ((elm as any)[memberName] !== newValue) {
             (elm as any)[memberName] = newValue;
           }
-        } catch (e) {}
+        } catch (e) {
+          /**
+           * in case someone tries to set a read-only property, e.g. "namespaceURI", we just ignore it
+           */
+        }
       }
 
       /**
@@ -153,5 +200,25 @@ export const setAccessor = (
     }
   }
 };
+
 const parseClassListRegex = /\s/;
-const parseClassList = (value: string | undefined | null): string[] => (!value ? [] : value.split(parseClassListRegex));
+/**
+ * Parsed a string of classnames into an array
+ * @param value className string, e.g. "foo bar baz"
+ * @returns list of classes, e.g. ["foo", "bar", "baz"]
+ */
+const parseClassList = (value: string | SVGAnimatedString | undefined | null): string[] => {
+  // Can't use `value instanceof SVGAnimatedString` because it'll break in non-browser environments
+  // see https://developer.mozilla.org/docs/Web/API/SVGAnimatedString for more information
+  if (typeof value === 'object' && 'baseVal' in value) {
+    value = value.baseVal;
+  }
+
+  if (!value) {
+    return [];
+  }
+
+  return value.split(parseClassListRegex);
+};
+const CAPTURE_EVENT_SUFFIX = 'Capture';
+const CAPTURE_EVENT_REGEX = new RegExp(CAPTURE_EVENT_SUFFIX + '$');

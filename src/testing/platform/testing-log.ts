@@ -1,7 +1,7 @@
 import type * as d from '../../declarations';
 import { caughtErrors } from './testing-constants';
 
-let customError: d.ErrorHandler;
+let customError: d.ErrorHandler | undefined;
 
 const defaultConsoleError = (e: any) => {
   caughtErrors.push(e);
@@ -23,4 +23,4 @@ export const consoleDevInfo = (..._: any[]) => {
   /* noop for testing */
 };
 
-export const setErrorHandler = (handler: d.ErrorHandler) => (customError = handler);
+export const setErrorHandler = (handler: d.ErrorHandler | undefined) => (customError = handler);

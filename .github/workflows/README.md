@@ -39,6 +39,18 @@ This workflow is responsible for building Stencil and validating the resultant a
 This workflow is responsible for validating that the code adheres to the Stencil team's formatting configuration before
 a pull request is merged.
 
+### Dev Release (`release-dev.yml`)
+
+This workflow initiates a developer build of Stencil from the `main` branch.
+It is intended to be manually invoked by a member of the Stencil team.
+
+### Nightly Release (`release-nightly.yml`)
+
+This workflow initiates a nightly build of Stencil from the `main` branch.
+A nightly build is similar to a 'Dev Release', except that:
+- it is run on a set cadence (it is not expectedthat a developer to manually invoke it)
+- it is published to the npm registry under the 'nightly' tag
+
 ### Test Analysis (`test-analysis.yml`)
 
 This workflow is responsible for running the Stencil analysis testing suite.
@@ -52,6 +64,16 @@ Those are handled by a [separate workflow](#browserstack-browserstackyml).
 ### Test Unit (`test-unit.yml`)
 
 This workflow is responsible for running the Stencil unit testing suite.
+
+### WebdriverIO Tests (`test-wdio.yml`)
+
+This workflow runs our integration tests which assert that various Stencil
+features work correctly when components using them are built and then rendered
+in actual browsers. We run these tests using
+[WebdriverIO](https://webdriver.io/) against Firefox, Chrome, and Edge.
+
+For more information on how those tests are set up please see the [WebdriverIO
+test README](../../test/wdio/README.md).
 
 ### Design
 
@@ -104,17 +126,6 @@ all jobs' options in the GitHub Actions UI.
 When a `git push` is made to a branch, Stencil's CI is designed to stop existing job(s) associated with the workflow + 
 branch.
 A new CI run (of each workflow) will begin upon stopping the existing job(s) using the new `HEAD` of the branch.
-
-### BrowserStack (`browserstack.yml`)
-
-This workflow is used to run a series of integration tests using [BrowserStack](https://www.browserstack.com).
-The exact details of which browsers are targeted can be found in the [karma directory](../../test/karma) of the project.
-
-Running this workflow requires a username + access key in order to access BrowserStack.
-These credentials are stored as secrets in GitHub.
-
-This workflow differs from most in that it is designed to run on `pull_request_target` triggers.
-This allows community provided pull requests to run BrowserStack tests. 
 
 ## Repository Configuration
 

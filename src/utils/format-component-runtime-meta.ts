@@ -3,7 +3,7 @@ import { CMP_FLAGS, LISTENER_FLAGS, MEMBER_FLAGS } from './constants';
 
 export const formatLazyBundleRuntimeMeta = (
   bundleId: any,
-  cmps: d.ComponentCompilerMeta[]
+  cmps: d.ComponentCompilerMeta[],
 ): d.LazyBundleRuntimeData => {
   return [bundleId, cmps.map((cmp) => formatComponentRuntimeMeta(cmp, true))];
 };
@@ -18,7 +18,7 @@ export const formatLazyBundleRuntimeMeta = (
  */
 export const formatComponentRuntimeMeta = (
   compilerMeta: d.ComponentCompilerMeta,
-  includeMethods: boolean
+  includeMethods: boolean,
 ): d.ComponentRuntimeMetaCompact => {
   let flags = 0;
   if (compilerMeta.encapsulation === 'shadow') {
@@ -29,6 +29,9 @@ export const formatComponentRuntimeMeta = (
   } else if (compilerMeta.encapsulation === 'scoped') {
     flags |= CMP_FLAGS.scopedCssEncapsulation;
   }
+  if (compilerMeta.formAssociated) {
+    flags |= CMP_FLAGS.formAssociated;
+  }
   if (compilerMeta.encapsulation !== 'shadow' && compilerMeta.htmlTagNames.includes('slot')) {
     flags |= CMP_FLAGS.hasSlotRelocation;
   }
@@ -38,11 +41,13 @@ export const formatComponentRuntimeMeta = (
 
   const members = formatComponentRuntimeMembers(compilerMeta, includeMethods);
   const hostListeners = formatHostListeners(compilerMeta);
+  const watchers = formatComponentRuntimeWatchers(compilerMeta);
   return trimFalsy([
     flags,
     compilerMeta.tagName,
     Object.keys(members).length > 0 ? members : undefined,
     hostListeners.length > 0 ? hostListeners : undefined,
+    Object.keys(watchers).length > 0 ? watchers : undefined,
   ]);
 };
 
@@ -56,9 +61,28 @@ export const stringifyRuntimeData = (data: any) => {
   return json;
 };
 
+/**
+ * Transforms Stencil compiler metadata into a {@link d.ComponentCompilerMeta} object.
+ * This handles processing any compiler metadata transformed from components' uses of `@Watch()`.
+ * The map of watched attributes to their callback(s) will be immediately available
+ * to the runtime at bootstrap.
+ *
+ * @param compilerMeta Component metadata gathered during compilation
+ * @returns An object mapping watched attributes to their respective callback(s)
+ */
+const formatComponentRuntimeWatchers = (compilerMeta: d.ComponentCompilerMeta) => {
+  const watchers: d.ComponentConstructorWatchers = {};
+
+  compilerMeta.watchers.forEach(({ propName, methodName }) => {
+    watchers[propName] = [...(watchers[propName] ?? []), methodName];
+  });
+
+  return watchers;
+};
+
 const formatComponentRuntimeMembers = (
   compilerMeta: d.ComponentCompilerMeta,
-  includeMethods = true
+  includeMethods = true,
 ): d.ComponentRuntimeMembers => {
   return {
     ...formatPropertiesRuntimeMember(compilerMeta.properties),
@@ -89,6 +113,12 @@ const formatFlags = (compilerProperty: d.ComponentCompilerProperty) => {
   }
   if (compilerProperty.reflect) {
     type |= MEMBER_FLAGS.ReflectAttr;
+  }
+  if (compilerProperty.getter) {
+    type |= MEMBER_FLAGS.Getter;
+  }
+  if (compilerProperty.setter) {
+    type |= MEMBER_FLAGS.Setter;
   }
   return type;
 };

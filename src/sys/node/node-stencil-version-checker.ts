@@ -19,7 +19,7 @@ export async function checkVersion(logger: Logger, currentVersion: string): Prom
           printUpdateMessage(logger, currentVersion, latestVersion);
         } else {
           console.debug(
-            `${logger.cyan('@stencil/core')} version ${logger.green(currentVersion)} is the latest version`
+            `${logger.cyan('@stencil/core')} version ${logger.green(currentVersion)} is the latest version`,
           );
         }
       };

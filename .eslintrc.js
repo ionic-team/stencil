@@ -1,7 +1,7 @@
 module.exports = {
   root: true,
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'jsdoc', 'jest', 'simple-import-sort'],
+  plugins: ['@typescript-eslint', 'jsdoc', 'jest', 'simple-import-sort', 'wdio'],
   extends: [
     'plugin:jest/recommended',
     // including prettier here ensures that we don't set any rules which will conflict
@@ -65,20 +65,21 @@ module.exports = {
         checkSetters: true,
       },
     ],
+    'jsdoc/require-param-description': ['error'],
     // rely on TypeScript types to be the source of truth, minimize verbosity in comments
     'jsdoc/require-param-type': ['off'],
-    'jsdoc/require-param-description': ['error'],
+    'jsdoc/require-returns': ['error'],
     'jsdoc/require-returns-check': ['error'],
     'jsdoc/require-returns-description': ['error'],
     // rely on TypeScript types to be the source of truth, minimize verbosity in comments
     'jsdoc/require-returns-type': ['off'],
-    'jsdoc/require-returns': ['error'],
-    'prefer-const': 'error',
+    'no-cond-assign': 'error',
     'no-var': 'error',
+    'prefer-const': 'error',
     'prefer-rest-params': 'error',
     'prefer-spread': 'error',
-    'simple-import-sort/imports': 'error',
     'simple-import-sort/exports': 'error',
+    'simple-import-sort/imports': 'error',
   },
   overrides: [
     {
@@ -86,6 +87,14 @@ module.exports = {
       files: 'bin/**',
       rules: {
         'no-var': 'off',
+      },
+    },
+    {
+      // we don't want to use jest-related lint rules in the wdio tests
+      files: 'test/wdio/**/*.tsx',
+      rules: {
+        'jest/expect-expect': 'off',
+        'wdio/await-expect': 'error',
       },
     },
   ],

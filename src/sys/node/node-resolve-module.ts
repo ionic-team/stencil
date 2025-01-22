@@ -33,7 +33,7 @@ export class NodeResolveModule {
         id: fromFile,
         filename: fromFile,
         paths: Module._nodeModulePaths(fromDir),
-      })
+      }),
     );
 
     const root = normalizePath(path.parse(fromDir).root);

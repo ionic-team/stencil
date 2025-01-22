@@ -1,22 +1,13 @@
 import * as coreCompiler from '@stencil/core/compiler';
 import { mockValidatedConfig } from '@stencil/core/testing';
+import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '@utils';
 
 import { createConfigFlags } from '../../../cli/config-flags';
-import { DIST, DIST_CUSTOM_ELEMENTS, DIST_HYDRATE_SCRIPT, WWW } from '../../../compiler/output-targets/output-utils';
-import * as environment from '../../../compiler/sys/environment';
 import { createSystem } from '../../../compiler/sys/stencil-sys';
 import type * as d from '../../../declarations';
 import * as shouldTrack from '../shouldTrack';
 import * as telemetry from '../telemetry';
 import { anonymizeConfigForTelemetry } from '../telemetry';
-
-const browserEnvGetter = jest.fn().mockReturnValue(false);
-
-Object.defineProperty(environment, 'IS_BROWSER_ENV', {
-  get() {
-    return browserEnvGetter();
-  },
-});
 
 describe('telemetryBuildFinishedAction', () => {
   let config: d.ValidatedConfig;
@@ -36,7 +27,7 @@ describe('telemetryBuildFinishedAction', () => {
     spyShouldTrack.mockReturnValue(
       new Promise((resolve) => {
         resolve(true);
-      })
+      }),
     );
 
     const results = {
@@ -69,7 +60,7 @@ describe('telemetryAction', () => {
     spyShouldTrack.mockReturnValue(
       new Promise((resolve) => {
         resolve(true);
-      })
+      }),
     );
 
     await telemetry.telemetryAction(sys, config, coreCompiler, () => {});
@@ -83,7 +74,7 @@ describe('telemetryAction', () => {
     spyShouldTrack.mockReturnValue(
       new Promise((resolve) => {
         resolve(true);
-      })
+      }),
     );
 
     await telemetry.telemetryAction(sys, config, coreCompiler, async () => {
@@ -176,7 +167,6 @@ describe('prepareData', () => {
       cpu_model: '',
       duration_ms: 1000,
       has_app_pwa_config: false,
-      is_browser_env: false,
       os_name: '',
       os_version: '',
       packages: [],
@@ -189,14 +179,6 @@ describe('prepareData', () => {
       task: null,
       typescript: coreCompiler.versions.typescript,
       yarn: false,
-    });
-  });
-
-  describe('it sets an "is_browser_env" property', () => {
-    it.each([true, false])('reports accurately when %p', async (isBrowserEnv: boolean) => {
-      browserEnvGetter.mockReturnValue(isBrowserEnv);
-      const data = await telemetry.prepareData(coreCompiler, config, sys, 1000);
-      expect(data.is_browser_env).toBe(isBrowserEnv);
     });
   });
 
@@ -286,7 +268,7 @@ describe('anonymizeConfigForTelemetry', () => {
       outputTargets: [
         { type: WWW, baseUrl: 'https://example.com' },
         { type: DIST_HYDRATE_SCRIPT, external: ['beep', 'boop'], dir: 'shoud/go/away' },
-        { type: DIST_CUSTOM_ELEMENTS, autoDefineCustomElements: false },
+        { type: DIST_CUSTOM_ELEMENTS },
         { type: DIST_CUSTOM_ELEMENTS, generateTypeDeclarations: true },
         { type: DIST, typesDir: 'my-types' },
       ],
@@ -295,7 +277,7 @@ describe('anonymizeConfigForTelemetry', () => {
     expect(anonymizedConfig.outputTargets).toEqual([
       { type: WWW, baseUrl: 'omitted' },
       { type: DIST_HYDRATE_SCRIPT, external: ['beep', 'boop'], dir: 'omitted' },
-      { type: DIST_CUSTOM_ELEMENTS, autoDefineCustomElements: false },
+      { type: DIST_CUSTOM_ELEMENTS },
       { type: DIST_CUSTOM_ELEMENTS, generateTypeDeclarations: true },
       { type: DIST, typesDir: 'omitted' },
     ]);

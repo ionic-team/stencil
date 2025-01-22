@@ -8,15 +8,13 @@ on:
 jobs:
   build_core:
     name: Core
-    runs-on: 'ubuntu-latest'
+    strategy:
+      matrix:
+        os: ['ubuntu-22.04', 'windows-latest']
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout Code
-        uses: actions/checkout@93ea575cb5d8a053eaa0ac8fa3b40d7e05a33cc8 # v3.1.0
-        with:
-          # the pull_request_target event will consider the HEAD of `main` to be the SHA to use.
-          # attempt to use the SHA associated with a pull request and fallback to HEAD of `main`
-          ref: ${{ github.event_name == 'pull_request_target' && format('refs/pull/{0}/merge', github.event.number) || '' }}
-          persist-credentials: false
+        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
 
       - name: Get Core Dependencies
         uses: ./.github/workflows/actions/get-core-dependencies
@@ -34,8 +32,9 @@ jobs:
         shell: bash
 
       - name: Upload Build Artifacts
+        if: ${{ matrix.os == 'ubuntu-22.04' }}
         uses: ./.github/workflows/actions/upload-archive
         with:
           name: stencil-core
           output: stencil-core-build.zip
-          paths: build cli compiler dependencies.json dev-server internal mock-doc scripts/build screenshot sys testing
+          paths: cli compiler dev-server internal mock-doc scripts/build screenshot sys testing

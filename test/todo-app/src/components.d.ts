@@ -30,13 +30,36 @@ declare global {
         prototype: HTMLAppRootElement;
         new (): HTMLAppRootElement;
     };
+    interface HTMLTodoInputElementEventMap {
+        "inputSubmit": any;
+    }
     interface HTMLTodoInputElement extends Components.TodoInput, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLTodoInputElementEventMap>(type: K, listener: (this: HTMLTodoInputElement, ev: TodoInputCustomEvent<HTMLTodoInputElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLTodoInputElementEventMap>(type: K, listener: (this: HTMLTodoInputElement, ev: TodoInputCustomEvent<HTMLTodoInputElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLTodoInputElement: {
         prototype: HTMLTodoInputElement;
         new (): HTMLTodoInputElement;
     };
+    interface HTMLTodoItemElementEventMap {
+        "itemCheck": any;
+        "itemRemove": any;
+    }
     interface HTMLTodoItemElement extends Components.TodoItem, HTMLStencilElement {
+        addEventListener<K extends keyof HTMLTodoItemElementEventMap>(type: K, listener: (this: HTMLTodoItemElement, ev: TodoItemCustomEvent<HTMLTodoItemElementEventMap[K]>) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | AddEventListenerOptions): void;
+        addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLTodoItemElementEventMap>(type: K, listener: (this: HTMLTodoItemElement, ev: TodoItemCustomEvent<HTMLTodoItemElementEventMap[K]>) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof DocumentEventMap>(type: K, listener: (this: Document, ev: DocumentEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener<K extends keyof HTMLElementEventMap>(type: K, listener: (this: HTMLElement, ev: HTMLElementEventMap[K]) => any, options?: boolean | EventListenerOptions): void;
+        removeEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | EventListenerOptions): void;
     }
     var HTMLTodoItemElement: {
         prototype: HTMLTodoItemElement;

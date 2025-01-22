@@ -1,7 +1,6 @@
-import { byteSize, sortBy } from '@utils';
+import { byteSize, isOutputTargetStats, result, sortBy } from '@utils';
 
 import type * as d from '../../declarations';
-import { isOutputTargetStats } from '../output-targets/output-utils';
 
 /**
  * Generates the Build Stats from the buildCtx. Writes any files to the file system.
@@ -10,19 +9,17 @@ import { isOutputTargetStats } from '../output-targets/output-utils';
  * @returns CompilerBuildStats or an Object including diagnostics.
  */
 export function generateBuildStats(
-  config: d.Config,
-  buildCtx: d.BuildCtx
-): d.CompilerBuildStats | { diagnostics: d.Diagnostic[] } {
+  config: d.ValidatedConfig,
+  buildCtx: d.BuildCtx,
+): result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }> {
   // TODO(STENCIL-461): Investigate making this return only a single type
   const buildResults = buildCtx.buildResults;
 
-  let jsonData: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] };
-
   try {
     if (buildResults.hasError) {
-      jsonData = {
+      return result.err({
         diagnostics: buildResults.diagnostics,
-      };
+      });
     } else {
       const stats: d.CompilerBuildStats = {
         timestamp: buildResults.timestamp,
@@ -33,17 +30,17 @@ export function generateBuildStats(
         app: {
           namespace: config.namespace,
           fsNamespace: config.fsNamespace,
-          components: Object.keys(buildResults.componentGraph).length,
-          entries: Object.keys(buildResults.componentGraph).length,
+          components: Object.keys(buildResults.componentGraph ?? {}).length,
+          entries: Object.keys(buildResults.componentGraph ?? {}).length,
           bundles: buildResults.outputs.reduce((total, en) => total + en.files.length, 0),
           outputs: getAppOutputs(config, buildResults),
         },
         options: {
-          minifyJs: config.minifyJs,
-          minifyCss: config.minifyCss,
-          hashFileNames: config.hashFileNames,
+          minifyJs: !!config.minifyJs,
+          minifyCss: !!config.minifyCss,
+          hashFileNames: !!config.hashFileNames,
           hashedFileNameLength: config.hashedFileNameLength,
-          buildEs5: config.buildEs5,
+          buildEs5: !!config.buildEs5,
         },
         formats: {
           esmBrowser: sanitizeBundlesForStats(buildCtx.esmBrowserComponentBundle),
@@ -54,26 +51,24 @@ export function generateBuildStats(
         },
         components: getComponentsFileMap(config, buildCtx),
         entries: buildCtx.entryModules,
-        componentGraph: buildResults.componentGraph,
+        componentGraph: buildResults.componentGraph ?? {},
         sourceGraph: getSourceGraph(config, buildCtx),
-        rollupResults: buildCtx.rollupResults,
+        rollupResults: buildCtx.rollupResults ?? { modules: [] },
         collections: getCollections(config, buildCtx),
       };
-
-      jsonData = stats;
+      return result.ok(stats);
     }
   } catch (e: unknown) {
     const diagnostic: d.Diagnostic = {
-      messageText: `Generate Build Stats Error: ` + e,
       level: `error`,
+      lines: [],
+      messageText: `Generate Build Stats Error: ` + e,
       type: `build`,
     };
-    jsonData = {
+    return result.err({
       diagnostics: [diagnostic],
-    };
+    });
   }
-
-  return jsonData;
 }
 
 /**
@@ -83,20 +78,24 @@ export function generateBuildStats(
  * config)
  */
 export async function writeBuildStats(
-  config: d.Config,
-  data: d.CompilerBuildStats | { diagnostics: d.Diagnostic[] }
+  config: d.ValidatedConfig,
+  data: result.Result<d.CompilerBuildStats, { diagnostics: d.Diagnostic[] }>,
 ): Promise<void> {
   const statsTargets = config.outputTargets.filter(isOutputTargetStats);
 
-  await Promise.all(
-    statsTargets.map(async (outputTarget) => {
-      const result = await config.sys.writeFile(outputTarget.file, JSON.stringify(data, null, 2));
+  await result.map(data, async (compilerBuildStats) => {
+    await Promise.all(
+      statsTargets.map(async (outputTarget) => {
+        if (outputTarget.file) {
+          const result = await config.sys.writeFile(outputTarget.file, JSON.stringify(compilerBuildStats, null, 2));
 
-      if (result.error) {
-        config.logger.warn([`Stats failed to write file to ${outputTarget.file}`]);
-      }
-    })
-  );
+          if (result.error) {
+            config.logger.warn([`Stats failed to write file to ${outputTarget.file}`]);
+          }
+        }
+      }),
+    );
+  });
 }
 
 function sanitizeBundlesForStats(bundleArray: ReadonlyArray<d.BundleModule>): ReadonlyArray<d.CompilerBuildStatBundle> {
@@ -118,7 +117,7 @@ function sanitizeBundlesForStats(bundleArray: ReadonlyArray<d.BundleModule>): Re
   });
 }
 
-function getSourceGraph(config: d.Config, buildCtx: d.BuildCtx) {
+function getSourceGraph(config: d.ValidatedConfig, buildCtx: d.BuildCtx) {
   const sourceGraph: d.BuildSourceGraph = {};
 
   sortBy(buildCtx.moduleFiles, (m) => m.sourceFilePath).forEach((moduleFile) => {
@@ -129,7 +128,7 @@ function getSourceGraph(config: d.Config, buildCtx: d.BuildCtx) {
   return sourceGraph;
 }
 
-function getAppOutputs(config: d.Config, buildResults: d.CompilerBuildResults) {
+function getAppOutputs(config: d.ValidatedConfig, buildResults: d.CompilerBuildResults) {
   return buildResults.outputs.map((output) => {
     return {
       name: output.type,
@@ -139,7 +138,7 @@ function getAppOutputs(config: d.Config, buildResults: d.CompilerBuildResults) {
   });
 }
 
-function getComponentsFileMap(config: d.Config, buildCtx: d.BuildCtx) {
+function getComponentsFileMap(config: d.ValidatedConfig, buildCtx: d.BuildCtx) {
   return buildCtx.components.map((component) => {
     return {
       tag: component.tagName,
@@ -157,8 +156,6 @@ function getComponentsFileMap(config: d.Config, buildCtx: d.BuildCtx) {
       excludeFromCollection: component.excludeFromCollection,
       events: component.events,
       internal: component.internal,
-      legacyConnect: component.legacyConnect,
-      legacyContext: component.legacyContext,
       listeners: component.listeners,
       methods: component.methods,
       potentialCmpRefs: component.potentialCmpRefs,
@@ -169,7 +166,7 @@ function getComponentsFileMap(config: d.Config, buildCtx: d.BuildCtx) {
   });
 }
 
-function getCollections(config: d.Config, buildCtx: d.BuildCtx) {
+function getCollections(config: d.ValidatedConfig, buildCtx: d.BuildCtx): d.CompilerBuildStatCollection[] {
   return buildCtx.collections
     .map((c) => {
       return {
@@ -185,6 +182,6 @@ function getCollections(config: d.Config, buildCtx: d.BuildCtx) {
     });
 }
 
-function relativePath(config: d.Config, file: string) {
+function relativePath(config: d.ValidatedConfig, file: string) {
   return config.sys.normalizePath(config.sys.platformPath.relative(config.rootDir, file));
 }

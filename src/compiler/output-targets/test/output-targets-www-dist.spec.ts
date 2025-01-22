@@ -49,14 +49,8 @@ describe.skip('outputTarget, www / dist / docs', () => {
       }`,
       [path.join(root, 'User', 'testing', 'src', 'index.html')]: `<cmp-a></cmp-a>`,
       [path.join(config.sys.getClientPath('polyfills/index.js'))]: `/* polyfills */`,
-      [path.join(
-        root,
-        'User',
-        'testing',
-        'src',
-        'components',
-        'cmp-a.tsx'
-      )]: `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
+      [path.join(root, 'User', 'testing', 'src', 'components', 'cmp-a.tsx')]:
+        `@Component({ tag: 'cmp-a' }) export class CmpA {}`,
     });
     await compiler.fs.commit();
 

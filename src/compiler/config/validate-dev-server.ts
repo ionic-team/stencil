@@ -1,15 +1,11 @@
-import { buildError, isBoolean, isNumber, isString, normalizePath } from '@utils';
-import { isAbsolute, join } from 'path';
+import { buildError, isBoolean, isNumber, isOutputTargetWww, isString, join, normalizePath } from '@utils';
+import { isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
-import { isOutputTargetWww } from '../output-targets/output-utils';
 
-export const validateDevServer = (
-  config: d.ValidatedConfig,
-  diagnostics: d.Diagnostic[]
-): d.DevServerConfig | undefined => {
+export const validateDevServer = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]): d.DevServerConfig => {
   if ((config.devServer === null || (config.devServer as any)) === false) {
-    return undefined;
+    return {};
   }
 
   const { flags } = config;
@@ -21,7 +17,7 @@ export const validateDevServer = (
     devServer.address = '0.0.0.0';
   }
 
-  // default to http for localdev
+  // default to http for local dev
   let addressProtocol: 'http' | 'https' = 'http';
   if (devServer.address.toLowerCase().startsWith('http://')) {
     devServer.address = devServer.address.substring(7);
@@ -32,6 +28,16 @@ export const validateDevServer = (
   }
 
   devServer.address = devServer.address.split('/')[0];
+
+  // Validate "ping" route option
+  if (devServer.pingRoute !== null) {
+    let pingRoute = isString(devServer.pingRoute) ? devServer.pingRoute : '/ping';
+    if (!pingRoute.startsWith('/')) {
+      pingRoute = `/${pingRoute}`;
+    }
+
+    devServer.pingRoute = pingRoute;
+  }
 
   // split on `:` to get the domain and the (possibly present) port
   // separately. we've already sliced off the protocol (if present) above
@@ -100,8 +106,10 @@ export const validateDevServer = (
     devServer.protocol = devServer.https ? 'https' : addressProtocol ? addressProtocol : 'http';
   }
 
-  if (devServer.historyApiFallback !== null && devServer.historyApiFallback !== false) {
-    devServer.historyApiFallback = devServer.historyApiFallback || {};
+  if (devServer.historyApiFallback !== null) {
+    if (Array.isArray(devServer.historyApiFallback) || typeof devServer.historyApiFallback !== 'object') {
+      devServer.historyApiFallback = {};
+    }
 
     if (!isString(devServer.historyApiFallback.index)) {
       devServer.historyApiFallback.index = 'index.html';

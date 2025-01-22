@@ -14,7 +14,7 @@ export const build = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
-  tsBuilder: ts.BuilderProgram
+  tsBuilder: ts.BuilderProgram,
 ) => {
   try {
     // reset process.cwd() for 3rd-party plugins

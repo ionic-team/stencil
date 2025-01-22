@@ -9,24 +9,28 @@ import {
   getAttributeTypeInfo,
   isMemberPrivate,
   mapJSDocTagInfo,
-  serializeSymbol,
+  retrieveTsDecorators,
+  retrieveTsModifiers,
   typeToString,
-  validateReferences,
 } from '../transform-utils';
 import { isDecoratorNamed } from './decorator-utils';
 
 export const methodDecoratorsToStatic = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
   cmpNode: ts.ClassDeclaration,
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
-  newMembers: ts.ClassElement[]
+  program: ts.Program,
+  newMembers: ts.ClassElement[],
+  decoratorName: string,
 ) => {
   const tsSourceFile = cmpNode.getSourceFile();
   const methods = decoratedProps
     .filter(ts.isMethodDeclaration)
-    .map((method) => parseMethodDecorator(config, diagnostics, tsSourceFile, typeChecker, method))
+    .map((method) =>
+      parseMethodDecorator(config, diagnostics, tsSourceFile, typeChecker, program, method, decoratorName),
+    )
     .filter((method) => !!method);
 
   if (methods.length > 0) {
@@ -35,13 +39,15 @@ export const methodDecoratorsToStatic = (
 };
 
 const parseMethodDecorator = (
-  config: d.Config,
+  config: d.ValidatedConfig,
   diagnostics: d.Diagnostic[],
   tsSourceFile: ts.SourceFile,
   typeChecker: ts.TypeChecker,
-  method: ts.MethodDeclaration
-) => {
-  const methodDecorator = method.decorators.find(isDecoratorNamed('Method'));
+  program: ts.Program,
+  method: ts.MethodDeclaration,
+  decoratorName: string,
+): ts.PropertyAssignment | null => {
+  const methodDecorator = retrieveTsDecorators(method)?.find(isDecoratorNamed(decoratorName));
   if (methodDecorator == null) {
     return null;
   }
@@ -53,7 +59,7 @@ const parseMethodDecorator = (
   const returnTypeNode = typeChecker.typeToTypeNode(
     returnType,
     method,
-    ts.NodeBuilderFlags.NoTruncation | ts.NodeBuilderFlags.NoTypeReduction
+    ts.NodeBuilderFlags.NoTruncation | ts.NodeBuilderFlags.NoTypeReduction,
   );
   let returnString = typeToString(typeChecker, returnType);
   let signatureString = typeChecker.signatureToString(signature, method, flags, ts.SignatureKind.Call);
@@ -79,7 +85,7 @@ const parseMethodDecorator = (
     const err = buildError(diagnostics);
     err.messageText =
       'Methods decorated with the @Method() decorator cannot be "private" nor "protected". More info: https://stenciljs.com/docs/methods';
-    augmentDiagnosticWithNode(err, method.modifiers[0]);
+    augmentDiagnosticWithNode(err, retrieveTsModifiers(method)![0]);
   }
 
   // Validate if the method name does not conflict with existing public names
@@ -88,10 +94,14 @@ const parseMethodDecorator = (
   const methodMeta: d.ComponentCompilerStaticMethod = {
     complexType: {
       signature: signatureString,
-      parameters: signature.parameters.map((symbol) => serializeSymbol(typeChecker, symbol)),
+      parameters: signature.parameters.map((symbol) => ({
+        name: symbol.getName(),
+        type: typeToString(typeChecker, typeChecker.getTypeOfSymbolAtLocation(symbol, method)),
+        docs: ts.displayPartsToString(symbol.getDocumentationComment(typeChecker)),
+      })),
       references: {
-        ...getAttributeTypeInfo(returnTypeNode, tsSourceFile),
-        ...getAttributeTypeInfo(method, tsSourceFile),
+        ...getAttributeTypeInfo(returnTypeNode, tsSourceFile, typeChecker, program),
+        ...getAttributeTypeInfo(method, tsSourceFile, typeChecker, program),
       },
       return: returnString,
     },
@@ -100,11 +110,10 @@ const parseMethodDecorator = (
       tags: mapJSDocTagInfo(signature.getJsDocTags()),
     },
   };
-  validateReferences(diagnostics, methodMeta.complexType.references, method.type || method.name);
 
   const staticProp = ts.factory.createPropertyAssignment(
     ts.factory.createStringLiteral(methodName),
-    convertValueToLiteral(methodMeta)
+    convertValueToLiteral(methodMeta),
   );
 
   return staticProp;

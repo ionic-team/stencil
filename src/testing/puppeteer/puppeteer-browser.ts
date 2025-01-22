@@ -1,5 +1,7 @@
+import * as d from '@stencil/core/declarations';
 import type { E2EProcessEnv, ValidatedConfig } from '@stencil/core/internal';
 import type * as puppeteer from 'puppeteer';
+import semverMajor from 'semver/functions/major';
 
 export async function startPuppeteerBrowser(config: ValidatedConfig) {
   if (!config.flags.e2e) {
@@ -11,13 +13,22 @@ export async function startPuppeteerBrowser(config: ValidatedConfig) {
   const puppeteerDep = config.testing.browserExecutablePath ? 'puppeteer-core' : 'puppeteer';
 
   const puppeteerModulePath = config.sys.lazyRequire.getModulePath(config.rootDir, puppeteerDep);
+  const puppeteerPackageJsonPath = config.sys.platformPath.join(puppeteerModulePath, 'package.json');
   const puppeteer = config.sys.lazyRequire.require(config.rootDir, puppeteerModulePath);
   env.__STENCIL_PUPPETEER_MODULE__ = puppeteerModulePath;
+
+  try {
+    const puppeteerManifest = config.sys.readFileSync(puppeteerPackageJsonPath, 'utf8');
+    const puppeteerPkgJson: d.PackageJsonData = JSON.parse(puppeteerManifest);
+    env.__STENCIL_PUPPETEER_VERSION__ = semverMajor(puppeteerPkgJson.version);
+  } catch (e: unknown) {
+    console.error(`An error occurred determining the version of Puppeteer installed:\n${e}`);
+    env.__STENCIL_PUPPETEER_VERSION__ = undefined;
+  }
+
   env.__STENCIL_BROWSER_WAIT_UNTIL = config.testing.browserWaitUntil;
 
   if (config.flags.devtools) {
-    config.testing.browserDevtools = true;
-    config.testing.browserHeadless = false;
     env.__STENCIL_E2E_DEVTOOLS__ = 'true';
   }
 
@@ -39,7 +50,6 @@ export async function startPuppeteerBrowser(config: ValidatedConfig) {
   // connection options will be used regardless whether a new browser instance is created or we attach to a
   // pre-existing instance
   const connectOpts: puppeteer.ConnectOptions = {
-    ignoreHTTPSErrors: true,
     slowMo: config.testing.browserSlowMo,
   };
 
@@ -50,8 +60,9 @@ export async function startPuppeteerBrowser(config: ValidatedConfig) {
       ...connectOpts,
     });
   } else {
-    const launchOpts: puppeteer.BrowserLaunchArgumentOptions & puppeteer.LaunchOptions & puppeteer.ConnectOptions = {
+    const launchOpts: puppeteer.LaunchOptions & puppeteer.ConnectOptions = {
       args: config.testing.browserArgs,
+      channel: config.testing.browserChannel,
       headless: config.testing.browserHeadless,
       devtools: config.testing.browserDevtools,
       ...connectOpts,
@@ -85,7 +96,6 @@ export async function connectBrowser() {
 
   const connectOpts: puppeteer.ConnectOptions = {
     browserWSEndpoint: wsEndpoint,
-    ignoreHTTPSErrors: true,
   };
 
   const puppeteer = require(env.__STENCIL_PUPPETEER_MODULE__);

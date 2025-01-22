@@ -7,8 +7,9 @@ import { initializeClientHydrate } from './client-hydrate';
 import { fireConnectedCallback, initializeComponent } from './initialize-component';
 import { createTime } from './profile';
 import { HYDRATE_ID, NODE_TYPE, PLATFORM_FLAGS } from './runtime-constants';
-import { addStyle } from './styles';
+import { addStyle, getScopeId } from './styles';
 import { attachToAncestor } from './update-component';
+import { insertBefore } from './vdom/vdom-render';
 
 export const connectedCallback = (elm: d.HostElement) => {
   if ((plt.$flags$ & PLATFORM_FLAGS.isTmpDisconnected) === 0) {
@@ -34,6 +35,11 @@ export const connectedCallback = (elm: d.HostElement) => {
               ? addStyle(elm.shadowRoot, cmpMeta, elm.getAttribute('s-mode'))
               : addStyle(elm.shadowRoot, cmpMeta);
             elm.classList.remove(scopeId + '-h', scopeId + '-s');
+          } else if (BUILD.scoped && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
+            // set the scope id on the element now. Useful when hydrating,
+            // to more quickly set the initial scoped classes for scoped css
+            const scopeId = getScopeId(cmpMeta, BUILD.mode ? elm.getAttribute('s-mode') : undefined);
+            elm['s-sc'] = scopeId;
           }
           initializeClientHydrate(elm, cmpMeta.$tagName$, hostId, hostRef);
         }
@@ -47,6 +53,7 @@ export const connectedCallback = (elm: d.HostElement) => {
         if (
           BUILD.hydrateServerSide ||
           ((BUILD.slot || BUILD.shadowDom) &&
+            // TODO(STENCIL-854): Remove code related to legacy shadowDomShim field
             cmpMeta.$flags$ & (CMP_FLAGS.hasSlotRelocation | CMP_FLAGS.needsShadowDomShim))
         ) {
           setContentReference(elm);
@@ -105,7 +112,11 @@ export const connectedCallback = (elm: d.HostElement) => {
       addHostEventListeners(elm, hostRef, cmpMeta.$listeners$, false);
 
       // fire off connectedCallback() on component instance
-      fireConnectedCallback(hostRef.$lazyInstance$, elm);
+      if (hostRef?.$lazyInstance$) {
+        fireConnectedCallback(hostRef.$lazyInstance$, elm);
+      } else if (hostRef?.$onReadyPromise$) {
+        hostRef.$onReadyPromise$.then(() => fireConnectedCallback(hostRef.$lazyInstance$, elm));
+      }
     }
 
     endConnected();
@@ -120,8 +131,8 @@ const setContentReference = (elm: d.HostElement) => {
   // create a node to represent where the original
   // content was first placed, which is useful later on
   const contentRefElm = (elm['s-cr'] = doc.createComment(
-    BUILD.isDebug ? `content-ref (host=${elm.localName})` : ''
+    BUILD.isDebug ? `content-ref (host=${elm.localName})` : '',
   ) as any);
   contentRefElm['s-cn'] = true;
-  elm.insertBefore(contentRefElm, elm.firstChild);
+  insertBefore(elm, contentRefElm, elm.firstChild as d.RenderNode);
 };

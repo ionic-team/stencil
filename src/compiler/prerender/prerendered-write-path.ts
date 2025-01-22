@@ -1,3 +1,4 @@
+import { join } from '@utils';
 import path from 'path';
 
 import type * as d from '../../declarations';
@@ -46,5 +47,5 @@ export const getWriteFilePathFromUrlPath = (manager: d.PrerenderManager, inputHr
   pathParts.push(fileName);
 
   // figure out the directory where this file will be saved
-  return path.join(manager.outputTarget.appDir, ...pathParts);
+  return join(manager.outputTarget.appDir, ...pathParts);
 };

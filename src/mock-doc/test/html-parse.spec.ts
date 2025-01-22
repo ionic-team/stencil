@@ -54,13 +54,13 @@ describe('parseHtml', () => {
         <svg>
       </div>
     `);
-    expect(doc.body.firstElementChild.tagName).toEqual('DIV');
-    expect(doc.body.firstElementChild.firstElementChild.tagName).toEqual('svg');
-    expect(doc.body.firstElementChild.firstElementChild.children[0].tagName).toEqual('a');
-    expect(doc.body.firstElementChild.firstElementChild.children[1].tagName).toEqual('feImage');
-    expect(doc.body.firstElementChild.firstElementChild.children[2].tagName).toEqual('foreignObject');
-    expect(doc.body.firstElementChild.firstElementChild.children[2].children[0].tagName).toEqual('A');
-    expect(doc.body.firstElementChild.firstElementChild.children[2].children[1].tagName).toEqual('FEIMAGE');
+    expect(doc.body?.firstElementChild?.tagName).toEqual('DIV');
+    expect(doc.body?.firstElementChild?.firstElementChild?.tagName).toEqual('svg');
+    expect(doc.body?.firstElementChild?.firstElementChild?.children?.[0]?.tagName).toEqual('a');
+    expect(doc.body?.firstElementChild?.firstElementChild?.children?.[1]?.tagName).toEqual('feImage');
+    expect(doc.body?.firstElementChild?.firstElementChild?.children?.[2]?.tagName).toEqual('foreignObject');
+    expect(doc.body?.firstElementChild?.firstElementChild?.children?.[2].children?.[0]?.tagName).toEqual('A');
+    expect(doc.body?.firstElementChild?.firstElementChild?.children?.[2]?.children?.[1]?.tagName).toEqual('FEIMAGE');
     expect(doc.body).toEqualHtml(`
     <div>
       <svg>
@@ -85,7 +85,7 @@ describe('parseHtml', () => {
       <svg viewBox="0 0 100 100"></svg>
     `);
 
-    expect(doc.body.firstElementChild.attributes.item(0).name).toEqual('viewBox');
+    expect(doc.body?.firstElementChild?.attributes?.item(0)?.name).toEqual('viewBox');
   });
 
   it('svg matrix members', () => {
@@ -132,7 +132,7 @@ describe('parseHtml', () => {
     const tmplElm: HTMLTemplateElement = doc.head.firstElementChild as any;
 
     expect(tmplElm.outerHTML).toBe(`<template>text</template>`);
-    expect(tmplElm.content.firstChild.textContent).toBe(`text`);
+    expect(tmplElm.content?.firstChild?.textContent).toBe(`text`);
     expect(tmplElm.childNodes).toHaveLength(0);
   });
 
@@ -145,8 +145,8 @@ describe('parseHtml', () => {
 
     expect(doc.nodeType).toBe(NODE_TYPES.DOCUMENT_NODE);
     expect(doc.childElementCount).toBe(1);
-    expect(doc.firstElementChild.tagName).toBe('HTML');
-    expect(doc.lastChild.nodeName).toBe('HTML');
+    expect(doc.firstElementChild?.tagName).toBe('HTML');
+    expect(doc.lastChild?.nodeName).toBe('HTML');
     expect(doc.children[0].nodeName).toBe('HTML');
     expect(doc.children[0].nodeType).toBe(NODE_TYPES.ELEMENT_NODE);
 

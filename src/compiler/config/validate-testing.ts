@@ -1,8 +1,7 @@
-import { buildError, isString } from '@utils';
-import { basename, dirname, isAbsolute, join } from 'path';
+import { buildError, isOutputTargetDist, isOutputTargetWww, isString, join, normalizePath } from '@utils';
+import { basename, dirname, isAbsolute } from 'path';
 
 import type * as d from '../../declarations';
-import { isOutputTargetDist, isOutputTargetWww } from '../output-targets/output-utils';
 import { isLocalModule } from '../sys/resolve/resolve-utils';
 
 export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagnostic[]) => {
@@ -21,25 +20,42 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
     configPathDir = config.rootDir!;
   }
 
-  if (typeof config.flags.headless === 'boolean') {
+  if (typeof config.flags.headless === 'boolean' || config.flags.headless === 'shell') {
     testing.browserHeadless = config.flags.headless;
-  } else if (typeof testing.browserHeadless !== 'boolean') {
-    testing.browserHeadless = true;
+  } else if (typeof testing.browserHeadless !== 'boolean' && testing.browserHeadless !== 'shell') {
+    testing.browserHeadless = 'shell';
+  }
+
+  /**
+   * Using the deprecated `browserHeadless: true` flag causes Chrome to crash when running tests.
+   * Ensure users don't run into this by throwing a deliberate error.
+   */
+  if (typeof testing.browserHeadless === 'boolean' && testing.browserHeadless) {
+    throw new Error(`Setting "browserHeadless" config to \`true\` is not supported anymore, please set it to "shell"!`);
   }
 
   if (!testing.browserWaitUntil) {
     testing.browserWaitUntil = 'load';
   }
 
+  /**
+   * ensure we always test on stable Chrome
+   */
+  if (!isString(testing.browserChannel)) {
+    testing.browserChannel = 'chrome';
+  }
+
   testing.browserArgs = testing.browserArgs || [];
   addTestingConfigOption(testing.browserArgs, '--font-render-hinting=medium');
   addTestingConfigOption(testing.browserArgs, '--incognito');
-
   if (config.flags.ci) {
     addTestingConfigOption(testing.browserArgs, '--no-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-setuid-sandbox');
     addTestingConfigOption(testing.browserArgs, '--disable-dev-shm-usage');
-    testing.browserHeadless = true;
+    testing.browserHeadless = 'shell';
+  } else if (config.flags.devtools || testing.browserDevtools) {
+    testing.browserDevtools = true;
+    testing.browserHeadless = false;
   }
 
   if (typeof testing.rootDir === 'string') {
@@ -57,6 +73,8 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
   if (typeof testing.screenshotConnector === 'string') {
     if (!isAbsolute(testing.screenshotConnector)) {
       testing.screenshotConnector = join(config.rootDir!, testing.screenshotConnector);
+    } else {
+      testing.screenshotConnector = normalizePath(testing.screenshotConnector);
     }
   } else {
     testing.screenshotConnector = join(
@@ -64,8 +82,16 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
       '..',
       '..',
       'screenshot',
-      'local-connector.js'
+      'local-connector.js',
     );
+  }
+
+  /**
+   * We only allow numbers or null for the screenshotTimeout, so if we detect anything
+   * else, we set it to null.
+   */
+  if (typeof testing.screenshotTimeout != 'number') {
+    testing.screenshotTimeout = null;
   }
 
   if (!Array.isArray(testing.testPathIgnorePatterns)) {
@@ -75,7 +101,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
 
     (config.outputTargets ?? [])
       .filter(
-        (o): o is d.OutputTargetWww | d.OutputTargetDist => (isOutputTargetDist(o) || isOutputTargetWww(o)) && !!o.dir
+        (o): o is d.OutputTargetWww | d.OutputTargetDist => (isOutputTargetDist(o) || isOutputTargetWww(o)) && !!o.dir,
       )
       .forEach((outputTarget) => {
         testing.testPathIgnorePatterns?.push(outputTarget.dir!);
@@ -93,7 +119,7 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
   }
 
   testing.setupFilesAfterEnv.unshift(
-    join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js')
+    join(config.sys!.getCompilerExecutingPath(), '..', '..', 'testing', 'jest-setuptestframework.js'),
   );
 
   if (isString(testing.testEnvironment)) {
@@ -139,7 +165,9 @@ export const validateTesting = (config: d.ValidatedConfig, diagnostics: d.Diagno
      *   - this regex case shall match file names such as `my-cmp.spec.ts`, `test.spec.ts`
      *   - this regex case shall not match file names such as `attest.ts`, `bespec.ts`
      */
-    testing.testRegex = '(/__tests__/.*|(\\.|/)(test|spec|e2e))\\.[jt]sx?$';
+    testing.testRegex = ['(/__tests__/.*|(\\.|/)(test|spec|e2e))\\.[jt]sx?$'];
+  } else if (typeof testing.testRegex === 'string') {
+    testing.testRegex = [testing.testRegex];
   }
 
   if (Array.isArray(testing.testMatch)) {

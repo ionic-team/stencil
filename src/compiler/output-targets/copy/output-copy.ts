@@ -1,11 +1,20 @@
-import { buildError, isGlob, normalizePath } from '@utils';
-import minimatch from 'minimatch';
-import { join } from 'path';
+import { buildError, isGlob, isOutputTargetCopy, join, normalizePath } from '@utils';
+import { minimatch } from 'minimatch';
 
 import type * as d from '../../../declarations';
-import { isOutputTargetCopy } from '../output-utils';
 import { canSkipAssetsCopy, getComponentAssetsCopyTasks } from './assets-copy-tasks';
 import { getDestAbsPath, getSrcAbsPath } from './local-copy-tasks';
+
+const DEFAULT_IGNORE = [
+  '**/__mocks__/**',
+  '**/__fixtures__/**',
+  '**/dist/**',
+  '**/.{idea,git,cache,output,temp}/**',
+  '**/.ds_store',
+  '**/.gitignore',
+  '**/desktop.ini',
+  '**/thumbs.db',
+];
 
 export const outputCopy = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   const outputTargets = config.outputTargets.filter(isOutputTargetCopy);
@@ -48,7 +57,7 @@ const getCopyTasks = (
   config: d.ValidatedConfig,
   buildCtx: d.BuildCtx,
   o: d.OutputTargetCopy,
-  changedFiles: string[]
+  changedFiles: string[],
 ) => {
   if (!Array.isArray(o.copy)) {
     return [];
@@ -85,6 +94,7 @@ const transformToAbs = (copyTask: d.CopyTask, dest: string): Required<d.CopyTask
   return {
     src: copyTask.src,
     dest: getDestAbsPath(copyTask.src, dest, copyTask.dest),
+    ignore: copyTask.ignore || DEFAULT_IGNORE,
     keepDirStructure:
       typeof copyTask.keepDirStructure === 'boolean' ? copyTask.keepDirStructure : copyTask.dest == null,
     warn: copyTask.warn !== false,

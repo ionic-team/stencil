@@ -16,7 +16,6 @@ export const BOOLEAN_CLI_FLAGS = [
   'e2e',
   'es5',
   'esm',
-  'headless',
   'help',
   'log',
   'open',
@@ -173,6 +172,18 @@ export const STRING_ARRAY_CLI_FLAGS = [
 export const STRING_NUMBER_CLI_FLAGS = ['maxWorkers'] as const;
 
 /**
+ * All the CLI arguments which may have boolean or string values.
+ */
+export const BOOLEAN_STRING_CLI_FLAGS = [
+  /**
+   * `headless` is an argument passed through to Puppeteer (which is passed to Chrome) for end-to-end testing.
+   *
+   * {@see https://developer.chrome.com/blog/chrome-headless-shell/}
+   */
+  'headless',
+] as const;
+
+/**
  * All the LogLevel-type options supported by the Stencil CLI
  *
  * This is a bit silly since there's only one such argument atm,
@@ -193,6 +204,7 @@ export type StringCLIFlag = ArrayValuesAsUnion<typeof STRING_CLI_FLAGS>;
 export type StringArrayCLIFlag = ArrayValuesAsUnion<typeof STRING_ARRAY_CLI_FLAGS>;
 export type NumberCLIFlag = ArrayValuesAsUnion<typeof NUMBER_CLI_FLAGS>;
 export type StringNumberCLIFlag = ArrayValuesAsUnion<typeof STRING_NUMBER_CLI_FLAGS>;
+export type BooleanStringCLIFlag = ArrayValuesAsUnion<typeof BOOLEAN_STRING_CLI_FLAGS>;
 export type LogCLIFlag = ArrayValuesAsUnion<typeof LOG_LEVEL_CLI_FLAGS>;
 
 export type KnownCLIFlag =
@@ -201,6 +213,7 @@ export type KnownCLIFlag =
   | StringArrayCLIFlag
   | NumberCLIFlag
   | StringNumberCLIFlag
+  | BooleanStringCLIFlag
   | LogCLIFlag;
 
 type AliasMap = Partial<Record<string, KnownCLIFlag>>;
@@ -213,13 +226,25 @@ export const CLI_FLAG_ALIASES: AliasMap = {
   h: 'help',
   p: 'port',
   v: 'version',
+
+  // JEST SPECIFIC CLI FLAGS
+  // these are defined in
+  // https://github.com/facebook/jest/blob/4156f86/packages/jest-cli/src/args.ts
+  b: 'bail',
+  e: 'expand',
+  f: 'onlyFailures',
+  i: 'runInBand',
+  o: 'onlyChanged',
+  t: 'testNamePattern',
+  u: 'updateSnapshot',
+  w: 'maxWorkers',
 };
 
 /**
  * A regular expression which can be used to match a CLI flag for one of our
  * short aliases.
  */
-export const CLI_FLAG_REGEX = new RegExp(`^-[chpv]{1}$`);
+export const CLI_FLAG_REGEX = new RegExp(`^-[chpvbewofitu]{1}$`);
 
 /**
  * Given two types `K` and `T` where `K` extends `ReadonlyArray<string>`,
@@ -264,6 +289,12 @@ type NumberConfigFlags = ObjectFromKeys<typeof NUMBER_CLI_FLAGS, number>;
 type StringNumberConfigFlags = ObjectFromKeys<typeof STRING_NUMBER_CLI_FLAGS, string | number>;
 
 /**
+ * Type containing the configuration flags which may be set to either string
+ * or boolean values.
+ */
+type BooleanStringConfigFlags = ObjectFromKeys<typeof BOOLEAN_STRING_CLI_FLAGS, boolean | string>;
+
+/**
  * Type containing the possible LogLevel configuration flags, to be included
  * in ConfigFlags, below
  */
@@ -289,6 +320,7 @@ export interface ConfigFlags
     StringArrayConfigFlags,
     NumberConfigFlags,
     StringNumberConfigFlags,
+    BooleanStringConfigFlags,
     LogLevelFlags {
   task: TaskCommand | null;
   args: string[];

@@ -1,5 +1,4 @@
 import type * as d from '../../../declarations';
-import * as Util from '../../../utils/util';
 import { generatePropTypes } from '../generate-prop-types';
 import * as StencilTypes from '../stencil-types';
 import { stubComponentCompilerMeta } from './ComponentCompilerMeta.stub';
@@ -13,7 +12,6 @@ describe('generate-prop-types', () => {
       ReturnType<typeof StencilTypes.updateTypeIdentifierNames>,
       Parameters<typeof StencilTypes.updateTypeIdentifierNames>
     >;
-    let getTextDocsSpy: jest.SpyInstance<ReturnType<typeof Util.getTextDocs>, Parameters<typeof Util.getTextDocs>>;
 
     beforeEach(() => {
       updateTypeIdentifierNamesSpy = jest.spyOn(StencilTypes, 'updateTypeIdentifierNames');
@@ -22,17 +20,13 @@ describe('generate-prop-types', () => {
           _typeReferences: d.ComponentCompilerTypeReferences,
           _typeImportData: d.TypesImportData,
           _sourceFilePath: string,
-          initialType: string
-        ) => initialType
+          initialType: string,
+        ) => initialType,
       );
-
-      getTextDocsSpy = jest.spyOn(Util, 'getTextDocs');
-      getTextDocsSpy.mockReturnValue('');
     });
 
     afterEach(() => {
       updateTypeIdentifierNamesSpy.mockRestore();
-      getTextDocsSpy.mockRestore();
     });
 
     it('returns an empty array when no props are provided', () => {
@@ -134,6 +128,60 @@ describe('generate-prop-types', () => {
           optional: true,
           required: false,
           type: 'number',
+        },
+      ];
+
+      const actualTypeInfo = generatePropTypes(componentMeta, stubImportTypes);
+
+      expect(actualTypeInfo).toEqual(expectedTypeInfo);
+    });
+
+    it('appends `@readonly` to jsdoc when the property has a getter and no setter', () => {
+      const stubImportTypes = stubTypesImportData();
+      const componentMeta = stubComponentCompilerMeta({
+        properties: [
+          stubComponentCompilerProperty({
+            getter: true,
+            setter: false,
+          }),
+        ],
+      });
+
+      const expectedTypeInfo: d.TypeInfo = [
+        {
+          jsdoc: '@readonly',
+          internal: false,
+          name: 'propName',
+          optional: false,
+          required: false,
+          type: 'UserCustomPropType',
+        },
+      ];
+
+      const actualTypeInfo = generatePropTypes(componentMeta, stubImportTypes);
+
+      expect(actualTypeInfo).toEqual(expectedTypeInfo);
+    });
+
+    it('does not include `@readonly` to jsdoc when the property has a getter and a setter', () => {
+      const stubImportTypes = stubTypesImportData();
+      const componentMeta = stubComponentCompilerMeta({
+        properties: [
+          stubComponentCompilerProperty({
+            getter: true,
+            setter: true,
+          }),
+        ],
+      });
+
+      const expectedTypeInfo: d.TypeInfo = [
+        {
+          jsdoc: '',
+          internal: false,
+          name: 'propName',
+          optional: false,
+          required: false,
+          type: 'UserCustomPropType',
         },
       ];
 

@@ -11,7 +11,7 @@ export const workerPlugin = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   platform: string,
-  inlineWorkers: boolean
+  inlineWorkers: boolean,
 ): Plugin => {
   if (platform === 'worker' || platform === 'hydrate') {
     return {
@@ -66,7 +66,7 @@ export const workerPlugin = (
           buildCtx,
           this,
           workersMap,
-          workerEntryPath
+          workerEntryPath,
         );
         const referenceId = this.emitFile({
           type: 'asset',
@@ -87,7 +87,7 @@ export const workerPlugin = (
           buildCtx,
           this,
           workersMap,
-          workerEntryPath
+          workerEntryPath,
         );
         const referenceId = this.emitFile({
           type: 'asset',
@@ -144,7 +144,7 @@ const getWorker = async (
   buildCtx: d.BuildCtx,
   ctx: PluginContext,
   workersMap: Map<string, WorkerMeta>,
-  workerEntryPath: string
+  workerEntryPath: string,
 ): Promise<WorkerMeta> => {
   let worker = workersMap.get(workerEntryPath);
   if (!worker) {
@@ -165,7 +165,7 @@ const buildWorker = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   ctx: PluginContext,
-  workerEntryPath: string
+  workerEntryPath: string,
 ) => {
   const workerName = getWorkerName(workerEntryPath);
   const workerMsgId = `stencil.${workerName}`;
@@ -416,10 +416,17 @@ import { createWorker } from '${WORKER_HELPER_ID}';
 export const workerName = '${workerName}';
 export const workerMsgId = '${workerMsgId}';
 export const workerPath = /*@__PURE__*/import.meta.ROLLUP_FILE_URL_${referenceId};
-const blob = new Blob(['importScripts("' + workerPath + '")'], { type: 'text/javascript' });
-const url = URL.createObjectURL(blob);
-export const worker = /*@__PURE__*/createWorker(url, workerName, workerMsgId);
-URL.revokeObjectURL(url);
+export let worker;
+try {
+  // first try directly starting the worker with the URL
+  worker = /*@__PURE__*/createWorker(workerPath, workerName, workerMsgId);
+} catch(e) {
+  // probably a cross-origin issue, try using a Blob instead
+  const blob = new Blob(['importScripts("' + workerPath + '")'], { type: 'text/javascript' });
+  const url = URL.createObjectURL(blob);
+  worker = /*@__PURE__*/createWorker(url, workerName, workerMsgId);
+  URL.revokeObjectURL(url);
+}
 `;
 };
 

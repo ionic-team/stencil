@@ -16,8 +16,8 @@ import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 export const generateRollupOutput = async (
   build: RollupBuild,
   options: OutputOptions,
-  config: d.Config,
-  entryModules: d.EntryModule[]
+  config: d.ValidatedConfig,
+  entryModules: d.EntryModule[],
 ): Promise<d.RollupResult[] | null> => {
   if (build == null) {
     return null;

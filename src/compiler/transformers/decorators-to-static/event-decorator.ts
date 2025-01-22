@@ -7,20 +7,22 @@ import {
   createStaticGetter,
   getAttributeTypeInfo,
   resolveType,
+  retrieveTsDecorators,
   serializeSymbol,
-  validateReferences,
 } from '../transform-utils';
-import { getDeclarationParameters, isDecoratorNamed } from './decorator-utils';
+import { getDecoratorParameters, isDecoratorNamed } from './decorator-utils';
 
 export const eventDecoratorsToStatic = (
   diagnostics: d.Diagnostic[],
   decoratedProps: ts.ClassElement[],
   typeChecker: ts.TypeChecker,
-  newMembers: ts.ClassElement[]
+  program: ts.Program,
+  newMembers: ts.ClassElement[],
+  decoratorName: string,
 ) => {
   const events = decoratedProps
     .filter(ts.isPropertyDeclaration)
-    .map((prop) => parseEventDecorator(diagnostics, typeChecker, prop))
+    .map((prop) => parseEventDecorator(diagnostics, typeChecker, program, prop, decoratorName))
     .filter((ev) => !!ev);
 
   if (events.length > 0) {
@@ -34,16 +36,20 @@ export const eventDecoratorsToStatic = (
  * @param diagnostics a list of diagnostics used as a part of the parsing process. Any parse errors/warnings shall be
  * added to this collection
  * @param typeChecker an instance of the TypeScript type checker, used to generate information about the `@Event()` and
+ * @param program a {@link ts.Program} object
  * its surrounding context in the AST
  * @param prop the property on the Stencil component class that is decorated with `@Event()`
+ * @param decoratorName the name of the decorator to look for
  * @returns generated metadata for the class member decorated by `@Event()`, or `null` if none could be derived
  */
 const parseEventDecorator = (
   diagnostics: d.Diagnostic[],
   typeChecker: ts.TypeChecker,
-  prop: ts.PropertyDeclaration
+  program: ts.Program,
+  prop: ts.PropertyDeclaration,
+  decoratorName: string,
 ): d.ComponentCompilerStaticEvent | null => {
-  const eventDecorator = prop.decorators?.find(isDecoratorNamed('Event'));
+  const eventDecorator = retrieveTsDecorators(prop)?.find(isDecoratorNamed(decoratorName));
 
   if (eventDecorator == null) {
     return null;
@@ -54,7 +60,7 @@ const parseEventDecorator = (
     return null;
   }
 
-  const [eventOpts] = getDeclarationParameters<d.EventOptions>(eventDecorator);
+  const [eventOpts] = getDecoratorParameters<d.EventOptions>(eventDecorator, typeChecker);
   const symbol = typeChecker.getSymbolAtLocation(prop.name);
   const eventName = getEventName(eventOpts, memberName);
 
@@ -67,9 +73,8 @@ const parseEventDecorator = (
     cancelable: eventOpts && typeof eventOpts.cancelable === 'boolean' ? eventOpts.cancelable : true,
     composed: eventOpts && typeof eventOpts.composed === 'boolean' ? eventOpts.composed : true,
     docs: serializeSymbol(typeChecker, symbol),
-    complexType: getComplexType(typeChecker, prop),
+    complexType: getComplexType(typeChecker, program, prop),
   };
-  validateReferences(diagnostics, eventMeta.complexType.references, prop.type);
   return eventMeta;
 };
 
@@ -84,19 +89,21 @@ export const getEventName = (eventOptions: d.EventOptions, memberName: string) =
 /**
  * Derive Stencil's class member type metadata from a node in the AST
  * @param typeChecker the TypeScript type checker
+ * @param program a {@link ts.Program} object
  * @param node the node in the AST to generate metadata for
  * @returns the generated metadata
  */
 const getComplexType = (
   typeChecker: ts.TypeChecker,
-  node: ts.PropertyDeclaration
+  program: ts.Program,
+  node: ts.PropertyDeclaration,
 ): d.ComponentCompilerPropertyComplexType => {
   const sourceFile = node.getSourceFile();
   const eventType = node.type ? getEventType(node.type) : null;
   return {
     original: eventType ? eventType.getText() : 'any',
     resolved: eventType ? resolveType(typeChecker, typeChecker.getTypeFromTypeNode(eventType)) : 'any',
-    references: eventType ? getAttributeTypeInfo(eventType, sourceFile) : {},
+    references: eventType ? getAttributeTypeInfo(eventType, sourceFile, typeChecker, program) : {},
   };
 };
 
@@ -419,5 +426,5 @@ const DOM_EVENT_NAMES: Set<string> = new Set(
     'vrdisplaypresentchange',
     'waiting',
     'wheel',
-  ].map((e) => e.toLowerCase())
+  ].map((e) => e.toLowerCase()),
 );

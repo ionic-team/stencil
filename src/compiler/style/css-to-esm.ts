@@ -1,9 +1,9 @@
-import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString, normalizePath } from '@utils';
+import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString, normalizePath, resolve } from '@utils';
+import { scopeCss } from '@utils/shadow-css';
 import MagicString from 'magic-string';
 import path from 'path';
 
 import type * as d from '../../declarations';
-import { scopeCss } from '../../utils/shadow-css';
 import { parseStyleDocs } from '../docs/style-docs';
 import { optimizeCss } from '../optimize/optimize-css';
 import { serializeImportPath } from '../transformers/stencil-import-path';
@@ -107,17 +107,15 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
   };
 
   if (input.docs) {
-    parseStyleDocs(results.styleDocs, input.input);
+    parseStyleDocs(results.styleDocs, input.input, input.mode);
   }
 
   try {
     const varNames = new Set([results.defaultVarName]);
 
-    if (isString(input.tag)) {
-      if (input.encapsulation === 'scoped' || (input.encapsulation === 'shadow' && input.commentOriginalSelector)) {
-        const scopeId = getScopeId(input.tag, input.mode);
-        results.styleText = scopeCss(results.styleText, scopeId, input.commentOriginalSelector);
-      }
+    if (isString(input.tag) && input.encapsulation === 'scoped') {
+      const scopeId = getScopeId(input.tag, input.mode);
+      results.styleText = scopeCss(results.styleText, scopeId);
     }
 
     const cssImports = getCssToEsmImports(varNames, results.styleText, input.file, input.mode);
@@ -133,7 +131,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
           encapsulation: input.encapsulation,
           mode: input.mode,
         },
-        input.styleImportData
+        input.styleImportData,
       );
 
       // str.append(`import ${cssImport.varName} from '${importPath}';\n`);
@@ -159,7 +157,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
  */
 const generateTransformCssToEsm = (
   input: d.TransformCssToEsmInput,
-  results: d.TransformCssToEsmOutput
+  results: d.TransformCssToEsmOutput,
 ): d.TransformCssToEsmOutput => {
   const s = new MagicString('');
 
@@ -210,7 +208,7 @@ const getCssToEsmImports = (
   varNames: Set<string>,
   cssText: string,
   filePath: string,
-  modeName: string
+  modeName: string,
 ): d.CssToEsmImportData[] => {
   const cssImports: d.CssToEsmImportData[] = [];
 
@@ -243,7 +241,7 @@ const getCssToEsmImports = (
       cssImportData.filePath = normalizePath(cssImportData.url);
     } else {
       // relative path
-      cssImportData.filePath = normalizePath(path.resolve(dir, cssImportData.url));
+      cssImportData.filePath = normalizePath(resolve(dir, cssImportData.url));
     }
 
     cssImportData.varName = createCssVarName(cssImportData.filePath, modeName);

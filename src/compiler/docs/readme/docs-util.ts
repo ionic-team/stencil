@@ -130,6 +130,23 @@ const normalizeColumnWidth = (rows: RowData[]) => {
   }
 };
 
+/**
+ * Checks if a given string is a valid hexadecimal color representation.
+ *
+ * @param str - The string to be checked.
+ * @returns `true` if the string is a valid hex color (e.g., '#FF00AA', '#f0f'), `false` otherwise.
+ *
+ * @example
+ * isHexColor('#FF00AA'); // true
+ * isHexColor('#f0f');    // true
+ * isHexColor('#abcde');  // false (too many characters)
+ * isHexColor('FF00AA');  // false (missing #)
+ */
+export const isHexColor = (str: string): boolean => {
+  const hexColorRegex = /^#([0-9A-Fa-f]{3}){1,2}$/;
+  return hexColorRegex.test(str);
+};
+
 interface ColumnData {
   text: string;
   width: number;

@@ -27,7 +27,7 @@ export const removeUnusedStyles = (doc: Document, diagnostics: d.Diagnostic[]) =
 const removeUnusedStyleText = (
   usedSelectors: UsedSelectors,
   diagnostics: d.Diagnostic[],
-  styleElm: HTMLStyleElement
+  styleElm: HTMLStyleElement,
 ) => {
   try {
     // parse the css from being applied to the document
@@ -50,6 +50,7 @@ const removeUnusedStyleText = (
         type: 'css',
         header: 'CSS Stringify',
         messageText: e,
+        lines: [],
       });
     }
   } catch (e: any) {
@@ -58,6 +59,7 @@ const removeUnusedStyleText = (
       type: 'css',
       header: 'CSS Parse',
       messageText: e,
+      lines: [],
     });
   }
 };

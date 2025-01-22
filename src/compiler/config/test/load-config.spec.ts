@@ -1,7 +1,8 @@
+import { mockCompilerSystem } from '@stencil/core/testing';
 import path from 'path';
+import ts from 'typescript';
 
 import { ConfigFlags } from '../../../cli/config-flags';
-import { createSystem } from '../../../compiler/sys/stencil-sys';
 import type * as d from '../../../declarations';
 import { normalizePath } from '../../../utils';
 import { loadConfig } from '../load-config';
@@ -9,18 +10,24 @@ import { loadConfig } from '../load-config';
 describe('load config', () => {
   const configPath = require.resolve('./fixtures/stencil.config.ts');
   const configPath2 = require.resolve('./fixtures/stencil.config2.ts');
-  const fixturesPath = path.dirname(configPath);
-  const srcPath = path.join(fixturesPath, 'src');
-  const indexPath = path.join(srcPath, 'index.ts');
+
   let sys: d.CompilerSystem;
 
   beforeEach(() => {
-    sys = createSystem();
-    sys.writeFileSync(configPath, ``);
-    sys.writeFileSync(configPath2, ``);
-    sys.createDirSync(fixturesPath);
-    sys.createDirSync(srcPath);
-    sys.writeFileSync(indexPath, `console.log('fixture');`);
+    sys = mockCompilerSystem();
+
+    jest.spyOn(ts, 'getParsedCommandLineOfConfigFile').mockReturnValue({
+      options: {
+        target: ts.ScriptTarget.ES2017,
+        module: ts.ModuleKind.ESNext,
+      },
+      fileNames: [],
+      errors: [],
+    });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
   it("merges a user's configuration with a stencil.config file on disk", async () => {
@@ -29,6 +36,7 @@ describe('load config', () => {
       sys,
       config: {
         hashedFileNameLength: 9,
+        rootDir: '/foo/bar',
       },
       initTsConfig: true,
     });
@@ -42,7 +50,9 @@ describe('load config', () => {
     // these fields are defined in the config file on disk, and should be present
     expect<ConfigFlags>(actualConfig.flags).toEqual({ dev: true });
     expect(actualConfig.extras).toBeDefined();
-    expect(actualConfig.extras!.experimentalImportInjection).toBe(true);
+    expect(actualConfig.extras!.enableImportInjection).toBe(true);
+    // respects custom root dir
+    expect(actualConfig.rootDir).toBe('/foo/bar');
   });
 
   it('uses the provided config path when no initial config provided', async () => {
@@ -66,7 +76,7 @@ describe('load config', () => {
 
   describe('empty initialization argument', () => {
     it('provides sensible default values with no config', async () => {
-      const loadedConfig = await loadConfig({ initTsConfig: true });
+      const loadedConfig = await loadConfig({ initTsConfig: true, sys });
 
       const actualConfig = loadedConfig.config;
       expect(actualConfig).toBeDefined();
@@ -75,52 +85,44 @@ describe('load config', () => {
       expect(actualConfig.configPath).toBe(null);
     });
 
-    it('warns that a tsconfig file could not be found when "initTsConfig" set', async () => {
-      const loadedConfig = await loadConfig({ initTsConfig: true });
-
-      expect(loadedConfig.diagnostics).toHaveLength(1);
-      expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
-        absFilePath: '/tsconfig.json',
-        code: '18003',
-        header: 'TypeScript',
-        language: 'typescript',
-        level: 'warn',
-        lines: [],
-        messageText:
-          "No inputs were found in config file '/tsconfig.json'. Specified 'include' paths were '[\"src\"]' and 'exclude' paths were '[]'.",
-        relFilePath: null,
-        type: 'typescript',
-      });
+    it('creates a tsconfig file when "initTsConfig" set', async () => {
+      const tsconfigPath = path.resolve(path.dirname(configPath), 'tsconfig.json');
+      expect(sys.accessSync(tsconfigPath)).toBe(false);
+      const loadedConfig = await loadConfig({ initTsConfig: true, configPath, sys });
+      expect(sys.accessSync(tsconfigPath)).toBe(true);
+      expect(loadedConfig.diagnostics).toHaveLength(0);
     });
 
     it('errors that a tsconfig file could not be created when "initTsConfig" isn\'t present', async () => {
-      const loadedConfig = await loadConfig({});
+      const loadedConfig = await loadConfig({ configPath, sys });
       expect(loadedConfig.diagnostics).toHaveLength(1);
       expect<d.Diagnostic>(loadedConfig.diagnostics[0]).toEqual({
-        absFilePath: null,
+        absFilePath: undefined,
         header: 'Missing tsconfig.json',
         level: 'error',
         lines: [],
-        messageText:
-          'Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "/" directory.',
-        relFilePath: null,
+        messageText: `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "${normalizePath(
+          path.dirname(configPath),
+        )}" directory.`,
+        relFilePath: undefined,
         type: 'build',
       });
     });
   });
 
   describe('no initialization argument', () => {
-    it('errors that a tsconfig file could not be created', async () => {
-      const loadConfigResults = await loadConfig();
+    it('errors that a tsconfig file cannot be found', async () => {
+      const loadConfigResults = await loadConfig({ sys });
       expect(loadConfigResults.diagnostics).toHaveLength(1);
       expect<d.Diagnostic>(loadConfigResults.diagnostics[0]).toEqual({
-        absFilePath: null,
+        absFilePath: undefined,
         header: 'Missing tsconfig.json',
         level: 'error',
         lines: [],
-        messageText:
-          'Unable to load TypeScript config file. Please create a "tsconfig.json" file within the "/" directory.',
-        relFilePath: null,
+        messageText: expect.stringMatching(
+          `Unable to load TypeScript config file. Please create a "tsconfig.json" file within the`,
+        ),
+        relFilePath: undefined,
         type: 'build',
       });
     });

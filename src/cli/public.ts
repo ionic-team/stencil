@@ -1,4 +1,4 @@
-import type { CliInitOptions, CompilerSystem, Config, Logger, TaskCommand } from '@stencil/core/internal';
+import type { CliInitOptions, Config, Logger, TaskCommand } from '@stencil/core/internal';
 
 import type { ConfigFlags } from './config-flags';
 
@@ -19,7 +19,6 @@ export declare function run(init: CliInitOptions): Promise<void>;
  */
 export declare function runTask(coreCompiler: any, config: Config, task: TaskCommand): Promise<void>;
 
-// TODO(STENCIL-509): remove the _sys parameter here (for v3)
-export declare function parseFlags(args: string[], _sys?: CompilerSystem): ConfigFlags;
+export declare function parseFlags(args: string[]): ConfigFlags;
 
-export { CompilerSystem, Config, ConfigFlags, Logger, TaskCommand };
+export { Config, ConfigFlags, Logger, TaskCommand };

@@ -1,13 +1,24 @@
 import { BUILD } from '@app-data';
 import { doc, plt, styles, supportsConstructableStylesheets, supportsShadow } from '@platform';
-import { CMP_FLAGS } from '@utils';
+import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
 import { createTime } from './profile';
-import { HYDRATED_STYLE_ID, NODE_TYPE } from './runtime-constants';
+import { HYDRATED_STYLE_ID, NODE_TYPE, SLOT_FB_CSS } from './runtime-constants';
 
-const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
+export const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
 
+/**
+ * Register the styles for a component by creating a stylesheet and then
+ * registering it under the component's scope ID in a `WeakMap` for later use.
+ *
+ * If constructable stylesheet are not supported or `allowCS` is set to
+ * `false` then the styles will be registered as a string instead.
+ *
+ * @param scopeId the scope ID for the component of interest
+ * @param cssText styles for the component of interest
+ * @param allowCS whether or not to use a constructable stylesheet
+ */
 export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean) => {
   let style = styles.get(scopeId);
   if (supportsConstructableStylesheets && allowCS) {
@@ -23,13 +34,21 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
   styles.set(scopeId, style);
 };
 
-export const addStyle = (
-  styleContainerNode: any,
-  cmpMeta: d.ComponentRuntimeMeta,
-  mode?: string,
-  hostElm?: HTMLElement
-) => {
-  let scopeId = getScopeId(cmpMeta, mode);
+/**
+ * Attach the styles for a given component to the DOM
+ *
+ * If the element uses shadow or is already attached to the DOM then we can
+ * create a stylesheet inside of its associated document fragment, otherwise
+ * we'll stick the stylesheet into the document head.
+ *
+ * @param styleContainerNode the node within which a style element for the
+ * component of interest should be added
+ * @param cmpMeta runtime metadata for the component of interest
+ * @param mode an optional current mode
+ * @returns the scope ID for the component of interest
+ */
+export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMeta, mode?: string) => {
+  const scopeId = getScopeId(cmpMeta, mode);
   const style = styles.get(scopeId);
 
   if (!BUILD.attachStyles) {
@@ -41,7 +60,7 @@ export const addStyle = (
 
   if (style) {
     if (typeof style === 'string') {
-      styleContainerNode = styleContainerNode.head || styleContainerNode;
+      styleContainerNode = styleContainerNode.head || (styleContainerNode as HTMLElement);
       let appliedStyles = rootAppliedStyles.get(styleContainerNode);
       let styleElm;
       if (!appliedStyles) {
@@ -56,32 +75,83 @@ export const addStyle = (
           // This is only happening on native shadow-dom, do not needs CSS var shim
           styleElm.innerHTML = style;
         } else {
-          if (BUILD.cssVarShim && plt.$cssShim$) {
-            styleElm = plt.$cssShim$.createHostStyle(
-              hostElm,
-              scopeId,
-              style,
-              !!(cmpMeta.$flags$ & CMP_FLAGS.needsScopedEncapsulation)
-            );
-            const newScopeId = (styleElm as any)['s-sc'];
-            if (newScopeId) {
-              scopeId = newScopeId;
+          styleElm = document.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`) || doc.createElement('style');
+          styleElm.innerHTML = style;
 
-              // we don't want to add this styleID to the appliedStyles Set
-              // since the cssVarShim might need to apply several different
-              // stylesheets for the same component
-              appliedStyles = null;
-            }
-          } else {
-            styleElm = doc.createElement('style');
-            styleElm.innerHTML = style;
+          // Apply CSP nonce to the style tag if it exists
+          const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+          if (nonce != null) {
+            styleElm.setAttribute('nonce', nonce);
           }
 
-          if (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) {
+          if (
+            (BUILD.hydrateServerSide || BUILD.hotModuleReplacement) &&
+            cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation
+          ) {
             styleElm.setAttribute(HYDRATED_STYLE_ID, scopeId);
           }
 
-          styleContainerNode.insertBefore(styleElm, styleContainerNode.querySelector('link'));
+          /**
+           * attach styles at the end of the head tag if we render scoped components
+           */
+          if (!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
+            if (styleContainerNode.nodeName === 'HEAD') {
+              /**
+               * if the page contains preconnect links, we want to insert the styles
+               * after the last preconnect link to ensure the styles are preloaded
+               */
+              const preconnectLinks = styleContainerNode.querySelectorAll('link[rel=preconnect]');
+              const referenceNode =
+                preconnectLinks.length > 0
+                  ? preconnectLinks[preconnectLinks.length - 1].nextSibling
+                  : styleContainerNode.querySelector('style');
+              (styleContainerNode as HTMLElement).insertBefore(styleElm, referenceNode);
+            } else if ('host' in styleContainerNode) {
+              if (supportsConstructableStylesheets) {
+                /**
+                 * If a scoped component is used within a shadow root then turn the styles into a
+                 * constructable stylesheet and add it to the shadow root's adopted stylesheets.
+                 *
+                 * Note: order of how styles are adopted is important. The new stylesheet should be
+                 * adopted before the existing styles.
+                 */
+                const stylesheet = new CSSStyleSheet();
+                stylesheet.replaceSync(style);
+                styleContainerNode.adoptedStyleSheets = [stylesheet, ...styleContainerNode.adoptedStyleSheets];
+              } else {
+                /**
+                 * If a scoped component is used within a shadow root and constructable stylesheets are
+                 * not supported, we want to insert the styles at the beginning of the shadow root node.
+                 *
+                 * However, if there is already a style node in the shadow root, we just append
+                 * the styles to the existing node.
+                 *
+                 * Note: order of how styles are applied is important. The new style node
+                 * should be inserted before the existing style node.
+                 */
+                const existingStyleContainer = styleContainerNode.querySelector('style');
+                if (existingStyleContainer) {
+                  existingStyleContainer.innerHTML = style + existingStyleContainer.innerHTML;
+                } else {
+                  (styleContainerNode as HTMLElement).prepend(styleElm);
+                }
+              }
+            } else {
+              styleContainerNode.append(styleElm);
+            }
+          }
+
+          /**
+           * attach styles at the beginning of a shadow root node if we render shadow components
+           */
+          if (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation && styleContainerNode.nodeName !== 'HEAD') {
+            styleContainerNode.insertBefore(styleElm, null);
+          }
+        }
+
+        // Add styles for `slot-fb` elements if we're using slots outside the Shadow DOM
+        if (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) {
+          styleElm.innerHTML += SLOT_FB_CSS;
         }
 
         if (appliedStyles) {
@@ -95,19 +165,29 @@ export const addStyle = (
   return scopeId;
 };
 
+/**
+ * Add styles for a given component to the DOM, optionally handling 'scoped'
+ * encapsulation by adding an appropriate class name to the host element.
+ *
+ * @param hostRef the host reference for the component of interest
+ */
 export const attachStyles = (hostRef: d.HostRef) => {
   const cmpMeta = hostRef.$cmpMeta$;
   const elm = hostRef.$hostElement$;
   const flags = cmpMeta.$flags$;
   const endAttachStyles = createTime('attachStyles', cmpMeta.$tagName$);
   const scopeId = addStyle(
-    BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : elm.getRootNode(),
+    BUILD.shadowDom && supportsShadow && elm.shadowRoot ? elm.shadowRoot : (elm.getRootNode() as ShadowRoot),
     cmpMeta,
     hostRef.$modeName$,
-    elm
   );
 
-  if ((BUILD.shadowDom || BUILD.scoped) && BUILD.cssAnnotations && flags & CMP_FLAGS.needsScopedEncapsulation) {
+  if (
+    (BUILD.shadowDom || BUILD.scoped) &&
+    BUILD.cssAnnotations &&
+    flags & CMP_FLAGS.needsScopedEncapsulation &&
+    flags & CMP_FLAGS.scopedCssEncapsulation
+  ) {
     // only required when we're NOT using native shadow dom (slot)
     // or this browser doesn't support native shadow dom
     // and this host element was NOT created with SSR
@@ -117,18 +197,19 @@ export const attachStyles = (hostRef: d.HostRef) => {
     // DOM WRITE!!
     elm['s-sc'] = scopeId;
     elm.classList.add(scopeId + '-h');
-
-    if (BUILD.scoped && flags & CMP_FLAGS.scopedCssEncapsulation) {
-      elm.classList.add(scopeId + '-s');
-    }
   }
   endAttachStyles();
 };
 
+/**
+ * Get the scope ID for a given component
+ *
+ * @param cmp runtime metadata for the component of interest
+ * @param mode the current mode (optional)
+ * @returns a scope ID for the component of interest
+ */
 export const getScopeId = (cmp: d.ComponentRuntimeMeta, mode?: string) =>
   'sc-' + (BUILD.mode && mode && cmp.$flags$ & CMP_FLAGS.hasMode ? cmp.$tagName$ + '-' + mode : cmp.$tagName$);
-
-export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
 
 declare global {
   export interface CSSStyleSheet {

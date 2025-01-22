@@ -9,10 +9,7 @@
 </h1>
 
 <p align="center">
-  A compiler for generating <a href="https://www.webcomponents.org/introduction" target="_blank" rel="noopener noref">Web Components</a>, built by the <a href="https://ionic.io/">Ionic team</a>.
-</p>
-<p align="center">
-  Stencil allows developers to use technologies like TypeScript and JSX to define components, then generate 100% standards-based Web Components that run on both <a href="https://stenciljs.com/docs/browser-support" target="_blank" rel="noopener noref">modern browsers and legacy browsers</a>
+  A compiler for generating <a href="https://www.webcomponents.org/introduction" target="_blank" rel="noopener noref">Web Components</a> using technologies like TypeScript and JSX, built by the <a href="https://ionic.io/">Ionic team</a>.
 </p>
 
 <p align="center">
@@ -21,11 +18,14 @@
   <a href="https://github.com/ionic-team/stencil/blob/main/LICENSE.md">
     <img src="https://img.shields.io/badge/license-MIT-yellow.svg" alt="StencilJS is released under the MIT license." />
   </a>
-  <a href="https://github.com/ionic-team/stencil/blob/main/.github/CONTRIBUTING.md">
+  <a href="https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md">
     <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome!" />
   </a>
   <a href="https://twitter.com/stenciljs">
-    <img src="https://img.shields.io/twitter/follow/stenciljs.svg?label=Follow%20@stenciljs" alt="Follow @stenciljs">
+    <img src="https://img.shields.io/badge/follow-%40stenciljs-1DA1F2?logo=twitter" alt="Follow @stenciljs">
+  </a>
+  <a href="https://chat.stenciljs.com">
+    <img src="https://img.shields.io/discord/520266681499779082?color=7289DA&label=%23stencil&logo=discord&logoColor=white" alt="Official Ionic Discord" />
   </a>
 </p>
 
@@ -34,12 +34,12 @@
   <span> · </span>
   <a href="https://stenciljs.com/docs/introduction">Documentation</a>
   <span> · </span>
-  <a href="https://github.com/ionic-team/stencil/blob/main/.github/CONTRIBUTING.md">Contribute</a>
+  <a href="https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md">Contribute</a>
   <span> · </span>
   <a href="https://ionicframework.com/blog/tag/stencil/">Blog</a>
   <br />
-  Community: 
-  <a href="https://stencil-worldwide.herokuapp.com">Slack</a>
+  Community:
+  <a href="https://chat.stenciljs.com">Discord</a>
   <span> · </span>
   <a href="https://forum.ionicframework.com/c/stencil/21/">Forums</a>
   <span> · </span>
@@ -90,10 +90,5 @@ In many cases, Stencil can be used as a drop in replacement for traditional fron
 ### Contributing
 
 Thanks for your interest in contributing!
-Please take a moment to read up on our guidelines for [contributing](https://github.com/ionic-team/stencil/blob/main/.github/CONTRIBUTING.md).
+Please take a moment to read up on our guidelines for [contributing](https://github.com/ionic-team/stencil/blob/main/CONTRIBUTING.md).
 Please note that this project is released with a [Contributor Code of Conduct](https://github.com/ionic-team/stencil/blob/main/CODE_OF_CONDUCT.md). By participating in this project you agree to abide by its terms.
-
-### Thanks
-Stencil's internal testing suite is supported by the [BrowserStack Open-Source Program](https://www.browserstack.com/open-source)
-<br>
-<a href="https://www.browserstack.com/" target="_blank" rel="noopener noref"><img width="200" src="https://www.browserstack.com/images/layout/browserstack-logo-600x315.png"></a>

@@ -9,15 +9,18 @@ import type * as d from '../../declarations';
  *
  * @param styleDocs the array to hold formatted CSS docstrings
  * @param styleText the CSS text we're working with
+ * @param mode a mode associated with the parsed style, if applicable (e.g. this is not applicable for global styles)
  */
-export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null) {
+export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null, mode?: string | undefined) {
   if (typeof styleText !== 'string') {
     return;
   }
 
-  let startIndex: number;
-  while ((startIndex = styleText.indexOf(CSS_DOC_START)) > -1) {
-    styleText = styleText.substring(startIndex + CSS_DOC_START.length);
+  // Using `match` allows us to know which substring matched the regex and the starting
+  // index at which the match was found
+  let match = styleText.match(CSS_DOC_START);
+  while (match !== null) {
+    styleText = styleText.substring(match.index + match[0].length);
 
     const endIndex = styleText.indexOf(CSS_DOC_END);
     if (endIndex === -1) {
@@ -25,9 +28,10 @@ export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null
     }
 
     const comment = styleText.substring(0, endIndex);
-    parseCssComment(styleDocs, comment);
+    parseCssComment(styleDocs, comment, mode);
 
     styleText = styleText.substring(endIndex + CSS_DOC_END.length);
+    match = styleText.match(CSS_DOC_START);
   }
 }
 
@@ -37,8 +41,9 @@ export function parseStyleDocs(styleDocs: d.StyleDoc[], styleText: string | null
  *
  * @param styleDocs an array which will be modified with the docstring
  * @param comment the comment string
+ * @param mode a mode associated with the parsed style, if applicable (e.g. this is not applicable for global styles)
  */
-function parseCssComment(styleDocs: d.StyleDoc[], comment: string): void {
+function parseCssComment(styleDocs: d.StyleDoc[], comment: string, mode: string | undefined): void {
   /**
    * @prop --max-width: Max width of the alert
    */
@@ -74,6 +79,7 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string): void {
       name: splt[0].trim(),
       docs: (splt.shift() && splt.join(`:`)).trim(),
       annotation: 'prop',
+      mode,
     };
 
     if (!styleDocs.some((c) => c.name === cssDoc.name && c.annotation === 'prop')) {
@@ -83,9 +89,10 @@ function parseCssComment(styleDocs: d.StyleDoc[], comment: string): void {
 }
 
 /**
- * Opening syntax for a CSS docstring
+ * Opening syntax for a CSS docstring.
+ * This will match a traditional docstring or a "loud" comment in sass
  */
-const CSS_DOC_START = '/**';
+const CSS_DOC_START = /\/\*(\*|\!)/;
 /**
  * Closing syntax for a CSS docstring
  */

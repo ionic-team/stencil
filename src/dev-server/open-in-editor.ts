@@ -28,7 +28,7 @@ export async function serveOpenInEditor(serverCtx: d.DevServerContext, req: d.Ht
     status,
     responseHeaders({
       'content-type': 'application/json; charset=utf-8',
-    })
+    }),
   );
 
   res.write(JSON.stringify(data, null, 2));
@@ -39,7 +39,7 @@ async function parseData(
   editors: d.DevServerEditor[],
   sys: d.CompilerSystem,
   req: d.HttpRequest,
-  data: d.OpenInEditorData
+  data: d.OpenInEditorData,
 ) {
   const qs = req.searchParams;
 
@@ -122,7 +122,7 @@ export function getEditors() {
               priority: EDITOR_PRIORITY[editorId],
               supported: isSupported,
             });
-          })
+          }),
         );
       } catch (e) {}
 
@@ -139,7 +139,7 @@ export function getEditors() {
               id: e.id,
               name: EDITORS[e.id],
             } as d.DevServerEditor;
-          })
+          }),
       );
     });
   }

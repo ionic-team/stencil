@@ -4,8 +4,6 @@ import type * as d from '../declarations';
 
 export const win = typeof window !== 'undefined' ? window : ({} as Window);
 
-export const CSS = BUILD.cssVarShim ? (win as any).CSS : null;
-
 export const doc = win.document || ({ head: {} } as Document);
 
 export const H = ((win as any).HTMLElement || (class {} as any)) as HTMLElement;
@@ -30,10 +28,7 @@ export const setPlatformHelpers = (helpers: {
   Object.assign(plt, helpers);
 };
 
-export const supportsShadow =
-  BUILD.shadowDomShim && BUILD.shadowDom
-    ? /*@__PURE__*/ (() => (doc.head.attachShadow + '').indexOf('[native') > -1)()
-    : true;
+export const supportsShadow = BUILD.shadowDom;
 
 export const supportsListenerOptions = /*@__PURE__*/ (() => {
   let supportsListenerOptions = false;
@@ -45,7 +40,7 @@ export const supportsListenerOptions = /*@__PURE__*/ (() => {
         get() {
           supportsListenerOptions = true;
         },
-      })
+      }),
     );
   } catch (e) {}
   return supportsListenerOptions;

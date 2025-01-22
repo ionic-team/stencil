@@ -13,8 +13,8 @@ import { validateBuildPackageJson } from '../types/validate-build-package-json';
 export const validateBuildFiles = (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  buildCtx: d.BuildCtx
-): Promise<(void | void[])[]> => {
+  buildCtx: d.BuildCtx,
+): Promise<(void | void[] | null)[]> | null => {
   if (buildCtx.hasError) {
     return null;
   }

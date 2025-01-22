@@ -1,4 +1,4 @@
-import { buildError, isString, normalizePath } from '@utils';
+import { buildError, isString, normalizePath, result } from '@utils';
 
 import type { CompilerSystem, Diagnostic } from '../declarations';
 
@@ -8,7 +8,7 @@ import type { CompilerSystem, Diagnostic } from '../declarations';
  */
 export type FindConfigOptions = {
   sys: CompilerSystem;
-  configPath: string;
+  configPath?: string | null;
 };
 
 /**
@@ -17,7 +17,6 @@ export type FindConfigOptions = {
 export type FindConfigResults = {
   configPath: string;
   rootDir: string;
-  diagnostics: Diagnostic[];
 };
 
 /**
@@ -25,7 +24,7 @@ export type FindConfigResults = {
  * @param opts the options needed to find the configuration file
  * @returns the results of attempting to find a configuration file on disk
  */
-export const findConfig = async (opts: FindConfigOptions): Promise<FindConfigResults> => {
+export const findConfig = async (opts: FindConfigOptions): Promise<result.Result<FindConfigResults, Diagnostic[]>> => {
   const sys = opts.sys;
   const cwd = sys.getCurrentDirectory();
   const rootDir = normalizePath(cwd);
@@ -39,7 +38,7 @@ export const findConfig = async (opts: FindConfigOptions): Promise<FindConfigRes
       configPath = normalizePath(sys.platformPath.join(cwd, configPath));
     } else {
       // config path already an absolute path, we're good here
-      configPath = normalizePath(opts.configPath);
+      configPath = normalizePath(configPath);
     }
   } else {
     // nothing was passed in, use the current working directory
@@ -49,16 +48,16 @@ export const findConfig = async (opts: FindConfigOptions): Promise<FindConfigRes
   const results: FindConfigResults = {
     configPath,
     rootDir: normalizePath(cwd),
-    diagnostics: [],
   };
 
   const stat = await sys.stat(configPath);
   if (stat.error) {
-    const diagnostic = buildError(results.diagnostics);
+    const diagnostics: Diagnostic[] = [];
+    const diagnostic = buildError(diagnostics);
     diagnostic.absFilePath = configPath;
     diagnostic.header = `Invalid config path`;
     diagnostic.messageText = `Config path "${configPath}" not found`;
-    return results;
+    return result.err(diagnostics);
   }
 
   if (stat.isFile) {
@@ -77,5 +76,5 @@ export const findConfig = async (opts: FindConfigOptions): Promise<FindConfigRes
     }
   }
 
-  return results;
+  return result.ok(results);
 };

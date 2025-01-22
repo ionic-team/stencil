@@ -1,7 +1,9 @@
-import { basename, join } from 'path';
+import { join } from '@utils';
+import { basename } from 'path';
 import type { RollupOutput } from 'rollup';
 
 import type * as d from '../../../declarations';
+import { MODE_RESOLUTION_CHAIN_DECLARATION } from './hydrate-factory-closure';
 import { relocateHydrateContextConst } from './relocate-hydrate-context';
 
 export const writeHydrateOutputs = (
@@ -9,12 +11,12 @@ export const writeHydrateOutputs = (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTargets: d.OutputTargetHydrate[],
-  rollupOutput: RollupOutput
+  rollupOutput: RollupOutput,
 ) => {
   return Promise.all(
     outputTargets.map((outputTarget) => {
       return writeHydrateOutput(config, compilerCtx, buildCtx, outputTarget, rollupOutput);
-    })
+    }),
   );
 };
 
@@ -23,21 +25,26 @@ const writeHydrateOutput = async (
   compilerCtx: d.CompilerCtx,
   buildCtx: d.BuildCtx,
   outputTarget: d.OutputTargetHydrate,
-  rollupOutput: RollupOutput
+  rollupOutput: RollupOutput,
 ) => {
   const hydratePackageName = await getHydratePackageName(config, compilerCtx);
 
   const hydrateAppDirPath = outputTarget.dir;
+  if (!hydrateAppDirPath) {
+    throw new Error(`outputTarget config missing the "dir" property`);
+  }
 
   const hydrateCoreIndexPath = join(hydrateAppDirPath, 'index.js');
+  const hydrateCoreIndexPathESM = join(hydrateAppDirPath, 'index.mjs');
   const hydrateCoreIndexDtsFilePath = join(hydrateAppDirPath, 'index.d.ts');
 
   const pkgJsonPath = join(hydrateAppDirPath, 'package.json');
   const pkgJsonCode = getHydratePackageJson(
     config,
     hydrateCoreIndexPath,
+    hydrateCoreIndexPathESM,
     hydrateCoreIndexDtsFilePath,
-    hydratePackageName
+    hydratePackageName,
   );
 
   await Promise.all([
@@ -52,43 +59,61 @@ const writeHydrateOutput = async (
     rollupOutput.output.map(async (output) => {
       if (output.type === 'chunk') {
         output.code = relocateHydrateContextConst(config, compilerCtx, output.code);
+
+        /**
+         * Enable the line where we define `modeResolutionChain` for the hydrate module.
+         */
+        output.code = output.code.replace(
+          `// const ${MODE_RESOLUTION_CHAIN_DECLARATION}`,
+          `const ${MODE_RESOLUTION_CHAIN_DECLARATION}`,
+        );
+
         const filePath = join(hydrateAppDirPath, output.fileName);
         await compilerCtx.fs.writeFile(filePath, output.code, { immediateWrite: true });
       }
-    })
+    }),
   );
 };
 
 const getHydratePackageJson = (
   config: d.ValidatedConfig,
-  hydrateAppFilePath: string,
+  hydrateAppFilePathCJS: string,
+  hydrateAppFilePathESM: string,
   hydrateDtsFilePath: string,
-  hydratePackageName: string
+  hydratePackageName: string,
 ) => {
   const pkg: d.PackageJsonData = {
     name: hydratePackageName,
     description: `${config.namespace} component hydration app.`,
-    main: basename(hydrateAppFilePath),
+    main: basename(hydrateAppFilePathCJS),
     types: basename(hydrateDtsFilePath),
+    exports: {
+      '.': {
+        require: `./${basename(hydrateAppFilePathCJS)}`,
+        import: `./${basename(hydrateAppFilePathESM)}`,
+      },
+    },
   };
   return JSON.stringify(pkg, null, 2);
 };
 
 const getHydratePackageName = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
+  const directoryName = basename(config.rootDir);
   try {
     const rootPkgFilePath = join(config.rootDir, 'package.json');
     const pkgStr = await compilerCtx.fs.readFile(rootPkgFilePath);
     const pkgData = JSON.parse(pkgStr) as d.PackageJsonData;
-    return `${pkgData.name}/hydrate`;
+    const scope = pkgData.name || directoryName;
+    return `${scope}/hydrate`;
   } catch (e) {}
 
-  return `${config.fsNamespace}/hydrate`;
+  return `${config.fsNamespace || directoryName}/hydrate`;
 };
 
 const copyHydrateRunnerDts = async (
   config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
-  hydrateAppDirPath: string
+  hydrateAppDirPath: string,
 ) => {
   const packageDir = join(config.sys.getCompilerExecutingPath(), '..', '..');
   const srcHydrateDir = join(packageDir, 'internal', 'hydrate', 'runner.d.ts');

@@ -9,7 +9,7 @@ import { updateHydrateComponentClass } from './hydrate-component';
 
 export const hydrateComponentTransform = (
   compilerCtx: d.CompilerCtx,
-  transformOpts: d.TransformOptions
+  transformOpts: d.TransformOptions,
 ): ts.TransformerFactory<ts.SourceFile> => {
   return (transformCtx) => {
     return (tsSourceFile) => {

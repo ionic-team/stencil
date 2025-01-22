@@ -1,19 +1,25 @@
-import { basename, dirname, join, relative } from 'path';
-import { PartialResolvedId } from 'rollup';
+import { join, relative } from '@utils';
+import { basename, dirname } from 'path';
+import { ResolveIdResult } from 'rollup';
 
 import type * as d from '../../declarations';
 import { InMemoryFileSystem } from '../sys/in-memory-fs';
 import { DEV_MODULE_DIR } from './constants';
 
 export const devNodeModuleResolveId = async (
-  config: d.Config,
+  config: d.ValidatedConfig,
   inMemoryFs: InMemoryFileSystem,
-  resolvedId: PartialResolvedId,
-  importee: string
+  resolvedId: ResolveIdResult,
+  importee: string,
 ) => {
   if (!shouldCheckDevModule(resolvedId, importee)) {
     return resolvedId;
   }
+
+  if (typeof resolvedId === 'string' || !resolvedId) {
+    return resolvedId;
+  }
+
   const resolvedPath = resolvedId.id;
 
   const pkgPath = getPackageJsonPath(resolvedPath, importee);
@@ -41,9 +47,10 @@ export const devNodeModuleResolveId = async (
   return resolvedId;
 };
 
-const shouldCheckDevModule = (resolvedId: PartialResolvedId, importee: string) =>
+const shouldCheckDevModule = (resolvedId: ResolveIdResult, importee: string) =>
   resolvedId &&
   importee &&
+  typeof resolvedId !== 'string' &&
   resolvedId.id &&
   resolvedId.id.includes('node_modules') &&
   (resolvedId.id.endsWith('.js') || resolvedId.id.endsWith('.mjs')) &&
@@ -66,7 +73,12 @@ const getPackageJsonPath = (resolvedPath: string, importee: string): string => {
   return null;
 };
 
-const serializeDevNodeModuleUrl = (config: d.Config, moduleId: string, moduleVersion: string, resolvedPath: string) => {
+const serializeDevNodeModuleUrl = (
+  config: d.ValidatedConfig,
+  moduleId: string,
+  moduleVersion: string,
+  resolvedPath: string,
+) => {
   resolvedPath = relative(config.rootDir, resolvedPath);
 
   let id = `/${DEV_MODULE_DIR}/`;

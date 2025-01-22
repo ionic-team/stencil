@@ -23,6 +23,7 @@ export type {
   VNodeData,
 } from '../stencil-public-runtime';
 export {
+  AttachInternals,
   Build,
   Component,
   Element,
@@ -43,6 +44,7 @@ export {
   setAssetPath,
   setErrorHandler,
   setMode,
+  setNonce,
   setPlatformHelpers,
   State,
   Watch,

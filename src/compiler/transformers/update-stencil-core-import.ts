@@ -29,18 +29,17 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
                   const newImport = ts.factory.updateImportDeclaration(
                     s,
                     undefined,
-                    undefined,
                     ts.factory.createImportClause(
                       false,
                       undefined,
                       ts.factory.createNamedImports(
                         keepImports.map((name) =>
-                          ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(name))
-                        )
-                      )
+                          ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(name)),
+                        ),
+                      ),
                     ),
                     ts.factory.createStringLiteral(updatedCoreImportPath),
-                    undefined
+                    undefined,
                   );
                   newStatements.push(newImport);
                 }
@@ -61,7 +60,7 @@ export const updateStencilCoreImports = (updatedCoreImportPath: string): ts.Tran
           tsSourceFile.referencedFiles,
           tsSourceFile.typeReferenceDirectives,
           tsSourceFile.hasNoDefaultLib,
-          tsSourceFile.libReferenceDirectives
+          tsSourceFile.libReferenceDirectives,
         );
       }
 

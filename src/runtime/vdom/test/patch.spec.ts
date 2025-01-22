@@ -3,8 +3,8 @@ import { SVG_NS } from '@utils';
 
 import type * as d from '../../../declarations';
 import { h, newVNode } from '../h';
+import { toVNode } from '../util';
 import { patch } from '../vdom-render';
-import { toVNode } from './to-vnode';
 
 describe('renderer', () => {
   let hostElm: any;
@@ -226,7 +226,7 @@ describe('renderer', () => {
         const text = document.createTextNode('Foobar');
         (<any>text).testProperty = function () {
           /**/
-        }; // ensures we dont recreate the Text Node
+        }; // ensures we don't recreate the Text Node
         prevElm.appendChild(text);
         prevElm.appendChild(h2);
 
@@ -599,7 +599,7 @@ describe('renderer', () => {
             null,
             ...arr.map(function (n) {
               return spanNumWithOpacity(n, '1');
-            })
+            }),
           );
 
           const shufArr = shuffleArray(arr.slice(0));
@@ -618,7 +618,7 @@ describe('renderer', () => {
             null,
             ...arr.map(function (n) {
               return spanNumWithOpacity(shufArr[n], opacities[n]);
-            })
+            }),
           );
 
           patch(vnode1, vnode2);
@@ -679,7 +679,7 @@ describe('renderer', () => {
           expect(map(inner, hostElm.children)).toEqual(
             arr.filter(function (x) {
               return x != null;
-            })
+            }),
           );
         }
       });

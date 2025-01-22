@@ -1,13 +1,23 @@
 declare type CustomMethodDecorator<T> = (
   target: Object,
   propertyKey: string | symbol,
-  descriptor: TypedPropertyDescriptor<T>
+  descriptor: TypedPropertyDescriptor<T>,
 ) => TypedPropertyDescriptor<T> | void;
 
 export interface ComponentDecorator {
   (opts?: ComponentOptions): ClassDecorator;
 }
 export interface ComponentOptions {
+  /**
+   * When set to `true` this component will be form-associated. See
+   * https://stenciljs.com/docs/next/form-associated documentation on how to
+   * build form-associated Stencil components that integrate into forms like
+   * native browser elements such as `<input>` and `<textarea>`.
+   *
+   * The {@link AttachInternals} decorator allows for access to the
+   * `ElementInternals` object to modify the associated form.
+   */
+  formAssociated?: boolean;
   /**
    * Tag name of the web component. Ideally, the tag name must be globally unique,
    * so it's recommended to choose an unique prefix for all your components within the same collection.
@@ -74,7 +84,7 @@ export interface PropOptions {
   /**
    * The name of the associated DOM attribute.
    * Stencil uses different heuristics to determine the default name of the attribute,
-   * but using this property, you can override the default behaviour.
+   * but using this property, you can override the default behavior.
    */
   attribute?: string | null;
 
@@ -126,6 +136,10 @@ export interface EventOptions {
   composed?: boolean;
 }
 
+export interface AttachInternalsDecorator {
+  (): PropertyDecorator;
+}
+
 export interface ListenDecorator {
   (eventName: string, opts?: ListenOptions): CustomMethodDecorator<any>;
 }
@@ -149,7 +163,7 @@ export interface ListenOptions {
    * By default, Stencil uses several heuristics to determine if
    * it must attach a `passive` event listener or not.
    *
-   * Using the `passive` option can be used to change the default behaviour.
+   * Using the `passive` option can be used to change the default behavior.
    * Please see https://developers.google.com/web/updates/2016/06/passive-event-listeners for further information.
    */
   passive?: boolean;
@@ -203,6 +217,13 @@ export declare const Element: ElementDecorator;
  * https://stenciljs.com/docs/events
  */
 export declare const Event: EventDecorator;
+
+/**
+ * If the `formAssociated` option is set in options passed to the
+ * `@Component()` decorator then this decorator may be used to get access to the
+ * `ElementInternals` instance associated with the component.
+ */
+export declare const AttachInternals: AttachInternalsDecorator;
 
 /**
  * The `Listen()` decorator is for listening DOM events, including the ones
@@ -297,6 +318,16 @@ export declare function getAssetPath(path: string): string;
  * @returns the set path
  */
 export declare function setAssetPath(path: string): string;
+
+/**
+ * Used to specify a nonce value that corresponds with an application's
+ * [Content Security Policy (CSP)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP).
+ * When set, the nonce will be added to all dynamically created script and style tags at runtime.
+ * Alternatively, the nonce value can be set on a `meta` tag in the DOM head
+ * (<meta name="csp-nonce" content="{ nonce value here }" />) and will result in the same behavior.
+ * @param nonce The value to be used for the nonce attribute.
+ */
+export declare function setNonce(nonce: string): void;
 
 /**
  * Retrieve a Stencil element for a given reference
@@ -489,7 +520,7 @@ export interface QueueApi {
 /**
  * Host
  */
-interface HostAttributes {
+export interface HostAttributes {
   class?: string | { [className: string]: boolean };
   style?: { [key: string]: string | undefined };
   ref?: (el: HTMLElement | null) => void;
@@ -497,8 +528,44 @@ interface HostAttributes {
   [prop: string]: any;
 }
 
+/**
+ * Utilities for working with functional Stencil components. An object
+ * conforming to this interface is passed by the Stencil runtime as the third
+ * argument to a functional component, allowing component authors to work with
+ * features like children.
+ *
+ * The children of a functional component will be passed as the second
+ * argument, so a functional component which uses these utils to transform its
+ * children might look like the following:
+ *
+ * ```ts
+ * export const AddClass: FunctionalComponent = (_, children, utils) => (
+ *  utils.map(children, child => ({
+ *    ...child,
+ *    vattrs: {
+ *      ...child.vattrs,
+ *      class: `${child.vattrs.class} add-class`
+ *    }
+ *  }))
+ * );
+ * ```
+ *
+ * For more see the Stencil documentation, here:
+ * https://stenciljs.com/docs/functional-components
+ */
 export interface FunctionalUtilities {
+  /**
+   * Utility for reading the children of a functional component at runtime.
+   * Since the Stencil runtime uses a different interface for children it is
+   * not recommended to read the children directly, and is preferable to use
+   * this utility to, for instance, perform a side effect for each child.
+   */
   forEach: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => void) => void;
+  /**
+   * Utility for transforming the children of a functional component. Given an
+   * array of children and a callback this will return a list of the results of
+   * passing each child to the supplied callback.
+   */
   map: (children: VNode[], cb: (vnode: ChildNode, index: number, array: ChildNode[]) => ChildNode) => VNode[];
 }
 
@@ -506,6 +573,14 @@ export interface FunctionalComponent<T = {}> {
   (props: T, children: VNode[], utils: FunctionalUtilities): VNode | VNode[];
 }
 
+/**
+ * A Child VDOM node
+ *
+ * This has most of the same properties as {@link VNode} but friendlier names
+ * (i.e. `vtag` instead of `$tag$`, `vchildren` instead of `$children$`) in
+ * order to provide a friendlier public interface for users of the
+ * {@link FunctionalUtilities}).
+ */
 export interface ChildNode {
   vtag?: string | number | Function;
   vkey?: string | number;
@@ -561,6 +636,9 @@ export declare function h(sel: any, data: VNodeData | null, text: string): VNode
 export declare function h(sel: any, data: VNodeData | null, children: Array<VNode | undefined | null>): VNode;
 export declare function h(sel: any, data: VNodeData | null, children: VNode): VNode;
 
+/**
+ * A virtual DOM node
+ */
 export interface VNode {
   $flags$: number;
   $tag$: string | number | Function;
@@ -775,6 +853,7 @@ export namespace JSXBase {
     hrefLang?: string;
     hreflang?: string;
     media?: string;
+    ping?: string;
     rel?: string;
     target?: string;
     referrerPolicy?: ReferrerPolicy;
@@ -805,7 +884,6 @@ export namespace JSXBase {
   }
 
   export interface ButtonHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
     disabled?: boolean;
     form?: string;
     formAction?: string;
@@ -821,6 +899,11 @@ export namespace JSXBase {
     name?: string;
     type?: string;
     value?: string | string[] | number;
+
+    // popover
+    popoverTargetAction?: string;
+    popoverTargetElement?: Element | null;
+    popoverTarget?: string;
   }
 
   export interface CanvasHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -848,6 +931,7 @@ export namespace JSXBase {
   }
 
   export interface DialogHTMLAttributes<T> extends HTMLAttributes<T> {
+    onCancel?: (event: Event) => void;
     onClose?: (event: Event) => void;
     open?: boolean;
     returnValue?: string;
@@ -913,6 +997,8 @@ export namespace JSXBase {
 
   export interface ImgHTMLAttributes<T> extends HTMLAttributes<T> {
     alt?: string;
+    crossOrigin?: string;
+    crossorigin?: string;
     decoding?: 'async' | 'auto' | 'sync';
     importance?: 'low' | 'auto' | 'high';
     height?: number | string;
@@ -936,12 +1022,10 @@ export namespace JSXBase {
     accept?: string;
     allowdirs?: boolean;
     alt?: string;
-    autoCapitalize?: any;
-    autocapitalize?: any;
+    autoCapitalize?: string;
+    autocapitalize?: string;
     autoComplete?: string;
     autocomplete?: string;
-    autoFocus?: boolean;
-    autofocus?: boolean | string;
     capture?: string; // https://www.w3.org/TR/html-media-capture/#the-capture-attribute
     checked?: boolean;
     crossOrigin?: string;
@@ -973,6 +1057,8 @@ export namespace JSXBase {
     minlength?: number | string;
     multiple?: boolean;
     name?: string;
+    onSelect?: (event: Event) => void;
+    onselect?: (event: Event) => void;
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
@@ -991,11 +1077,14 @@ export namespace JSXBase {
     webkitdirectory?: boolean;
     webkitEntries?: any;
     width?: number | string;
+
+    // popover
+    popoverTargetAction?: string;
+    popoverTargetElement?: Element | null;
+    popoverTarget?: string;
   }
 
   export interface KeygenHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
-    autofocus?: boolean | string;
     challenge?: string;
     disabled?: boolean;
     form?: string;
@@ -1009,7 +1098,6 @@ export namespace JSXBase {
   export interface LabelHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     htmlFor?: string;
-    htmlfor?: string;
   }
 
   export interface LiHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1041,6 +1129,8 @@ export namespace JSXBase {
     autoPlay?: boolean;
     autoplay?: boolean | string;
     controls?: boolean;
+    controlslist?: 'nodownload' | 'nofullscreen' | 'noremoteplayback';
+    controlsList?: 'nodownload' | 'nofullscreen' | 'noremoteplayback';
     crossOrigin?: string;
     crossorigin?: string;
     loop?: boolean;
@@ -1135,7 +1225,6 @@ export namespace JSXBase {
   export interface OutputHTMLAttributes<T> extends HTMLAttributes<T> {
     form?: string;
     htmlFor?: string;
-    htmlfor?: string;
     name?: string;
   }
 
@@ -1164,7 +1253,6 @@ export namespace JSXBase {
   }
 
   export interface SelectHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
     disabled?: boolean;
     form?: string;
     multiple?: boolean;
@@ -1176,11 +1264,13 @@ export namespace JSXBase {
   }
 
   export interface SourceHTMLAttributes<T> extends HTMLAttributes<T> {
+    height?: number;
     media?: string;
     sizes?: string;
     src?: string;
     srcSet?: string;
     type?: string;
+    width?: number;
   }
 
   export interface StyleHTMLAttributes<T> extends HTMLAttributes<T> {
@@ -1199,8 +1289,8 @@ export namespace JSXBase {
   }
 
   export interface TextareaHTMLAttributes<T> extends HTMLAttributes<T> {
-    autoFocus?: boolean;
-    autofocus?: boolean | string;
+    autoComplete?: string;
+    autocomplete?: string;
     cols?: number;
     disabled?: boolean;
     form?: string;
@@ -1209,6 +1299,8 @@ export namespace JSXBase {
     minLength?: number;
     minlength?: number | string;
     name?: string;
+    onSelect?: (event: Event) => void;
+    onselect?: (event: Event) => void;
     placeholder?: string;
     readOnly?: boolean;
     readonly?: boolean | string;
@@ -1260,6 +1352,8 @@ export namespace JSXBase {
 
     // Standard HTML Attributes
     accessKey?: string;
+    autoFocus?: boolean;
+    autofocus?: boolean | string;
     class?: string | { [className: string]: boolean };
     contentEditable?: boolean | string;
     contenteditable?: boolean | string;
@@ -1269,12 +1363,18 @@ export namespace JSXBase {
     draggable?: boolean;
     hidden?: boolean;
     id?: string;
+    inert?: boolean;
     lang?: string;
     spellcheck?: 'true' | 'false' | any;
     style?: { [key: string]: string | undefined };
     tabIndex?: number;
     tabindex?: number | string;
     title?: string;
+    // These types don't allow you to use popover as a boolean attribute
+    // so you can't write HTML like `<div popover>` and get the default value.
+    // Developer must explicitly specify one of the valid popover values or it will fallback
+    // to `manual` (following the HTML spec).
+    popover?: string | null;
 
     // Unknown
     inputMode?: string;
@@ -1299,8 +1399,8 @@ export namespace JSXBase {
     vocab?: string;
 
     // Non-standard Attributes
-    autoCapitalize?: any;
-    autocapitalize?: any;
+    autoCapitalize?: string;
+    autocapitalize?: string;
     autoCorrect?: string;
     autocorrect?: string;
     autoSave?: string;
@@ -1323,7 +1423,6 @@ export namespace JSXBase {
 
   export interface SVGAttributes<T = SVGElement> extends DOMAttributes<T> {
     // Attributes which also defined in HTMLAttributes
-    // See comment in SVGDOMPropertyConfig.js
     class?: string | { [className: string]: boolean };
     color?: string;
     height?: number | string;
@@ -1384,7 +1483,7 @@ export namespace JSXBase {
     clipPathUnits?: number | string;
     'clip-rule'?: number | string;
     'color-interpolation'?: number | string;
-    'color-interpolation-filters'?: 'auto' | 's-rGB' | 'linear-rGB' | 'inherit';
+    'color-interpolation-filters'?: 'auto' | 'sRGB' | 'linearRGB';
     'color-profile'?: number | string;
     'color-rendering'?: number | string;
     contentScriptType?: number | string;
@@ -1612,12 +1711,12 @@ export namespace JSXBase {
     onPasteCapture?: (event: ClipboardEvent) => void;
 
     // Composition Events
-    onCompositionEnd?: (event: CompositionEvent) => void;
-    onCompositionEndCapture?: (event: CompositionEvent) => void;
-    onCompositionStart?: (event: CompositionEvent) => void;
-    onCompositionStartCapture?: (event: CompositionEvent) => void;
-    onCompositionUpdate?: (event: CompositionEvent) => void;
-    onCompositionUpdateCapture?: (event: CompositionEvent) => void;
+    onCompositionend?: (event: CompositionEvent) => void;
+    onCompositionendCapture?: (event: CompositionEvent) => void;
+    onCompositionstart?: (event: CompositionEvent) => void;
+    onCompositionstartCapture?: (event: CompositionEvent) => void;
+    onCompositionupdate?: (event: CompositionEvent) => void;
+    onCompositionupdateCapture?: (event: CompositionEvent) => void;
 
     // Focus Events
     onFocus?: (event: FocusEvent) => void;
@@ -1632,14 +1731,18 @@ export namespace JSXBase {
     // Form Events
     onChange?: (event: Event) => void;
     onChangeCapture?: (event: Event) => void;
-    onInput?: (event: Event) => void;
-    onInputCapture?: (event: Event) => void;
+    onInput?: (event: InputEvent) => void;
+    onInputCapture?: (event: InputEvent) => void;
     onReset?: (event: Event) => void;
     onResetCapture?: (event: Event) => void;
     onSubmit?: (event: Event) => void;
     onSubmitCapture?: (event: Event) => void;
     onInvalid?: (event: Event) => void;
     onInvalidCapture?: (event: Event) => void;
+    onBeforeToggle?: (event: Event) => void;
+    onBeforeToggleCapture?: (event: Event) => void;
+    onToggle?: (event: Event) => void;
+    onToggleCapture?: (event: Event) => void;
 
     // Image Events
     onLoad?: (event: Event) => void;
@@ -1741,8 +1844,14 @@ export namespace JSXBase {
     onAnimationIterationCapture?: (event: AnimationEvent) => void;
 
     // Transition Events
+    onTransitionCancel?: (event: TransitionEvent) => void;
+    onTransitionCancelCapture?: (event: TransitionEvent) => void;
     onTransitionEnd?: (event: TransitionEvent) => void;
     onTransitionEndCapture?: (event: TransitionEvent) => void;
+    onTransitionRun?: (event: TransitionEvent) => void;
+    onTransitionRunCapture?: (event: TransitionEvent) => void;
+    onTransitionStart?: (event: TransitionEvent) => void;
+    onTransitionStartCapture?: (event: TransitionEvent) => void;
   }
 }
 
@@ -1763,13 +1872,13 @@ export interface CustomElementsDefineOptions {
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions
+    options: boolean | AddEventListenerOptions,
   ) => void;
   rel?: (
     el: EventTarget,
     eventName: string,
     listener: EventListenerOrEventListenerObject,
-    options: boolean | AddEventListenerOptions
+    options: boolean | AddEventListenerOptions,
   ) => void;
   ce?: (eventName: string, opts?: any) => CustomEvent;
 }

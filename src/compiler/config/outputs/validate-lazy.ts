@@ -1,8 +1,6 @@
-import { isBoolean } from '@utils';
-import { join } from 'path';
+import { DIST_LAZY, isBoolean, isOutputTargetDistLazy, join } from '@utils';
 
 import type * as d from '../../../declarations';
-import { DIST_LAZY, isOutputTargetDistLazy } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
 
 export const validateLazy = (config: d.ValidatedConfig, userOutputs: d.OutputTarget[]) => {

@@ -1,5 +1,6 @@
+import { isBoolean, isOutputTargetDistCollection } from '@utils';
+
 import type * as d from '../../../declarations';
-import { isOutputTargetDistCollection } from '../../output-targets/output-utils';
 import { getAbsolutePath } from '../config-utils';
 
 /**
@@ -12,12 +13,14 @@ import { getAbsolutePath } from '../config-utils';
  */
 export const validateCollection = (
   config: d.ValidatedConfig,
-  userOutputs: d.OutputTarget[]
+  userOutputs: d.OutputTarget[],
 ): d.OutputTargetDistCollection[] => {
   return userOutputs.filter(isOutputTargetDistCollection).map((outputTarget) => {
     return {
       ...outputTarget,
-      transformAliasedImportPaths: outputTarget.transformAliasedImportPaths ?? false,
+      transformAliasedImportPaths: isBoolean(outputTarget.transformAliasedImportPaths)
+        ? outputTarget.transformAliasedImportPaths
+        : true,
       dir: getAbsolutePath(config, outputTarget.dir ?? 'dist/collection'),
     };
   });
