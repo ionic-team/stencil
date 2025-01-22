@@ -20,6 +20,7 @@ export const coreResolvePlugin = (
   compilerCtx: d.CompilerCtx,
   platform: 'client' | 'hydrate' | 'worker',
   externalRuntime: boolean,
+  lazyLoad: boolean,
 ): Plugin => {
   const compilerExe = config.sys.getCompilerExecutingPath();
   const internalClient = getStencilInternalModule(config, compilerExe, 'client/index.js');
@@ -38,9 +39,14 @@ export const coreResolvePlugin = (
               external: true,
             };
           }
-          // adding ?app-data=conditional as an identifier to ensure we don't
-          // use the default app-data, but build a custom one based on component meta
-          return internalClient + APP_DATA_CONDITIONAL;
+          if (lazyLoad) {
+            // with a lazy / dist build, add `?app-data=conditional` as an identifier to ensure we don't
+            // use the default app-data, but build a custom one based on component meta
+            return internalClient + APP_DATA_CONDITIONAL;
+          }
+          // for a non-lazy / dist-custom-elements build, use the default, complete core.
+          // This ensures all features are available for any importer library
+          return internalClient;
         }
         if (platform === 'hydrate') {
           return internalHydrate;
@@ -56,9 +62,9 @@ export const coreResolvePlugin = (
             external: true,
           };
         }
-        // continue to add ?app-data=conditional - making a custom build
-        // based on component meta. Otherwise, rollup will duplicate the whole of Stencil Core
-        return internalClient + APP_DATA_CONDITIONAL;
+        // importing @stencil/core/internal/client directly, so it shouldn't get
+        // the custom app-data conditionals
+        return internalClient;
       }
       if (id === STENCIL_INTERNAL_CLIENT_PATCH_BROWSER_ID) {
         if (externalRuntime) {
