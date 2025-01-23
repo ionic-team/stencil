@@ -1,3 +1,19 @@
+# 🚑 [4.25.0](https://github.com/ionic-team/stencil/compare/v4.24.0...v4.25.0) (2025-01-23)
+
+
+### Bug Fixes
+
+* **SSR:** class prop / state reactivity for target es2022 ([#6099](https://github.com/ionic-team/stencil/issues/6099)) ([07dcfa8](https://github.com/ionic-team/stencil/commit/07dcfa84e223820046fef2e0eab91c313f26fa81))
+* **test:** stop re-running prototype augment in spec tests. ([#6105](https://github.com/ionic-team/stencil/issues/6105)) ([a7d3873](https://github.com/ionic-team/stencil/commit/a7d38735a8572303fa2ea7e154e9a9dc3bf7eecb))
+
+
+### Features
+
+* **mock-doc:** `assignednodes` and `assignedElements` ([#6108](https://github.com/ionic-team/stencil/issues/6108)) ([777aafd](https://github.com/ionic-team/stencil/commit/777aafd57b6b03dc972e0f0bada648bf8af1f42f))
+* **runtime:** Add element to component error handler. Enables error boundaries ([#2979](https://github.com/ionic-team/stencil/issues/2979)) ([5605d48](https://github.com/ionic-team/stencil/commit/5605d48d1c9f42279ab3442b625007edcd7a9e3f))
+
+
+
 # 🚜 [4.24.0](https://github.com/ionic-team/stencil/compare/v4.23.2...v4.24.0) (2025-01-17)
 
 
