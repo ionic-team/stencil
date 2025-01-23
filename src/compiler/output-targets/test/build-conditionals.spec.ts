@@ -3,7 +3,6 @@ import { mockConfig, mockLoadConfigInit } from '@stencil/core/testing';
 import type * as d from '../../../declarations';
 import { validateConfig } from '../../config/validate-config';
 import { getCustomElementsBuildConditionals } from '../dist-custom-elements/custom-elements-build-conditionals';
-import { getHydrateBuildConditionals } from '../dist-hydrate-script/hydrate-build-conditionals';
 import { getLazyBuildConditionals } from '../dist-lazy/lazy-build-conditionals';
 
 describe('build-conditionals', () => {
