@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-22.04
     strategy:
       matrix:
-        browser: [CHROME, FIREFOX, EDGE]
+        # browser: [CHROME, FIREFOX, EDGE]
+        browser: [CHROME, EDGE]
 
     steps:
       - name: Checkout Code

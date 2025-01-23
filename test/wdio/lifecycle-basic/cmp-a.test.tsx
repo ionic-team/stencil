@@ -1,9 +1,11 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, $$, expect } from '@wdio/globals';
 
 describe('lifecycle-basic', function () {
   beforeEach(() => {
     render({
+      components: [],
       template: () => <lifecycle-basic-a></lifecycle-basic-a>,
     });
   });
