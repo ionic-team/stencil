@@ -6,12 +6,12 @@ import { PLATFORM_FLAGS } from './runtime-constants';
 import { rootAppliedStyles } from './styles';
 import { safeCall } from './update-component';
 
-const disconnectInstance = (instance: any) => {
+const disconnectInstance = (instance: any, elm?: d.HostElement) => {
   if (BUILD.lazyLoad && BUILD.disconnectedCallback) {
-    safeCall(instance, 'disconnectedCallback');
+    safeCall(instance, 'disconnectedCallback', undefined, elm || instance);
   }
   if (BUILD.cmpDidUnload) {
-    safeCall(instance, 'componentDidUnload');
+    safeCall(instance, 'componentDidUnload', undefined, elm || instance);
   }
 };
 
@@ -29,9 +29,9 @@ export const disconnectedCallback = async (elm: d.HostElement) => {
     if (!BUILD.lazyLoad) {
       disconnectInstance(elm);
     } else if (hostRef?.$lazyInstance$) {
-      disconnectInstance(hostRef.$lazyInstance$);
+      disconnectInstance(hostRef.$lazyInstance$, elm);
     } else if (hostRef?.$onReadyPromise$) {
-      hostRef.$onReadyPromise$.then(() => disconnectInstance(hostRef.$lazyInstance$));
+      hostRef.$onReadyPromise$.then(() => disconnectInstance(hostRef.$lazyInstance$, elm));
     }
   }
 
