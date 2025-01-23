@@ -3,8 +3,8 @@
 
 ### Bug Fixes
 
-* **SSR:** class prop / state reactivity for target es2022 ([#6099](https://github.com/ionic-team/stencil/issues/6099)) ([07dcfa8](https://github.com/ionic-team/stencil/commit/07dcfa84e223820046fef2e0eab91c313f26fa81))
-* **test:** stop re-running prototype augment in spec tests. ([#6105](https://github.com/ionic-team/stencil/issues/6105)) ([a7d3873](https://github.com/ionic-team/stencil/commit/a7d38735a8572303fa2ea7e154e9a9dc3bf7eecb))
+* **SSR:** class prop / state reactivity for target es2022 ([#6099](https://github.com/ionic-team/stencil/issues/6099)) ([07dcfa8](https://github.com/ionic-team/stencil/commit/07dcfa84e223820046fef2e0eab91c313f26fa81)), closes [#6095](https://github.com/ionic-team/stencil/issues/6095)
+* **test:** stop re-running prototype augment in spec tests. ([#6105](https://github.com/ionic-team/stencil/issues/6105)) ([a7d3873](https://github.com/ionic-team/stencil/commit/a7d38735a8572303fa2ea7e154e9a9dc3bf7eecb)), closes [#6104](https://github.com/ionic-team/stencil/issues/6104)
 
 
 ### Features
