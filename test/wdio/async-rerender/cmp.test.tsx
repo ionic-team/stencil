@@ -2,7 +2,7 @@ import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 import { $, expect } from '@wdio/globals';
 
-describe('attribute-basic', () => {
+describe('asynchronous re-rendering', () => {
   before(async () => {
     render({
       template: () => <async-rerender></async-rerender>,
