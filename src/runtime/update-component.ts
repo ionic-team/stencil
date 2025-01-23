@@ -438,6 +438,7 @@ export const appDidLoad = (who: string) => {
  * @param instance any object that may or may not contain methods
  * @param method method name
  * @param arg single arbitrary argument
+ * @param elm the element which made the call
  * @returns result of method call if it exists, otherwise `undefined`
  */
 export const safeCall = (instance: any, method: string, arg?: any, elm?: HTMLElement) => {

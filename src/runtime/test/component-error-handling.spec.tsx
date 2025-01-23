@@ -1,4 +1,4 @@
-import { Component, h, Prop, ComponentInterface, setErrorHandler } from '@stencil/core';
+import { Component, ComponentInterface, h, Prop, setErrorHandler } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
 describe('component error handling', () => {
@@ -45,7 +45,7 @@ describe('component error handling', () => {
           cancelable: true,
           composed: true,
           detail: e,
-        })
+        }),
       );
     };
     setErrorHandler(customErrorHandler);

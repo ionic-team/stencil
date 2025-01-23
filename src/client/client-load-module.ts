@@ -49,13 +49,18 @@ export const loadModule = (
     /* webpackInclude: /\.entry\.js$/ */
     /* webpackExclude: /\.system\.entry\.js$/ */
     /* webpackMode: "lazy" */
-    `${MODULE_IMPORT_PREFIX}${bundleId}.entry.js${BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''}`
-  ).then((importedModule) => {
-    if (!BUILD.hotModuleReplacement) {
-      cmpModules.set(bundleId, importedModule);
-    }
-    return importedModule[exportName];
-  }, (e: Error) => {
-    consoleError(e, hostRef.$hostElement$);
-  });
+    `${MODULE_IMPORT_PREFIX}${bundleId}.entry.js${
+      BUILD.hotModuleReplacement && hmrVersionId ? '?s-hmr=' + hmrVersionId : ''
+    }`
+  ).then(
+    (importedModule) => {
+      if (!BUILD.hotModuleReplacement) {
+        cmpModules.set(bundleId, importedModule);
+      }
+      return importedModule[exportName];
+    },
+    (e: Error) => {
+      consoleError(e, hostRef.$hostElement$);
+    },
+  );
 };
