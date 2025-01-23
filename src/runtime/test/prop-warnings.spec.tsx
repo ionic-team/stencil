@@ -1,6 +1,18 @@
 import { Component, h, Method, Prop } from '@stencil/core';
 import { newSpecPage } from '@stencil/core/testing';
 
+@Component({
+  tag: 'shared-cmp',
+  shadow: true,
+})
+class SharedCmp {
+  @Prop() a = 'Boom!';
+
+  render() {
+    return `${this.a}`;
+  }
+}
+
 describe('prop', () => {
   const spy = jest.spyOn(console, 'warn').mockImplementation();
 
@@ -87,6 +99,30 @@ describe('prop', () => {
     await waitForChanges();
 
     expect(root).toEqualHtml('<cmp-a>2</cmp-a>');
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should not show warning when component is used across multiple tests - first time', async () => {
+    const { root, waitForChanges } = await newSpecPage({
+      components: [SharedCmp],
+      html: `<shared-cmp></shared-cmp>`,
+    });
+
+    root.a = 'Bam!';
+    await waitForChanges();
+
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it('should not show warning when component is used across multiple tests - second time', async () => {
+    const { root, waitForChanges } = await newSpecPage({
+      components: [SharedCmp],
+      html: `<shared-cmp></shared-cmp>`,
+    });
+
+    root.a = 'Boom!';
+    await waitForChanges();
+
     expect(spy).not.toHaveBeenCalled();
   });
 });

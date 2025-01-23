@@ -113,9 +113,9 @@ export const connectedCallback = (elm: d.HostElement) => {
 
       // fire off connectedCallback() on component instance
       if (hostRef?.$lazyInstance$) {
-        fireConnectedCallback(hostRef.$lazyInstance$);
+        fireConnectedCallback(hostRef.$lazyInstance$, elm);
       } else if (hostRef?.$onReadyPromise$) {
-        hostRef.$onReadyPromise$.then(() => fireConnectedCallback(hostRef.$lazyInstance$));
+        hostRef.$onReadyPromise$.then(() => fireConnectedCallback(hostRef.$lazyInstance$, elm));
       }
     }
 

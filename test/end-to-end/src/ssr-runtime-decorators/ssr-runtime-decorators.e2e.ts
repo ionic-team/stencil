@@ -72,4 +72,39 @@ describe('different types of decorated properties and states render on both serv
     expect(await txt('basicState')).toBe('basicState');
     expect(await txt('decoratedState')).toBe('10');
   });
+
+  it('renders values via properties', async () => {
+    const doc = await renderToString(
+      `
+      <runtime-decorators></runtime-decorators>
+    `,
+      {
+        beforeHydrate: (doc: Document) => {
+          const el = doc.querySelector('runtime-decorators');
+          el.basicProp = 'basicProp via prop';
+          el.decoratedProp = 200;
+          el.decoratedGetterSetterProp = -5;
+          // @ts-ignore
+          el.basicState = 'basicState via prop';
+          // @ts-ignore
+          el.decoratedState = 'decoratedState via prop';
+        },
+      },
+    );
+    html = doc.html;
+
+    expect(htmlTxt('basicProp')).toBe('basicProp via prop');
+    expect(htmlTxt('decoratedProp')).toBe('25');
+    expect(htmlTxt('decoratedGetterSetterProp')).toBe('0');
+    expect(htmlTxt('basicState')).toBe('basicState');
+    expect(htmlTxt('decoratedState')).toBe('10');
+
+    page = await newE2EPage({ html, url: 'https://stencil.com' });
+
+    expect(await txt('basicProp')).toBe('basicProp via prop');
+    expect(await txt('decoratedProp')).toBe('25');
+    expect(await txt('decoratedGetterSetterProp')).toBe('0');
+    expect(await txt('basicState')).toBe('basicState');
+    expect(await txt('decoratedState')).toBe('10');
+  });
 });

@@ -1,5 +1,6 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, expect } from '@wdio/globals';
 
 const CSS = `main {
   color: blue;
@@ -9,6 +10,7 @@ const CSS = `main {
 describe('shadow-dom-slot-nested', () => {
   beforeEach(async () => {
     render({
+      components: [],
       template: () => (
         <>
           <main>
@@ -41,7 +43,7 @@ describe('shadow-dom-slot-nested', () => {
     } = await article.getCSSProperty('color');
     expect(hexArticle).toBe('#008000');
 
-    const children = article.$$('*');
+    const children = cmp.$$('article > shadow-dom-slot-nested');
     await expect(children).toBeElementsArrayOfSize(3);
 
     const testShadowNested = async function (i: number) {

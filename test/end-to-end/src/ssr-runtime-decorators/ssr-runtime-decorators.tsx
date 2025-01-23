@@ -31,15 +31,15 @@ function Clamp(lowerBound: number, upperBound: number, descriptor?: PropertyDesc
 export class RunTimeDecorators {
   @Element() el: HTMLElement;
 
-  @Prop() basicProp: string = 'basicProp';
+  @Prop({ reflect: true }) basicProp: string = 'basicProp';
 
   @Clamp(-5, 25)
-  @Prop()
+  @Prop({ reflect: true })
   decoratedProp: number = -10;
 
   private _decoratedGetterSetterProp: number = 1000;
   @Clamp(0, 999)
-  @Prop()
+  @Prop({ reflect: true })
   get decoratedGetterSetterProp() {
     return this._decoratedGetterSetterProp || 0;
   }

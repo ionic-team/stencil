@@ -1,21 +1,33 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, browser } from '@wdio/globals';
 
 import { setupIFrameTest } from '../util.js';
 
+// @ts-ignore may not be existing when project hasn't been built
+type HydrateModule = typeof import('../../hydrate');
+
 const testSuites = async (root: HTMLTsTargetPropsElement) => {
-  function getTxt(selector: string) {
-    browser.waitUntil(() => !!root.querySelector(selector), { timeout: 3000 });
+  async function getTxt(selector: string) {
+    await browser.waitUntil(() => !!root.querySelector(selector), { timeout: 3000 });
     return root.querySelector(selector).textContent.trim();
+  }
+  function getTxtHtml(html: string, className: string) {
+    const match = html.match(new RegExp(`<div class="${className}".*?>(.*?)</div>`, 'g'));
+    if (match && match[0]) {
+      const textMatch = match[0].match(new RegExp(`<div class="${className}".*?>(.*?)</div>`));
+      return textMatch ? textMatch[1].replace(/<!--.*?-->/g, '').trim() : null;
+    }
+    return null;
   }
 
   return {
     defaultValue: async () => {
-      expect(getTxt('.basicProp')).toBe('basicProp');
-      expect(getTxt('.decoratedProp')).toBe('-5');
-      expect(getTxt('.decoratedGetterSetterProp')).toBe('999');
-      expect(getTxt('.basicState')).toBe('basicState');
-      expect(getTxt('.decoratedState')).toBe('10');
+      expect(await getTxt('.basicProp')).toBe('basicProp');
+      expect(await getTxt('.decoratedProp')).toBe('-5');
+      expect(await getTxt('.decoratedGetterSetterProp')).toBe('999');
+      expect(await getTxt('.basicState')).toBe('basicState');
+      expect(await getTxt('.decoratedState')).toBe('10');
     },
     viaAttributes: async () => {
       root.setAttribute('decorated-prop', '200');
@@ -26,11 +38,11 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
 
       await browser.pause(100);
 
-      expect(getTxt('.basicProp')).toBe('basicProp via attribute');
-      expect(getTxt('.decoratedProp')).toBe('25');
-      expect(getTxt('.decoratedGetterSetterProp')).toBe('0');
-      expect(getTxt('.basicState')).toBe('basicState');
-      expect(getTxt('.decoratedState')).toBe('10');
+      expect(await getTxt('.basicProp')).toBe('basicProp via attribute');
+      expect(await getTxt('.decoratedProp')).toBe('25');
+      expect(await getTxt('.decoratedGetterSetterProp')).toBe('0');
+      expect(await getTxt('.basicState')).toBe('basicState');
+      expect(await getTxt('.decoratedState')).toBe('10');
     },
     viaProps: async (nativeElement: boolean = false) => {
       root.basicProp = 'basicProp via prop';
@@ -43,28 +55,73 @@ const testSuites = async (root: HTMLTsTargetPropsElement) => {
 
       await browser.pause(100);
 
-      expect(getTxt('.basicProp')).toBe('basicProp via prop');
-      expect(getTxt('.decoratedProp')).toBe('-3');
-      expect(getTxt('.decoratedGetterSetterProp')).toBe('543');
+      expect(await getTxt('.basicProp')).toBe('basicProp via prop');
+      expect(await getTxt('.decoratedProp')).toBe('-3');
+      expect(await getTxt('.decoratedGetterSetterProp')).toBe('543');
 
       // you can change internal state via prop within native elements because the class instance === the element
       const basicStateMatch = !nativeElement ? 'basicState' : 'basicState via prop';
-      expect(getTxt('.basicState')).toBe(basicStateMatch);
+      expect(await getTxt('.basicState')).toBe(basicStateMatch);
       const decoratedStateMatch = !nativeElement ? '10' : '3';
-      expect(getTxt('.decoratedState')).toBe(decoratedStateMatch);
+      expect(await getTxt('.decoratedState')).toBe(decoratedStateMatch);
     },
     reflectsStateChanges: async () => {
-      const buttons = root.querySelectorAll('button');
-      expect(getTxt('.basicState')).toBe('basicState');
-      expect(getTxt('.decoratedState')).toBe('10');
+      expect(await getTxt('.basicState')).toBe('basicState');
+      expect(await getTxt('.decoratedState')).toBe('10');
 
+      const buttons = root.querySelectorAll('button');
       buttons[0].click();
       await browser.pause(100);
-      expect(getTxt('.basicState')).toBe('basicState changed');
+      expect(await getTxt('.basicState')).toBe('basicState changed');
 
       buttons[1].click();
       await browser.pause(100);
-      expect(getTxt('.decoratedState')).toBe('0');
+      expect(await getTxt('.decoratedState')).toBe('0');
+    },
+    ssrViaAttrs: async (hydrationModule: any) => {
+      const renderToString: HydrateModule['renderToString'] = hydrationModule.renderToString;
+      const { html } = await renderToString(
+        `
+        <ts-target-props
+          basic-prop="basicProp via attribute"
+          decorated-prop="200"
+          decorated-getter-setter-prop="-5"
+          basic-state="basicState via attribute"
+          decorated-state="decoratedState via attribute"
+        ></ts-target-props>
+      `,
+        {
+          serializeShadowRoot: true,
+          fullDocument: false,
+        },
+      );
+      expect(await getTxtHtml(html, 'basicProp')).toBe('basicProp pnpmvia attribute');
+      expect(await getTxtHtml(html, 'decoratedProp')).toBe('25');
+      expect(await getTxtHtml(html, 'decoratedGetterSetterProp')).toBe('0');
+      expect(await getTxtHtml(html, 'basicState')).toBe('basicState via attribute');
+      expect(await getTxtHtml(html, 'decoratedState')).toBe('10');
+    },
+    ssrViaProps: async (hydrationModule: any) => {
+      const renderToString: HydrateModule['renderToString'] = hydrationModule.renderToString;
+      const { html } = await renderToString(`<ts-target-props></ts-target-props>`, {
+        serializeShadowRoot: true,
+        fullDocument: false,
+        beforeHydrate: (doc: Document) => {
+          const el = doc.querySelector('ts-target-props');
+          el.basicProp = 'basicProp via prop';
+          el.decoratedProp = -3;
+          el.decoratedGetterSetterProp = 543;
+          // @ts-ignore
+          el.basicState = 'basicState via prop';
+          // @ts-ignore
+          el.decoratedState = 3;
+        },
+      });
+      expect(await getTxtHtml(html, 'basicProp')).toBe('basicProp via prop');
+      expect(await getTxtHtml(html, 'decoratedProp')).toBe('-3');
+      expect(await getTxtHtml(html, 'decoratedGetterSetterProp')).toBe('543');
+      expect(await getTxtHtml(html, 'basicState')).toBe('basicState');
+      expect(await getTxtHtml(html, 'decoratedState')).toBe('10');
     },
   };
 };
@@ -97,6 +154,12 @@ describe('Checks class properties and runtime decorators of different es targets
       await (await $('ts-target-props')).waitForStable();
       await (await testSuites(document.querySelector('ts-target-props'))).reflectsStateChanges();
     });
+
+    it('renders component during SSR hydration', async () => {
+      // @ts-ignore may not be existing when project hasn't been built
+      const mod = await import('/hydrate/index.mjs');
+      await (await testSuites(document.querySelector('ts-target-props'))).ssrViaProps(mod);
+    });
   });
 
   describe('es2022 dist output', () => {
@@ -126,6 +189,12 @@ describe('Checks class properties and runtime decorators of different es targets
     it('reflects internal state changes to the dom', async () => {
       const { reflectsStateChanges } = await testSuites(frameContent.querySelector('ts-target-props'));
       await reflectsStateChanges();
+    });
+
+    it('renders component during SSR hydration', async () => {
+      // @ts-ignore may not be existing when project hasn't been built
+      const mod = await import('/test-ts-target-output/hydrate/index.mjs');
+      await (await testSuites(document.querySelector('ts-target-props'))).ssrViaProps(mod);
     });
   });
 

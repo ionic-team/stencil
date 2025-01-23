@@ -32,8 +32,7 @@ export const initializeComponent = async (
     // Let the runtime know that the component has been initialized
     hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 
-    const bundleId = cmpMeta.$lazyBundleId$;
-    if ((BUILD.lazyLoad || BUILD.hydrateClientSide) && bundleId) {
+    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element
@@ -77,7 +76,7 @@ export const initializeComponent = async (
       try {
         new (Cstr as any)(hostRef);
       } catch (e) {
-        consoleError(e);
+        consoleError(e, elm);
       }
 
       if (BUILD.member) {
@@ -87,7 +86,7 @@ export const initializeComponent = async (
         hostRef.$flags$ |= HOST_FLAGS.isWatchReady;
       }
       endNewInstance();
-      fireConnectedCallback(hostRef.$lazyInstance$);
+      fireConnectedCallback(hostRef.$lazyInstance$, elm);
     } else {
       // sync constructor component
       Cstr = elm.constructor as any;
@@ -189,8 +188,8 @@ export const initializeComponent = async (
   }
 };
 
-export const fireConnectedCallback = (instance: any) => {
+export const fireConnectedCallback = (instance: any, elm?: HTMLElement) => {
   if (BUILD.lazyLoad && BUILD.connectedCallback) {
-    safeCall(instance, 'connectedCallback');
+    safeCall(instance, 'connectedCallback', undefined, elm);
   }
 };

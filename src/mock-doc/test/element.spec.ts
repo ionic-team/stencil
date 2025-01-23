@@ -521,4 +521,88 @@ describe('element', () => {
     expect(ctx).toBeDefined();
     expect(ctx.toDataURL()).toBe('data:,');
   });
+
+  describe('slot', () => {
+    it('returns no nodes via `assignedNodes` / `assignedElements` when not within a custom element', () => {
+      const slot = doc.createElement('slot');
+      slot.innerHTML = 'invisible <div>Something</div> <!-- not here -->';
+      expect(slot.assignedNodes().length).toEqual(0);
+      expect(slot.assignedElements().length).toEqual(0);
+    });
+
+    it('returns correct nodes with `assignedNodes`', () => {
+      const elm = doc.createElement('cmp-a');
+      const shadowRoot = elm.attachShadow({ mode: 'open' });
+      const slot = doc.createElement('slot');
+      shadowRoot.appendChild(slot);
+      slot.innerHTML = '<slot name="nested-slot">Fallback content</slot>';
+
+      elm.innerHTML = `
+        text node 
+        <div>light dom</div>
+        <!-- comment node -->
+        <div slot="nested-slot">nested slot</div>
+      `;
+
+      expect(slot.assignedNodes().length).toEqual(5);
+      expect(slot.assignedNodes()[0].textContent.trim()).toEqual('text node');
+      expect(slot.assignedNodes()[1].textContent.trim()).toEqual('light dom');
+      expect(slot.assignedNodes()[3].textContent.trim()).toEqual('comment node');
+      expect(slot.assignedNodes()[4].textContent.trim()).toEqual('');
+      expect(slot.assignedNodes({ flatten: true }).length).toEqual(5);
+
+      elm.innerHTML = '<div slot="nested-slot">nested slot</div>';
+
+      expect(slot.assignedNodes().length).toEqual(0);
+      expect(slot.assignedNodes({ flatten: true }).length).toEqual(1);
+      expect(slot.assignedNodes({ flatten: true })[0].textContent.trim()).toEqual('nested slot');
+
+      elm.innerHTML = 'text node <div slot="nested-slot">nested slot</div>';
+
+      expect(slot.assignedNodes().length).toEqual(1);
+      expect(slot.assignedNodes({ flatten: true }).length).toEqual(1);
+      expect(slot.assignedNodes()[0].textContent.trim()).toEqual('text node');
+
+      elm.innerHTML = '';
+      expect(slot.assignedNodes().length).toEqual(0);
+      expect(slot.assignedNodes({ flatten: true }).length).toEqual(1);
+      expect(slot.assignedNodes({ flatten: true })[0].textContent.trim()).toEqual('Fallback content');
+    });
+
+    it('returns correct elements with `assignedElements`', () => {
+      const elm = doc.createElement('cmp-a');
+      const shadowRoot = elm.attachShadow({ mode: 'open' });
+      const slot = doc.createElement('slot');
+      shadowRoot.appendChild(slot);
+      slot.innerHTML = '<slot name="nested-slot"><div>Fallback content</div></slot>';
+
+      elm.innerHTML = `
+        text node 
+        <div>light dom</div>
+        <!-- comment node -->
+        <div slot="nested-slot">nested slot</div>
+      `;
+
+      expect(slot.assignedElements().length).toEqual(1);
+      expect(slot.assignedElements()[0].textContent.trim()).toEqual('light dom');
+      expect(slot.assignedElements({ flatten: true }).length).toEqual(1);
+
+      elm.innerHTML = '<div slot="nested-slot">nested slot</div>';
+
+      expect(slot.assignedElements().length).toEqual(0);
+      expect(slot.assignedElements({ flatten: true }).length).toEqual(1);
+      expect(slot.assignedElements({ flatten: true })[0].textContent.trim()).toEqual('nested slot');
+
+      elm.innerHTML = 'text node <div slot="nested-slot">nested slot</div>';
+
+      expect(slot.assignedElements().length).toEqual(0);
+      expect(slot.assignedElements({ flatten: true }).length).toEqual(1);
+      expect(slot.assignedElements({ flatten: true })[0].textContent.trim()).toEqual('nested slot');
+
+      elm.innerHTML = '';
+      expect(slot.assignedElements().length).toEqual(0);
+      expect(slot.assignedElements({ flatten: true }).length).toEqual(1);
+      expect(slot.assignedElements({ flatten: true })[0].textContent.trim()).toEqual('Fallback content');
+    });
+  });
 });

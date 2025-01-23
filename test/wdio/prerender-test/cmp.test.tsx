@@ -60,7 +60,7 @@ describe('prerender', () => {
   });
 
   it('server componentWillLoad Order', async () => {
-    const elm = await browser.waitUntil(async () => iframe.querySelector<HTMLElement>('#server-componentWillLoad'));
+    const elm = await browser.waitUntil(() => iframe.querySelector<HTMLElement>('#server-componentWillLoad'));
     expect(elm.innerText).toMatchInlineSnapshot(`
       "CmpA server componentWillLoad
       CmpD - a1-child server componentWillLoad
@@ -74,7 +74,7 @@ describe('prerender', () => {
   });
 
   it('server componentDidLoad Order', async () => {
-    const elm = await browser.waitUntil(async () => iframe.querySelector<HTMLElement>('#server-componentDidLoad'));
+    const elm = await browser.waitUntil(() => iframe.querySelector<HTMLElement>('#server-componentDidLoad'));
     expect(elm.innerText).toMatchInlineSnapshot(`
       "CmpD - a1-child server componentDidLoad
       CmpD - a2-child server componentDidLoad
@@ -89,6 +89,7 @@ describe('prerender', () => {
 
   it('correct scoped styles applied after scripts kick in', async () => {
     const iframe = await setupTest('/prerender/index.html');
+    await browser.waitUntil(() => iframe.querySelector('cmp-scoped-a.hydrated'));
     testScopedStyles(iframe);
   });
 

@@ -2,8 +2,6 @@
 
 import path from 'node:path';
 
-import type { Options } from '@wdio/types';
-
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
 const isCI = Boolean(process.env.CI);
 
@@ -33,7 +31,7 @@ const BROWSER_CONFIGURATION = (() => {
   }
 })();
 
-export const config: Options.Testrunner = {
+export const config: WebdriverIO.Config = {
   //
   // ====================
   // Runner Configuration
@@ -53,13 +51,6 @@ export const config: Options.Testrunner = {
       },
     },
   ],
-  autoCompileOpts: {
-    autoCompile: true,
-    tsNodeOpts: {
-      project: './tsconfig.json',
-      transpileOnly: true,
-    },
-  },
 
   //
   // ==================
@@ -102,7 +93,6 @@ export const config: Options.Testrunner = {
   // we set this to an empty array here and programmatically add configuration below
   //
   capabilities: [],
-
   //
   // ===================
   // Test Configurations
@@ -348,11 +338,14 @@ if (['CHROME', 'ALL'].includes(BROWSER_CONFIGURATION)) {
   });
 }
 
-if (['FIREFOX', 'ALL'].includes(BROWSER_CONFIGURATION)) {
-  (config.capabilities as WebdriverIO.Capabilities[]).push({
-    browserName: 'firefox',
-  });
-}
+/**
+ * Disable FF tests due to issues in the WebDriver protocol
+ */
+// if (['FIREFOX', 'ALL'].includes(BROWSER_CONFIGURATION)) {
+//   (config.capabilities as WebdriverIO.Capabilities[]).push({
+//     browserName: 'firefox'
+//   });
+// }
 
 if (['EDGE', 'ALL'].includes(BROWSER_CONFIGURATION)) {
   (config.capabilities as WebdriverIO.Capabilities[]).push({

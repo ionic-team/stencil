@@ -29,6 +29,14 @@ export const proxyComponent = (
 ): d.ComponentConstructor => {
   const prototype = (Cstr as any).prototype;
 
+  if (BUILD.isTesting) {
+    if (prototype.done) {
+      // @ts-expect-error - we don't want to re-augment the prototype. This happens during spec tests.
+      return;
+    }
+    prototype.done = true;
+  }
+
   /**
    * proxy form associated custom element lifecycle callbacks
    * @ref https://web.dev/articles/more-capable-form-controls#lifecycle_callbacks
@@ -113,9 +121,9 @@ export const proxyComponent = (
                 // the element is not constructing
                 (ref && ref.$flags$ & HOST_FLAGS.isConstructingInstance) === 0 &&
                 // the member is a prop
-                (cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Prop) !== 0 &&
+                (memberFlags & MEMBER_FLAGS.Prop) !== 0 &&
                 // the member is not mutable
-                (cmpMeta.$members$[memberName][0] & MEMBER_FLAGS.Mutable) === 0
+                (memberFlags & MEMBER_FLAGS.Mutable) === 0
               ) {
                 consoleDevWarn(
                   `@Prop() "${memberName}" on <${cmpMeta.$tagName$}> is immutable but was modified from within the component.\nMore information: https://stenciljs.com/docs/properties#prop-mutability`,
