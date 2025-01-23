@@ -271,7 +271,7 @@ export declare const Watch: WatchDecorator;
 
 export type ResolutionHandler = (elm: HTMLElement) => string | undefined | null;
 
-export type ErrorHandler = (err: any, element?: Element) => void;
+export type ErrorHandler = (err: any, element?: HTMLElement) => void;
 
 /**
  * `setMode()` is used for libraries which provide multiple "modes" for styles.

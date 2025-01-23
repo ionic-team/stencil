@@ -4,7 +4,7 @@ import type * as d from '../declarations';
 
 let customError: d.ErrorHandler;
 
-export const consoleError: d.ErrorHandler = (e: any, el?: Element) => (customError || console.error)(e, el);
+export const consoleError: d.ErrorHandler = (e: any, el?: HTMLElement) => (customError || console.error)(e, el);
 
 export const STENCIL_DEV_MODE = BUILD.isTesting
   ? ['STENCIL:'] // E2E testing
