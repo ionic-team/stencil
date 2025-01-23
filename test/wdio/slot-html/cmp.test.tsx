@@ -1,5 +1,6 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, $$, expect } from '@wdio/globals';
 
 describe('slot-html', () => {
   const style = `body {
@@ -20,6 +21,7 @@ div section {
 
   beforeEach(async () => {
     render({
+      components: [],
       template: () => (
         <>
           <style>{style}</style>
@@ -111,7 +113,9 @@ div section {
     const results2 = await $('.results2 div');
     await expect(results2).toHaveText('default slot text node');
 
-    const results3DefaultSlotChildren = $('.results3 div').$$('content-default');
+    const results3DefaultSlotChildren = $$('.results3 div content-default');
+    await expect(results3DefaultSlotChildren).toBeElementsArrayOfSize(3);
+
     await expect(results3DefaultSlotChildren[0]).toHaveText('default slot element 1');
     await expect(results3DefaultSlotChildren[1]).toHaveText('default slot element 2');
     await expect(results3DefaultSlotChildren[2]).toHaveText('default slot element 3');

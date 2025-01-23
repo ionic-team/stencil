@@ -1,5 +1,6 @@
 import { h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, browser } from '@wdio/globals';
 
 import { setupIFrameTest } from '../util.js';
 

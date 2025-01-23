@@ -1,5 +1,6 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, expect } from '@wdio/globals';
 
 /**
  * Tests for the patched `removeChild()` method on `scoped` components.
@@ -9,6 +10,7 @@ describe('remove-child-patch', () => {
 
   beforeEach(async () => {
     render({
+      components: [],
       template: () => (
         <>
           <remove-child-patch>
@@ -43,24 +45,24 @@ describe('remove-child-patch', () => {
   });
 
   it('should remove the last slotted node', async () => {
-    let slotContainer = $(host).$('.slot-container').$$('span');
+    let slotContainer = $(host).$$('span');
     await expect(slotContainer).toBeElementsArrayOfSize(2);
 
     await $('button').click();
 
-    slotContainer = $(host).$('.slot-container').$$('span');
+    slotContainer = $(host).$$('span');
     await expect(slotContainer).toBeElementsArrayOfSize(1);
   });
 
   it('should show slot-fb if the last slotted node is removed', async () => {
-    const slotContainer = $(host).$('.slot-container').$$('span');
+    const slotContainer = $(host).$$('span');
     await expect(slotContainer).toBeElementsArrayOfSize(2);
 
     const button = $('#remove-child-button');
     await button.click();
     await button.click();
 
-    const slottedSpansAfter = $(host).$('.slot-container').$$('span');
+    const slottedSpansAfter = $(host).$$('span');
     expect(await slottedSpansAfter.length).toBe(0);
     await expect($(host).$('.slot-container')).toHaveText('Slot fallback content');
   });
@@ -68,9 +70,10 @@ describe('remove-child-patch', () => {
   it('should still be able to remove nodes not slotted', async () => {
     await expect($(host).$('div')).toBeExisting();
 
+    await browser.pause(3000);
     const button = $('#remove-child-div-button');
     await button.click();
 
-    await expect($(host).$('div')).not.toBeExisting();
+    await expect(await $(host).$('div').isExisting()).toBe(false);
   });
 });
