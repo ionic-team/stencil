@@ -120,7 +120,7 @@ export const getRollupOptions = (
         compilerCtx,
         bundleOpts.platform,
         !!bundleOpts.externalRuntime,
-        bundleOpts.conditionals.lazyLoad,
+        bundleOpts.conditionals?.lazyLoad ?? false,
       ),
       appDataPlugin(config, compilerCtx, buildCtx, bundleOpts.conditionals, bundleOpts.platform),
       lazyComponentPlugin(buildCtx),
