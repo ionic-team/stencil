@@ -1,6 +1,6 @@
 import { BUILD } from '@app-data';
 
-import { setAccessor } from '../set-accessor';
+import { parseClassList, setAccessor } from '../set-accessor';
 
 describe('setAccessor for custom elements', () => {
   let elm: any;
@@ -941,4 +941,23 @@ describe('setAccessor for standard html elements', () => {
     setAccessor(elm2, 'textContent', undefined, 'some-content', false, 0);
     expect(spy2.mock.calls).toEqual([]);
   });
+
+  describe('parseClassList', () => {
+    it('should parse class list', () => {
+      const classList = parseClassList('class1 class2 class3');
+      expect(classList).toEqual(['class1', 'class2', 'class3']);
+    });
+
+    it('should not parse class list', () => {
+      expect(parseClassList('')).toEqual([]);
+      // @ts-expect-error
+      expect(parseClassList()).toEqual([]);
+      expect(parseClassList(null)).toEqual([]);
+    });
+
+    it('should parse SVGAnimatedString', () => {
+      const classList = parseClassList({ baseVal: 'class1 class2 class3' } as SVGAnimatedString);
+      expect(classList).toEqual(['class1', 'class2', 'class3']);
+    })
+  })
 });
