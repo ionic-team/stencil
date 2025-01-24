@@ -123,7 +123,7 @@ export * from '${USER_INDEX_ENTRY_ID}';
   describe('bundleCustomElements', () => {
     it('should set a diagnostic if no `dir` prop on the output target', async () => {
       const { config, compilerCtx, buildCtx } = setup();
-      const outputTarget: OutputTargetDistCustomElements = { type: DIST_CUSTOM_ELEMENTS };
+      const outputTarget: OutputTargetDistCustomElements = { type: DIST_CUSTOM_ELEMENTS, externalRuntime: true };
       await bundleCustomElements(config, compilerCtx, buildCtx, outputTarget);
       expect(buildCtx.diagnostics).toEqual([
         {

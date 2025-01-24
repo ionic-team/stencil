@@ -107,6 +107,7 @@ export const getRollupOptions = (
 
   const beforePlugins = config.rollupPlugins.before || [];
   const afterPlugins = config.rollupPlugins.after || [];
+
   const rollupOptions: RollupOptions = {
     input: bundleOpts.inputs,
     output: {
@@ -114,7 +115,13 @@ export const getRollupOptions = (
     },
 
     plugins: [
-      coreResolvePlugin(config, compilerCtx, bundleOpts.platform, !!bundleOpts.externalRuntime),
+      coreResolvePlugin(
+        config,
+        compilerCtx,
+        bundleOpts.platform,
+        !!bundleOpts.externalRuntime,
+        bundleOpts.conditionals?.lazyLoad ?? false,
+      ),
       appDataPlugin(config, compilerCtx, buildCtx, bundleOpts.conditionals, bundleOpts.platform),
       lazyComponentPlugin(buildCtx),
       loaderPlugin(bundleOpts.loader),
