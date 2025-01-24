@@ -1,3 +1,5 @@
+import { BUILD } from '@app-data';
+
 import { setAccessor } from '../set-accessor';
 
 describe('setAccessor for custom elements', () => {
@@ -598,6 +600,10 @@ describe('setAccessor for inputs', () => {
 });
 
 describe('setAccessor for standard html elements', () => {
+  beforeEach(() => {
+    BUILD.hydrateClientSide = true;
+  });
+
   describe('simple global attributes', () => {
     it('should not add attribute when prop is undefined or null', () => {
       const inputElm = document.createElement('section');
@@ -788,6 +794,43 @@ describe('setAccessor for standard html elements', () => {
 
       setAccessor(elm, 'class', 'md', '', false, 0);
       expect(elm.className).toEqual('');
+    });
+
+    it('should add scope classes on initial render if `s-si` set', () => {
+      const elm = document.createElement('section');
+
+      // not s-si set
+      setAccessor(elm, 'class', 'a-scope-id', undefined, false, 0, true);
+      expect(elm.className).toEqual('');
+
+      (elm as any)['s-si'] = 'a-scope-id';
+
+      setAccessor(elm, 'class', '', undefined, false, 0, true);
+      expect(elm.className).toEqual('a-scope-id');
+
+      setAccessor(
+        elm,
+        'class',
+        'a-scope-id-something a-scope-id-something-else unrelated-old-thing',
+        undefined,
+        false,
+        0,
+        true,
+      );
+      expect(elm.className).toEqual('a-scope-id a-scope-id-something a-scope-id-something-else');
+
+      elm.className = '';
+      setAccessor(elm, 'class', 'something-old', 'something-new', false, 0, true);
+      expect(elm.className).toEqual('something-new a-scope-id');
+
+      elm.className = '';
+      setAccessor(elm, 'class', 'something-old a-scope-id-something', 'something-new', false, 0, true);
+      expect(elm.className).toEqual('something-new a-scope-id a-scope-id-something');
+
+      // just check it reverts to normal behavior after initial render
+      elm.className = '';
+      setAccessor(elm, 'class', 'something-old a-scope-id-something', 'something-new', false, 0);
+      expect(elm.className).toEqual('something-new');
     });
   });
 

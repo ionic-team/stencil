@@ -56,7 +56,6 @@ export const setAccessor = (
           if (c.startsWith(elm['s-si'])) newClasses.push(c);
         });
         newClasses = [...new Set(newClasses)];
-
         classList.add(...newClasses);
       } else {
         classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
