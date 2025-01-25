@@ -105,7 +105,10 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
                 preconnectLinks.length > 0
                   ? preconnectLinks[preconnectLinks.length - 1].nextSibling
                   : styleContainerNode.querySelector('style');
-              (styleContainerNode as HTMLElement).insertBefore(styleElm, referenceNode);
+              (styleContainerNode as HTMLElement).insertBefore(
+                styleElm,
+                referenceNode?.parentNode === styleContainerNode ? referenceNode : null,
+              );
             } else if ('host' in styleContainerNode) {
               if (supportsConstructableStylesheets) {
                 /**
