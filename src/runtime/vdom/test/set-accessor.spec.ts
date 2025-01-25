@@ -958,6 +958,6 @@ describe('setAccessor for standard html elements', () => {
     it('should parse SVGAnimatedString', () => {
       const classList = parseClassList({ baseVal: 'class1 class2 class3' } as SVGAnimatedString);
       expect(classList).toEqual(['class1', 'class2', 'class3']);
-    })
-  })
+    });
+  });
 });
