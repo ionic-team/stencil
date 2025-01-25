@@ -1,3 +1,15 @@
+## 🌳 [4.25.1](https://github.com/ionic-team/stencil/compare/v4.25.0...v4.25.1) (2025-01-25)
+
+
+### Bug Fixes
+
+* **dist-custom-elements:** stop duplicate `@stencil/core` ([#6109](https://github.com/ionic-team/stencil/issues/6109)) ([dc4c88f](https://github.com/ionic-team/stencil/commit/dc4c88f998de33c53fb94b73bffb913adf953cf3))
+* **runtime:** allow classList to be null ([#6118](https://github.com/ionic-team/stencil/issues/6118)) ([749fab9](https://github.com/ionic-team/stencil/commit/749fab9636d70429f67e61af92f4d932bf475ea5))
+* **runtime:** fix NotFoundError in addStyle function with referenceNode parent check ([#6107](https://github.com/ionic-team/stencil/issues/6107)) ([26ceed6](https://github.com/ionic-team/stencil/commit/26ceed69570761ed17c66e4bc38ff9d88ebe819c))
+* **runtime:** SSR class handling breaks normal class handling ([#6116](https://github.com/ionic-team/stencil/issues/6116)) ([1e8a2d2](https://github.com/ionic-team/stencil/commit/1e8a2d228810d92e3b2b6b271d547087df911ce7))
+
+
+
 # 🏅 [4.25.0](https://github.com/ionic-team/stencil/compare/v4.24.0...v4.25.0) (2025-01-23)
 
 
