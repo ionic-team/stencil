@@ -28,6 +28,7 @@ import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
  * @param newValue the new value for the attribute
  * @param isSvg whether we're in an svg context or not
  * @param flags bitflags for Vdom variables
+ * @param initialRender whether this is the first render of the VDom
  */
 export const setAccessor = (
   elm: d.RenderNode,
@@ -36,6 +37,7 @@ export const setAccessor = (
   newValue: any,
   isSvg: boolean,
   flags: number,
+  initialRender?: boolean,
 ) => {
   if (oldValue !== newValue) {
     let isProp = isMemberInElement(elm, memberName);
@@ -46,7 +48,7 @@ export const setAccessor = (
       const oldClasses = parseClassList(oldValue);
       let newClasses = parseClassList(newValue);
 
-      if (elm['s-si']) {
+      if (BUILD.hydrateClientSide && elm['s-si'] && initialRender) {
         // for `scoped: true` components, new nodes after initial hydration
         // from SSR don't have the slotted class added. Let's add that now
         newClasses.push(elm['s-si']);
@@ -54,9 +56,7 @@ export const setAccessor = (
           if (c.startsWith(elm['s-si'])) newClasses.push(c);
         });
         newClasses = [...new Set(newClasses)];
-
         classList.add(...newClasses);
-        delete elm['s-si'];
       } else {
         classList.remove(...oldClasses.filter((c) => c && !newClasses.includes(c)));
         classList.add(...newClasses.filter((c) => c && !oldClasses.includes(c)));

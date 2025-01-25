@@ -684,7 +684,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
         // either this is the first render of an element OR it's an update
         // AND we already know it's possible it could have changed
         // this updates the element's css classes, attrs, props, listeners, etc.
-        updateElement(oldVNode, newVNode, isSvgMode);
+        updateElement(oldVNode, newVNode, isSvgMode, isInitialRender);
       }
     }
 
