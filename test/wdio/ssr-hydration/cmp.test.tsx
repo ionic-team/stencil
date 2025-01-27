@@ -43,8 +43,6 @@ describe('ssr-shadow-cmp', () => {
       document.body.appendChild(stage);
     }
 
-    // expect(typeof customElements.get('ssr-shadow-cmp')).toBe('undefined');
-
     // @ts-expect-error resolved through WDIO
     const { defineCustomElements } = await import('/dist/loader/index.js');
     defineCustomElements().catch(console.error);
