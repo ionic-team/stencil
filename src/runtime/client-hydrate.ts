@@ -220,13 +220,6 @@ export const initializeClientHydrate = (
     for (rnIdex; rnIdex < rnLen; rnIdex++) {
       shadowRoot.appendChild(shadowRootNodes[rnIdex] as any);
     }
-
-    // Tidy up left-over / unnecessary comments to stop frameworks complaining about DOM mismatches
-    Array.from(hostElm.childNodes).forEach((node) => {
-      if (node.nodeType === NODE_TYPE.CommentNode && typeof (node as d.RenderNode)['s-sn'] !== 'string') {
-        node.parentNode.removeChild(node);
-      }
-    });
   }
 
   hostRef.$hostElement$ = hostElm;
