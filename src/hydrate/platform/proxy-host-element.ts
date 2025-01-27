@@ -108,8 +108,9 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
 
             // if we have a parsed value from an attribute / or userland prop use that first.
             // otherwise if we have a getter already applied, use that.
-            return attrPropVal !== undefined
-              ? attrPropVal
+            const ref = getHostRef(this);
+            return ref.$instanceValues$?.get(memberName) !== undefined
+              ? ref.$instanceValues$?.get(memberName)
               : origGetter
                 ? origGetter.apply(this)
                 : getValue(this, memberName);
