@@ -56,4 +56,31 @@ describe('ssr-shadow-cmp', () => {
 
     document.querySelector('#stage')?.remove();
   });
+
+  it('checks perf when loading lots of the same component', async () => {
+    performance.mark('start');
+
+    const { html } = await renderToString(
+      Array(50)
+        .fill(0)
+        .map((_, i) => `<ssr-shadow-cmp>Value ${i}</ssr-shadow-cmp>`)
+        .join(''),
+      {
+        fullDocument: true,
+        serializeShadowRoot: true,
+        constrainTimeouts: false,
+      },
+    );
+    const stage = document.createElement('div');
+    stage.setAttribute('id', 'stage');
+    stage.setHTMLUnsafe(html);
+    document.body.appendChild(stage);
+
+    performance.mark('end');
+    const renderTime = performance.measure('render', 'start', 'end').duration;
+
+    await expect(renderTime).toBeLessThan(100);
+
+    document.querySelector('#stage')?.remove();
+  });
 });
