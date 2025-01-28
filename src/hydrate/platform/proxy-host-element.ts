@@ -97,27 +97,32 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
           enumerable: true,
         });
 
-        // instance
-        Object.defineProperty((cstr as any).prototype, memberName, {
-          get: function (this: any) {
-            if (origGetter && attrPropVal === undefined && !getValue(this, memberName)) {
-              // if the initial value comes from an instance getter
-              // the element will never have the value set. So let's do that now.
-              setValue(this, memberName, origGetter.apply(this), cmpMeta);
-            }
+        if (!(cstr as any).prototype.__stencilAugmented) {
+          // instance prototype
+          Object.defineProperty((cstr as any).prototype, memberName, {
+            get: function (this: any) {
+              const ref = getHostRef(this);
+              // incoming value from a attr / prop?
+              const attrPropVal = ref.$instanceValues$?.get(memberName);
 
-            // if we have a parsed value from an attribute / or userland prop use that first.
-            // otherwise if we have a getter already applied, use that.
-            const ref = getHostRef(this);
-            return ref.$instanceValues$?.get(memberName) !== undefined
-              ? ref.$instanceValues$?.get(memberName)
-              : origGetter
-                ? origGetter.apply(this)
-                : getValue(this, memberName);
-          },
-          configurable: true,
-          enumerable: true,
-        });
+              if (origGetter && attrPropVal === undefined && !getValue(this, memberName)) {
+                // if the initial value comes from an instance getter
+                // the element will never have the value set. So let's do that now.
+                setValue(this, memberName, origGetter.apply(this), cmpMeta);
+              }
+
+              // if we have a parsed value from an attribute / or userland prop use that first.
+              // otherwise if we have a getter already applied, use that.
+              return attrPropVal !== undefined
+                ? attrPropVal
+                : origGetter
+                  ? origGetter.apply(this)
+                  : getValue(this, memberName);
+            },
+            configurable: true,
+            enumerable: true,
+          });
+        }
       } else if (memberFlags & MEMBER_FLAGS.Method) {
         Object.defineProperty(elm, memberName, {
           value(this: d.HostElement, ...args: any[]) {
@@ -131,6 +136,8 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
         });
       }
     });
+    // instance prototype should only be processed once
+    (cstr as any).prototype.__stencilAugmented = true;
   }
 }
 
