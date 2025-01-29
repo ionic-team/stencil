@@ -112,6 +112,6 @@ describe('ssr-shadow-cmp', () => {
       ' Default slot content Client-only slot content ',
     );
 
-    // document.querySelector('#stage')?.remove();
+    document.querySelector('#stage')?.remove();
   });
 });
