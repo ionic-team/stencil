@@ -84,6 +84,7 @@ describe('ssr-shadow-cmp', () => {
         `
         <ssr-shadow-cmp>
           <p>Default slot content</p>
+          <p slot="client-only">Client-only slot content</p>
         </ssr-shadow-cmp>
       `,
         {
@@ -105,8 +106,12 @@ describe('ssr-shadow-cmp', () => {
     // wait for Stencil to take over and reconcile
     await browser.waitUntil(async () => customElements.get('ssr-shadow-cmp'));
     expect(typeof customElements.get('ssr-shadow-cmp')).toBe('function');
-    await expect(document.querySelector('ssr-shadow-cmp').textContent).toBe(' Default slot content ');
 
-    document.querySelector('#stage')?.remove();
+    await browser.waitUntil(async () => document.querySelector('ssr-shadow-cmp [slot="client-only"]'));
+    await expect(document.querySelector('ssr-shadow-cmp').textContent).toBe(
+      ' Default slot content Client-only slot content ',
+    );
+
+    // document.querySelector('#stage')?.remove();
   });
 });
