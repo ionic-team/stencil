@@ -1,4 +1,4 @@
-import { Component, h, Prop } from '@stencil/core';
+import { Build, Component, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'ssr-shadow-cmp',
@@ -20,7 +20,9 @@ export class SsrShadowCmp {
           'option--novalue': !this.value,
         }}
       >
+        <slot name="top" />
         <slot />
+        {Build.isBrowser && <slot name="client-only" />}
       </div>
     );
   }
