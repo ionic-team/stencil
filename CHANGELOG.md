@@ -1,3 +1,17 @@
+## 🚁 [4.25.3](https://github.com/ionic-team/stencil/compare/v4.25.2...v4.25.3) (2025-02-04)
+
+
+### Bug Fixes
+
+* **runtime:** don't include loadModule logic in hydrate runtime ([#6145](https://github.com/ionic-team/stencil/issues/6145)) ([948b63a](https://github.com/ionic-team/stencil/commit/948b63af01498be9a6017b1bd8f67b952de756a5))
+
+
+### Reverts
+
+* Revert "Revert "fix(custom-elements): hydrate on client side (#5317)" (#6111)" (#6144) ([464c1a4](https://github.com/ionic-team/stencil/commit/464c1a48a3049d3e5d32b5fad29646e2ea0dcd53))
+
+
+
 ## 🐉 [4.25.2](https://github.com/ionic-team/stencil/compare/v4.25.1...v4.25.2) (2025-02-04)
 
 
