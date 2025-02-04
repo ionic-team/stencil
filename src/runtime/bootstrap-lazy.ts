@@ -165,9 +165,16 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
            * node that was removed. This is necessary to ensure that these
            * references used as keys in the `hostRef` object can be properly
            * garbage collected.
+           *
+           * Also remove the reference from `deferredConnectedCallbacks` array
+           * otherwise removed instances won't get garbage collected.
            */
           plt.raf(() => {
             const hostRef = getHostRef(this);
+            const i = deferredConnectedCallbacks.findIndex((host) => host === this);
+            if (i > -1) {
+              deferredConnectedCallbacks.splice(i, 1);
+            }
             if (hostRef?.$vnode$?.$elm$ instanceof Node && !hostRef.$vnode$.$elm$.isConnected) {
               delete hostRef.$vnode$.$elm$;
             }
