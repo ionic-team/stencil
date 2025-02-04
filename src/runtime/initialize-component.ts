@@ -32,7 +32,8 @@ export const initializeComponent = async (
     // Let the runtime know that the component has been initialized
     hostRef.$flags$ |= HOST_FLAGS.hasInitializedComponent;
 
-    if (BUILD.lazyLoad || BUILD.hydrateClientSide) {
+    const bundleId = cmpMeta.$lazyBundleId$;
+    if ((BUILD.lazyLoad || BUILD.hydrateClientSide) && bundleId) {
       // lazy loaded components
       // request the component's implementation to be
       // wired up with the host element
