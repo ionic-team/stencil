@@ -372,10 +372,13 @@ function tagRequiresScoped(tagName: string, opts: d.HydrateFactoryOptions['seria
   if (typeof opts === 'object') {
     tagName = tagName.toLowerCase();
 
-    if (Array.isArray(opts.dsd) && opts.dsd.includes(tagName)) {
+    if (Array.isArray(opts['declarative-shadow-dom']) && opts['declarative-shadow-dom'].includes(tagName)) {
       // if the tag is in the dsd array, return dsd
       return false;
-    } else if ((!Array.isArray(opts.scoped) || !opts.scoped.includes(tagName)) && opts.default === 'dsd') {
+    } else if (
+      (!Array.isArray(opts.scoped) || !opts.scoped.includes(tagName)) &&
+      opts.default === 'declarative-shadow-dom'
+    ) {
       // if the tag is not in the scoped array and the default is dsd, return dsd
       return false;
     } else {

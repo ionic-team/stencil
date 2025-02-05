@@ -36,7 +36,8 @@ function normalizeSerializationOptions(opts: Partial<SerializeNodeToHtmlOptions>
     removeBooleanAttributeQuotes:
       typeof opts.removeBooleanAttributeQuotes !== 'boolean' ? false : opts.removeBooleanAttributeQuotes,
     removeHtmlComments: typeof opts.removeHtmlComments !== 'boolean' ? false : opts.removeHtmlComments,
-    serializeShadowRoot: typeof opts.serializeShadowRoot === 'undefined' ? 'dsd' : opts.serializeShadowRoot,
+    serializeShadowRoot:
+      typeof opts.serializeShadowRoot === 'undefined' ? 'declarative-shadow-dom' : opts.serializeShadowRoot,
     fullDocument: typeof opts.fullDocument !== 'boolean' ? true : opts.fullDocument,
   } as const;
 }
