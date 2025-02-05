@@ -956,7 +956,7 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    * @default 'dsd'
    */
   serializeShadowRoot?:
-    | 'dsd'
+    | 'declarative-shadow-dom'
     | 'scoped'
     | {
         dsd: string[];
