@@ -17,7 +17,7 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
 
   /**
    * Only attach shadow root if there isn't one already and
-   * the this component is rendering DSD (not scoped) during SSR
+   * the component is rendering DSD (not scoped) during SSR
    */
   if (
     !elm.shadowRoot &&
