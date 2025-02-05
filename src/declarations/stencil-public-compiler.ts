@@ -949,15 +949,25 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    * If set to `true` the component will be rendered within a Declarative Shadow DOM.
    * If set to `false` Stencil will ignore the contents of the shadow root and render the
    * element as given in provided template.
-   * @default true
+   *
+   * *NOTE* `true | false` values have been deprecated in favor of `dsd` and `scoped`
+   * @default 'dsd'
    */
-  serializeShadowRoot?: boolean;
+  serializeShadowRoot?:
+    | 'dsd'
+    | 'scoped'
+    | {
+        dsd: string[];
+        scoped: string[];
+        default: 'dsd' | 'scoped';
+      }
+    | boolean;
   /**
    * The `fullDocument` flag determines the format of the rendered output. Set it to true to
    * generate a complete HTML document, or false to render only the component.
    * @default true
    */
-  fullDocument?: boolean;
+  fullDocument?: true;
   /**
    * Style modes to render the component in.
    * @see https://stenciljs.com/docs/styling#style-modes

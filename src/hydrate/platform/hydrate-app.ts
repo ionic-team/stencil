@@ -1,6 +1,7 @@
 import { globalScripts } from '@app-globals';
 import { addHostEventListeners, doc, getHostRef, loadModule, plt, registerHost } from '@platform';
 import { connectedCallback, insertVdomAnnotations } from '@runtime';
+import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../../declarations';
 import { proxyHostElement } from './proxy-host-element';
@@ -84,6 +85,23 @@ export function hydrateApp(
 
           if (Cstr != null && Cstr.cmpMeta != null) {
             // we found valid component metadata
+
+            if (
+              !!(Cstr.cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) &&
+              tagRequiresScoped(elm.tagName, opts.serializeShadowRoot)
+            ) {
+              // this component requires scoped css encapsulation during SSR
+              const cmpMeta = Cstr.cmpMeta;
+              cmpMeta.$flags$ |= CMP_FLAGS.shadowNeedsScopedCss;
+
+              // 'cmpMeta' is a getter only, so needs redefining
+              Object.defineProperty(Cstr as any, 'cmpMeta', {
+                get: function (this: any) {
+                  return cmpMeta;
+                },
+              });
+            }
+
             createdElements.add(elm);
             elm.connectedCallback = patchedConnectedCallback;
 
@@ -332,4 +350,39 @@ function waitingOnElementMsg(waitingElement: HTMLElement) {
 
 function waitingOnElementsMsg(waitingElements: Set<HTMLElement>) {
   return Array.from(waitingElements).map(waitingOnElementMsg);
+}
+
+/**
+ * Determines if the tag requires a declarative shadow dom
+ * or a scoped / light dom during SSR.
+ *
+ * @param tagName - component tag name
+ * @param opts - serializeShadowRoot options
+ * @returns `true` when the tag requires a scoped / light dom during SSR
+ */
+function tagRequiresScoped(tagName: string, opts: d.HydrateFactoryOptions['serializeShadowRoot']) {
+  if (typeof opts === 'string') {
+    return opts === 'scoped';
+  }
+
+  if (typeof opts === 'boolean') {
+    return opts === true ? false : true;
+  }
+
+  if (typeof opts === 'object') {
+    tagName = tagName.toLowerCase();
+
+    if (Array.isArray(opts.dsd) && opts.dsd.includes(tagName)) {
+      // if the tag is in the dsd array, return dsd
+      return false;
+    } else if ((!Array.isArray(opts.scoped) || !opts.scoped.includes(tagName)) && opts.default === 'dsd') {
+      // if the tag is not in the scoped array and the default is dsd, return dsd
+      return false;
+    } else {
+      // otherwise, return scoped
+      return true;
+    }
+  }
+
+  return false;
 }

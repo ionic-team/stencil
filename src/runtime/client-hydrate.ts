@@ -213,12 +213,22 @@ export const initializeClientHydrate = (
     });
   }
 
-  if (BUILD.shadowDom && shadowRoot) {
+  if (BUILD.shadowDom && shadowRoot && !shadowRoot.childNodes.length) {
+    // For `scoped` shadowDOM rendering (not DSD);
     // Add all the root nodes in the shadowDOM (a root node can have a whole nested DOM tree)
     let rnIdex = 0;
     const rnLen = shadowRootNodes.length;
-    for (rnIdex; rnIdex < rnLen; rnIdex++) {
-      shadowRoot.appendChild(shadowRootNodes[rnIdex] as any);
+    if (rnLen) {
+      for (rnIdex; rnIdex < rnLen; rnIdex++) {
+        shadowRoot.appendChild(shadowRootNodes[rnIdex] as any);
+      }
+      // During `scoped` shadowDOM rendering, there's a bunch of comment nodes used for positioning.
+      // Let's tidy them up now to stop frameworks complaining about DOM mismatches.
+      Array.from(hostElm.childNodes).forEach((node) => {
+        if (typeof (node as d.RenderNode)['s-sn'] !== 'string') {
+          node.parentNode.removeChild(node);
+        }
+      });
     }
   }
 
@@ -390,7 +400,7 @@ const clientHydrate = (
       });
 
       if (childNodeType === TEXT_NODE_ID) {
-        childVNode.$elm$ = node.nextSibling as any;
+        childVNode.$elm$ = findCorrespondingNode(node, NODE_TYPE.TextNode) as any;
 
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.TextNode) {
           childVNode.$text$ = childVNode.$elm$.textContent;
@@ -414,7 +424,7 @@ const clientHydrate = (
           }
         }
       } else if (childNodeType === COMMENT_NODE_ID) {
-        childVNode.$elm$ = node.nextSibling as any;
+        childVNode.$elm$ = findCorrespondingNode(node, NODE_TYPE.CommentNode) as any;
 
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.CommentNode) {
           // A non-Stencil comment node
@@ -462,6 +472,14 @@ const clientHydrate = (
     vnode.$elm$ = node;
     vnode.$index$ = '0';
     parentVNode.$children$ = [vnode];
+  } else {
+    if (node.nodeType === NODE_TYPE.TextNode && !(node as unknown as Text).wholeText.trim()) {
+      // empty white space is never accounted for from SSR so there's
+      // no corresponding comment node giving it a position in the DOM.
+      // It therefore gets slotted / clumped together at the end of the host.
+      // It's cleaner to remove. Ideally, SSR is rendered with `prettyHtml: false`
+      node.remove();
+    }
   }
 
   return parentVNode;
@@ -636,6 +654,22 @@ const addSlottedNodes = (
     slottedNodes[slotNodeId as any].push({ slot: slotNode, node: slottedNode, hostId });
     slottedNode = slottedNode.nextSibling as d.RenderNode;
   }
+};
+
+/**
+ * Steps through the node's siblings to find the next node of a specific type, with a value.
+ * e.g. when we find a position comment `<!--t.1-->`, we need to find the next text node with a value.
+ * (it's a guard against whitespace which is never accounted for in the SSR output)
+ * @param node - the starting node
+ * @param type - the type of node to find
+ * @returns the first corresponding node of the type
+ */
+const findCorrespondingNode = (node: Node, type: NODE_TYPE.CommentNode | NODE_TYPE.TextNode) => {
+  let sibling = node;
+  do {
+    sibling = sibling.nextSibling;
+  } while (sibling && (sibling.nodeType !== type || !sibling.nodeValue));
+  return sibling;
 };
 
 type SlottedNodes = Array<{ slot: d.RenderNode; node: d.RenderNode; hostId: string }>;

@@ -113,6 +113,12 @@ export const enum CMP_FLAGS {
    * options passed to the `@Component` decorator.
    */
   formAssociated = 1 << 6,
+
+  /**
+   * Determines if a `shadow: true` component needs
+   * to have its styles scoped during SSR as opposed to using DSD.
+   */
+  shadowNeedsScopedCss = 1 << 7,
 }
 
 /**

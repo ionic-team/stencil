@@ -36,7 +36,7 @@ function normalizeSerializationOptions(opts: Partial<SerializeNodeToHtmlOptions>
     removeBooleanAttributeQuotes:
       typeof opts.removeBooleanAttributeQuotes !== 'boolean' ? false : opts.removeBooleanAttributeQuotes,
     removeHtmlComments: typeof opts.removeHtmlComments !== 'boolean' ? false : opts.removeHtmlComments,
-    serializeShadowRoot: typeof opts.serializeShadowRoot !== 'boolean' ? true : opts.serializeShadowRoot,
+    serializeShadowRoot: typeof opts.serializeShadowRoot === 'undefined' ? 'dsd' : opts.serializeShadowRoot,
     fullDocument: typeof opts.fullDocument !== 'boolean' ? true : opts.fullDocument,
   } as const;
 }
@@ -243,7 +243,7 @@ function* streamToHtml(
 
     if (EMPTY_ELEMENTS.has(tagName) === false) {
       const shadowRoot = (node as HTMLElement).shadowRoot;
-      if (shadowRoot != null && opts.serializeShadowRoot) {
+      if (shadowRoot != null) {
         output.indent = output.indent + (opts.indentSpaces ?? 0);
 
         yield* streamToHtml(shadowRoot, opts, output);
@@ -681,6 +681,14 @@ export interface SerializeNodeToHtmlOptions {
   removeBooleanAttributeQuotes?: boolean;
   removeEmptyAttributes?: boolean;
   removeHtmlComments?: boolean;
-  serializeShadowRoot?: boolean;
+  serializeShadowRoot?:
+    | 'dsd'
+    | 'scoped'
+    | {
+        dsd?: string[];
+        scoped?: string[];
+        default: 'dsd' | 'scoped';
+      }
+    | boolean;
   fullDocument?: boolean;
 }
