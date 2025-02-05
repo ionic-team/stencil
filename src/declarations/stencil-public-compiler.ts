@@ -947,22 +947,29 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
   removeHtmlComments?: boolean;
   /**
    * Configure how Stencil serializes the components shadow root.
-   * - If set to `dsd` the component will be rendered within a Declarative Shadow DOM.
+   * - If set to `declarative-shadow-dom` the component will be rendered within a Declarative Shadow DOM.
    * - If set to `scoped` Stencil will render the contents of the shadow root as a `scoped: true` component
    *   and the shadow DOM will be created during client-side hydration.
-   * - Alternatively you can mix and match the two by providing an object with `dsd` and `scoped` keys, 
-   * the value arrays containing tag names of the components that should be rendered in that mode.
+   * - Alternatively you can mix and match the two by providing an object with `declarative-shadow-dom` and `scoped` keys,
+   * the value arrays containing the tag names of the components that should be rendered in that mode.
    *
-   * *NOTE* `true | false` values have been deprecated in favor of `dsd` and `scoped`
-   * @default 'dsd'
+   * Examples:
+   * - `{ 'declarative-shadow-dom': ['my-component-1', 'another-component'], default: 'scoped' }`
+   * Render all components as `scoped` apart from `my-component-1` and `another-component`
+   * -  `{ 'scoped': ['an-option-component'], default: 'declarative-shadow-dom' }`
+   * Render all components within `declarative-shadow-dom` apart from `an-option-component`
+   * - 'scoped' Render all components as `scoped`
+   *
+   * *NOTE* `true | false` values have been deprecated in favor of `declarative-shadow-dom` and `scoped`
+   * @default 'declarative-shadow-dom'
    */
   serializeShadowRoot?:
     | 'declarative-shadow-dom'
     | 'scoped'
     | {
-        dsd: string[];
-        scoped: string[];
-        default: 'dsd' | 'scoped';
+        'declarative-shadow-dom'?: string[];
+        scoped?: string[];
+        default: 'declarative-shadow-dom' | 'scoped';
       }
     | boolean;
   /**
@@ -970,7 +977,7 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    * generate a complete HTML document, or false to render only the component.
    * @default true
    */
-  fullDocument?: true;
+  fullDocument?: boolean;
   /**
    * Style modes to render the component in.
    * @see https://stenciljs.com/docs/styling#style-modes

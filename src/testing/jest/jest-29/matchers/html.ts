@@ -12,15 +12,7 @@ export function toEqualLightHtml(input: string | HTMLElement | ShadowRoot, shoul
 export function compareHtml(
   input: string | HTMLElement | ShadowRoot,
   shouldEqual: string,
-  serializeShadowRoot:
-    | boolean
-    | 'dsd'
-    | 'scoped'
-    | {
-        dsd?: string[];
-        scoped?: string[];
-        default: 'dsd' | 'scoped';
-      },
+  serializeShadowRoot: d.SerializeDocumentOptions['serializeShadowRoot'],
 ) {
   if (input == null) {
     throw new Error(`expect toEqualHtml() value is "${input}"`);

@@ -682,12 +682,12 @@ export interface SerializeNodeToHtmlOptions {
   removeEmptyAttributes?: boolean;
   removeHtmlComments?: boolean;
   serializeShadowRoot?:
-    | 'dsd'
+    | 'declarative-shadow-dom'
     | 'scoped'
     | {
-        dsd?: string[];
+        'declarative-shadow-dom'?: string[];
         scoped?: string[];
-        default: 'dsd' | 'scoped';
+        default: 'declarative-shadow-dom' | 'scoped';
       }
     | boolean;
   fullDocument?: boolean;
