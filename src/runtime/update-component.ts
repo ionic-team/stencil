@@ -1,5 +1,5 @@
 import { BUILD, NAMESPACE } from '@app-data';
-import { Build, consoleError, doc, getHostRef, nextTick, plt, win, writeTask } from '@platform';
+import { Build, consoleError, getHostRef, nextTick, plt, win, writeTask } from '@platform';
 import { CMP_FLAGS, HOST_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
@@ -415,11 +415,6 @@ export const forceUpdate = (ref: any) => {
 };
 
 export const appDidLoad = (who: string) => {
-  // on appload
-  // we have finish the first big initial render
-  if (BUILD.cssAnnotations) {
-    addHydratedFlag(doc.documentElement);
-  }
   if (BUILD.asyncQueue) {
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }

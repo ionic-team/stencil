@@ -1,3 +1,31 @@
+## 🚁 [4.25.3](https://github.com/ionic-team/stencil/compare/v4.25.2...v4.25.3) (2025-02-04)
+
+
+### Bug Fixes
+
+* **runtime:** don't include loadModule logic in hydrate runtime ([#6145](https://github.com/ionic-team/stencil/issues/6145)) ([948b63a](https://github.com/ionic-team/stencil/commit/948b63af01498be9a6017b1bd8f67b952de756a5))
+
+
+### Reverts
+
+* Revert "Revert "fix(custom-elements): hydrate on client side (#5317)" (#6111)" (#6144) ([464c1a4](https://github.com/ionic-team/stencil/commit/464c1a48a3049d3e5d32b5fad29646e2ea0dcd53))
+
+
+
+## 🐉 [4.25.2](https://github.com/ionic-team/stencil/compare/v4.25.1...v4.25.2) (2025-02-04)
+
+
+### Bug Fixes
+
+* **runtime:** clean deferredConnectedCallbacks array on disconnectedCallback ([#6142](https://github.com/ionic-team/stencil/issues/6142)) ([788dfd0](https://github.com/ionic-team/stencil/commit/788dfd0bea4a8b23027682a639ecfa7f029f33a1)), closes [#6119](https://github.com/ionic-team/stencil/issues/6119)
+* **runtime:** don't flag html tag with hydrate flag anymore ([#6103](https://github.com/ionic-team/stencil/issues/6103)) ([0691295](https://github.com/ionic-team/stencil/commit/0691295ce94746100bb1d3d17b10caf38f85979c)), closes [#6091](https://github.com/ionic-team/stencil/issues/6091)
+* **ssr:** correctly resolve slots during hydration ([#6131](https://github.com/ionic-team/stencil/issues/6131)) ([8853790](https://github.com/ionic-team/stencil/commit/885379071f64b9ba073c68612d883fe341fa47e2)), closes [#6130](https://github.com/ionic-team/stencil/issues/6130)
+* **ssr:** exponential perf slow down ([#6128](https://github.com/ionic-team/stencil/issues/6128)) ([c1e6838](https://github.com/ionic-team/stencil/commit/c1e68382529c92328d63f8fdea2632302ffe000c)), closes [#6127](https://github.com/ionic-team/stencil/issues/6127)
+* **ssr:** multiple component instances sharing initial properties ([#6126](https://github.com/ionic-team/stencil/issues/6126)) ([f7ecec3](https://github.com/ionic-team/stencil/commit/f7ecec340dddaf61a287371e0f153c86fc39dc0e)), closes [#6125](https://github.com/ionic-team/stencil/issues/6125)
+* **ssr:** stop stripping comment nodes  ([#6123](https://github.com/ionic-team/stencil/issues/6123)) ([5a7ab24](https://github.com/ionic-team/stencil/commit/5a7ab241cbdfdb40de427297d513c24b67c40565)), closes [#6120](https://github.com/ionic-team/stencil/issues/6120)
+
+
+
 ## 🌳 [4.25.1](https://github.com/ionic-team/stencil/compare/v4.25.0...v4.25.1) (2025-01-25)
 
 

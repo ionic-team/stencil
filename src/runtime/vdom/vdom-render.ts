@@ -913,7 +913,7 @@ function addRemoveSlotScopedClass(
     // let's add a scoped-slot class to this slotted node's parent
     newParent.classList?.add(scopeId + '-s');
 
-    if (oldParent && oldParent.classList.contains(scopeId + '-s')) {
+    if (oldParent && oldParent.classList?.contains(scopeId + '-s')) {
       let child = ((oldParent as d.RenderNode).__childNodes || oldParent.childNodes)[0] as d.RenderNode;
       let found = false;
 

@@ -109,6 +109,7 @@ export const initializeClientHydrate = (
     }
 
     if (childRenderNode.$tag$ === 'slot') {
+      childRenderNode.$name$ = childRenderNode.$elm$['s-sn'] || (childRenderNode.$elm$ as any)['name'] || null;
       if (childRenderNode.$children$) {
         childRenderNode.$flags$ |= VNODE_FLAGS.isSlotFallback;
 
