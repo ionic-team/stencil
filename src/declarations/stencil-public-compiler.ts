@@ -946,6 +946,7 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    */
   removeHtmlComments?: boolean;
   /**
+   * Configure how Stencil serializes the components shadow root.
    * - If set to `dsd` the component will be rendered within a Declarative Shadow DOM.
    * - If set to `scoped` Stencil will render the contents of the shadow root as a `scoped: true` component
    *   and the shadow DOM will be created during client-side hydration.
