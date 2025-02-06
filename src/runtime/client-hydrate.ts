@@ -64,7 +64,7 @@ export const initializeClientHydrate = (
     }
   }
 
-  if (!plt.$orgLocNodes$) {
+  if (!plt.$orgLocNodes$ || !plt.$orgLocNodes$.size) {
     // This is the first pass over of this whole document;
     // does a scrape to construct a 'bare-bones' tree of what elements we have and where content has been moved from
     initializeDocumentHydrate(doc.body, (plt.$orgLocNodes$ = new Map()));
@@ -223,11 +223,17 @@ export const initializeClientHydrate = (
       for (rnIdex; rnIdex < rnLen; rnIdex++) {
         shadowRoot.appendChild(shadowRootNodes[rnIdex] as any);
       }
-      // During `scoped` shadowDOM rendering, there's a bunch of comment nodes used for positioning.
+      // During `scoped` shadowDOM rendering, there's a bunch of comment nodes used for positioning / empty text nodes.
       // Let's tidy them up now to stop frameworks complaining about DOM mismatches.
       Array.from(hostElm.childNodes).forEach((node) => {
         if (typeof (node as d.RenderNode)['s-sn'] !== 'string') {
-          node.parentNode.removeChild(node);
+          if (node.nodeType === NODE_TYPE.ElementNode && (node as HTMLElement).slot && (node as HTMLElement).hidden) {
+            // this is a slotted node that doesn't have a home ... yet.
+            // we can safely leave it be, native behavior will mean it's hidden
+            (node as HTMLElement).removeAttribute('hidden');
+          } else {
+            node.parentNode.removeChild(node);
+          }
         }
       });
     }
@@ -474,6 +480,14 @@ const clientHydrate = (
     vnode.$elm$ = node;
     vnode.$index$ = '0';
     parentVNode.$children$ = [vnode];
+  } else {
+    if (node.nodeType === NODE_TYPE.TextNode && !(node as unknown as Text).wholeText.trim()) {
+      // empty white space is never accounted for from SSR so there's
+      // no corresponding comment node giving it a position in the DOM.
+      // It therefore gets slotted / clumped together at the end of the host.
+      // It's cleaner to remove. Ideally, SSR is rendered with `prettyHtml: false`
+      node.remove();
+    }
   }
 
   return parentVNode;

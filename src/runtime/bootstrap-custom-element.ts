@@ -25,7 +25,7 @@ import {
 import { computeMode } from './mode';
 import { proxyComponent } from './proxy-component';
 import { HYDRATED_STYLE_ID, PROXY_FLAGS } from './runtime-constants';
-import { attachStyles, getScopeId, registerStyle, convertScopedToShadow } from './styles';
+import { attachStyles, convertScopedToShadow,getScopeId, registerStyle } from './styles';
 
 export const defineCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
   customElements.define(compactMeta[1], proxyCustomElement(Cstr, compactMeta) as CustomElementConstructor);
