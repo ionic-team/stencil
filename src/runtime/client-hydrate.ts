@@ -233,6 +233,7 @@ export const initializeClientHydrate = (
     }
   }
 
+  plt.$orgLocNodes$.delete(hostElm['s-id']);
   hostRef.$hostElement$ = hostElm;
   endHydrate();
 };
@@ -473,14 +474,6 @@ const clientHydrate = (
     vnode.$elm$ = node;
     vnode.$index$ = '0';
     parentVNode.$children$ = [vnode];
-  } else {
-    if (node.nodeType === NODE_TYPE.TextNode && !(node as unknown as Text).wholeText.trim()) {
-      // empty white space is never accounted for from SSR so there's
-      // no corresponding comment node giving it a position in the DOM.
-      // It therefore gets slotted / clumped together at the end of the host.
-      // It's cleaner to remove. Ideally, SSR is rendered with `prettyHtml: false`
-      node.remove();
-    }
   }
 
   return parentVNode;
@@ -489,7 +482,7 @@ const clientHydrate = (
 /**
  * Recursively locate any comments representing an 'original location' for a node; in a node's children or shadowRoot children.
  * Creates a map of component IDs and 'original location' ID's which are derived from comment nodes placed by 'vdom-annotations.ts'.
- * Each 'original location' relates to lightDOM node that was moved deeper into the SSR markup. e.g. `<!--o.1-->` maps to `<div c-id="0.1">`
+ * Each 'original location' relates to a lightDOM node that was moved deeper into the SSR markup. e.g. `<!--o.1-->` maps to `<div c-id="0.1">`
  *
  * @param node The node to search.
  * @param orgLocNodes A map of the original location annotations and the current node being searched.
