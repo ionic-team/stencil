@@ -221,7 +221,7 @@ export const initializeClientHydrate = (
     const rnLen = shadowRootNodes.length;
     if (rnLen) {
       for (rnIdex; rnIdex < rnLen; rnIdex++) {
-        shadowRoot.appendChild(shadowRootNodes[rnIdex] as any);
+        shadowRoot.appendChild(shadowRootNodes[rnIdex]);
       }
       // During `scoped` shadowDOM rendering, there's a bunch of comment nodes used for positioning / empty text nodes.
       // Let's tidy them up now to stop frameworks complaining about DOM mismatches.
