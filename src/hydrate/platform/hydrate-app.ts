@@ -360,7 +360,7 @@ function waitingOnElementsMsg(waitingElements: Set<HTMLElement>) {
  * @param opts - serializeShadowRoot options
  * @returns `true` when the tag requires a scoped / light dom during SSR
  */
-function tagRequiresScoped(tagName: string, opts: d.HydrateFactoryOptions['serializeShadowRoot']) {
+export function tagRequiresScoped(tagName: string, opts: d.HydrateFactoryOptions['serializeShadowRoot']) {
   if (typeof opts === 'string') {
     return opts === 'scoped';
   }
