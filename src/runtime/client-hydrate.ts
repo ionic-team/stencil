@@ -408,7 +408,7 @@ const clientHydrate = (
       });
 
       if (childNodeType === TEXT_NODE_ID) {
-        childVNode.$elm$ = findCorrespondingNode(node, NODE_TYPE.TextNode) as any;
+        childVNode.$elm$ = findCorrespondingNode(node, NODE_TYPE.TextNode) as d.RenderNode;
 
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.TextNode) {
           childVNode.$text$ = childVNode.$elm$.textContent;
