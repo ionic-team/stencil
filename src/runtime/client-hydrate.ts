@@ -432,7 +432,7 @@ const clientHydrate = (
           }
         }
       } else if (childNodeType === COMMENT_NODE_ID) {
-        childVNode.$elm$ = findCorrespondingNode(node, NODE_TYPE.CommentNode) as any;
+        childVNode.$elm$ = findCorrespondingNode(node, NODE_TYPE.CommentNode) as d.RenderNode;
 
         if (childVNode.$elm$ && childVNode.$elm$.nodeType === NODE_TYPE.CommentNode) {
           // A non-Stencil comment node
