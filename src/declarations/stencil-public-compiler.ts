@@ -958,9 +958,10 @@ export interface SerializeDocumentOptions extends HydrateDocumentOptions {
    * Render all components as `scoped` apart from `my-component-1` and `another-component`
    * -  `{ 'scoped': ['an-option-component'], default: 'declarative-shadow-dom' }`
    * Render all components within `declarative-shadow-dom` apart from `an-option-component`
-   * - 'scoped' Render all components as `scoped`
+   * - `'scoped'` Render all components as `scoped`
+   * - `false` disables shadow root serialization
    *
-   * *NOTE* `true | false` values have been deprecated in favor of `declarative-shadow-dom` and `scoped`
+   * *NOTE* `true` has been deprecated in favor of `declarative-shadow-dom` and `scoped`
    * @default 'declarative-shadow-dom'
    */
   serializeShadowRoot?:

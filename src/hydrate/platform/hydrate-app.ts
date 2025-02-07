@@ -87,6 +87,7 @@ export function hydrateApp(
             // we found valid component metadata
 
             if (
+              opts.serializeShadowRoot !== false &&
               !!(Cstr.cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) &&
               tagRequiresScoped(elm.tagName, opts.serializeShadowRoot)
             ) {

@@ -16,8 +16,8 @@ import {
 import { hmrStart } from './hmr-component';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
-import { HYDRATED_CSS, HYDRATED_STYLE_ID, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
-import { convertScopedToShadow, registerStyle } from './styles';
+import { HYDRATED_CSS, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
+import { hydrateScopedToShadow } from './styles';
 import { appDidLoad } from './update-component';
 export { setNonce } from '@platform';
 
@@ -50,12 +50,9 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     // async queue. This will improve the first input delay
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
   }
+
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-    const styles = doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
-    let i = 0;
-    for (; i < styles.length; i++) {
-      registerStyle(styles[i].getAttribute(HYDRATED_STYLE_ID), convertScopedToShadow(styles[i].innerHTML), true);
-    }
+    hydrateScopedToShadow();
   }
 
   let hasSlotRelocation = false;

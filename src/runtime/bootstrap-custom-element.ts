@@ -2,7 +2,6 @@ import { BUILD } from '@app-data';
 import {
   addHostEventListeners,
   deleteHostRef,
-  doc,
   forceUpdate,
   getHostRef,
   plt,
@@ -24,8 +23,8 @@ import {
 } from './dom-extras';
 import { computeMode } from './mode';
 import { proxyComponent } from './proxy-component';
-import { HYDRATED_STYLE_ID, PROXY_FLAGS } from './runtime-constants';
-import { attachStyles, convertScopedToShadow, getScopeId, registerStyle } from './styles';
+import { PROXY_FLAGS } from './runtime-constants';
+import { attachStyles, getScopeId, hydrateScopedToShadow, registerStyle } from './styles';
 
 export const defineCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
   customElements.define(compactMeta[1], proxyCustomElement(Cstr, compactMeta) as CustomElementConstructor);
@@ -76,11 +75,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
   }
 
   if (BUILD.hydrateClientSide && BUILD.shadowDom) {
-    const styles = doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
-    let i = 0;
-    for (; i < styles.length; i++) {
-      registerStyle(styles[i].getAttribute(HYDRATED_STYLE_ID), convertScopedToShadow(styles[i].innerHTML), true);
-    }
+    hydrateScopedToShadow();
   }
 
   const originalConnectedCallback = Cstr.prototype.connectedCallback;

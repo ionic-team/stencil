@@ -242,6 +242,18 @@ export const getScopeId = (cmp: d.ComponentRuntimeMeta, mode?: string) =>
  */
 export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+)\*\/[^\{]+\{/g, '$1{');
 
+/**
+ * Hydrate styles after SSR for components *not* using DSD. Convert 'scoped' styles to 'shadow'
+ * and add them to a constructable stylesheet.
+ */
+export const hydrateScopedToShadow = () => {
+  const styles = doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
+  let i = 0;
+  for (; i < styles.length; i++) {
+    registerStyle(styles[i].getAttribute(HYDRATED_STYLE_ID), convertScopedToShadow(styles[i].innerHTML), true);
+  }
+};
+
 declare global {
   export interface CSSStyleSheet {
     replaceSync(cssText: string): void;

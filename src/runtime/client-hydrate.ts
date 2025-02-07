@@ -223,15 +223,19 @@ export const initializeClientHydrate = (
       for (rnIdex; rnIdex < rnLen; rnIdex++) {
         shadowRoot.appendChild(shadowRootNodes[rnIdex]);
       }
-      // During `scoped` shadowDOM rendering, there's a bunch of comment nodes used for positioning / empty text nodes.
-      // Let's tidy them up now to stop frameworks complaining about DOM mismatches.
+
       Array.from(hostElm.childNodes).forEach((node) => {
         if (typeof (node as d.RenderNode)['s-sn'] !== 'string') {
           if (node.nodeType === NODE_TYPE.ElementNode && (node as HTMLElement).slot && (node as HTMLElement).hidden) {
             // this is a slotted node that doesn't have a home ... yet.
             // we can safely leave it be, native behavior will mean it's hidden
             (node as HTMLElement).removeAttribute('hidden');
-          } else {
+          } else if (
+            node.nodeType === NODE_TYPE.CommentNode ||
+            (node.nodeType === NODE_TYPE.TextNode && !(node as Text).wholeText.trim())
+          ) {
+            // During `scoped` shadowDOM rendering, there's a bunch of comment nodes used for positioning / empty text nodes.
+            // Let's tidy them up now to stop frameworks complaining about DOM mismatches.
             node.parentNode.removeChild(node);
           }
         }
