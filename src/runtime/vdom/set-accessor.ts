@@ -12,7 +12,7 @@ import { isMemberInElement, plt, win } from '@platform';
 import { isComplexType } from '@utils';
 
 import type * as d from '../../declarations';
-import { VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
+import { NODE_TYPE, VNODE_FLAGS, XLINK_NS } from '../runtime-constants';
 
 /**
  * When running a VDom render set properties present on a VDom node onto the
@@ -189,7 +189,10 @@ export const setAccessor = (
             elm.removeAttribute(memberName);
           }
         }
-      } else if ((!isProp || flags & VNODE_FLAGS.isHost || isSvg) && !isComplex) {
+      } else if (
+        (!isProp || flags & VNODE_FLAGS.isHost || isSvg) && 
+        !isComplex && elm.nodeType === NODE_TYPE.ElementNode
+      ) {
         newValue = newValue === true ? '' : newValue;
         if (BUILD.vdomXlink && xlink) {
           elm.setAttributeNS(XLINK_NS, memberName, newValue);

@@ -5,7 +5,7 @@ import { NODE_TYPE } from './runtime-constants';
 
 /**
  * Adjust the `.hidden` property as-needed on any nodes in a DOM subtree which
- * are slot fallbacks nodes - `<slot-fb>...</slot-fb>`
+ * are slot fallback nodes - `<slot-fb>...</slot-fb>`
  *
  * A slot fallback node should be visible by default. Then, it should be
  * conditionally hidden if:
@@ -191,3 +191,36 @@ export const addSlotRelocateNode = (
 
 export const getSlotName = (node: d.PatchedSlotNode) =>
   node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || '';
+
+/**
+ * Add `assignedElements` and `assignedNodes` methods on a fake slot node
+ * 
+ * @param node - slot node to patch
+ * @returns 
+ */
+export function patchSlotNode(node: d.RenderNode) {
+  if ((node as any).assignedElements || (node as any).assignedNodes || !node['s-sr']) return;
+
+  const assignedFactory = (elementsOnly: boolean) => (function(opts?: { flatten: boolean }) {
+    let toReturn = getHostSlotChildNodes(this, this['s-sn'], true);
+    if (elementsOnly) toReturn = toReturn.filter((n) => n.nodeType === NODE_TYPE.ElementNode);
+    
+    if (!opts?.flatten) return toReturn.filter(n => !n['s-sr']);
+
+    return toReturn.reduce(
+      (acc, node) => {
+        if (node['s-sr']) {
+          if (elementsOnly) acc.push(...(node as any).assignedElements(opts));
+          else acc.push(...(node as any).assignedNodes(opts));
+        } else {
+          acc.push(node);
+        }
+        return acc;
+      },
+      [] as d.RenderNode[],
+    );
+  }).bind(node);
+
+  (node as any).assignedElements = assignedFactory(true);
+  (node as any).assignedNodes = assignedFactory(false);
+}

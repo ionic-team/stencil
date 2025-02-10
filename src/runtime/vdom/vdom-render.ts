@@ -13,7 +13,7 @@ import { CMP_FLAGS, HTML_NS, isDef, NODE_TYPES, SVG_NS } from '@utils';
 import type * as d from '../../declarations';
 import { patchParentNode } from '../dom-extras';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
-import { isNodeLocatedInSlot, updateFallbackSlotVisibility } from '../slot-polyfill-utils';
+import { isNodeLocatedInSlot, patchSlotNode, updateFallbackSlotVisibility } from '../slot-polyfill-utils';
 import { h, isHost, newVNode } from './h';
 import { updateElement } from './update-element';
 
@@ -162,6 +162,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       }
       if (BUILD.scoped) {
         addRemoveSlotScopedClass(contentRef, elm, newParentVNode.$elm$, oldParentVNode?.$elm$);
+        patchSlotNode(elm);
       }
     }
   }
