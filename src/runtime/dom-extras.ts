@@ -395,8 +395,12 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
   });
 };
 
+/**
+ * Dispatches a `slotchange` event on a fake `<slot />` node.
+ *
+ * @param elm the slot node to dispatch the event from
+ */
 function dispatchSlotChangeEvent(elm: d.RenderNode) {
-  console.log('dispatchSlotChangeEvent');
   elm.dispatchEvent(new CustomEvent('slotchange', { bubbles: false, cancelable: false, composed: false }));
 }
 
