@@ -1,6 +1,6 @@
 {
   "name": "@stencil/core",
-  "version": "4.25.3",
+  "version": "4.26.0",
   "license": "MIT",
   "main": "./internal/stencil-core/index.cjs",
   "module": "./internal/stencil-core/index.js",
@@ -154,7 +154,7 @@
     "conventional-changelog-cli": "^5.0.0",
     "cspell": "^8.0.0",
     "dts-bundle-generator": "~9.5.0",
-    "esbuild": "^0.21.0",
+    "esbuild": "^0.25.0",
     "esbuild-plugin-replace": "^1.4.0",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^9.0.0",

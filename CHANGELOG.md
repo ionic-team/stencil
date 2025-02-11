@@ -1,3 +1,12 @@
+# 🐇 [4.26.0](https://github.com/ionic-team/stencil/compare/v4.25.3...v4.26.0) (2025-02-11)
+
+
+### Features
+
+* **ssr:** shadow dom components can render as declarative-shadow-dom or as 'scoped' ([#6147](https://github.com/ionic-team/stencil/issues/6147)) ([26e4aa3](https://github.com/ionic-team/stencil/commit/26e4aa3221d293f294d56b050f29a244d3e44c8c))
+
+
+
 ## 🚁 [4.25.3](https://github.com/ionic-team/stencil/compare/v4.25.2...v4.25.3) (2025-02-04)
 
 
