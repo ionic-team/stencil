@@ -1021,7 +1021,10 @@ render() {
     scopeId = hostElm['s-sc'];
   }
 
-  useNativeShadowDom = supportsShadow && (cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) !== 0;
+  useNativeShadowDom =
+    supportsShadow &&
+    !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) &&
+    !(cmpMeta.$flags$ & CMP_FLAGS.shadowNeedsScopedCss);
   if (BUILD.slotRelocation) {
     contentRef = hostElm['s-cr'];
 

@@ -16,9 +16,14 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
   }
 
   /**
-   * Only attach shadow root if there isn't one already
+   * Only attach shadow root if there isn't one already and
+   * the component is rendering DSD (not scoped) during SSR
    */
-  if (!elm.shadowRoot && !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation)) {
+  if (
+    !elm.shadowRoot &&
+    !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation) &&
+    !(cmpMeta.$flags$ & CMP_FLAGS.shadowNeedsScopedCss)
+  ) {
     if (BUILD.shadowDelegatesFocus) {
       elm.attachShadow({
         mode: 'open',

@@ -17,6 +17,7 @@ import { hmrStart } from './hmr-component';
 import { createTime, installDevTools } from './profile';
 import { proxyComponent } from './proxy-component';
 import { HYDRATED_CSS, PLATFORM_FLAGS, PROXY_FLAGS, SLOT_FB_CSS } from './runtime-constants';
+import { hydrateScopedToShadow } from './styles';
 import { appDidLoad } from './update-component';
 export { setNonce } from '@platform';
 
@@ -48,6 +49,10 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
     // If the app is already hydrated there is not point to disable the
     // async queue. This will improve the first input delay
     plt.$flags$ |= PLATFORM_FLAGS.appLoaded;
+  }
+
+  if (BUILD.hydrateClientSide && BUILD.shadowDom) {
+    hydrateScopedToShadow();
   }
 
   let hasSlotRelocation = false;

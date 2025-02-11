@@ -24,7 +24,7 @@ import {
 import { computeMode } from './mode';
 import { proxyComponent } from './proxy-component';
 import { PROXY_FLAGS } from './runtime-constants';
-import { attachStyles, getScopeId, registerStyle } from './styles';
+import { attachStyles, getScopeId, hydrateScopedToShadow, registerStyle } from './styles';
 
 export const defineCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMetaCompact) => {
   customElements.define(compactMeta[1], proxyCustomElement(Cstr, compactMeta) as CustomElementConstructor);
@@ -72,6 +72,10 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
     if (BUILD.scopedSlotTextContentFix && cmpMeta.$flags$ & CMP_FLAGS.scopedCssEncapsulation) {
       patchTextContent(Cstr.prototype);
     }
+  }
+
+  if (BUILD.hydrateClientSide && BUILD.shadowDom) {
+    hydrateScopedToShadow();
   }
 
   const originalConnectedCallback = Cstr.prototype.connectedCallback;
