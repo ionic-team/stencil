@@ -147,6 +147,9 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the ref callback function
       elm['s-rf'] = newVNode.$attrs$?.ref;
 
+      // give this node `assignedElements` and `assignedNodes` methods 
+      patchSlotNode(elm);
+
       // check if we've got an old vnode for this slot
       oldVNode = oldParentVNode && oldParentVNode.$children$ && oldParentVNode.$children$[childIndex];
       if (oldVNode && oldVNode.$tag$ === newVNode.$tag$ && oldParentVNode.$elm$) {
@@ -162,7 +165,6 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       }
       if (BUILD.scoped) {
         addRemoveSlotScopedClass(contentRef, elm, newParentVNode.$elm$, oldParentVNode?.$elm$);
-        patchSlotNode(elm);
       }
     }
   }
