@@ -3,8 +3,20 @@ import { reWireGetterSetter } from '@utils/es2022-rewire-class-members';
 
 import type * as d from '../declarations';
 
-export const deleteHostRef = (ref: d.RuntimeRef) => {
-  delete ref.$hostRef$;
+/**
+ * Given a {@link d.RuntimeRef} remove the corresponding {@link d.HostRef} from
+ * the {@link hostRefs} WeakMap.
+ *
+ * @param ref the runtime ref of interest
+ * @returns — true if the element was successfully removed, or false if it was not present.
+ */
+export const deleteHostRef = (ref: d.RuntimeRef): boolean => {
+  if (ref.$hostRef$) {
+    delete ref.$hostRef$;
+    return true;
+  }
+
+  return false;
 };
 
 /**
