@@ -11,8 +11,8 @@ import type * as d from '../declarations';
  * @returns — true if the element was successfully removed, or false if it was not present.
  */
 export const deleteHostRef = (ref: d.RuntimeRef): boolean => {
-  if (ref.$hostRef$) {
-    delete ref.$hostRef$;
+  if (ref.__stencil__getHostRef) {
+    delete ref.__stencil__getHostRef;
     return true;
   }
 
@@ -26,7 +26,11 @@ export const deleteHostRef = (ref: d.RuntimeRef): boolean => {
  * @returns the Host reference (if found) or undefined
  */
 export const getHostRef = (ref: d.RuntimeRef): d.HostRef | undefined => {
-  return ref.$hostRef$;
+  if (ref.__stencil__getHostRef) {
+    return ref.__stencil__getHostRef();
+  }
+
+  return undefined;
 };
 
 /**
@@ -37,7 +41,7 @@ export const getHostRef = (ref: d.RuntimeRef): d.HostRef | undefined => {
  * @param hostRef that instances `HostRef` object
  */
 export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
-  lazyInstance.$hostRef$ = hostRef;
+  lazyInstance.__stencil__getHostRef = () => hostRef;
   hostRef.$lazyInstance$ = lazyInstance;
 
   if (BUILD.modernPropertyDecls && (BUILD.state || BUILD.prop)) {
@@ -73,7 +77,8 @@ export const registerHost = (hostElement: d.HostElement, cmpMeta: d.ComponentRun
     hostElement['s-rc'] = [];
   }
 
-  const ref = (hostElement.$hostRef$ = hostRef);
+  const ref = hostRef;
+  hostElement.__stencil__getHostRef = () => ref;
 
   if (!BUILD.lazyLoad && BUILD.modernPropertyDecls && (BUILD.state || BUILD.prop)) {
     reWireGetterSetter(hostElement, hostRef);
