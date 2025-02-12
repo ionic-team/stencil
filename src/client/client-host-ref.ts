@@ -2,15 +2,8 @@ import { BUILD } from '@app-data';
 import { reWireGetterSetter } from '@utils/es2022-rewire-class-members';
 
 import type * as d from '../declarations';
-import { consoleDevWarn } from './client-log';
 
 export const deleteHostRef = (ref: d.RuntimeRef) => {
-  if (ref.$hostRef$) {
-    if (BUILD.isDev) {
-      consoleDevWarn(`Could not cleanup`, ref);
-    }
-    return;
-  }
   delete ref.$hostRef$;
 };
 
