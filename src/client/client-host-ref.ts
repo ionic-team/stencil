@@ -2,9 +2,16 @@ import { BUILD } from '@app-data';
 import { reWireGetterSetter } from '@utils/es2022-rewire-class-members';
 
 import type * as d from '../declarations';
+import { consoleDevWarn } from './client-log';
 
 export const deleteHostRef = (ref: d.RuntimeRef) => {
-  delete (ref as any)['$$hostRef'];
+  if (ref.$hostRef$) {
+    if (BUILD.isDev) {
+      consoleDevWarn(`Could not cleanup`, ref);
+    }
+    return;
+  }
+  delete ref.$hostRef$;
 };
 
 /**
@@ -14,7 +21,7 @@ export const deleteHostRef = (ref: d.RuntimeRef) => {
  * @returns the Host reference (if found) or undefined
  */
 export const getHostRef = (ref: d.RuntimeRef): d.HostRef | undefined => {
-  return (ref as any).$$hostRef;
+  return ref.$hostRef$;
 };
 
 /**
@@ -25,7 +32,7 @@ export const getHostRef = (ref: d.RuntimeRef): d.HostRef | undefined => {
  * @param hostRef that instances `HostRef` object
  */
 export const registerInstance = (lazyInstance: any, hostRef: d.HostRef) => {
-  lazyInstance['$$hostRef'] = hostRef;
+  lazyInstance.$hostRef$ = hostRef;
   hostRef.$lazyInstance$ = lazyInstance;
 
   if (BUILD.modernPropertyDecls && (BUILD.state || BUILD.prop)) {
@@ -61,7 +68,7 @@ export const registerHost = (hostElement: d.HostElement, cmpMeta: d.ComponentRun
     hostElement['s-rc'] = [];
   }
 
-  const ref = ((hostElement as any).$$hostRef = hostRef);
+  const ref = (hostElement.$hostRef$ = hostRef);
 
   if (!BUILD.lazyLoad && BUILD.modernPropertyDecls && (BUILD.state || BUILD.prop)) {
     reWireGetterSetter(hostElement, hostRef);
