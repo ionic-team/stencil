@@ -76,6 +76,20 @@ const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: bool
       }
       const optional = jsxAttributes ? !type.required : type.optional;
       fullList.push(`        "${type.name}"${optional ? '?' : ''}: ${type.type};`);
+
+      /**
+       * deprecated usage of dash-casing in JSX, use camelCase instead
+       */
+      if (type.attributeName && type.attributeName !== type.name) {
+        const padding = ' '.repeat(8);
+        fullList.push([
+          `${padding}/**`,
+          `${padding} * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.`,
+          `${padding} */`
+        ].join('\n'));
+        fullList.push(`${padding}"${type.attributeName}"${optional ? '?' : ''}: ${type.type};`);
+      }
+
       return fullList;
     }, [] as string[])
     .join(`\n`);

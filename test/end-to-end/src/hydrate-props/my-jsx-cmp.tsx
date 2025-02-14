@@ -8,9 +8,16 @@ import { Component, h, Prop } from '@stencil/core';
   shadow: true,
 })
 export class MyJsxCmp {
+  /**
+   * foo prop
+   */
   @Prop()
   fooProp: string;
 
+  /**
+   * bar prop
+   * @returns bar
+   */
   @Prop()
   get barProp() {
     return 'bar';

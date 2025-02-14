@@ -20,6 +20,7 @@ export const generatePropTypes = (cmpMeta: d.ComponentCompilerMeta, typeImportDa
       }
       return {
         name: cmpProp.name,
+        attributeName: cmpProp.attribute,
         type: getType(cmpProp, typeImportData, cmpMeta.sourceFilePath),
         optional: cmpProp.optional,
         required: cmpProp.required,
