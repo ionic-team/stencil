@@ -8,8 +8,20 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface TsTargetProps {
         "basicProp": string;
+        /**
+         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         */
+        "basic-prop": string;
         "decoratedGetterSetterProp": number;
+        /**
+         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         */
+        "decorated-getter-setter-prop": number;
         "decoratedProp": number;
+        /**
+         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         */
+        "decorated-prop": number;
     }
 }
 declare global {
@@ -26,8 +38,20 @@ declare global {
 declare namespace LocalJSX {
     interface TsTargetProps {
         "basicProp"?: string;
+        /**
+         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         */
+        "basic-prop"?: string;
         "decoratedGetterSetterProp"?: number;
+        /**
+         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         */
+        "decorated-getter-setter-prop"?: number;
         "decoratedProp"?: number;
+        /**
+         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         */
+        "decorated-prop"?: number;
     }
     interface IntrinsicElements {
         "ts-target-props": TsTargetProps;
