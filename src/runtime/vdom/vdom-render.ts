@@ -13,7 +13,13 @@ import { CMP_FLAGS, HTML_NS, isDef, NODE_TYPES, SVG_NS } from '@utils';
 import type * as d from '../../declarations';
 import { patchParentNode } from '../dom-extras';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
-import { isNodeLocatedInSlot, patchSlotNode, updateFallbackSlotVisibility } from '../slot-polyfill-utils';
+import {
+  dispatchSlotChangeEvent,
+  findSlotFromSlottedNode,
+  isNodeLocatedInSlot,
+  patchSlotNode,
+  updateFallbackSlotVisibility,
+} from '../slot-polyfill-utils';
 import { h, isHost, newVNode } from './h';
 import { updateElement } from './update-element';
 
@@ -73,6 +79,10 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     // create a slot reference node
     elm = newVNode.$elm$ =
       BUILD.isDebug || BUILD.hydrateServerSide ? slotReferenceDebugNode(newVNode) : (doc.createTextNode('') as any);
+    // add css classes, attrs, props, listeners, etc.
+    if (BUILD.vdomAttribute) {
+      updateElement(null, newVNode, isSvgMode);
+    }
   } else {
     if (BUILD.svg && !isSvgMode) {
       isSvgMode = newVNode.$tag$ === 'svg';
@@ -147,7 +157,7 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
       // remember the ref callback function
       elm['s-rf'] = newVNode.$attrs$?.ref;
 
-      // give this node `assignedElements` and `assignedNodes` methods 
+      // give this node `assignedElements` and `assignedNodes` methods
       patchSlotNode(elm);
 
       // check if we've got an old vnode for this slot
@@ -683,7 +693,7 @@ export const patch = (oldVNode: d.VNode, newVNode: d.VNode, isInitialRender = fa
           newVNode.$elm$['s-sn'] = newVNode.$name$ || '';
           relocateToHostRoot(newVNode.$elm$.parentElement);
         }
-      } 
+      }
       // either this is the first render of an element OR it's an update
       // AND we already know it's possible it could have changed
       // this updates the element's css classes, attrs, props, listeners, etc.
@@ -871,7 +881,13 @@ export const insertBefore = (
       patchParentNode(newNode);
     }
     // potentially use the patched insertBefore method. This will correctly slot the new node
-    return parent.insertBefore(newNode, reference);
+    parent.insertBefore(newNode, reference);
+
+    // if we find a corresponding slot node, dispatch a slotchange event now
+    const { slotNode } = findSlotFromSlottedNode(newNode);
+    if (slotNode) dispatchSlotChangeEvent(slotNode);
+
+    return newNode;
   }
 
   if (BUILD.experimentalSlotFixes && (parent as d.RenderNode).__insertBefore) {
@@ -1138,8 +1154,7 @@ render() {
               }
             }
           }
-
-          nodeToRelocate && typeof slotRefNode['s-rf'] === 'function' && slotRefNode['s-rf'](nodeToRelocate);
+          nodeToRelocate && typeof slotRefNode['s-rf'] === 'function' && slotRefNode['s-rf'](slotRefNode);
         } else {
           // this node doesn't have a slot home to go to, so let's hide it
           if (nodeToRelocate.nodeType === NODE_TYPE.ElementNode) {

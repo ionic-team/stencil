@@ -4,6 +4,8 @@ import { supportsShadow } from '@platform';
 import type * as d from '../declarations';
 import {
   addSlotRelocateNode,
+  dispatchSlotChangeEvent,
+  findSlotFromSlottedNode,
   getHostSlotChildNodes,
   getHostSlotNodes,
   getSlotName,
@@ -92,8 +94,7 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
   
   HostElementPrototype.appendChild = function (this: d.RenderNode, newChild: d.RenderNode) {
-    const slotName = (newChild['s-sn'] = getSlotName(newChild));
-    const slotNode = getHostSlotNodes((this as any).__childNodes || this.childNodes, this.tagName, slotName)[0];
+    const { slotName, slotNode } = findSlotFromSlottedNode(newChild, this);
     if (slotNode) {
       addSlotRelocateNode(newChild, slotNode);
 
@@ -157,13 +158,13 @@ export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
       const slotNode = getHostSlotNodes(childNodes, this.tagName, slotName)[0];
       if (slotNode) {
         addSlotRelocateNode(newChild, slotNode, true);
-        
+
         const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
         const appendAfter = slotChildNodes[0];
-        
+
         const parent = internalCall(appendAfter, 'parentNode') as d.RenderNode;
         internalCall(parent, 'insertBefore')(newChild, internalCall(appendAfter, 'nextSibling'));
-        
+
         dispatchSlotChangeEvent(slotNode);
       }
 
@@ -259,8 +260,7 @@ const patchInsertBefore = (HostElementPrototype: HTMLElement) => {
     newChild: T,
     currentChild: d.RenderNode | null,
   ) {
-    const slotName = (newChild['s-sn'] = getSlotName(newChild));
-    const slotNode = getHostSlotNodes(this.__childNodes, this.tagName, slotName)[0];
+    const { slotName, slotNode } = findSlotFromSlottedNode(newChild, this);
     const slottedNodes = this.__childNodes ? this.childNodes : getSlottedChildNodes(this.childNodes);
 
     if (slotNode) {
@@ -285,7 +285,7 @@ const patchInsertBefore = (HostElementPrototype: HTMLElement) => {
             const parent = internalCall(currentChild, 'parentNode') as d.RenderNode;
             internalCall(parent, 'insertBefore')(newChild, currentChild);
 
-            dispatchSlotChangeEvent(slotNode);            
+            dispatchSlotChangeEvent(slotNode);
           }
           return;
         }
@@ -395,15 +395,6 @@ export const patchChildSlotNodes = (elm: HTMLElement) => {
   });
 };
 
-/**
- * Dispatches a `slotchange` event on a fake `<slot />` node.
- *
- * @param elm the slot node to dispatch the event from
- */
-function dispatchSlotChangeEvent(elm: d.RenderNode) {
-  elm.dispatchEvent(new CustomEvent('slotchange', { bubbles: false, cancelable: false, composed: false }));
-}
-
 /// SLOTTED NODES ///
 
 /**
@@ -419,7 +410,7 @@ function dispatchSlotChangeEvent(elm: d.RenderNode) {
  * @param node the slotted node to be patched
  */
 export const patchSlottedNode = (node: Node) => {
-  if (!node || (node as any).__nextSibling || !globalThis.Node) return;
+  if (!node || (node as any).__nextSibling !== undefined || !globalThis.Node) return;
 
   patchNextSibling(node);
   patchPreviousSibling(node);
@@ -582,13 +573,13 @@ function patchHostOriginalAccessor(
  *
  * @returns the original accessor or method of the node
  */
-function internalCall<T extends d.RenderNode, P extends keyof d.RenderNode>(node: T, method: P): T[P] {
+export function internalCall<T extends d.RenderNode, P extends keyof d.RenderNode>(node: T, method: P): T[P] {
   if ('__' + method in node) {
     const toReturn = node[('__' + method) as keyof d.RenderNode] as T[P];
     if (typeof toReturn !== 'function') return toReturn;
-    return toReturn.bind(node) as T[P];;
+    return toReturn.bind(node) as T[P];
   } else {
     if (typeof node[method] !== 'function') return node[method];
-    return (node[method]).bind(node);
+    return node[method].bind(node) as T[P];
   }
 }
