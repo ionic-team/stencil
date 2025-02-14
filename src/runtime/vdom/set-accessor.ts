@@ -190,8 +190,9 @@ export const setAccessor = (
           }
         }
       } else if (
-        (!isProp || flags & VNODE_FLAGS.isHost || isSvg) && 
-        !isComplex && elm.nodeType === NODE_TYPE.ElementNode
+        (!isProp || flags & VNODE_FLAGS.isHost || isSvg) &&
+        !isComplex &&
+        elm.nodeType === NODE_TYPE.ElementNode
       ) {
         newValue = newValue === true ? '' : newValue;
         if (BUILD.vdomXlink && xlink) {

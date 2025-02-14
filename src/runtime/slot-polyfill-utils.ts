@@ -245,9 +245,10 @@ export function dispatchSlotChangeEvent(elm: d.RenderNode) {
  */
 export function findSlotFromSlottedNode(slottedNode: d.PatchedSlotNode, parentHost?: HTMLElement) {
   parentHost = parentHost || slottedNode['s-ol']?.parentElement;
+
   if (!parentHost) return { slotNode: null, slotName: '' };
 
-  const slotName = (slottedNode['s-sn'] = getSlotName(slottedNode));
+  const slotName = (slottedNode['s-sn'] = getSlotName(slottedNode) || '');
   const childNodes = internalCall(parentHost, 'childNodes');
   const slotNode = getHostSlotNodes(childNodes, parentHost.tagName, slotName)[0];
   return { slotNode, slotName };

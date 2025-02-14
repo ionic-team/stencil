@@ -92,7 +92,7 @@ export const patchCloneNode = (HostElementPrototype: HTMLElement) => {
  */
 export const patchSlotAppendChild = (HostElementPrototype: any) => {
   HostElementPrototype.__appendChild = HostElementPrototype.appendChild;
-  
+
   HostElementPrototype.appendChild = function (this: d.RenderNode, newChild: d.RenderNode) {
     const { slotName, slotNode } = findSlotFromSlottedNode(newChild, this);
     if (slotNode) {

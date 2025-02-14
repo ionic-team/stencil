@@ -15,6 +15,9 @@ export class ScopedSlotChange {
     return (
       <div>
         <slot onSlotchange={this.handleSlotchange} />
+        <slot name="fallback-slot" onSlotchange={this.handleSlotchange}>
+          Slot with fallback
+        </slot>
       </div>
     );
   }

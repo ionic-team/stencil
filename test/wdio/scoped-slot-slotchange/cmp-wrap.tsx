@@ -11,7 +11,7 @@ export class ScopedSlotChangeWrap {
     return (
       <div>
         <scoped-slot-slotchange>
-          {this.swapSlotContent ? <div>Swapped slotted content</div> : <span>Initial slotted content</span>}
+          {this.swapSlotContent ? <div>Swapped slotted content</div> : <p>Initial slotted content</p>}
         </scoped-slot-slotchange>
       </div>
     );
