@@ -84,7 +84,7 @@ const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: bool
         const padding = ' '.repeat(8);
         fullList.push([
           `${padding}/**`,
-          `${padding} * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.`,
+          `${padding} * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.`,
           `${padding} */`
         ].join('\n'));
         fullList.push(`${padding}"${type.attributeName}"${optional ? '?' : ''}: ${type.type};`);

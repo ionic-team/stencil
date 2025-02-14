@@ -41,7 +41,7 @@ export namespace Components {
     interface CmpDsd {
         "initialCounter": number;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "initial-counter": number;
     }
@@ -106,7 +106,7 @@ export namespace Components {
         "someMethodWithArgs": (unit: string, value: number) => Promise<string>;
         "someProp": number;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "some-prop": number;
     }
@@ -118,7 +118,7 @@ export namespace Components {
          */
         "barProp": string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "bar-prop": string;
         /**
@@ -126,7 +126,7 @@ export namespace Components {
          */
         "fooProp": string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "foo-prop": string;
         /**
@@ -142,7 +142,7 @@ export namespace Components {
          */
         "barProp": string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "bar-prop": string;
         /**
@@ -150,7 +150,7 @@ export namespace Components {
          */
         "fooProp": string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "foo-prop": string;
         /**
@@ -184,12 +184,12 @@ export namespace Components {
          */
         "fullName": string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "full-name": string;
         "lastName": string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "last-name": string;
         /**
@@ -200,17 +200,17 @@ export namespace Components {
     interface RuntimeDecorators {
         "basicProp": string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "basic-prop": string;
         "decoratedGetterSetterProp": number;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "decorated-getter-setter-prop": number;
         "decoratedProp": number;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "decorated-prop": number;
     }
@@ -671,7 +671,7 @@ declare namespace LocalJSX {
     interface CmpDsd {
         "initialCounter"?: number;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "initial-counter"?: number;
     }
@@ -710,7 +710,7 @@ declare namespace LocalJSX {
     interface MethodCmp {
         "someProp"?: number;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "some-prop"?: number;
     }
@@ -722,7 +722,7 @@ declare namespace LocalJSX {
          */
         "barProp"?: string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "bar-prop"?: string;
         /**
@@ -730,7 +730,7 @@ declare namespace LocalJSX {
          */
         "fooProp"?: string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "foo-prop"?: string;
         /**
@@ -746,7 +746,7 @@ declare namespace LocalJSX {
          */
         "barProp"?: string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "bar-prop"?: string;
         /**
@@ -754,7 +754,7 @@ declare namespace LocalJSX {
          */
         "fooProp"?: string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "foo-prop"?: string;
         /**
@@ -788,12 +788,12 @@ declare namespace LocalJSX {
          */
         "fullName"?: string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "full-name"?: string;
         "lastName"?: string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "last-name"?: string;
         /**
@@ -804,17 +804,17 @@ declare namespace LocalJSX {
     interface RuntimeDecorators {
         "basicProp"?: string;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "basic-prop"?: string;
         "decoratedGetterSetterProp"?: number;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "decorated-getter-setter-prop"?: number;
         "decoratedProp"?: number;
         /**
-         * @deprecated dash-casing is not supported in JSX, use camelCase instead. Support for it will be removed in Stencil v5.
+         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "decorated-prop"?: number;
     }
