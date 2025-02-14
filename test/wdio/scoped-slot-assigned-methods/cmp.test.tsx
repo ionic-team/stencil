@@ -1,4 +1,4 @@
-import { h, Fragment } from '@stencil/core';
+import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
 import { $, expect } from '@wdio/globals';
 
@@ -79,7 +79,7 @@ describe('scoped-slot-assigned-methods', () => {
     const component: any = document.querySelector('scoped-slot-assigned-methods');
     expect(component.getSlotAssignedElements).toBeDefined();
 
-    let eles = await component.getSlotAssignedElements(undefined, true);
+    const eles = await component.getSlotAssignedElements(undefined, true);
     let nodes = await component.getSlotAssignedNodes(undefined, true);
     expect(eles).toBeDefined();
     expect(nodes).toBeDefined();

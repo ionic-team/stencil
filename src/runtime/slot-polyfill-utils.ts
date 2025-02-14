@@ -1,8 +1,8 @@
 import { BUILD } from '@app-data';
 
 import type * as d from '../declarations';
-import { NODE_TYPE } from './runtime-constants';
 import { internalCall } from './dom-extras';
+import { NODE_TYPE } from './runtime-constants';
 
 /**
  * Adjust the `.hidden` property as-needed on any nodes in a DOM subtree which
@@ -100,6 +100,8 @@ export function getHostSlotNodes(childNodes: NodeListOf<ChildNode>, hostName?: s
  * @param slot - the slot node to get the child nodes from
  * @param slotName - the name of the slot to match on
  * @param includeSlot - whether to include the slot node in the result
+ * @param flatten - recursively get slotted nodes of child slot nodes
+ * (https://developer.mozilla.org/en-US/docs/Web/API/HTMLSlotElement/assignedNodes#flatten)
  * @returns slotted child nodes of the slot node
  */
 export const getHostSlotChildNodes = (slot: d.RenderNode, slotName: string, includeSlot = true, flatten?: boolean) => {
@@ -212,14 +214,13 @@ export const getSlotName = (node: d.PatchedSlotNode) =>
  * Add `assignedElements` and `assignedNodes` methods on a fake slot node
  *
  * @param node - slot node to patch
- * @returns
  */
 export function patchSlotNode(node: d.RenderNode) {
   if ((node as any).assignedElements || (node as any).assignedNodes || !node['s-sr']) return;
 
   const assignedFactory = (elementsOnly: boolean) =>
     function (opts?: { flatten: boolean }) {
-      let toReturn = getHostSlotChildNodes(this, this['s-sn'], false, opts?.flatten);
+      const toReturn = getHostSlotChildNodes(this, this['s-sn'], false, opts?.flatten);
       if (elementsOnly) return toReturn.filter((n) => n.nodeType === NODE_TYPE.ElementNode);
       return toReturn;
     }.bind(node);
@@ -240,7 +241,8 @@ export function dispatchSlotChangeEvent(elm: d.RenderNode) {
 /**
  * Find the slot node that a slotted node belongs to
  *
- * @param slottedNode
+ * @param slottedNode - the slotted node to find the slot for
+ * @param parentHost - the parent host element of the slotted node
  * @returns the slot node and slot name
  */
 export function findSlotFromSlottedNode(slottedNode: d.PatchedSlotNode, parentHost?: HTMLElement) {

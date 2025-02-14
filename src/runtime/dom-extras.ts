@@ -102,7 +102,7 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
 
       const parent = internalCall(appendAfter, 'parentNode') as d.RenderNode;
-      let insertedNode: d.RenderNode = internalCall(parent, 'insertBefore')(newChild, appendAfter.nextSibling);
+      const insertedNode: d.RenderNode = internalCall(parent, 'insertBefore')(newChild, appendAfter.nextSibling);
       dispatchSlotChangeEvent(slotNode);
 
       // Check if there is fallback content that should be hidden
