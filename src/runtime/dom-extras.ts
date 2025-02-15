@@ -153,19 +153,18 @@ export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
       if (typeof newChild === 'string') {
         newChild = this.ownerDocument.createTextNode(newChild) as unknown as d.RenderNode;
       }
-      const slotName = (newChild['s-sn'] = getSlotName(newChild));
+      const slotName = (newChild['s-sn'] = getSlotName(newChild)) || '';
       const childNodes = internalCall(this, 'childNodes');
       const slotNode = getHostSlotNodes(childNodes, this.tagName, slotName)[0];
       if (slotNode) {
         addSlotRelocateNode(newChild, slotNode, true);
-
         const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
         const appendAfter = slotChildNodes[0];
 
         const parent = internalCall(appendAfter, 'parentNode') as d.RenderNode;
-        internalCall(parent, 'insertBefore')(newChild, internalCall(appendAfter, 'nextSibling'));
-
+        const toReturn = internalCall(parent, 'insertBefore')(newChild, internalCall(appendAfter, 'nextSibling'));
         dispatchSlotChangeEvent(slotNode);
+        return toReturn;
       }
 
       if (newChild.nodeType === 1 && !!newChild.getAttribute('slot')) {
@@ -292,7 +291,7 @@ const patchInsertBefore = (HostElementPrototype: HTMLElement) => {
       });
       if (found) return newChild;
     }
-    return (this as d.RenderNode).__insertBefore(newChild, currentChild);
+    return (this as any).__insertBefore(newChild, currentChild);
   };
 };
 
