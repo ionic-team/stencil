@@ -1088,6 +1088,8 @@ export interface HostElement extends HTMLElement {
   host?: Element;
   forceUpdate?: () => void;
 
+  __stencil__getHostRef?: () => HostRef;
+
   // "s-" prefixed properties should not be property renamed
   // and should be common between all versions of stencil
 
@@ -1724,7 +1726,7 @@ export type ComponentRuntimeReflectingAttr = [string, string | undefined];
  * keys in a `WeakMap` which maps {@link HostElement} instances to their
  * associated {@link HostRef} instance.
  */
-export type RuntimeRef = HostElement | {};
+export type RuntimeRef = HostElement | { __stencil__getHostRef?: () => HostRef };
 
 /**
  * Interface used to track an Element, it's virtual Node (`VNode`), and other data
