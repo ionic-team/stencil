@@ -26,7 +26,7 @@ export const updateFallbackSlotVisibility = (elm: d.RenderNode) => {
     getHostSlotNodes(childNodes as any, (elm as HTMLElement).tagName).forEach((slotNode) => {
       if (slotNode.nodeType === NODE_TYPE.ElementNode && slotNode.tagName === 'SLOT-FB') {
         // this is a slot fallback node
-        if (getHostSlotChildNodes(slotNode, getSlotName(slotNode), false)?.length) {
+        if (getSlotChildSiblings(slotNode, getSlotName(slotNode), false)?.length) {
           // has slotted nodes, hide fallback
           slotNode.hidden = true;
         } else {
@@ -96,30 +96,19 @@ export function getHostSlotNodes(childNodes: NodeListOf<ChildNode>, hostName?: s
 }
 
 /**
- * Get all slotted child nodes of a slot node
+ * Get all 'child' sibling nodes of a slot node
  * @param slot - the slot node to get the child nodes from
  * @param slotName - the name of the slot to match on
  * @param includeSlot - whether to include the slot node in the result
- * @param flatten - recursively get slotted nodes of child slot nodes
- * (https://developer.mozilla.org/en-US/docs/Web/API/HTMLSlotElement/assignedNodes#flatten)
- * @returns slotted child nodes of the slot node
+ * @returns child nodes of the slot node
  */
-export const getHostSlotChildNodes = (slot: d.RenderNode, slotName: string, includeSlot = true, flatten?: boolean) => {
+export const getSlotChildSiblings = (slot: d.RenderNode, slotName: string, includeSlot = true) => {
   const childNodes: d.RenderNode[] = [];
   if ((includeSlot && slot['s-sr']) || !slot['s-sr']) childNodes.push(slot as any);
   let node = slot;
 
   while ((node = node.nextSibling as any)) {
     if (getSlotName(node) === slotName) childNodes.push(node as any);
-  }
-  if (flatten && slot.nodeType === NODE_TYPE.ElementNode && !slot.hidden && slot.childNodes.length) {
-    (slot.childNodes as NodeListOf<d.RenderNode>).forEach((nestedNode) => {
-      if (nestedNode['s-sr'] && !nestedNode.hidden) {
-        childNodes.push(...getHostSlotChildNodes(nestedNode, getSlotName(nestedNode), false, true));
-      } else {
-        childNodes.push(nestedNode);
-      }
-    });
   }
   return childNodes;
 };
@@ -166,37 +155,35 @@ export const addSlotRelocateNode = (
   prepend?: boolean,
   position?: number,
 ) => {
-  let slottedNodeLocation: d.RenderNode;
 
-  // does newChild already have a slot location node?
   if (newChild['s-ol'] && newChild['s-ol'].isConnected) {
-    slottedNodeLocation = newChild['s-ol'];
-  } else {
-    slottedNodeLocation = document.createTextNode('') as any;
-    slottedNodeLocation['s-nr'] = newChild;
+    // newChild already has a slot location node
+    return;
   }
 
+  const slottedNodeLocation = document.createTextNode('') as any;
+  slottedNodeLocation['s-nr'] = newChild;
+
+  // if there's no content reference node, or parentNode we can't do anything
   if (!slotNode['s-cr'] || !slotNode['s-cr'].parentNode) return;
 
   const parent = slotNode['s-cr'].parentNode as any;
   const appendMethod = prepend ? internalCall(parent, 'prepend') : internalCall(parent, 'appendChild');
 
-  if (typeof position !== 'undefined') {
-    if (BUILD.hydrateClientSide) {
-      slottedNodeLocation['s-oo'] = position;
-      const childNodes = internalCall(parent, 'childNodes') as NodeListOf<d.RenderNode>;
-      const slotRelocateNodes: d.RenderNode[] = [slottedNodeLocation];
-      childNodes.forEach((n) => {
-        if (n['s-nr']) slotRelocateNodes.push(n);
-      });
+  if (BUILD.hydrateClientSide && typeof position !== 'undefined') {
+    slottedNodeLocation['s-oo'] = position;
+    const childNodes = internalCall(parent, 'childNodes') as NodeListOf<d.RenderNode>;
+    const slotRelocateNodes: d.RenderNode[] = [slottedNodeLocation];
+    childNodes.forEach((n) => {
+      if (n['s-nr']) slotRelocateNodes.push(n);
+    });
 
-      slotRelocateNodes.sort((a, b) => {
-        if (!a['s-oo'] || a['s-oo'] < (b['s-oo'] || 0)) return -1;
-        else if (!b['s-oo'] || b['s-oo'] < a['s-oo']) return 1;
-        return 0;
-      });
-      slotRelocateNodes.forEach((n) => appendMethod.call(parent, n));
-    }
+    slotRelocateNodes.sort((a, b) => {
+      if (!a['s-oo'] || a['s-oo'] < (b['s-oo'] || 0)) return -1;
+      else if (!b['s-oo'] || b['s-oo'] < a['s-oo']) return 1;
+      return 0;
+    });
+    slotRelocateNodes.forEach((n) => appendMethod.call(parent, n));
   } else {
     appendMethod.call(parent, slottedNodeLocation);
   }
@@ -207,8 +194,8 @@ export const addSlotRelocateNode = (
 
 export const getSlotName = (node: d.PatchedSlotNode) =>
   typeof node['s-sn'] === 'string'
-    ? node['s-sn'] || (node.nodeType === 1 && (node as Element).getAttribute('slot')) || ''
-    : undefined;
+    ? node['s-sn']
+    : (node.nodeType === 1 && (node as Element).getAttribute('slot')) || undefined;
 
 /**
  * Add `assignedElements` and `assignedNodes` methods on a fake slot node
@@ -220,7 +207,44 @@ export function patchSlotNode(node: d.RenderNode) {
 
   const assignedFactory = (elementsOnly: boolean) =>
     function (opts?: { flatten: boolean }) {
-      const toReturn = getHostSlotChildNodes(this, this['s-sn'], false, opts?.flatten);
+      const toReturn: d.RenderNode[] = [];
+      const slotNamesToFind = [this['s-sn']];
+
+      if ((this['s-sn'], opts?.flatten && this.nodeType === NODE_TYPE.ElementNode && this.childNodes.length)) {
+        // if we're flattening, we need to find all nested <slot /> nodes
+        const getNestedSlotNames = (slot: d.RenderNode) => {
+          (slot.childNodes as NodeListOf<d.RenderNode>).forEach((nestedNode) => {
+            if (nestedNode['s-sr']) {
+              // found a slot node. Let's add it to the list of slot names to find
+              slotNamesToFind.push(getSlotName(nestedNode));
+              if (nestedNode.nodeType === NODE_TYPE.ElementNode && !nestedNode.hidden) {
+                // this 'slot' is also a `<slot-fb />` so we need to drill down recursively
+                getNestedSlotNames(nestedNode);
+              }
+            } else {
+              toReturn.push(nestedNode as d.RenderNode);
+            }
+          });
+        };
+        getNestedSlotNames(this);
+      }
+
+      const parent = this['s-cr'].parentElement as d.RenderNode;
+      // get all light dom nodes
+      const slottedNodes = parent.__childNodes ? parent.childNodes : getSlottedChildNodes(parent.childNodes);
+
+      (slottedNodes as d.RenderNode[]).forEach((n) => {
+        // find all the nodes assigned to slots we care about
+        if (slotNamesToFind.includes(getSlotName(n))) {
+          if (toReturn.includes(n)) {
+            // if the node is already in the list, remove it;
+            // it may be in the wrong order
+            toReturn.splice(toReturn.indexOf(n), 1);
+          }
+          toReturn.push(n);
+        }
+      });
+
       if (elementsOnly) return toReturn.filter((n) => n.nodeType === NODE_TYPE.ElementNode);
       return toReturn;
     }.bind(node);

@@ -11,7 +11,6 @@ export class ScopedSlotAssignedMethods {
   @Method()
   async getSlotAssignedElements(opts?: { flatten: boolean }, getPlainSlot = false) {
     if (getPlainSlot) {
-      console.log('plain slot', this.plainSlot);
       return this.plainSlot.assignedElements(opts);
     }
     return this.fbSlot.assignedElements(opts);
@@ -20,7 +19,6 @@ export class ScopedSlotAssignedMethods {
   @Method()
   async getSlotAssignedNodes(opts?: { flatten: boolean }, getPlainSlot = false) {
     if (getPlainSlot) {
-      console.log('plain slot', this.plainSlot);
       return this.plainSlot.assignedNodes(opts);
     }
     return this.fbSlot.assignedNodes(opts);

@@ -55,8 +55,10 @@ describe('scoped-slot-slotchange', () => {
     await expect(slotChangeEle.slotEventCatch[0].event.target.name).toBeFalsy();
     await expect(slotChangeEle.slotEventCatch[0].assignedNodes[0].outerHTML).toMatch(`<p>Append child content</p>`);
 
-    p.slot = 'fallback-slot';
-    slotChangeEle.appendChild(p);
+    const p2 = document.createElement('p');
+    p2.innerHTML = 'Fallback content';
+    p2.slot = 'fallback-slot';
+    slotChangeEle.appendChild(p2);
     await waitForChanges();
 
     await expect(slotChangeEle.slotEventCatch).toHaveLength(2);
@@ -68,8 +70,8 @@ describe('scoped-slot-slotchange', () => {
     slotChangeEle.insertBefore(div, null);
     await waitForChanges();
 
-    await expect(slotChangeEle.slotEventCatch).toHaveLength(3);
+    await expect(slotChangeEle.slotEventCatch).toHaveLength(4);
     await expect(slotChangeEle.slotEventCatch[2]).toMatchObject({ event: { type: 'slotchange' } });
-    await expect(slotChangeEle.slotEventCatch[2].assignedNodes[0].outerHTML).toMatch(`<div>InsertBefore content</div>`);
+    await expect(slotChangeEle.slotEventCatch[2].assignedNodes[1].outerHTML).toMatch(`<div>InsertBefore content</div>`);
   });
 });

@@ -1440,7 +1440,7 @@ export interface RenderNode extends HostElement {
 
   /**
    * Node reference:
-   * This is a reference for a original location node
+   * This is a reference from an original location node
    * back to the node that's been moved around.
    */
   ['s-nr']?: PatchedSlotNode | RenderNode;

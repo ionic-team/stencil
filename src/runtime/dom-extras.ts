@@ -6,8 +6,8 @@ import {
   addSlotRelocateNode,
   dispatchSlotChangeEvent,
   findSlotFromSlottedNode,
-  getHostSlotChildNodes,
   getHostSlotNodes,
+  getSlotChildSiblings,
   getSlotName,
   getSlottedChildNodes,
   updateFallbackSlotVisibility,
@@ -98,7 +98,7 @@ export const patchSlotAppendChild = (HostElementPrototype: any) => {
     if (slotNode) {
       addSlotRelocateNode(newChild, slotNode);
 
-      const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
+      const slotChildNodes = getSlotChildSiblings(slotNode, slotName);
       const appendAfter = slotChildNodes[slotChildNodes.length - 1];
 
       const parent = internalCall(appendAfter, 'parentNode') as d.RenderNode;
@@ -158,7 +158,7 @@ export const patchSlotPrepend = (HostElementPrototype: HTMLElement) => {
       const slotNode = getHostSlotNodes(childNodes, this.tagName, slotName)[0];
       if (slotNode) {
         addSlotRelocateNode(newChild, slotNode, true);
-        const slotChildNodes = getHostSlotChildNodes(slotNode, slotName);
+        const slotChildNodes = getSlotChildSiblings(slotNode, slotName);
         const appendAfter = slotChildNodes[0];
 
         const parent = internalCall(appendAfter, 'parentNode') as d.RenderNode;
