@@ -299,6 +299,21 @@ const patchInsertBefore = (HostElementPrototype: HTMLElement) => {
       });
       if (found) return newChild;
     }
+
+    /**
+     * Fixes an issue where slotted elements are dynamically relocated in React, such as after data fetch.
+     *
+     * When a slotted element is passed to another scoped component (e.g., <A><C slot="header"/></A>),
+     * the child’s __parentNode (original parent node property) does not match this.
+     *
+     * To prevent errors, this checks if the current child's parent node differs from this.
+     * If so, appendChild(newChild) is called to ensure the child is correctly inserted,
+     * allowing Stencil to properly manage the slot placement.
+     */
+    const parentNode = (currentChild as d.PatchedSlotNode)?.__parentNode;
+    if (parentNode && !this.isSameNode(parentNode)) {
+      return this.appendChild(newChild);
+    }
     return (this as d.RenderNode).__insertBefore(newChild, currentChild);
   };
 };
