@@ -155,7 +155,6 @@ export const addSlotRelocateNode = (
   prepend?: boolean,
   position?: number,
 ) => {
-
   if (newChild['s-ol'] && newChild['s-ol'].isConnected) {
     // newChild already has a slot location node
     return;
@@ -208,25 +207,14 @@ export function patchSlotNode(node: d.RenderNode) {
   const assignedFactory = (elementsOnly: boolean) =>
     function (opts?: { flatten: boolean }) {
       const toReturn: d.RenderNode[] = [];
-      const slotNamesToFind = [this['s-sn']];
+      const slotName = this['s-sn'];
 
-      if ((this['s-sn'], opts?.flatten && this.nodeType === NODE_TYPE.ElementNode && this.childNodes.length)) {
-        // if we're flattening, we need to find all nested <slot /> nodes
-        const getNestedSlotNames = (slot: d.RenderNode) => {
-          (slot.childNodes as NodeListOf<d.RenderNode>).forEach((nestedNode) => {
-            if (nestedNode['s-sr']) {
-              // found a slot node. Let's add it to the list of slot names to find
-              slotNamesToFind.push(getSlotName(nestedNode));
-              if (nestedNode.nodeType === NODE_TYPE.ElementNode && !nestedNode.hidden) {
-                // this 'slot' is also a `<slot-fb />` so we need to drill down recursively
-                getNestedSlotNames(nestedNode);
-              }
-            } else {
-              toReturn.push(nestedNode as d.RenderNode);
-            }
-          });
-        };
-        getNestedSlotNames(this);
+      if (opts?.flatten) {
+        console.error(`
+          Flattening is not supported for Stencil non-shadow slots. 
+          You can use \`.childNodes\` to nested slot fallback content.
+          If you have a particular use case, please open an issue on the Stencil repo.
+        `);
       }
 
       const parent = this['s-cr'].parentElement as d.RenderNode;
@@ -235,17 +223,14 @@ export function patchSlotNode(node: d.RenderNode) {
 
       (slottedNodes as d.RenderNode[]).forEach((n) => {
         // find all the nodes assigned to slots we care about
-        if (slotNamesToFind.includes(getSlotName(n))) {
-          if (toReturn.includes(n)) {
-            // if the node is already in the list, remove it;
-            // it may be in the wrong order
-            toReturn.splice(toReturn.indexOf(n), 1);
-          }
+        if (slotName === getSlotName(n)) {
           toReturn.push(n);
         }
       });
 
-      if (elementsOnly) return toReturn.filter((n) => n.nodeType === NODE_TYPE.ElementNode);
+      if (elementsOnly) {
+        return toReturn.filter((n) => n.nodeType === NODE_TYPE.ElementNode);
+      }
       return toReturn;
     }.bind(node);
 

@@ -3,6 +3,8 @@ import { render } from '@wdio/browser-runner/stencil';
 import { $, expect } from '@wdio/globals';
 
 describe('scoped-slot-assigned-methods', () => {
+  let originalConsoleError: typeof console.error;
+
   beforeEach(async () => {
     // @ts-expect-error - no components array?
     render({
@@ -19,7 +21,18 @@ describe('scoped-slot-assigned-methods', () => {
     await $('scoped-slot-assigned-methods div').waitForExist();
   });
 
+  before(async () => {
+    originalConsoleError = console.error;
+  });
+
+  after(() => {
+    console.error = originalConsoleError;
+  });
+
   it('tests assignedElements method on a `<slot-fb>`', async () => {
+    const errorLogs: string[] = [];
+    console.error = (message) => errorLogs.push(message);
+
     const component: any = document.querySelector('scoped-slot-assigned-methods');
     expect(component.getSlotAssignedElements).toBeDefined();
 
@@ -32,6 +45,7 @@ describe('scoped-slot-assigned-methods', () => {
     expect(await component.getSlotAssignedElements()).toHaveLength(0);
     nodes = await component.getSlotAssignedElements({ flatten: true });
     expect(nodes).toHaveLength(0);
+    expect(errorLogs.length).toEqual(1);
 
     const div = document.createElement('div');
     div.slot = 'nested-slot';
@@ -40,11 +54,14 @@ describe('scoped-slot-assigned-methods', () => {
     expect(await component.getSlotAssignedElements()).toHaveLength(0);
 
     nodes = await component.getSlotAssignedElements({ flatten: true });
-    expect(nodes).toHaveLength(1);
-    expect(nodes[0].outerHTML).toBe('<div slot="nested-slot">Nested slotted content</div>');
+    expect(nodes).toHaveLength(0);
+    expect(errorLogs.length).toEqual(2);
   });
 
   it('tests assignedNodes method on a `<slot-fb>`', async () => {
+    const errorLogs: string[] = [];
+    console.error = (message) => errorLogs.push(message);
+
     const component: any = document.querySelector('scoped-slot-assigned-methods');
     expect(component.getSlotAssignedNodes).toBeDefined();
 
@@ -61,8 +78,8 @@ describe('scoped-slot-assigned-methods', () => {
     expect(await component.getSlotAssignedNodes()).toHaveLength(0);
 
     nodes = await component.getSlotAssignedNodes({ flatten: true });
-    expect(nodes).toHaveLength(1);
-    expect(nodes[0].nodeValue).toBe('Fallback content');
+    expect(nodes).toHaveLength(0);
+    expect(errorLogs.length).toEqual(1);
 
     const div = document.createElement('div');
     div.slot = 'nested-slot';
@@ -71,11 +88,14 @@ describe('scoped-slot-assigned-methods', () => {
     expect(await component.getSlotAssignedNodes()).toHaveLength(0);
 
     nodes = await component.getSlotAssignedNodes({ flatten: true });
-    expect(nodes).toHaveLength(1);
-    expect(nodes[0].outerHTML).toBe('<div slot="nested-slot">Nested slotted content</div>');
+    expect(nodes).toHaveLength(0);
+    expect(errorLogs.length).toEqual(2);
   });
 
   it('tests assignedElements / assignedNodes method on a plain slot (a text / comment node)', async () => {
+    const errorLogs: string[] = [];
+    console.error = (message) => errorLogs.push(message);
+
     const component: any = document.querySelector('scoped-slot-assigned-methods');
     expect(component.getSlotAssignedElements).toBeDefined();
 
@@ -94,5 +114,6 @@ describe('scoped-slot-assigned-methods', () => {
     nodes = await component.getSlotAssignedElements({ flatten: true }, true);
 
     expect(nodes).toHaveLength(0);
+    expect(errorLogs.length).toEqual(1);
   });
 });

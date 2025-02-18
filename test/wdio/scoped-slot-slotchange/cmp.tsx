@@ -8,7 +8,7 @@ export class ScopedSlotChange {
   @Prop({ mutable: true }) slotEventCatch: { event: Event; assignedNodes: Node[] }[] = [];
 
   private handleSlotchange = (e) => {
-    this.slotEventCatch.push({ event: e, assignedNodes: e.target.assignedNodes({ flatten: true }) });
+    this.slotEventCatch.push({ event: e, assignedNodes: e.target.assignedNodes() });
   };
 
   render() {
