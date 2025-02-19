@@ -84,13 +84,13 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
       }
 
       connectedCallback(this);
-      if (BUILD.connectedCallback && originalConnectedCallback) {
+      if (originalConnectedCallback) {
         originalConnectedCallback.call(this);
       }
     },
     disconnectedCallback() {
       disconnectedCallback(this);
-      if (BUILD.disconnectedCallback && originalDisconnectedCallback) {
+      if (originalDisconnectedCallback) {
         originalDisconnectedCallback.call(this);
       }
     },

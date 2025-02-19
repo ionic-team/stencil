@@ -184,7 +184,7 @@ export const initializeComponent = async (
 };
 
 export const fireConnectedCallback = (instance: any, elm?: HTMLElement) => {
-  if (BUILD.lazyLoad && BUILD.connectedCallback) {
+  if (BUILD.lazyLoad) {
     safeCall(instance, 'connectedCallback', undefined, elm);
   }
 };

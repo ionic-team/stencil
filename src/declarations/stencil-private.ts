@@ -144,17 +144,7 @@ export interface BuildFeatures {
   modernPropertyDecls: boolean;
 
   // lifecycle events
-  lifecycle: boolean;
-  cmpDidLoad: boolean;
-  cmpShouldUpdate: boolean;
-  cmpWillLoad: boolean;
-  cmpDidUpdate: boolean;
-  cmpWillUpdate: boolean;
-  cmpWillRender: boolean;
-  cmpDidRender: boolean;
   cmpDidUnload: boolean;
-  connectedCallback: boolean;
-  disconnectedCallback: boolean;
   asyncLoading: boolean;
 
   // attr
