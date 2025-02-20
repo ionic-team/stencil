@@ -1,3 +1,17 @@
+## 🍌 [4.26.1](https://github.com/ionic-team/stencil/compare/v4.26.0...v4.26.1) (2025-02-20)
+
+
+### Bug Fixes
+
+* **runtime:** append newChild if parent node doesn't match with patched node ([#6141](https://github.com/ionic-team/stencil/issues/6141)) ([eafe1f9](https://github.com/ionic-team/stencil/commit/eafe1f9d55f964d7f4927e18f4e3f7347e30a7f2))
+
+
+### Features
+
+* **runtime:** add `slotchange` event and `assignedNodes` / `assignedElements` methods for `scoped: true` slots ([#6151](https://github.com/ionic-team/stencil/issues/6151)) ([2a1038e](https://github.com/ionic-team/stencil/commit/2a1038e06440cf541534df9ae938bf74e0b37bb4))
+
+
+
 # 🐇 [4.26.0](https://github.com/ionic-team/stencil/compare/v4.25.3...v4.26.0) (2025-02-11)
 
 
