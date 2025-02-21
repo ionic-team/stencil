@@ -40,7 +40,7 @@ export const setAccessor = (
   initialRender?: boolean,
 ) => {
   if (oldValue === newValue) {
-    return
+    return;
   }
 
   let isProp = isMemberInElement(elm, memberName);

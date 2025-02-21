@@ -1,3 +1,4 @@
+// @ts-ignore may not be existing when project hasn't been built
 type HydrateModule = typeof import('../../hydrate');
 let renderToString: HydrateModule['renderToString'];
 
