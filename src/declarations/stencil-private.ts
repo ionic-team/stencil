@@ -2565,6 +2565,7 @@ export interface TypesModule {
 export type TypeInfo = {
   name: string;
   type: string;
+  attributeName?: string;
   optional: boolean;
   required: boolean;
   internal: boolean;
