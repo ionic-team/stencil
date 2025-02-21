@@ -16,7 +16,7 @@ import {
   TEXT_NODE_ID,
   VNODE_FLAGS,
 } from './runtime-constants';
-import { addSlotRelocateNode } from './slot-polyfill-utils';
+import { addSlotRelocateNode, patchSlotNode } from './slot-polyfill-utils';
 import { newVNode } from './vdom/h';
 
 /**
@@ -615,6 +615,7 @@ function addSlot(
 
     // attempt to find any mock slotted nodes which we'll move later
     addSlottedNodes(slottedNodes, slotId, slotName, node, shouldMove ? parentNodeId : childVNode.$hostId$);
+    patchSlotNode(node);
 
     if (shouldMove) {
       // Move slot comment node (to after any other comment nodes)
