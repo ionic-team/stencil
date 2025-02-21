@@ -44,6 +44,7 @@ describe('generate-prop-types', () => {
 
       const expectedTypeInfo: d.TypeInfo = [
         {
+          attributeName: 'my-cmp',
           jsdoc: '',
           internal: false,
           name: 'propName',
@@ -69,6 +70,7 @@ describe('generate-prop-types', () => {
 
       const expectedTypeInfo: d.TypeInfo = [
         {
+          attributeName: 'my-cmp',
           jsdoc: '',
           internal: false,
           name: 'propName',
@@ -114,6 +116,7 @@ describe('generate-prop-types', () => {
 
       const expectedTypeInfo: d.TypeInfo = [
         {
+          attributeName: 'my-cmp',
           jsdoc: '',
           internal: false,
           name: 'propName',
@@ -149,6 +152,7 @@ describe('generate-prop-types', () => {
 
       const expectedTypeInfo: d.TypeInfo = [
         {
+          attributeName: 'my-cmp',
           jsdoc: '@readonly',
           internal: false,
           name: 'propName',
@@ -176,6 +180,7 @@ describe('generate-prop-types', () => {
 
       const expectedTypeInfo: d.TypeInfo = [
         {
+          attributeName: 'my-cmp',
           jsdoc: '',
           internal: false,
           name: 'propName',
