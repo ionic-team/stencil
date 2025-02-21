@@ -24,7 +24,6 @@ export const getBuildFeatures = (cmps: ComponentCompilerMeta[]): BuildFeatures =
   const slotRelocation = cmps.some((c) => c.encapsulation !== 'shadow' && c.htmlTagNames.includes('slot'));
   const f: BuildFeatures = {
     allRenderFn: cmps.every((c) => c.hasRenderFn),
-    cmpDidUnload: cmps.some((c) => c.hasComponentDidUnloadFn),
     formAssociated: cmps.some((c) => c.formAssociated),
 
     element: cmps.some((c) => c.hasElement),

@@ -24,7 +24,6 @@ import type { BuildConditionals } from '@stencil/core/internal';
  */
 export const BUILD: BuildConditionals = {
   allRenderFn: false,
-  cmpDidUnload: false,
   element: true,
   event: true,
   hasRenderFn: true,

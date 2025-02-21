@@ -10,9 +10,6 @@ const disconnectInstance = (instance: any, elm?: d.HostElement) => {
   if (BUILD.lazyLoad) {
     safeCall(instance, 'disconnectedCallback', undefined, elm || instance);
   }
-  if (BUILD.cmpDidUnload) {
-    safeCall(instance, 'componentDidUnload', undefined, elm || instance);
-  }
 };
 
 export const disconnectedCallback = async (elm: d.HostElement) => {
