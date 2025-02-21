@@ -30,6 +30,7 @@ export const getBuildFeatures = (cmps: ComponentCompilerMeta[]): BuildFeatures =
     element: cmps.some((c) => c.hasElement),
     event: cmps.some((c) => c.hasEvent),
     hasRenderFn: cmps.some((c) => c.hasRenderFn),
+    lifecycle: cmps.some((c) => c.hasLifecycle),
     asyncLoading: true,
     hostListener: cmps.some((c) => c.hasListener),
     hostListenerTargetWindow: cmps.some((c) => c.hasListenerTargetWindow),
@@ -149,7 +150,7 @@ export const updateBuildConditionals = (config: ValidatedConfig, b: BuildConditi
     !config._isTesting
   );
   b.updatable = b.updatable || b.hydrateClientSide || b.hotModuleReplacement;
-  b.member = b.member || b.updatable || b.mode;
+  b.member = b.member || b.updatable || b.mode || b.lifecycle;
   b.constructableCSS = !b.hotModuleReplacement || !!config._isTesting;
   b.asyncLoading = !!(b.asyncLoading || b.lazyLoad || b.taskQueue || b.initializeNextTick);
   b.cssAnnotations = true;

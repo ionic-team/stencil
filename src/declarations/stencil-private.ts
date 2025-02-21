@@ -144,6 +144,7 @@ export interface BuildFeatures {
   modernPropertyDecls: boolean;
 
   // lifecycle events
+  lifecycle: boolean;
   cmpDidUnload: boolean;
   asyncLoading: boolean;
 
