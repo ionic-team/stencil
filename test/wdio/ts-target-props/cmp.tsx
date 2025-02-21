@@ -1,4 +1,4 @@
-import { Component, ComponentInterface,Element, h, Prop, State } from '@stencil/core';
+import { Component, ComponentInterface, Element, h, Prop, State } from '@stencil/core';
 
 declare global {
   interface Window {

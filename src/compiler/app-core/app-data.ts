@@ -30,7 +30,7 @@ export const getBuildFeatures = (cmps: ComponentCompilerMeta[]): BuildFeatures =
     element: cmps.some((c) => c.hasElement),
     event: cmps.some((c) => c.hasEvent),
     hasRenderFn: cmps.some((c) => c.hasRenderFn),
-    asyncLoading: false,
+    asyncLoading: true,
     hostListener: cmps.some((c) => c.hasListener),
     hostListenerTargetWindow: cmps.some((c) => c.hasListenerTargetWindow),
     hostListenerTargetDocument: cmps.some((c) => c.hasListenerTargetDocument),
@@ -71,7 +71,6 @@ export const getBuildFeatures = (cmps: ComponentCompilerMeta[]): BuildFeatures =
     watchCallback: cmps.some((c) => c.hasWatchCallback),
     taskQueue: true,
   };
-  f.asyncLoading = true;
   f.vdomAttribute = f.vdomAttribute || f.reflect;
   f.vdomPropOrAttr = f.vdomPropOrAttr || f.reflect;
 
