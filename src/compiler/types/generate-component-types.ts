@@ -89,7 +89,7 @@ const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: bool
             `${padding} */`,
           ].join('\n'),
         );
-        fullList.push(`${padding}"${type.attributeName}"${optional ? '?' : ''}: ${type.type};`);
+        fullList.push(`${padding}"${type.attributeName}"?: ${type.type};`);
       }
 
       return fullList;

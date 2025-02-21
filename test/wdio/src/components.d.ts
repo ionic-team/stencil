@@ -23,7 +23,7 @@ export namespace Components {
         /**
          * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
-        "unique-id": string;
+        "unique-id"?: string;
     }
     interface CmpScopedA {
     }

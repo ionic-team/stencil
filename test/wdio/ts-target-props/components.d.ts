@@ -11,17 +11,17 @@ export namespace Components {
         /**
          * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
-        "basic-prop": string;
+        "basic-prop"?: string;
         "decoratedGetterSetterProp": number;
         /**
          * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
-        "decorated-getter-setter-prop": number;
+        "decorated-getter-setter-prop"?: number;
         "decoratedProp": number;
         /**
          * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
-        "decorated-prop": number;
+        "decorated-prop"?: number;
     }
 }
 declare global {
