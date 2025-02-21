@@ -90,17 +90,18 @@ export function proxyHostElement(elm: d.HostElement, cstr: d.ComponentConstructo
         }
 
         // element
-        Object.defineProperty(elm, memberName, {
-          get: function (this: any) {
+        const getterSetterDescriptor: PropertyDescriptor = {
+          get: function (this: d.RuntimeRef) {
             return getValue(this, memberName);
           },
-          set(this: d.RuntimeRef, newValue) {
-            // proxyComponent, set value
+          set: function (this: d.RuntimeRef, newValue: unknown) {
             setValue(this, memberName, newValue, cmpMeta);
           },
           configurable: true,
           enumerable: true,
-        });
+        };
+        Object.defineProperty(elm, memberName, getterSetterDescriptor);
+        Object.defineProperty(elm, metaAttributeName, getterSetterDescriptor);
 
         if (!(cstr as any).prototype.__stencilAugmented) {
           // instance prototype
