@@ -14,6 +14,11 @@
 * **runtime:** add `slotchange` event and `assignedNodes` / `assignedElements` methods for `scoped: true` slots ([#6151](https://github.com/ionic-team/stencil/issues/6151)) ([2a1038e](https://github.com/ionic-team/stencil/commit/2a1038e06440cf541534df9ae938bf74e0b37bb4))
 
 
+### Refactor
+
+* **runtime:** make WeakMap obsolete ([#6156](https://github.com/ionic-team/stencil/issues/6156))
+
+
 
 # 🐇 [4.26.0](https://github.com/ionic-team/stencil/compare/v4.25.3...v4.26.0) (2025-02-11)
 
