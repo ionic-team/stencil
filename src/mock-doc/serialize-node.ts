@@ -79,12 +79,14 @@ export function serializeNodeToHtml(elm: Node | MockNode, serializationOptions: 
     (BUILD.scoped || (opts.serializeShadowRoot !== 'declarative-shadow-dom' && opts.serializeShadowRoot !== true))
   ) {
     for (let i = 0, ii = children.length; i < ii; i++) {
-      const child = children[i];
-      if ((child as Element).tagName) {
+      const child = children[i] as HTMLElement;
+      if (child.tagName) {
         const styleTag = (elm as Element).querySelector(
-          `style[sty-id="sc-${(child as Element).tagName.toLowerCase()}"]`,
+          `style[sty-id="sc-${(child as Element).tagName.toLowerCase()}"]`
         );
-        if (styleTag) children.unshift(styleTag);
+        if (styleTag) {
+          child.prepend(styleTag);
+        }
       }
     }
   }
