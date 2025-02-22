@@ -145,16 +145,6 @@ export interface BuildFeatures {
 
   // lifecycle events
   lifecycle: boolean;
-  cmpDidLoad: boolean;
-  cmpShouldUpdate: boolean;
-  cmpWillLoad: boolean;
-  cmpDidUpdate: boolean;
-  cmpWillUpdate: boolean;
-  cmpWillRender: boolean;
-  cmpDidRender: boolean;
-  cmpDidUnload: boolean;
-  connectedCallback: boolean;
-  disconnectedCallback: boolean;
   asyncLoading: boolean;
 
   // attr
@@ -547,7 +537,6 @@ export interface ComponentCompilerFeatures {
   hasComponentDidUpdateFn: boolean;
   hasComponentWillRenderFn: boolean;
   hasComponentDidRenderFn: boolean;
-  hasComponentDidUnloadFn: boolean;
   hasConnectedCallbackFn: boolean;
   hasDisconnectedCallbackFn: boolean;
   hasElement: boolean;

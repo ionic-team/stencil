@@ -22,6 +22,7 @@ export namespace Components {
          * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "decorated-prop"?: number;
+        "dynamicLifecycle": string[];
     }
 }
 declare global {
@@ -52,6 +53,7 @@ declare namespace LocalJSX {
          * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
          */
         "decorated-prop"?: number;
+        "dynamicLifecycle"?: string[];
     }
     interface IntrinsicElements {
         "ts-target-props": TsTargetProps;
