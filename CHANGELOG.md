@@ -1,3 +1,20 @@
+# 🏔 [4.27.0](https://github.com/ionic-team/stencil/compare/v4.26.0...v4.27.0) (2025-02-22)
+
+
+### Bug Fixes
+
+* **hydrate:** support dash-case case in hydrate mode ([#6158](https://github.com/ionic-team/stencil/issues/6158)) ([30f2a09](https://github.com/ionic-team/stencil/commit/30f2a09b1d5c282d1c6d2a99e7f19219d26e179b))
+* **runtime:** `scoped: true` slot fallback with forwarded slot ([#6171](https://github.com/ionic-team/stencil/issues/6171)) ([57e7e58](https://github.com/ionic-team/stencil/commit/57e7e5886d81ba3c3357683415cb592e1e72740d))
+* **runtime:** always call component lifecycle hooks ([#6167](https://github.com/ionic-team/stencil/issues/6167)) ([260ced2](https://github.com/ionic-team/stencil/commit/260ced2bdc41e499110f7e6fd89b193166285093))
+* **runtime:** append newChild if parent node doesn't match with patched node ([#6141](https://github.com/ionic-team/stencil/issues/6141)) ([eafe1f9](https://github.com/ionic-team/stencil/commit/eafe1f9d55f964d7f4927e18f4e3f7347e30a7f2))
+
+
+### Features
+
+* **runtime:** add `slotchange` event and `assignedNodes` / `assignedElements` methods for `scoped: true` slots ([#6151](https://github.com/ionic-team/stencil/issues/6151)) ([2a1038e](https://github.com/ionic-team/stencil/commit/2a1038e06440cf541534df9ae938bf74e0b37bb4))
+
+
+
 # 🐇 [4.26.0](https://github.com/ionic-team/stencil/compare/v4.25.3...v4.26.0) (2025-02-11)
 
 
