@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { doc, plt, styles, supportsConstructableStylesheets, supportsShadow } from '@platform';
+import { plt, styles, supportsConstructableStylesheets, supportsShadow, win } from '@platform';
 import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
 import type * as d from '../declarations';
@@ -51,12 +51,12 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
   const scopeId = getScopeId(cmpMeta, mode);
   const style = styles.get(scopeId);
 
-  if (!BUILD.attachStyles) {
+  if (!BUILD.attachStyles || !win.document) {
     return scopeId;
   }
   // if an element is NOT connected then getRootNode() will return the wrong root node
   // so the fallback is to always use the document for the root node in those cases
-  styleContainerNode = styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : doc;
+  styleContainerNode = styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : win.document;
 
   if (style) {
     if (typeof style === 'string') {
@@ -75,11 +75,12 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
           // This is only happening on native shadow-dom, do not needs CSS var shim
           styleElm.innerHTML = style;
         } else {
-          styleElm = document.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`) || doc.createElement('style');
+          styleElm =
+            document.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`) || win.document.createElement('style');
           styleElm.innerHTML = style;
 
           // Apply CSP nonce to the style tag if it exists
-          const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+          const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(win.document);
           if (nonce != null) {
             styleElm.setAttribute('nonce', nonce);
           }
@@ -247,7 +248,11 @@ export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+
  * and add them to a constructable stylesheet.
  */
 export const hydrateScopedToShadow = () => {
-  const styles = doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
+  if (!win.document) {
+    return;
+  }
+
+  const styles = win.document.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let i = 0;
   for (; i < styles.length; i++) {
     registerStyle(styles[i].getAttribute(HYDRATED_STYLE_ID), convertScopedToShadow(styles[i].innerHTML), true);

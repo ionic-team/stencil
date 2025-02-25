@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { doc, getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
+import { getHostRef, plt, registerHost, supportsShadow, win } from '@platform';
 import { addHostEventListeners } from '@runtime';
 import { CMP_FLAGS, queryNonceMetaTagContent } from '@utils';
 
@@ -27,19 +27,24 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
   }
   installDevTools();
 
+  if (!win.document) {
+    console.warn('Stencil: No document found. Skipping bootstrapping lazy components.');
+    return;
+  }
+
   const endBootstrap = createTime('bootstrapLazy');
   const cmpTags: string[] = [];
   const exclude = options.exclude || [];
   const customElements = win.customElements;
-  const head = doc.head;
+  const head = win.document.head;
   const metaCharset = /*@__PURE__*/ head.querySelector('meta[charset]');
-  const dataStyles = /*@__PURE__*/ doc.createElement('style');
+  const dataStyles = /*@__PURE__*/ win.document.createElement('style');
   const deferredConnectedCallbacks: { connectedCallback: () => void }[] = [];
   let appLoadFallback: any;
   let isBootstrapping = true;
 
   Object.assign(plt, options);
-  plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', doc.baseURI).href;
+  plt.$resourcesUrl$ = new URL(options.resourcesUrl || './', win.document.baseURI).href;
   if (BUILD.asyncQueue) {
     if (options.syncQueue) {
       plt.$flags$ |= PLATFORM_FLAGS.queueSync;
@@ -259,7 +264,7 @@ export const bootstrapLazy = (lazyBundles: d.LazyBundlesRuntimeData, options: d.
       dataStyles.setAttribute('data-styles', '');
 
       // Apply CSP nonce to the style tag if it exists
-      const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(doc);
+      const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(win.document);
       if (nonce != null) {
         dataStyles.setAttribute('nonce', nonce);
       }
