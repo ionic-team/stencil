@@ -247,6 +247,9 @@ export const convertScopedToShadow = (css: string) => css.replace(/\/\*!@([^\/]+
  * and add them to a constructable stylesheet.
  */
 export const hydrateScopedToShadow = () => {
+  if (typeof window === 'undefined') {
+    return;
+  }
   const styles = doc.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
   let i = 0;
   for (; i < styles.length; i++) {
