@@ -54,8 +54,6 @@ export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
 
 export const win = window;
 
-export const doc = win.document;
-
 export const readTask = (cb: Function) => {
   nextTick(() => {
     try {

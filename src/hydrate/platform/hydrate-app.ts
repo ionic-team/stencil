@@ -1,5 +1,5 @@
 import { globalScripts } from '@app-globals';
-import { addHostEventListeners, doc, getHostRef, loadModule, plt, registerHost } from '@platform';
+import { addHostEventListeners, getHostRef, loadModule, plt, registerHost } from '@platform';
 import { connectedCallback, insertVdomAnnotations } from '@runtime';
 import { CMP_FLAGS } from '@utils';
 
@@ -169,7 +169,7 @@ export function hydrateApp(
     // ensure we use NodeJS's native setTimeout, not the mocked hydrate app scoped one
     tmrId = globalThis.setTimeout(timeoutExceeded, opts.timeout);
 
-    plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', doc.baseURI).href;
+    plt.$resourcesUrl$ = new URL(opts.resourcesUrl || './', win.document.baseURI).href;
 
     globalScripts();
 

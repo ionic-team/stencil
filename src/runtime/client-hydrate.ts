@@ -1,5 +1,5 @@
 import { BUILD } from '@app-data';
-import { doc, plt } from '@platform';
+import { plt, win } from '@platform';
 import { CMP_FLAGS } from '@utils';
 
 import type * as d from '../declarations';
@@ -64,10 +64,13 @@ export const initializeClientHydrate = (
     }
   }
 
-  if (!plt.$orgLocNodes$ || !plt.$orgLocNodes$.size) {
+  if (
+    win.document &&
+    (!plt.$orgLocNodes$ || !plt.$orgLocNodes$.size)
+  ) {
     // This is the first pass over of this whole document;
     // does a scrape to construct a 'bare-bones' tree of what elements we have and where content has been moved from
-    initializeDocumentHydrate(doc.body, (plt.$orgLocNodes$ = new Map()));
+    initializeDocumentHydrate(win.document.body, (plt.$orgLocNodes$ = new Map()));
   }
 
   hostElm[HYDRATE_ID] = hostId;
@@ -578,11 +581,11 @@ function addSlot(
   // Important because where it is now in the constructed SSR markup might be different to where to *should* be
   const parentNodeId = parentVNode?.$elm$ ? parentVNode.$elm$['s-id'] || parentVNode.$elm$.getAttribute('s-id') : '';
 
-  if (BUILD.shadowDom && shadowRootNodes) {
+  if (BUILD.shadowDom && shadowRootNodes && win.document) {
     /* SHADOW */
 
     // Browser supports shadowRoot and this is a shadow dom component; create an actual slot element
-    const slot = (childVNode.$elm$ = doc.createElement(childVNode.$tag$ as string) as d.RenderNode);
+    const slot = (childVNode.$elm$ = win.document.createElement(childVNode.$tag$ as string) as d.RenderNode);
 
     if (childVNode.$name$) {
       // Add the slot name attribute
