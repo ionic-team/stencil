@@ -1,3 +1,13 @@
+## 🍸 [4.27.1](https://github.com/ionic-team/stencil/compare/v4.27.0...v4.27.1) (2025-02-25)
+
+
+### Bug Fixes
+
+* **docs:** update changelog with missing contribution ([8d596b0](https://github.com/ionic-team/stencil/commit/8d596b04cf145bb49614465c1e24a1a67bbdc5c3))
+* **runtime:** mock querySelectorAll ([#6175](https://github.com/ionic-team/stencil/issues/6175)) ([7a3e150](https://github.com/ionic-team/stencil/commit/7a3e1502253f4b0fea2af5de96ac937f3933e97e))
+
+
+
 # 🏔 [4.27.0](https://github.com/ionic-team/stencil/compare/v4.26.0...v4.27.0) (2025-02-22)
 
 
