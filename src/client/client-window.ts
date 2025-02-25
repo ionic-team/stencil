@@ -6,7 +6,7 @@ export const win = typeof window !== 'undefined' ? window : ({} as Window);
 
 export const doc = win.document || ({
   head: {},
-  querySelectorAll: () => [] as unknown as NodeListOf<Element>,
+  querySelectorAll: () => [] as unknown[],
 } as unknown as Document);
 
 export const H = ((win as any).HTMLElement || (class {} as any)) as HTMLElement;
