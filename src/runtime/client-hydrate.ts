@@ -64,10 +64,7 @@ export const initializeClientHydrate = (
     }
   }
 
-  if (
-    win.document &&
-    (!plt.$orgLocNodes$ || !plt.$orgLocNodes$.size)
-  ) {
+  if (win.document && (!plt.$orgLocNodes$ || !plt.$orgLocNodes$.size)) {
     // This is the first pass over of this whole document;
     // does a scrape to construct a 'bare-bones' tree of what elements we have and where content has been moved from
     initializeDocumentHydrate(win.document.body, (plt.$orgLocNodes$ = new Map()));

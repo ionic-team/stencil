@@ -15,7 +15,8 @@ export const patchBrowser = (): Promise<d.CustomElementsDefineOptions> => {
   }
 
   const scriptElm = BUILD.scriptDataOpts
-    ? win.document && Array.from(win.document.querySelectorAll('script')).find(
+    ? win.document &&
+      Array.from(win.document.querySelectorAll('script')).find(
         (s) =>
           new RegExp(`\/${NAMESPACE}(\\.esm)?\\.js($|\\?|#)`).test(s.src) ||
           s.getAttribute('data-stencil-namespace') === NAMESPACE,

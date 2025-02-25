@@ -78,7 +78,9 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
   } else if (BUILD.slotRelocation && newVNode.$flags$ & VNODE_FLAGS.isSlotReference) {
     // create a slot reference node
     elm = newVNode.$elm$ =
-      BUILD.isDebug || BUILD.hydrateServerSide ? slotReferenceDebugNode(newVNode) : (win.document.createTextNode('') as any);
+      BUILD.isDebug || BUILD.hydrateServerSide
+        ? slotReferenceDebugNode(newVNode)
+        : (win.document.createTextNode('') as any);
     // add css classes, attrs, props, listeners, etc.
     if (BUILD.vdomAttribute) {
       updateElement(null, newVNode, isSvgMode);
@@ -89,7 +91,10 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
     }
 
     if (!win.document) {
-      throw new Error('You are trying to render a component in a non-browser environment. This is not supported.');
+      throw new Error(
+        "You are trying to render a Stencil component in an environment that doesn't support the DOM. " +
+          'Make sure to populate the [`window`](https://developer.mozilla.org/en-US/docs/Web/API/Window/window) object before rendering a component.',
+      );
     }
 
     // create element
