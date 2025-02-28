@@ -131,6 +131,7 @@ export const validateConfig = (
     hydratedFlag: validateHydrated(config),
     logLevel,
     logger,
+    noDashCaseTypes: config.noDashCaseTypes ?? false,
     minifyCss: config.minifyCss ?? !devMode,
     minifyJs: config.minifyJs ?? !devMode,
     outputTargets: config.outputTargets ?? [],

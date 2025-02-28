@@ -309,6 +309,11 @@ export interface StencilConfig {
    */
   excludeUnusedDependencies?: boolean;
   stencilCoreResolvedId?: string;
+  /**
+   * Sets whether Stencil will generate dash-cased types (with deprecated comment)
+   * in `components.d.ts`. Defaults to `false`
+   */
+  noDashCaseTypes?: boolean;
 }
 
 interface ConfigExtrasBase {
@@ -501,6 +506,7 @@ type StrictConfigFields = keyof Pick<
   | 'minifyCss'
   | 'minifyJs'
   | 'namespace'
+  | 'noDashCaseTypes'
   | 'outputTargets'
   | 'packageJsonFilePath'
   | 'rollupConfig'

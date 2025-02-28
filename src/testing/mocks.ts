@@ -40,6 +40,7 @@ export function mockValidatedConfig(overrides: Partial<d.ValidatedConfig> = {}):
     minifyCss: false,
     minifyJs: false,
     namespace: 'Testing',
+    noDashCaseTypes: false,
     outputTargets: baseConfig.outputTargets ?? [],
     packageJsonFilePath: path.join(rootDir, 'package.json'),
     rootDir,

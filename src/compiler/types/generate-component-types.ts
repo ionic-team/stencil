@@ -8,12 +8,14 @@ import { generatePropTypes } from './generate-prop-types';
 
 /**
  * Generate a string based on the types that are defined within a component
+ * @param config the validated config for the Stencil project
  * @param cmp the metadata for the component that a type definition string is generated for
  * @param typeImportData locally/imported/globally used type names, which may be used to prevent naming collisions
  * @param areTypesInternal `true` if types being generated are for a project's internal purposes, `false` otherwise
  * @returns the generated types string alongside additional metadata
  */
 export const generateComponentTypes = (
+  config: d.ValidatedConfig,
   cmp: d.ComponentCompilerMeta,
   typeImportData: d.TypesImportData,
   areTypesInternal: boolean,
@@ -21,6 +23,7 @@ export const generateComponentTypes = (
   const tagName = cmp.tagName.toLowerCase();
   const tagNameAsPascal = dashToPascalCase(tagName);
   const htmlElementName = `HTML${tagNameAsPascal}Element`;
+  const noDashCaseTypes = config.noDashCaseTypes;
 
   const propAttributes = generatePropTypes(cmp, typeImportData);
   const methodAttributes = generateMethodTypes(cmp, typeImportData);
@@ -31,9 +34,15 @@ export const generateComponentTypes = (
     [...propAttributes, ...methodAttributes],
     false,
     areTypesInternal,
+    noDashCaseTypes,
   );
   const isDep = cmp.isCollectionDependency;
-  const jsxAttributes = attributesToMultiLineString([...propAttributes, ...eventAttributes], true, areTypesInternal);
+  const jsxAttributes = attributesToMultiLineString(
+    [...propAttributes, ...eventAttributes],
+    true,
+    areTypesInternal,
+    noDashCaseTypes,
+  );
 
   const element = [
     ...htmlElementEventMap,
@@ -60,7 +69,12 @@ export const generateComponentTypes = (
   };
 };
 
-const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: boolean, internal: boolean) => {
+const attributesToMultiLineString = (
+  attributes: d.TypeInfo,
+  jsxAttributes: boolean,
+  internal: boolean,
+  noDashCaseTypes: boolean,
+) => {
   const attributesStr = sortBy(attributes, (a) => a.name)
     .filter((type) => {
       if (jsxAttributes && !internal && type.internal) {
@@ -76,20 +90,21 @@ const attributesToMultiLineString = (attributes: d.TypeInfo, jsxAttributes: bool
       }
       const optional = jsxAttributes ? !type.required : type.optional;
       fullList.push(`        "${type.name}"${optional ? '?' : ''}: ${type.type};`);
-
-      /**
-       * deprecated usage of dash-casing in JSX, use camelCase instead
-       */
-      if (type.attributeName && type.attributeName !== type.name) {
-        const padding = ' '.repeat(8);
-        fullList.push(
-          [
-            `${padding}/**`,
-            `${padding} * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.`,
-            `${padding} */`,
-          ].join('\n'),
-        );
-        fullList.push(`${padding}"${type.attributeName}"?: ${type.type};`);
+      if (noDashCaseTypes === false) {
+        /**
+         * deprecated usage of dash-casing in JSX, use camelCase instead
+         */
+        if (type.attributeName && type.attributeName !== type.name) {
+          const padding = ' '.repeat(8);
+          fullList.push(
+            [
+              `${padding}/**`,
+              `${padding} * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.`,
+              `${padding} */`,
+            ].join('\n'),
+          );
+          fullList.push(`${padding}"${type.attributeName}"?: ${type.type};`);
+        }
       }
 
       return fullList;

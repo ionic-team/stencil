@@ -89,7 +89,7 @@ const generateComponentTypesFile = (
        */
       componentEventDetailTypes.push(generateEventDetailTypes(cmp));
     }
-    return generateComponentTypes(cmp, typeImportData, areTypesInternal);
+    return generateComponentTypes(config, cmp, typeImportData, areTypesInternal);
   });
 
   c.push(COMPONENTS_DTS_HEADER);
