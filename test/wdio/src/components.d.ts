@@ -20,10 +20,6 @@ export namespace Components {
     }
     interface CmpD {
         "uniqueId": string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "unique-id"?: string;
     }
     interface CmpScopedA {
     }
@@ -139,10 +135,6 @@ declare namespace LocalJSX {
     }
     interface CmpD {
         "uniqueId"?: string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "unique-id"?: string;
     }
     interface CmpScopedA {
     }

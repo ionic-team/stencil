@@ -847,10 +847,6 @@ export namespace Components {
      */
     interface MyComponent {
         "name": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
 }
 declare global {
@@ -873,10 +869,6 @@ declare namespace LocalJSX {
      */
     interface MyComponent {
         "name"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
@@ -957,15 +949,7 @@ export namespace Components {
      */
     interface MyComponent {
         "email": SecondUserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: SecondUserImplementedPropType;
         "name": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
 }
 declare global {
@@ -988,15 +972,7 @@ declare namespace LocalJSX {
      */
     interface MyComponent {
         "email"?: SecondUserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: SecondUserImplementedPropType;
         "name"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
@@ -1087,20 +1063,12 @@ export namespace Components {
      */
     interface MyComponent {
         "name": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     /**
      * docs
      */
     interface MyNewComponent {
         "fullName": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
 }
 declare global {
@@ -1133,20 +1101,12 @@ declare namespace LocalJSX {
      */
     interface MyComponent {
         "name"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     /**
      * docs
      */
     interface MyNewComponent {
         "fullName"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
@@ -1247,20 +1207,12 @@ export namespace Components {
      */
     interface MyComponent {
         "name": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     /**
      * docs
      */
     interface MyNewComponent {
         "newName": UserImplementedPropType1;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType1;
     }
 }
 declare global {
@@ -1293,20 +1245,12 @@ declare namespace LocalJSX {
      */
     interface MyComponent {
         "name"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     /**
      * docs
      */
     interface MyNewComponent {
         "newName"?: UserImplementedPropType1;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType1;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
@@ -1407,20 +1351,12 @@ export namespace Components {
      */
     interface MyComponent {
         "name": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     /**
      * docs
      */
     interface MyNewComponent {
         "name": UserImplementedPropType1;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType1;
     }
 }
 declare global {
@@ -1453,20 +1389,12 @@ declare namespace LocalJSX {
      */
     interface MyComponent {
         "name"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     /**
      * docs
      */
     interface MyNewComponent {
         "name"?: UserImplementedPropType1;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType1;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
@@ -1544,10 +1472,6 @@ export namespace Components {
      */
     interface MyComponent {
         "name": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
 }
 export interface MyComponentCustomEvent<T> extends CustomEvent<T> {
@@ -1585,10 +1509,6 @@ declare namespace LocalJSX {
      */
     interface MyComponent {
         "name"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
         "onMyEvent"?: (event: MyComponentCustomEvent<UserImplementedEventType>) => void;
     }
     interface IntrinsicElements {
@@ -1670,10 +1590,6 @@ export namespace Components {
      */
     interface MyComponent {
         "name": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
 }
 declare global {
@@ -1696,10 +1612,6 @@ declare namespace LocalJSX {
      */
     interface MyComponent {
         "name"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
@@ -1770,10 +1682,6 @@ export namespace Components {
      */
     interface MyComponent {
         "name": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
 }
 declare global {
@@ -1796,10 +1704,6 @@ declare namespace LocalJSX {
      */
     interface MyComponent {
         "name"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
@@ -1879,10 +1783,6 @@ export namespace Components {
      */
     interface MyComponent {
         "name": UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
 }
 declare global {
@@ -1905,10 +1805,6 @@ declare namespace LocalJSX {
      */
     interface MyComponent {
         "name"?: UserImplementedPropType;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "my-cmp"?: UserImplementedPropType;
     }
     interface IntrinsicElements {
         "my-component": MyComponent;
