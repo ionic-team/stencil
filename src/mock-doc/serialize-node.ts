@@ -128,7 +128,7 @@ function* streamToHtml(
       output.currentLineWidth += tag.length + 1;
 
       /**
-       * ToDo(https://github.com/ionic-team/stencil/issues/4111): the shadow root class is `#document-fragment`
+       * ToDo(https://github.com/stenciljs/core/issues/4111): the shadow root class is `#document-fragment`
        * and has no mode attribute. We should consider adding a mode attribute.
        */
       if (
@@ -666,7 +666,7 @@ interface SerializeOutput {
 }
 
 /**
- * Partially duplicate of https://github.com/ionic-team/stencil/blob/6017dad2cb6fe366242e2e0594f82c8e3a3b5d15/src/declarations/stencil-public-compiler.ts#L895
+ * Partially duplicate of https://github.com/stenciljs/core/blob/6017dad2cb6fe366242e2e0594f82c8e3a3b5d15/src/declarations/stencil-public-compiler.ts#L895
  * Types can't be imported in this documented as Eslint will not embed the types
  * in the d.ts file.
  */

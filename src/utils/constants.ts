@@ -243,7 +243,7 @@ export const GENERATED_DTS = 'components.d.ts';
  * Note: this is a duplicate of the `NODE_TYPES` enum in mock-doc, it's
  * copied over here so that we do not need to introduce a dependency on the
  * mock-doc bundle in the runtime. See
- * https://github.com/ionic-team/stencil/pull/5705 for more details.
+ * https://github.com/stenciljs/core/pull/5705 for more details.
  */
 export const enum NODE_TYPES {
   ELEMENT_NODE = 1,
