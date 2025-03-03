@@ -21,6 +21,11 @@ export const h = (nodeName: any, vnodeData: any, ...children: d.ChildType[]): d.
   let slotName: string = null;
   let simple = false;
   let lastSimple = false;
+
+  if (typeof nodeName === 'function' && 'is' in nodeName) {
+    nodeName = nodeName.is;
+  }
+
   const vNodeChildren: d.VNode[] = [];
   const walk = (c: any[]) => {
     for (let i = 0; i < c.length; i++) {

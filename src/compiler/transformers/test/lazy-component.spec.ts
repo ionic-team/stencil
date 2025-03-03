@@ -101,6 +101,9 @@ describe('lazy-component', () => {
             hostRef.$hostElement$["s-ei"] = this.internals;
           }
         }
+        static get is() {
+          return 'cmp-a';
+        }
         static get formAssociated() {
           return true;
         }
@@ -146,6 +149,9 @@ describe('lazy-component', () => {
           constructor (hostRef) {
             __stencil_registerInstance(this, hostRef);
           }
+          static get is() {
+            return 'cmp-a';
+          }
         };
         CmpA.style = CmpAStyle0;
       `,
@@ -174,6 +180,9 @@ describe('lazy-component', () => {
           constructor (hostRef) {
             __stencil_registerInstance(this, hostRef);
           }
+          static get is() {
+            return 'cmp-a';
+          }
         };
         CmpA.style = { bar: CmpABarStyle0, foo: CmpAFooStyle0 };
       `,
@@ -198,6 +207,9 @@ describe('lazy-component', () => {
         export const CmpA = class {
           constructor (hostRef) {
             __stencil_registerInstance(this, hostRef);
+          }
+          static get is() {
+            return 'cmp-a';
           }
         };
         CmpA.style = CmpAStyle0 + CmpAStyle1;

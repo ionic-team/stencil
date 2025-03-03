@@ -1,5 +1,6 @@
 import { Fragment, h } from '@stencil/core';
 import { render } from '@wdio/browser-runner/stencil';
+import { $, expect } from '@wdio/globals';
 
 const css = `
 body {
@@ -9,6 +10,7 @@ body {
 describe('esm-import', () => {
   beforeEach(() => {
     render({
+      components: [],
       template: () => (
         <>
           <style>{css}</style>

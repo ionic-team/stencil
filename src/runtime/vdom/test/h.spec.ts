@@ -302,6 +302,31 @@ describe('h()', () => {
     ]);
   });
 
+  it('should render class component', () => {
+    const ClassCmp = class {
+      render() { return  h('inner-div', null); }
+      static get is() { return 'class-cmp-1'; }
+    };
+    const vnode = h(ClassCmp, null);
+    expect(vnode.$tag$).toEqual('class-cmp-1');
+  });
+
+  it('should render class components with a child being a class component', () => {
+    const ClassCmp1 = class {
+      render() { return  h('inner-div', null); }
+      static get is() { return 'class-cmp-1'; }
+    };
+    const ClassCmp2 = class {
+      render() { return  h(ClassCmp1, null); }
+      static get is() { return 'class-cmp-2'; }
+    };
+    const vnode = h(ClassCmp2, null, h(ClassCmp1, null));
+    expect(vnode.$tag$).toEqual('class-cmp-2');
+    expect(vnode.$children$).toBeDefined();
+    expect(vnode.$children$.length).toBe(1);
+    expect(vnode.$children$[0].$tag$).toBe('class-cmp-1');
+  });
+
   describe('functional components', () => {
     it('should receive props, array, and utils as props', async () => {
       let args: any;

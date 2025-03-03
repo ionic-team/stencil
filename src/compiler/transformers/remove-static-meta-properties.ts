@@ -40,7 +40,6 @@ const STATIC_GETTERS_TO_REMOVE = [
   'elementRef',
   'encapsulation',
   'events',
-  'is',
   'listeners',
   'methods',
   'originalStyleUrls',
