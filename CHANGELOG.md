@@ -1,3 +1,13 @@
+## 🌱 [4.27.2](https://github.com/stenciljs/core/compare/v4.27.1...v4.27.2) (2025-03-03)
+
+
+### Bug Fixes
+
+* **compiler:** revert deprecation changes to components.d.ts ([#6184](https://github.com/stenciljs/core/issues/6184)) ([66cba68](https://github.com/stenciljs/core/commit/66cba6821d287603588248707cd423735be16566)), closes [#6183](https://github.com/stenciljs/core/issues/6183), closes [#6184](https://github.com/stenciljs/core/issues/6184)
+* **internal:** fix references to old repository ([#6177](https://github.com/stenciljs/core/issues/6177)) ([2ae7446](https://github.com/stenciljs/core/commit/2ae7446545611b3b3e36c582f06db40c06d4e558))
+
+
+
 ## 🍸 [4.27.1](https://github.com/stenciljs/core/compare/v4.27.0...v4.27.1) (2025-02-25)
 
 
