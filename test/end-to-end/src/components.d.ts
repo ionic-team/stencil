@@ -40,10 +40,6 @@ export namespace Components {
     }
     interface CmpDsd {
         "initialCounter": number;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "initial-counter"?: number;
     }
     interface CmpServerVsClient {
     }
@@ -105,10 +101,6 @@ export namespace Components {
          */
         "someMethodWithArgs": (unit: string, value: number) => Promise<string>;
         "someProp": number;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "some-prop"?: number;
     }
     interface MyCmp {
         /**
@@ -118,17 +110,9 @@ export namespace Components {
          */
         "barProp": string;
         /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "bar-prop"?: string;
-        /**
           * foo prop
          */
         "fooProp": string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "foo-prop"?: string;
         /**
           * Mode
          */
@@ -142,17 +126,9 @@ export namespace Components {
          */
         "barProp": string;
         /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "bar-prop"?: string;
-        /**
           * foo prop
          */
         "fooProp": string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "foo-prop"?: string;
         /**
           * Mode
          */
@@ -183,15 +159,7 @@ export namespace Components {
           * @readonly
          */
         "fullName": string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "full-name"?: string;
         "lastName": string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "last-name"?: string;
         /**
           * Mode
          */
@@ -199,20 +167,8 @@ export namespace Components {
     }
     interface RuntimeDecorators {
         "basicProp": string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "basic-prop"?: string;
         "decoratedGetterSetterProp": number;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "decorated-getter-setter-prop"?: number;
         "decoratedProp": number;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "decorated-prop"?: number;
     }
     interface ScopedCarDetail {
         "car": CarData;
@@ -670,10 +626,6 @@ declare namespace LocalJSX {
     }
     interface CmpDsd {
         "initialCounter"?: number;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "initial-counter"?: number;
     }
     interface CmpServerVsClient {
     }
@@ -709,10 +661,6 @@ declare namespace LocalJSX {
     }
     interface MethodCmp {
         "someProp"?: number;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "some-prop"?: number;
     }
     interface MyCmp {
         /**
@@ -722,17 +670,9 @@ declare namespace LocalJSX {
          */
         "barProp"?: string;
         /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "bar-prop"?: string;
-        /**
           * foo prop
          */
         "fooProp"?: string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "foo-prop"?: string;
         /**
           * Mode
          */
@@ -746,17 +686,9 @@ declare namespace LocalJSX {
          */
         "barProp"?: string;
         /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "bar-prop"?: string;
-        /**
           * foo prop
          */
         "fooProp"?: string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "foo-prop"?: string;
         /**
           * Mode
          */
@@ -787,15 +719,7 @@ declare namespace LocalJSX {
           * @readonly
          */
         "fullName"?: string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "full-name"?: string;
         "lastName"?: string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "last-name"?: string;
         /**
           * Mode
          */
@@ -803,20 +727,8 @@ declare namespace LocalJSX {
     }
     interface RuntimeDecorators {
         "basicProp"?: string;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "basic-prop"?: string;
         "decoratedGetterSetterProp"?: number;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "decorated-getter-setter-prop"?: number;
         "decoratedProp"?: number;
-        /**
-         * @deprecated use camelCase instead. Support for dash-casing will be removed in Stencil v5.
-         */
-        "decorated-prop"?: number;
     }
     interface ScopedCarDetail {
         "car"?: CarData;
