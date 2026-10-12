@@ -31,6 +31,7 @@ import { hmrApplyClass, hmrStart } from './hmr-component';
 import { computeMode } from './mode';
 import { normalizeWatchers } from './normalize-watchers';
 import { proxyComponent } from './proxy-component';
+import { getHostRegistry } from './registry';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { PROXY_FLAGS } from './runtime-constants';
 import { attachStyles, getScopeId, hydrateScopedToShadow, registerStyle } from './styles';
@@ -158,7 +159,7 @@ export const proxyCustomElement = (Cstr: any, compactMeta: d.ComponentRuntimeMet
           // Never fire before our nearest Stencil ancestor's real connectedCallback,
           // regardless of load order. Gated on having an ancestor since `awaitAncestorConnected`
           // is `async` - calling it unconditionally would cost every component a wasted tick.
-          await awaitAncestorConnected(hostRef.$ancestorComponent$);
+          await awaitAncestorConnected(hostRef.$ancestorComponent$, getHostRegistry(this));
 
           // If disconnected while suspended above, `disconnectedCallback` already ran - firing
           // the author's callback now would leak, with no matching disconnect left to follow.

@@ -8,6 +8,7 @@ import { computeMode } from './mode';
 import { normalizeWatchers } from './normalize-watchers';
 import { createTime, uniqueTime } from './profile';
 import { proxyComponent, replayPendingSetterValues } from './proxy-component';
+import { getHostRegistry } from './registry';
 import { PROXY_FLAGS, MAX_LAZY_LOAD_RETRIES } from './runtime-constants';
 import { initializeEffects, initializeSignals } from './signals';
 import { getScopeId, registerStyle } from './styles';
@@ -114,7 +115,7 @@ export const initializeComponent = async (
           // ancestor to wait on - `awaitAncestorConnected` is itself `async`, so awaiting
           // it unconditionally would cost every component an extra microtask tick even
           // when there's nothing to wait for.
-          await awaitAncestorConnected(hostRef.$ancestorComponent$);
+          await awaitAncestorConnected(hostRef.$ancestorComponent$, getHostRegistry(elm));
         }
 
         // For components that relocate slots, defer connectedCallback to the next microtask

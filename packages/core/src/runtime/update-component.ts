@@ -5,7 +5,6 @@ import type * as d from '@stencil/core';
 import { CMP_FLAGS, HOST_FLAGS } from '../utils/constants';
 import { emitEvent } from './event-emitter';
 import { createTime } from './profile';
-import { getRegistry } from './registry';
 import { PLATFORM_FLAGS } from './runtime-constants';
 import { attachStyles } from './styles';
 import { renderVdom } from './vdom/vdom-render';
@@ -46,11 +45,15 @@ export const markFirstConnected = (hostRef: d.HostRef) => {
  * autoloader, where the ancestor tag may not be defined yet.
  *
  * @param ancestorElm the nearest Stencil ancestor element
+ * @param registry the registry the waiting component is defined in
  */
-export const awaitAncestorConnected = async (ancestorElm: d.HostElement): Promise<void> => {
+export const awaitAncestorConnected = async (
+  ancestorElm: d.HostElement,
+  registry: CustomElementRegistry,
+): Promise<void> => {
   let ancestorHostRef = getHostRef(ancestorElm);
   if (!BUILD.lazyLoad && !ancestorHostRef) {
-    await getRegistry().whenDefined(ancestorElm.tagName.toLowerCase());
+    await registry.whenDefined(ancestorElm.tagName.toLowerCase());
     ancestorHostRef = getHostRef(ancestorElm);
   }
   if (ancestorHostRef && !(ancestorHostRef.$flags$ & HOST_FLAGS.hasFiredConnected)) {
