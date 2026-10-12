@@ -41,6 +41,7 @@ import {
   withVersionRanges,
 } from './wizard/init/steps.js';
 import {
+  clearInheritedProductionEnv,
   defaultProjectConfig,
   detectPackageManager,
   detectWorkspaceRoot,
@@ -68,23 +69,6 @@ async function verifyInstalled(rootDir: string, packageNames: string[]): Promise
     `Install reported success but ${missing.join(', ')} could not be found in ${rootDir}. Your package manager may have silently failed to write to node_modules - check its logs and try again.`,
   );
   process.exit(1);
-}
-
-/**
- * npm silently omits devDependencies when this CLI is itself running as a nested child
- * process (e.g. via `npx create-stencil` / `npm init stencil`). Root cause: npm/exec only
- * needs @stencil/cli's own regular dependencies to resolve+run it, so that install computes
- * `omit: ['dev']` - and per npm's own config flattening
- * (@npmcli/config/lib/definitions/definitions.js), whenever `omit` includes 'dev' npm sets
- * `process.env.NODE_ENV = 'production'` on itself. We inherit that env var from the outer
- * npm/npx process, and every child process we (or a wizard plugin) spawn from here would
- * inherit it right back, causing nested `npm install`s to also compute `omit: ['dev']` and
- * silently drop (or, worse, actively remove) every devDependency in the scaffolded project.
- * Clearing it once, up front, fixes every install call transitively - ours and every wizard
- * plugin's - without needing to special-case npm invocations one by one.
- */
-function clearInheritedProductionEnv(): void {
-  if (process.env.NODE_ENV === 'production') delete process.env.NODE_ENV;
 }
 
 const OUTPUT_TYPES: Record<OutputKey, string> = {
