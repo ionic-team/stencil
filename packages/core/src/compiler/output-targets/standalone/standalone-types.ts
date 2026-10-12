@@ -231,7 +231,7 @@ export const generateCustomElementType = (
     `/**`,
     ` * Used to define this component and all nested components recursively.`,
     ` */`,
-    `export const defineCustomElement: () => void;`,
+    `export const defineCustomElement: (opts?: { registry?: CustomElementRegistry }) => void;`,
     ``,
   ];
 
