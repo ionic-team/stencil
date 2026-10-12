@@ -159,13 +159,16 @@ export const generateSsrFactory = async (
           format: 'cjs',
           esModule: false,
           strict: false,
-          intro: SSR_FACTORY_INTRO,
-          outro: SSR_FACTORY_OUTRO,
           codeSplitting: false,
         });
 
         if (!buildCtx.hasError && rolldownOutput != null && Array.isArray(rolldownOutput.output)) {
-          return rolldownOutput.output[0].code;
+          // The chunk is generated as CommonJS only to get a body with no `import`/`export`
+          // statements, so that it can sit inside the `ssrFactory()` closure. The closure itself
+          // is an ES module export, so it's wrapped around the body here and not through Rolldown's
+          // `intro`/`outro`: Rolldown (1.2.13+) parses a CommonJS chunk as a script and rejects
+          // the `export` statement.
+          return SSR_FACTORY_INTRO + rolldownOutput.output[0].code + SSR_FACTORY_OUTRO;
         }
       }
     } catch (e: any) {
