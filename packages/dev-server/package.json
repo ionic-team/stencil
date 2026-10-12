@@ -55,6 +55,9 @@
   "peerDependencies": {
     "@stencil/core": "^5.0.0 || workspace:*"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "volta": {
     "extends": "../../package.json"
   }
