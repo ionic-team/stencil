@@ -49,6 +49,26 @@ describe('parse component', () => {
     );
   });
 
+  it('can not have a typed shadowRoot getter', () => {
+    let error: Error | undefined;
+    try {
+      transpileModule(`
+        @Component({
+          tag: 'cmp-a'
+        })
+        export class CmpA {
+          get shadowRoot(): ShadowRoot | null {
+            return null;
+          }
+        }
+      `);
+    } catch (err: unknown) {
+      error = err as Error;
+    }
+
+    expect(error.message).toContain(`The component "CmpA" has a getter called "shadowRoot".`);
+  });
+
   it('ignores shadowRoot getter in unrelated class', () => {
     const t = transpileModule(`
       @Component({
@@ -81,6 +101,28 @@ describe('parse component', () => {
         export class CmpA {
           componentShouldUpdate(newVal, oldVal, propName) {
             return newVal !== oldVal;
+          }
+        }
+      `);
+    } catch (err: unknown) {
+      error = err as Error;
+    }
+
+    expect(error.message).toContain(
+      `The component "CmpA" defines "componentShouldUpdate" with 3 parameters.`,
+    );
+  });
+
+  it('warns about pre-v5 "componentShouldUpdate" signature with typed parameters', () => {
+    let error: Error | undefined;
+    try {
+      transpileModule(`
+        @Component({
+          tag: 'cmp-a'
+        })
+        export class CmpA {
+          componentShouldUpdate(newVal: any, oldVal: any, propName: string) {
+            return propName === 'first' && newVal !== oldVal;
           }
         }
       `);
