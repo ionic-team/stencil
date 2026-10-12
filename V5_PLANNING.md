@@ -807,7 +807,7 @@ packages/cli/src/
 Package at `packages/unplugin/`. 32 tests (8 browser via `pnpm test:browser`).
 
 ### Design
-- `componentExport: 'customelement'` — component self-registers on import
+- `componentExport: 'customelement'` (default) — component self-registers on import. `transpileOptions.componentExport: 'module'` opts out: the module only exports the class (+ `proxyCustomElement` metadata) and the consumer calls `customElements.define()`. Dev HMR finds instances by the `@Component` tag, so a component registered under another name isn't hot-updated. Browser coverage: `test/module-export.test.ts`. A `transpile()` fix came with it: the documented `proxy: 'defineproperty'` default now applies (`getTranspileConfigOpt` used to accept `undefined` as the valid `null`, so `'module'` emitted a class with no runtime metadata; pass `proxy: null` for the old output).
 - `styleImportData: 'queryparams'` — CSS imports carry `?tag=my-cmp&encapsulation=shadow`
 - **JSX detection**: reads `tsconfig.json` for `jsx`/`jsxImportSource`; falls back to detecting `h` import → classic `jsx:react`; otherwise `jsx:react-jsx` + `jsxImportSource:@stencil/core`
 - **Filter**: `/\.tsx?$/` + fast `@Component` decorator check before paying `transpileSync` cost

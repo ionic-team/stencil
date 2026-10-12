@@ -34,6 +34,47 @@ describe('transformStencil', () => {
     expect(result!.code).not.toContain('bootstrapLazy');
   });
 
+  describe("componentExport: 'module'", () => {
+    const moduleOpts = { transpileOptions: { componentExport: 'module' as const } };
+
+    it('exports the class without registering it', async () => {
+      const result = await transformStencil(COMPONENT, '/src/my-button.tsx', moduleOpts);
+      expect(result!.code).not.toContain('defineCustomElement');
+      expect(result!.code).toMatch(/proxyCustomElement\(MyButton,/);
+      expect(result!.code.match(/export\b/g)).toHaveLength(1);
+      expect(result!.code).toContain('export const MyButton');
+    });
+
+    it('exports a class that was not exported in source', async () => {
+      const result = await transformStencil(
+        COMPONENT.replace('export class', 'class'),
+        '/src/my-button.tsx',
+        moduleOpts,
+      );
+      expect(result!.code).toContain('export{MyButton};');
+    });
+
+    it('still appends the HMR snippet in dev', async () => {
+      const result = await transformStencil(
+        COMPONENT,
+        '/src/my-button.tsx',
+        moduleOpts,
+        true,
+        'vite',
+      );
+      expect(result!.code).toContain('__stencil_module__ = import.meta.url');
+    });
+
+    it('is ignored in spec-page mode', async () => {
+      const result = await transformStencil(COMPONENT, '/src/my-button.tsx', {
+        ...moduleOpts,
+        mode: 'spec-page',
+      });
+      expect(result!.code).toContain('COMPILER_META');
+      expect(result!.code).not.toContain('proxyCustomElement');
+    });
+  });
+
   it('rewrites CSS imports with queryparams', async () => {
     const cmpWithStyle = `
       import { Component, h } from '@stencil/core';

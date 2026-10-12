@@ -18,8 +18,8 @@ export type StencilConfigSubset = Pick<
 export interface StencilPluginOptions {
   /**
    * Additional options forwarded to `transpileSync` for every `.tsx`/`.ts` file.
-   * `file`, `resolveImport`, `styleImportData`, `componentExport`, `componentMetadata`,
-   * and `coreImportPath` are managed by the plugin and should not be set here.
+   * `file`, `resolveImport`, `styleImportData`, `componentMetadata`, and `coreImportPath`
+   * are managed by the plugin and should not be set here.
    */
   transpileOptions?: Omit<
     TranspileOptions,
@@ -29,7 +29,18 @@ export interface StencilPluginOptions {
     | 'componentExport'
     | 'componentMetadata'
     | 'coreImportPath'
-  >;
+  > & {
+    /**
+     * `'customelement'` (default) - each component module registers its tag
+     * (`customElements.define`) when imported.
+     *
+     * `'module'` - the module only exports the component class, with no
+     * registration side effect; the consumer calls `customElements.define()` itself.
+     *
+     * Ignored in `mode: 'spec-page'`.
+     */
+    componentExport?: 'customelement' | 'module';
+  };
 
   /**
    * `'build'` (default) transpiles components into self-registering custom

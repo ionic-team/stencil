@@ -123,3 +123,28 @@ describe('transpileSync() - deprecated @Component API', () => {
     }
   });
 });
+
+describe('transpileSync() - componentExport', () => {
+  const component = (exportKeywords: string) => `
+    import { Component, Prop, h } from '@stencil/core';
+    @Component({ tag: 'my-cmp' })
+    ${exportKeywords} class MyCmp {
+      @Prop() label = 'hi';
+      render() { return <div>{this.label}</div>; }
+    }
+  `;
+  const transpileCmp = (exportKeywords: string, opts: Parameters<typeof transpileSync>[1] = {}) =>
+    transpileSync(component(exportKeywords), { file: 'my-cmp.tsx', sourceMap: false, ...opts });
+
+  it('attaches runtime metadata to a `module` export by default', () => {
+    const { code } = transpileCmp('export', { componentExport: 'module' });
+    expect(code).toContain('export const MyCmp = class extends HTMLElement');
+    expect(code).toMatch(/proxyCustomElement\(MyCmp, \[/);
+    expect(code).not.toContain('defineCustomElement');
+  });
+
+  it('leaves a `module` export unproxied when `proxy` is null', () => {
+    const { code } = transpileCmp('export', { componentExport: 'module', proxy: null });
+    expect(code).not.toContain('proxyCustomElement');
+  });
+});

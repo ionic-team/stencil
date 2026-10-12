@@ -169,9 +169,11 @@ stencilVite({
   docs: true,
 
   // Extra options forwarded to transpileSync for every transformed file.
-  // The plugin manages: file, resolveImport, styleImportData, componentExport — don't set those here.
+  // The plugin manages: file, resolveImport, styleImportData, componentMetadata, coreImportPath — don't set those here.
   transpileOptions: {
     sourceMap: true,
+    // 'customelement' (default) self-registers on import; 'module' only exports the class.
+    componentExport: 'customelement',
   },
 });
 ```
@@ -191,7 +193,19 @@ stencilVite({
 
 Only files containing Stencil decorators (`@Component`, `@Prop`, `@State`, etc.) are compiled. Everything else passes through untouched, apart from `Build` flag folding (below).
 
-Matching files are compiled with `componentExport: 'customelement'`, which means each component self-registers via `customElements.define` (if not already defined) when the module is imported — no separate registration step needed.
+Matching files are compiled with `componentExport: 'customelement'` by default, which means each component self-registers via `customElements.define` (if not already defined) when the module is imported — no separate registration step needed.
+
+#### Opting out of self-registration
+
+Set `transpileOptions.componentExport: 'module'` to get modules that only export the component class, with no registration side effect on import. Registering is then up to the consumer:
+
+```ts
+import { MyButton } from './my-button';
+
+customElements.define('my-button', MyButton);
+```
+
+In dev mode, HMR looks instances up by the tag from `@Component({ tag })`, so components registered under a different name aren't hot-updated.
 
 ### `Build` flags
 
