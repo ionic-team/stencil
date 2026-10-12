@@ -16,7 +16,12 @@ import {
   promptCustomPackages,
   withVersionRanges,
 } from './wizard/init/steps.js';
-import { defaultProjectConfig, detectWorkspaceRoot, toProjectConfig } from './wizard/project.js';
+import {
+  clearInheritedProductionEnv,
+  defaultProjectConfig,
+  detectWorkspaceRoot,
+  toProjectConfig,
+} from './wizard/project.js';
 import { printSplash } from './wizard/splash.js';
 
 async function getInstalledPackageNames(rootDir: string): Promise<Set<string>> {
@@ -73,6 +78,8 @@ export async function taskAdd(packages: string[], strictConfig?: ValidatedConfig
     p.log.warn('Running in CI - non-interactive mode is not yet supported for `stencil add`.');
     process.exit(1);
   }
+
+  clearInheritedProductionEnv();
 
   let packagesToInstall: string[] = packages;
   let pluginsToReconfigure: DiscoveredPlugin[] = [];
