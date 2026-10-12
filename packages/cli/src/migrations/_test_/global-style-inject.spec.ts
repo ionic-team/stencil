@@ -133,7 +133,7 @@ export const config: Config = {
       expect(result).toContain("inject: 'client'");
     });
 
-    it('should remove addGlobalStyleToComponents: false without adding global-style output target', () => {
+    it('should remove addGlobalStyleToComponents: false and add global-style with inject: none', () => {
       const source = `export const config: Config = {
   outputTargets: [
     { type: 'www' },
@@ -147,7 +147,73 @@ export const config: Config = {
       const result = globalStyleInjectRule.transform(sourceFile, matches);
 
       expect(result).not.toContain('addGlobalStyleToComponents');
-      expect(result).not.toContain("type: 'global-style'");
+      expect(result).toContain("type: 'global-style'");
+      expect(result).toContain("inject: 'none'");
+    });
+
+    it('should move globalStyle into the new global-style output target', () => {
+      const source = `export const config: Config = {
+  namespace: 'MyLib',
+  globalStyle: 'src/global/app.css',
+  outputTargets: [
+    { type: 'www' },
+  ],
+  extras: {
+    addGlobalStyleToComponents: false,
+  },
+};`;
+      const sourceFile = ts.createSourceFile('test.ts', source, ts.ScriptTarget.Latest, true);
+      const matches = globalStyleInjectRule.detect(sourceFile);
+      const result = globalStyleInjectRule.transform(sourceFile, matches);
+
+      expect(result).toBe(`export const config: Config = {
+  namespace: 'MyLib',
+  outputTargets: [
+    { type: 'www' },
+    {
+      type: 'global-style',
+      input: 'src/global/app.css',
+      fileName: 'mylib.css',
+      inject: 'none',
+      copyToLoaderBrowser: true,
+    }
+  ]
+};`);
+    });
+
+    it('should leave out fileName when namespace is not a string literal', () => {
+      const source = `export const config: Config = {
+  namespace: NAMESPACE,
+  globalStyle: 'src/global.css',
+  outputTargets: [{ type: 'www' }],
+  extras: { addGlobalStyleToComponents: true },
+};`;
+      const sourceFile = ts.createSourceFile('test.ts', source, ts.ScriptTarget.Latest, true);
+      const matches = globalStyleInjectRule.detect(sourceFile);
+      const result = globalStyleInjectRule.transform(sourceFile, matches);
+
+      expect(result).not.toContain('globalStyle:');
+      expect(result).toContain("input: 'src/global.css'");
+      expect(result).not.toContain('fileName');
+      expect(result).toContain("inject: 'all'");
+    });
+
+    it('should only set inject when the config has no globalStyle', () => {
+      const source = `export const config: Config = {
+  outputTargets: [
+    { type: 'www' },
+  ],
+  extras: {
+    addGlobalStyleToComponents: 'client',
+  },
+};`;
+      const sourceFile = ts.createSourceFile('test.ts', source, ts.ScriptTarget.Latest, true);
+      const matches = globalStyleInjectRule.detect(sourceFile);
+      const result = globalStyleInjectRule.transform(sourceFile, matches);
+
+      expect(result).not.toContain('input:');
+      expect(result).not.toContain('copyToLoaderBrowser');
+      expect(result).toContain("inject: 'client'");
     });
 
     it('should clean up empty extras object after removal', () => {
