@@ -34,8 +34,10 @@ export const mergeFlags = (config: UnvalidatedConfig, flags: ConfigFlags): Unval
   }
 
   // --docs → _docsFlag (internal flag to force docs in dev mode)
-  // This is processed during output target validation to set skipInDev: false on docs targets
-  if (flags.docs === true) {
+  // This is processed during output target validation to set skipInDev: false on docs targets.
+  // The `docs` task is a dev-mode build of the docs targets alone, so it always needs it -
+  // otherwise every docs target is skipped and the task writes nothing.
+  if (flags.docs === true || flags.task === 'docs') {
     merged._docsFlag = true;
   }
 

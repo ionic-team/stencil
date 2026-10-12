@@ -117,3 +117,14 @@ export async function isExistingStencilProject(dir: string) {
     return false;
   }
 }
+
+/**
+ * npm silently omits devDependencies when this CLI is itself running as a nested child
+ * process (e.g. via `npx create-stencil` / `npm init stencil`). Root cause: npm/exec only
+ * needs @stencil/cli's own regular dependencies to resolve+run it, so that install computes
+ * `omit: ['dev']` - and per npm's own config flattening
+ * (@npmcli/config/lib/definitions/definitions.js). Causing NODE_ENV === 'production'.
+ */
+export function clearInheritedProductionEnv(): void {
+  if (process.env.NODE_ENV === 'production') delete process.env.NODE_ENV;
+}

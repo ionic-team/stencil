@@ -648,12 +648,7 @@ export function createNodeSys(c: { process?: any; logger?: Logger } = {}): Compi
   const nodeResolve = new NodeResolveModule();
 
   sys.lazyRequire = new NodeLazyRequire(nodeResolve, {
-    '@types/jest': { minVersion: '24.9.1', recommendedVersion: '29', maxVersion: '29.0.0' },
-    jest: { minVersion: '24.9.0', recommendedVersion: '29', maxVersion: '29.0.0' },
-    'jest-cli': { minVersion: '24.9.0', recommendedVersion: '29', maxVersion: '29.0.0' },
-    puppeteer: { minVersion: '10.0.0', recommendedVersion: '20' },
-    'puppeteer-core': { minVersion: '10.0.0', recommendedVersion: '20' },
-    'workbox-build': { minVersion: '4.3.1', recommendedVersion: '4.3.1' },
+    'workbox-build': { minVersion: '4.3.1', recommendedVersion: '7' },
   });
 
   prcs.on('SIGINT', runInterruptsCallbacks);

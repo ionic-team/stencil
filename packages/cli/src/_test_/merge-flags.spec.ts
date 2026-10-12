@@ -114,6 +114,18 @@ describe('mergeFlags', () => {
 
       expect(result._docsFlag).toBe(true);
     });
+
+    it('sets _docsFlag for the `docs` task, which builds the docs targets in dev mode', () => {
+      const result = mergeFlags({}, createFlags({ task: 'docs' }));
+
+      expect(result._docsFlag).toBe(true);
+    });
+
+    it('does not set _docsFlag for other tasks', () => {
+      const result = mergeFlags({}, createFlags({ task: 'build' }));
+
+      expect(result._docsFlag).toBeUndefined();
+    });
   });
 
   describe('profile (--profile)', () => {

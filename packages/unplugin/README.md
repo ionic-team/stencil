@@ -77,6 +77,78 @@ module.exports = {
 };
 ```
 
+## Testing with Vitest
+
+### `newSpecPage()` tests
+
+`stencilSpecPage()` is a Vite plugin for your `vitest.config.ts`. It transpiles components so they work with `newSpecPage()` from `@stencil/core/testing`, which lets spec tests written for Stencil v4 run under Vitest without changing their imports.
+
+```ts
+// vitest.config.ts
+import { defineConfig } from 'vitest/config';
+import { stencilSpecPage } from '@stencil/unplugin';
+
+export default defineConfig({
+  plugins: [stencilSpecPage()],
+  test: {
+    include: ['src/**/*.spec.{ts,tsx}'],
+  },
+});
+```
+
+```ts
+// src/components/my-button/my-button.spec.ts
+import { newSpecPage } from '@stencil/core/testing';
+import { expect, it } from 'vitest';
+
+import { MyButton } from './my-button';
+
+it('renders its label', async () => {
+  const page = await newSpecPage({
+    components: [MyButton],
+    html: `<my-button label="Save"></my-button>`,
+  });
+  expect(page.root!.shadowRoot!.textContent).toBe('Save');
+
+  page.root!.label = 'Cancel';
+  await page.waitForChanges();
+  expect(page.root!.shadowRoot!.textContent).toBe('Cancel');
+});
+```
+
+In this mode components don't register themselves as custom elements. `newSpecPage()` registers the ones you pass it, in Stencil's mock DOM.
+
+The plugin also resolves a bare `@stencil/core` import to `@stencil/core/testing` in test files, so something like `setMode` imported from `@stencil/core` affects the same runtime `newSpecPage()` uses.
+
+It takes the same [options](#options) as the other plugins.
+
+### Browser and Node tests
+
+For tests that import a component and use it as a real custom element, use `stencilVite()`. Components are compiled on the fly, so no Stencil build is needed first, and each one registers itself when its file is imported. A test must import every component it renders, including ones rendered by other components.
+
+```ts
+// vitest.config.ts
+import { playwright } from '@vitest/browser-playwright';
+import { defineConfig } from 'vitest/config';
+import { stencilVite } from '@stencil/unplugin';
+
+export default defineConfig({
+  plugins: [stencilVite()],
+  test: {
+    browser: {
+      enabled: true,
+      provider: playwright(),
+      headless: true,
+      instances: [{ browser: 'chromium' }],
+    },
+  },
+});
+```
+
+The same plugin works for tests that run in Node with a simulated DOM. Replace the `browser` block with an `environment`: `'jsdom'`, `'happy-dom'`, or the `'stencil'` environment from [`@stencil/vitest`](https://github.com/stenciljs/vitest), which uses Stencil's mock-doc by default.
+
+To have `components.d.ts` written while tests run, so the JSX in them type-checks, pass `types: true`.
+
 ## Options
 
 All options are optional.
@@ -110,6 +182,7 @@ stencilVite({
 | `exclude` | `['node_modules/**']` | Files to skip |
 | `dev` | `false` (auto in Vite) | Inject HMR client code into component output |
 | `docs` | `false` | Scan and accumulate component metadata for docs/CEM |
+| `types` | `false` | Write `<srcDir>/components.d.ts` at build start and keep it current as components change |
 | `transpileOptions` | — | Passed through to `transpileSync` (see `TranspileOptions`) |
 
 ## How it works

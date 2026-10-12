@@ -47,11 +47,6 @@ export function ssrFactory($stencilWindow, $stencilHydrateOpts, $stencilHydrateR
   var setInterval = $stencilWindow.setInterval.bind($stencilWindow);
   var setTimeout = $stencilWindow.setTimeout.bind($stencilWindow);
 
-  // Tag transform functions are provided from the outer scope
-  // This ensures the factory uses the same instance as the runner
-  var setTagTransformer = $stencilTagTransform.setTagTransformer;
-  var transformTag = $stencilTagTransform.transformTag;
-
   var CharacterData = $stencilWindow.CharacterData;
   var CSS = $stencilWindow.CSS;
   var CustomEvent = $stencilWindow.CustomEvent;

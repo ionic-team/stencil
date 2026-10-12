@@ -167,7 +167,7 @@ export interface StencilConfig {
   transformAliasedImportPaths?: boolean;
 
   /**
-   * Passes custom configuration down to the "@rolldown/plugin-node-resolve" that Stencil uses under the hood.
+   * Passes custom configuration to Rolldown's module resolution (its `resolve` option), e.g. `alias`.
    * For further information: https://stenciljs.com/docs/module-bundling
    */
   nodeResolve?: NodeResolveConfig;

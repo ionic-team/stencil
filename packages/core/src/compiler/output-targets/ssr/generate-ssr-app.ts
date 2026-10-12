@@ -181,11 +181,13 @@ const generateSsrFactoryEntry = async (buildCtx: d.BuildCtx) => {
   const s = new MagicString('');
 
   s.append(
-    `import { ssrApp, registerComponents, styles } from '${STENCIL_INTERNAL_SSR_PLATFORM_ID}';\n`,
+    `import { ssrApp, registerComponents, setTagTransformer, styles } from '${STENCIL_INTERNAL_SSR_PLATFORM_ID}';\n`,
   );
 
   ssrCmps.forEach((cmpData) => s.append(cmpData.importLine + '\n'));
 
+  // the factory bundles its own copy of the runtime; route its tag lookups to the runner's transformer
+  s.append(`setTagTransformer((tag) => $stencilTagTransform.transformTag(tag));\n`);
   s.append(`registerComponents([\n`);
   ssrCmps.forEach((cmpData) => {
     s.append(`  ${cmpData.uniqueComponentClassName},\n`);

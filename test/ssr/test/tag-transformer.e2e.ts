@@ -49,4 +49,16 @@ test.describe('tag transformer', () => {
     expect(html).toContain('<your-car-detail');
     expect(html).not.toContain('<another-car-detail');
   });
+
+  test('tags rendered by a component use the transformed name', async () => {
+    setTagTransformer((tag) => tag.replace('another-', 'your-'));
+
+    const { html } = await renderToString(
+      `<your-car-list cars='[{"year":2024,"make":"VW","model":"Vento"}]'></your-car-list>`,
+      { serializeShadowRoot: true, fullDocument: false, clientSsrAnnotations: false },
+    );
+    expect(html).toContain('<your-car-detail');
+    expect(html).not.toContain('<another-car-detail');
+    expect(html).toContain('2024 VW Vento');
+  });
 });

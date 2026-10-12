@@ -143,6 +143,9 @@
     "vitest": "catalog:",
     "vitest-environment-stencil": "catalog:"
   },
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "volta": {
     "extends": "../../package.json"
   }
