@@ -18,6 +18,7 @@ Stencil recently had its 10th birthday - this release is a consolidation, organi
   - [Integrated Testing Removed](#integrated-testing-removed)
   - [`@Component` API: `encapsulation` Replaces `shadow` / `scoped` / `formAssociated`](#component-api-encapsulation-replaces-shadow--scoped--formassociated)
   - [Stencil's Own Package Is Now Pure ESM](#stencils-own-package-is-now-pure-esm)
+  - [Node.js 22 or Later Required](#nodejs-22-or-later-required)
   - [`loader-bundle` and `ssr` No Longer Generate CommonJS by Default](#loader-bundle-and-ssr-no-longer-generate-commonjs-by-default)
   - [ES5 Builds & Legacy Polyfills Removed](#es5-builds--legacy-polyfills-removed)
   - [`scriptDataOpts` and Legacy `patchBrowser` Removed](#scriptdataopts-and-legacy-patchbrowser-removed)
@@ -100,6 +101,10 @@ Run `stencil migrate --dry-run` to preview the automatic migration, or `stencil 
 #### Stencil's Own Package Is Now Pure ESM
 
 Stencil's own internal source - the compiler, CLI, and dev server - has moved from CommonJS to ESM. Every subpath in `@stencil/core`'s `package.json` `exports` map now declares only an `import` condition, with no `require` fallback, so `require('@stencil/core/...')` fails to resolve regardless of Node.js version.
+
+#### Node.js 22 or Later Required
+
+Stencil v5 requires Node.js 22 or later (v4 required 16 or later). Node.js 20 reached end of life in April 2026.
 
 #### `loader-bundle` and `ssr` No Longer Generate CommonJS by Default
 

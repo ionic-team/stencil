@@ -19,7 +19,7 @@ Modernize Stencil after 10 years: shed tech debt, embrace modern tooling, simpli
 ### 2. 🗑️ Update / Remove Legacy Features
 **Status:** In Progress
 - ES5 builds → ✅ REMOVED
-- Internal CommonJS → ✅ REMOVED (Pure ESM, Node 18+)
+- Internal CommonJS → ✅ REMOVED (Pure ESM, Node 22+)
 - Ancient polyfills → ✅ REMOVED
 - In-browser compilation → REMOVE
 - `*-sys` in-memory file-system → Replace with TypeScript incremental APIs (see Tasks)
@@ -145,7 +145,7 @@ Modernize Stencil after 10 years: shed tech debt, embrace modern tooling, simpli
 - **`loader-bundle` now supports `externalRuntime`**  set `externalRuntime: true` on the `loader-bundle` output target to mark `@stencil/core` as an external dependency in the ESM/CJS distribution output. Only affects the bundler variant; the browser/CDN build always includes the runtime. Useful when consumers already depend on `@stencil/core` and want to avoid bundling a second copy.
 - **setTagTransformer** - is now exported by default from your bundle entry point (same as `setNonce`), so library authors no longer need to manually re-export it from their `index.ts`. 
 - **Scoped Custom Element Registries** - always available, no config flag required. Pass a `CustomElementRegistry` instance and Stencil defines all components in it instead of `window.customElements`. What you do with that registry (attaching it to shadow roots, scoped DOM subtrees, etc.) is up to you.
-  - **Standalone per-component**: `defineCustomElement({ registry })` - stamps `._registry` on the class and registers in the scoped registry.
+  - **Standalone per-component**: `defineCustomElement({ registry })` - stamps `._registry` on the class and registers in the scoped registry. Children a component renders are created in the registry its own class was defined in (`getHostRegistry` in `runtime/registry.ts`), not the module-level `setRegistry()` value, so the option alone covers nested components. E2E: `test/ssr/test/scoped-registry.e2e.ts`.
   - **Standalone auto-loader / lazy loader**: pre-configure with `setRegistry(registry)` before the bundle loads. All components will be defined in the provided registry.
   - **Shadow components**: `attachShadow({ customElementRegistry: registry })` is set automatically so nested components inside a shadow root resolve from the same registry.
 
@@ -157,6 +157,7 @@ Modernize Stencil after 10 years: shed tech debt, embrace modern tooling, simpli
   await defineCustomElements();
   ```
 - **`setTagTransformer` auto-exported** - now auto-injected into generated library entry points (same as `setNonce`), so library authors no longer need to manually re-export it from their `index.ts`.
+  - **SSR**: the factory bundles its own copy of the runtime, so its entry (`generateSsrFactoryEntry`) points that copy's transformer at the runner's (`$stencilTagTransform`). Tags rendered *inside* components and `transformTag()` in component code now follow `setTagTransformer()` from `dist/ssr`. E2E: `test/ssr/test/tag-transformer.e2e.ts`. TODO: `ssr-wasm.e2e.ts` still only checks the host tag - add a nested-tag case.
 - **Signals** - opt-in signal-backed reactivity via `extras.signalBacking: true`. Zero API changes for component authors; `@State` and `@Prop` are backed by `@preact/signals-core` signals internally. New `@stencil/core/signals` subpath exports `signal`, `computed`, `effect`, `batch`, `untracked`, `@Effect()`, `getSignal<T>()`, and `STENCIL_SIGNALS_SYMBOL` for cross-framework interop. Signal values are valid JSX children and attributes - DOM updates bypass the vdom diff entirely. `@Prop`-only signals are exposed on the host element via `Symbol.for('stencil.signals')` for framework adapters without requiring a `@stencil/core` import.
 - **`stencil init` wizard** — ground-up redesign of project scaffolding and capability management. Context-aware: scaffolds a new project from the `component-starter` template, or runs in "add capabilities" mode on an existing project. Third-party packages participate by exporting a `wizard` object from a `stencil.wizard` entry declared in their `package.json` — no central registry. The `init` contribution's `run(context)` function owns its entire setup (prompts, peer dep installs, config file writes, example tests, script updates), matching the pattern used by `@nuxt/test-utils`. `generate` contributions add file templates and style extensions to `stencil generate`. `STENCIL_WIZARD_DEV=./path/to/wizard.js` injects a local wizard during development without publishing. Replaces `create-stencil` as the primary project bootstrapping path.
   - **Monorepo-aware** — `stencil init`/`stencil add` correctly discover and install into the right workspace package rather than assuming a single-package repo root (`task-init.ts`, `task-add.ts`, `wizard/discover.ts`, `wizard/init/apply.ts`).
@@ -610,7 +611,7 @@ A ground-up redesign of Stencil's project init and code generation DX. Goals: si
 | `stencil generate [name]` | Enhanced component/style scaffolding (existing command, upgraded) |
 | `npm create stencil` | Thin shim → delegates to `npx @stencil/cli@latest init` |
 
-`stencil init` detects context: if `stencil.config.ts` is already present it runs in "add capabilities" mode rather than scaffolding a new project from scratch. One entry point, no `stencil add` command needed.
+`stencil init` detects context: if `stencil.config.ts` is already present it runs in "add capabilities" mode rather than scaffolding a new project from scratch. `stencil add [package]` is a second entry point to that same add-capabilities flow, for installing a named integration directly.
 
 ### New package: `@stencil/templates` (`packages/templates/`)
 

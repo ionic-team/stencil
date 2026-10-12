@@ -14,7 +14,7 @@ import { CMP_FLAGS, NODE_TYPES, SVG_NS } from '../../utils/constants';
 import { isDef } from '../../utils/helpers';
 import { patchParentNode } from '../dom-extras';
 import { getShadowRoot } from '../element';
-import { getRegistry } from '../registry';
+import { getHostRegistry } from '../registry';
 import { NODE_TYPE, PLATFORM_FLAGS, VNODE_FLAGS } from '../runtime-constants';
 import { effect } from '../signals';
 import {
@@ -33,6 +33,7 @@ import type { SignalLike } from '../signals';
 let scopeId: string;
 let contentRef: d.RenderNode | undefined;
 let hostTagName: string;
+let hostRegistry: CustomElementRegistry;
 let useNativeShadowDom = false;
 let checkSlotFallbackVisibility = false;
 let checkSlotRelocate = false;
@@ -163,10 +164,9 @@ const createElm = (oldParentVNode: d.VNode, newParentVNode: d.VNode, childIndex:
         ? 'slot-fb'
         : (newVNode.$tag$ as string);
 
-    const _reg = getRegistry();
     const registryOpts =
-      _reg !== win.customElements && tag.includes('-')
-        ? ({ customElementRegistry: _reg } as ElementCreationOptions)
+      hostRegistry !== win.customElements && tag.includes('-')
+        ? ({ customElementRegistry: hostRegistry } as ElementCreationOptions)
         : undefined;
 
     elm = newVNode.$elm$ = (
@@ -1216,6 +1216,7 @@ export const renderVdom = (
   const rootVnode = isHostElement ? renderFnResults : h(null, null, renderFnResults as any);
 
   hostTagName = hostElm.tagName;
+  hostRegistry = getHostRegistry(hostElm);
 
   // <Host> runtime check
   if (BUILD.isDev && Array.isArray(renderFnResults) && renderFnResults.some(isHost)) {

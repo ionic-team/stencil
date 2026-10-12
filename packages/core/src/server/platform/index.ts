@@ -8,16 +8,9 @@ import { BUILD } from 'virtual:app-data';
 import type * as d from '@stencil/core';
 
 import { SERVER_BUILD_FLAGS } from '../../runtime/runtime-constants';
+import { transformTag } from '../../runtime/tag-transform';
 import { CMP_FLAGS } from '../../utils/constants';
 import { reWireGetterSetter } from '../../utils/es2022-rewire-class-members';
-
-/**
- * Access transformTag via the closure-scoped $stencilTagTransform object.
- * This object is defined in the factory closure (SSR_FACTORY_INTRO).
- * We declare it here to satisfy TypeScript, but at runtime it will be
- * provided by the factory closure scope.
- */
-declare const $stencilTagTransform: { transformTag: (tag: string) => string };
 
 let customError: d.ErrorHandler;
 
@@ -62,9 +55,7 @@ export const registerComponents = (Cstrs: d.ComponentNativeConstructor[]) => {
   for (const Cstr of Cstrs) {
     // using this format so it follows exactly how client-side modules work
     const exportName = Cstr.cmpMeta.$tagName$;
-    // Access transformTag from the closure-scoped $stencilTagTransform object
-    // This ensures we use the same instance as the runner (prevents duplication)
-    const transformedTagName = $stencilTagTransform.transformTag(exportName);
+    const transformedTagName = transformTag(exportName);
 
     cmpModules.set(exportName, {
       [exportName]: Cstr,
