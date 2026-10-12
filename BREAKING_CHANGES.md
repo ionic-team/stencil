@@ -19,6 +19,7 @@ Stencil recently had its 10th birthday - this release is a consolidation, organi
   - [`@Component` API: `encapsulation` Replaces `shadow` / `scoped` / `formAssociated`](#component-api-encapsulation-replaces-shadow--scoped--formassociated)
   - [Stencil's Own Package Is Now Pure ESM](#stencils-own-package-is-now-pure-esm)
   - [Node.js 22 or Later Required](#nodejs-22-or-later-required)
+  - [TypeScript Is No Longer Bundled](#typescript-is-no-longer-bundled)
   - [`loader-bundle` and `ssr` No Longer Generate CommonJS by Default](#loader-bundle-and-ssr-no-longer-generate-commonjs-by-default)
   - [ES5 Builds & Legacy Polyfills Removed](#es5-builds--legacy-polyfills-removed)
   - [`scriptDataOpts` and Legacy `patchBrowser` Removed](#scriptdataopts-and-legacy-patchbrowser-removed)
@@ -105,6 +106,17 @@ Stencil's own internal source - the compiler, CLI, and dev server - has moved fr
 #### Node.js 22 or Later Required
 
 Stencil v5 requires Node.js 22 or later (v4 required 16 or later). Node.js 20 reached end of life in April 2026.
+
+#### TypeScript Is No Longer Bundled
+
+Stencil v4 shipped its own copy of TypeScript. In v5, `typescript` is a regular dependency (`>5.0.0 <7.0.0`): Stencil uses the version in your project's `devDependencies`, and installs the latest in range (currently TypeScript 6) if there is none.
+
+TypeScript 6 rejects two settings common in v4 projects' `tsconfig.json`:
+
+- `"moduleResolution": "node"` fails the build with `Option 'moduleResolution=node10' is deprecated`. Use `"moduleResolution": "bundler"`.
+- `strict` is now on by default, so a decorated member with no initializer (`@Prop() name: string;`) fails with `Property 'name' has no initializer`. Set `"strictPropertyInitialization": false` to keep such members as they are.
+
+To stay on TypeScript 5, add it to your project's `devDependencies`.
 
 #### `loader-bundle` and `ssr` No Longer Generate CommonJS by Default
 
@@ -360,7 +372,7 @@ To migrate, run `stencil migrate` to move any explicit values into the appropria
 
 Similarly, component `assetsDirs` are now backed by a first-class `assets` output target, auto-generated when components declare assets. Both `global-style` and `assets` write into a unified `dist/assets/` location, and `copyAssets` has been removed from the `loader-bundle` and `www` output targets accordingly.
 
-To migrate, run `stencil migrate` - an explicit `extras.addGlobalStyleToComponents` is detected and rewritten into a `global-style` output target with the equivalent `inject` setting.
+To migrate, run `stencil migrate` - an explicit `extras.addGlobalStyleToComponents` is detected and rewritten, together with `globalStyle`, into a `global-style` output target with the equivalent `inject` setting.
 
 #### Output File Extensions Modernized
 
