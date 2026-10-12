@@ -205,7 +205,7 @@ export const runTask = async (
       break;
 
     case 'docs':
-      await taskDocs(coreCompiler, strictConfig);
+      await taskDocs(coreCompiler, strictConfig, resolvedFlags);
       break;
 
     case 'generate':

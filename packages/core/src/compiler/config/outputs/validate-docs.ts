@@ -93,9 +93,9 @@ const validateReadmeOutputTarget = (
     outputTarget.footer = NOTE;
   }
   outputTarget.strict = !!outputTarget.strict;
-  // docs targets skip in dev by default, unless --docs flag was used
+  // docs targets skip in dev by default
   if (!isBoolean(outputTarget.skipInDev)) {
-    outputTarget.skipInDev = !config._docsFlag;
+    outputTarget.skipInDev = true;
   }
   return outputTarget;
 };
@@ -119,9 +119,9 @@ const validateJsonDocsOutputTarget = (
     outputTarget.typesFile = outputTarget.file.replace(/\.json$/, '.d.ts');
   }
   outputTarget.strict = !!outputTarget.strict;
-  // docs targets skip in dev by default, unless --docs flag was used
+  // docs targets skip in dev by default
   if (!isBoolean(outputTarget.skipInDev)) {
-    outputTarget.skipInDev = !config._docsFlag;
+    outputTarget.skipInDev = true;
   }
   return outputTarget;
 };
@@ -137,9 +137,9 @@ const validateCustomDocsOutputTarget = (
   }
 
   outputTarget.strict = !!outputTarget.strict;
-  // docs targets skip in dev by default, unless --docs flag was used
+  // docs targets skip in dev by default
   if (!isBoolean(outputTarget.skipInDev)) {
-    outputTarget.skipInDev = !config._docsFlag;
+    outputTarget.skipInDev = true;
   }
   return outputTarget;
 };
@@ -153,9 +153,9 @@ const validateVScodeDocsOutputTarget = (
     const err = buildError(diagnostics);
     err.messageText = `docs-vscode outputTarget missing the "file" path`;
   }
-  // docs targets skip in dev by default, unless --docs flag was used
+  // docs targets skip in dev by default
   if (!isBoolean(outputTarget.skipInDev)) {
-    outputTarget.skipInDev = !config._docsFlag;
+    outputTarget.skipInDev = true;
   }
   return outputTarget;
 };
@@ -170,9 +170,9 @@ const validateAgentSkillOutputTarget = (
   // fsNamespace (not namespace) is used here -
   // fsNamespace stays lowercase/dash-preserving, matching kebab-case skill names.
   outputTarget.name = toSkillName(outputTarget.name || config.fsNamespace);
-  // docs targets skip in dev by default, unless --docs flag was used
+  // docs targets skip in dev by default
   if (!isBoolean(outputTarget.skipInDev)) {
-    outputTarget.skipInDev = !config._docsFlag;
+    outputTarget.skipInDev = true;
   }
   return outputTarget;
 };
@@ -188,9 +188,9 @@ const validateCustomElementsManifestOutputTarget = (
     outputTarget.file = join(config.rootDir, outputTarget.file);
   }
   outputTarget.strict = !!outputTarget.strict;
-  // docs targets skip in dev by default, unless --docs flag was used
+  // docs targets skip in dev by default
   if (!isBoolean(outputTarget.skipInDev)) {
-    outputTarget.skipInDev = !config._docsFlag;
+    outputTarget.skipInDev = true;
   }
   return outputTarget;
 };

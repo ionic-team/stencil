@@ -180,9 +180,10 @@ describe('run', () => {
       await runTask(coreCompiler, unvalidatedConfig, 'docs', sys);
 
       expect(taskDocsSpy).toHaveBeenCalledTimes(1);
-      // taskDocs receives (coreCompiler, config)
+      // taskDocs receives (coreCompiler, config, flags)
       expect(taskDocsSpy.mock.calls[0][0]).toBe(coreCompiler);
       expect(taskDocsSpy.mock.calls[0][1]).toHaveProperty('sys');
+      expect(taskDocsSpy.mock.calls[0][2]).toHaveProperty('task', 'docs');
     });
 
     describe('generate task', () => {

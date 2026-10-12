@@ -7,7 +7,7 @@
   "module": "dist/index.js",
   "types": "dist/types/components.d.ts",
   "scripts": {
-    "build": "stencil build --config ./stencil.build.config.ts --docs",
+    "build": "stencil build --config ./stencil.build.config.ts",
     "start": "stencil build --watch --dev --serve",
     "test": "playwright test"
   },
