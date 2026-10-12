@@ -1,19 +1,16 @@
-import { readFileSync } from 'node:fs';
-import { dirname, resolve as resolvePath } from 'node:path';
 import type * as d from '@stencil/core';
 import type { Plugin } from 'rolldown';
 
 import {
   hasError,
   isOutputTargetCollection,
-  isOutputTargetDocs,
   join,
   mergeIntoWith,
   normalizeFsPath,
   relative,
 } from '../../utils';
-import { runPluginTransformsEsmImports } from '../plugin/plugin';
 import { getScopeId } from '../style/scope-css';
+import { transformStylesheet } from '../style/transform-stylesheet';
 import { parseImportPath } from '../transformers/stencil-import-path';
 
 /**
@@ -116,46 +113,7 @@ export const extTransformsPlugin = (
         // Check before the populate block so we can distinguish cache hits from misses.
         const wasCached = compilerCtx.cssTransformCache.has(id);
 
-        if (!wasCached) {
-          const code = await compilerCtx.fs.readFile(filePath);
-          if (typeof code !== 'string') {
-            compilerCtx.cssTransformCache.set(id, null);
-          } else {
-            const pluginTransforms = await runPluginTransformsEsmImports(
-              config,
-              compilerCtx,
-              buildCtx,
-              code,
-              filePath,
-            );
-            const cssInput = data.tag
-              ? pluginTransforms.code
-              : inlineRelativeCssUrlAssets(pluginTransforms.code, filePath);
-            const cssTransformResults = await compilerCtx.worker.transformCssToEsm({
-              file: pluginTransforms.id,
-              input: cssInput,
-              tag: data.tag,
-              tags: buildCtx.components.map((c) => c.tagName),
-              addTagTransformers: !!buildCtx.config.compat.additionalTagTransformers,
-              encapsulation: data.encapsulation,
-              mode: data.mode,
-              sourceMap: config.sourceMap,
-              minify: config.minifyCss,
-              autoprefixer: config.autoprefixCss,
-              // Extract docs if any docs output targets are configured
-              docs: config.outputTargets.some(isOutputTargetDocs),
-            });
-            compilerCtx.cssTransformCache.set(id, {
-              pluginTransformId: pluginTransforms.id,
-              pluginTransformCode: pluginTransforms.code,
-              pluginTransformDependencies: pluginTransforms.dependencies,
-              pluginTransformDiagnostics: pluginTransforms.diagnostics,
-              cssTransformOutput: cssTransformResults,
-            });
-          }
-        }
-
-        const cacheEntry = compilerCtx.cssTransformCache.get(id);
+        const cacheEntry = await transformStylesheet(config, compilerCtx, buildCtx, id, data);
         if (wasCached) {
           cacheHits++;
         }
@@ -320,49 +278,3 @@ export const extTransformsPlugin = (
     },
   };
 };
-
-/**
- * 3rd-party stylesheets with relative `url(./font.ttf)` (font-face `src`, a background-image, ...)
- * have nowhere to resolve that path once this CSS is self-injected as a CSSStyleSheet:
- * there's no bundler output location for it to be relative *to*.
- * Inlining the referenced file as a `data:` URI sidesteps needing one - no separate asset
- * to serve, works the same regardless of how/where the final bundle is deployed.
- */
-const CSS_URL_RE = /url\(\s*(['"]?)([^'"()]+)\1\s*\)/g;
-
-const CSS_URL_ASSET_MIME_TYPES: Record<string, string> = {
-  ttf: 'font/ttf',
-  otf: 'font/otf',
-  woff: 'font/woff',
-  woff2: 'font/woff2',
-  eot: 'application/vnd.ms-fontobject',
-  png: 'image/png',
-  jpg: 'image/jpeg',
-  jpeg: 'image/jpeg',
-  gif: 'image/gif',
-  svg: 'image/svg+xml',
-};
-
-// 3rd party css import handling: inline relative url() assets to avoid needing a separate asset to serve
-const inlineRelativeCssUrlAssets = (cssText: string, cssFilePath: string): string =>
-  cssText.replace(CSS_URL_RE, (original, _quote: string, url: string) => {
-    // already a data: URI, an absolute URL, or root-relative - nothing to inline
-    if (/^(data:|[a-z][a-z0-9+.-]*:|\/\/|\/)/i.test(url)) {
-      return original;
-    }
-    const cleanUrl = url.split(/[?#]/)[0];
-    const ext = cleanUrl.split('.').pop()?.toLowerCase();
-    const mimeType = ext && CSS_URL_ASSET_MIME_TYPES[ext];
-    if (!mimeType) {
-      return original;
-    }
-    try {
-      const assetPath = resolvePath(dirname(cssFilePath), cleanUrl);
-      const base64 = readFileSync(assetPath).toString('base64');
-      return `url("data:${mimeType};base64,${base64}")`;
-    } catch {
-      // referenced file doesn't exist, or isn't readable - leave the original reference as-is
-      // rather than failing the whole build over one unresolved asset
-      return original;
-    }
-  });
