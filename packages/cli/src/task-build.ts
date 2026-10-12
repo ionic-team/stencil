@@ -15,6 +15,12 @@ export const taskBuild = async (
   config: d.ValidatedConfig,
   flags: ConfigFlags,
 ) => {
+  if (flags.unknownArgs?.includes('--docs')) {
+    config.logger.warn(
+      `The --docs flag has been removed. To generate docs in a dev build, set "skipInDev: false" on the docs output targets, or run "stencil docs" (optionally with --watch).`,
+    );
+  }
+
   if (flags.watch) {
     // watch build
     await taskWatch(coreCompiler, config, flags);

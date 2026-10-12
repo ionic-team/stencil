@@ -404,7 +404,15 @@ To migrate, run `stencil migrate` to append `?stencil` to existing raw asset imp
 
 Previously, the `docs-readme` output target was implicitly added to every non-dev build (a behavior gap inherited from v4's `!config.devMode` check, and briefly made unconditional once `buildDist`/`buildDocs` were removed). It's now purely `outputTargets`-driven, consistent with every other docs target (`docs-json`, `docs-custom`, `docs-vscode`, `docs-custom-elements-manifest`, `docs-agent-skill`) - nothing generates unless `{ type: 'docs-readme' }` is explicitly declared in your config.
 
-To migrate, add `{ type: 'docs-readme' }` to `outputTargets` in `stencil.config.ts` if you were relying on it being generated implicitly. `stencil docs` / `--docs` remain a fast, docs-only rebuild and are unaffected.
+To migrate, add `{ type: 'docs-readme' }` to `outputTargets` in `stencil.config.ts` if you were relying on it being generated implicitly. `stencil docs` remains a fast, docs-only rebuild and is unaffected.
+
+#### `--docs` CLI Flag Removed
+
+`stencil build --docs` only ever meant "don't skip docs output targets in a `--dev` build" - a production build already generates them. It duplicated `skipInDev`, so it has been removed; passing it now logs a warning and is otherwise ignored.
+
+To migrate, set `skipInDev: false` on the docs output targets you want generated in dev builds, or run `stencil docs` (which now accepts `--watch`) alongside your dev build. Drop `--docs` from production build scripts - it was a no-op there.
+
+`stencil docs` itself now always generates every configured docs output target (regardless of `skipInDev`), exits non-zero when the build has errors, and warns when no docs output targets are configured.
 
 ### Compiler API
 

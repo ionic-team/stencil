@@ -470,11 +470,6 @@ export interface Config extends StencilConfig {
   tsWatchOptions?: any;
   _isValidated?: boolean;
   _isTesting?: boolean;
-  /**
-   * Internal flag set when --docs CLI flag is used.
-   * Forces docs output targets to build even in dev mode.
-   */
-  _docsFlag?: boolean;
 
   /**
    * Whether running in a CI environment (disables interactive features, adjusts worker count)

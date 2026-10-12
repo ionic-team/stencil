@@ -8,16 +8,14 @@ import {
   isOutputTargetDocsJson,
   isOutputTargetDocsReadme,
   isOutputTargetDocsVscode,
-  join,
-  normalizePath,
 } from '../../utils';
 import { generateAgentSkillDocs } from '../docs/agent-skill';
 import { generateCustomElementsManifestDocs } from '../docs/cem';
+import { collectStyleDocs } from '../docs/collect-style-docs';
 import { generateCustomDocs } from '../docs/custom';
 import { generateDocData } from '../docs/generate-doc-data';
 import { generateJsonDocs } from '../docs/json';
 import { generateReadmeDocs } from '../docs/readme';
-import { extractExistingCssProps } from '../docs/readme/output-docs';
 import { generateVscodeDocs } from '../docs/vscode';
 
 /**
@@ -51,46 +49,9 @@ export const outputDocs = async (
 
   // ensure all the styles are built first, which parses all the css docs
   await buildCtx.stylesPromise;
+  await collectStyleDocs(config, compilerCtx, buildCtx);
 
   const docsData = await generateDocData(config, compilerCtx, buildCtx);
-
-  // If we're in docs-only mode (not a full build), preserve CSS Custom Properties
-  // from existing README files for components with empty styles.
-  // We detect docs-only mode by checking if ALL output targets are docs targets.
-  const isDocsOnlyMode = config.outputTargets.every(
-    (target) =>
-      target.type === 'docs-readme' ||
-      target.type === 'docs-json' ||
-      target.type === 'docs-custom' ||
-      target.type === 'docs-vscode' ||
-      target.type === 'docs-custom-elements-manifest' ||
-      target.type === 'docs-agent-skill',
-  );
-
-  if (isDocsOnlyMode) {
-    // Preserve CSS props for components with empty styles
-    await Promise.all(
-      docsData.components.map(async (component) => {
-        if (component.styles.length === 0) {
-          // Find the README output target to get the correct path
-          const readmeTarget = docsOutputTargets.find(isOutputTargetDocsReadme) as
-            | d.OutputTargetDocsReadme
-            | undefined;
-          const readmeDir = readmeTarget?.dir || config.srcDir;
-          const readmePath =
-            normalizePath(readmeDir) === normalizePath(config.srcDir)
-              ? component.readmePath
-              : join(readmeDir, component.readmePath.replace(config.srcDir, ''));
-
-          const existingCssProps = await extractExistingCssProps(compilerCtx, readmePath);
-          if (existingCssProps) {
-            // Update component styles with preserved props
-            component.styles = existingCssProps;
-          }
-        }
-      }),
-    );
-  }
 
   await Promise.all([
     generateReadmeDocs(config, compilerCtx, docsData, docsOutputTargets),

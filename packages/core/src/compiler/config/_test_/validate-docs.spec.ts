@@ -43,12 +43,6 @@ describe('validateDocs', () => {
     expect(config.outputTargets.some((o) => o.type === 'docs-readme')).toBe(false);
   });
 
-  it('does not auto-add docs-readme when the --docs flag is used without one declared', () => {
-    userConfig = mockConfig({ _docsFlag: true });
-    const { config } = validateConfig(userConfig, mockLoadConfigInit());
-    expect(config.outputTargets.some((o) => o.type === 'docs-readme')).toBe(false);
-  });
-
   it('should use default values for docs.markdown.targetComponent', () => {
     const { config } = validateConfig(userConfig, mockLoadConfigInit());
     expect(config.docs.markdown.targetComponent.background).toBe(
@@ -130,13 +124,13 @@ describe('validateDocs', () => {
       expect(o.name).toBe('custom-name');
     });
 
-    it('skips in dev by default, unless the --docs flag was used', () => {
+    it('skips in dev by default', () => {
       userConfig.outputTargets = [{ type: 'docs-agent-skill' } as d.OutputTargetDocsAgentSkill];
       const { config } = validateConfig(userConfig, mockLoadConfigInit());
       const o = config.outputTargets.find(
         (o) => o.type === 'docs-agent-skill',
       ) as d.OutputTargetDocsAgentSkill;
-      expect(o.skipInDev).toBe(!config._docsFlag);
+      expect(o.skipInDev).toBe(true);
     });
   });
 });

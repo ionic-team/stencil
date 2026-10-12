@@ -10,7 +10,6 @@ export const BOOLEAN_CLI_FLAGS = [
   'ci',
   'debug',
   'dev',
-  'docs',
   'dryRun',
   'help',
   'log',

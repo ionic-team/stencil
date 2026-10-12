@@ -32,12 +32,12 @@ export const taskHelp = async (logger: d.Logger, sys: d.CompilerSystem): Promise
       ${logger.cyan('--watch')} ${logger.dim('...........')} Rebuild when files update
       ${logger.cyan('--serve')} ${logger.dim('...........')} Start the dev-server (requires --watch)
       ${logger.cyan('--prerender')} ${logger.dim('.......')} Prerender the application
-      ${logger.cyan('--docs')} ${logger.dim('............')} Also generate docs output targets in a --dev build
       ${logger.cyan('--ssr')} ${logger.dim('.............')} Build a server-side-rendering bundle
       ${logger.cyan('--config')} ${logger.dim('..........')} Set stencil config file
       ${logger.cyan('--maxWorkers')} ${logger.dim('......')} Max number of workers, e.g. --maxWorkers 4
       ${logger.cyan('--no-cache')} ${logger.dim('........')} Disable the build cache
       ${logger.cyan('--stats')} ${logger.dim('...........')} Write stats, optional file path (default: stencil-stats.json)
+      ${logger.cyan('--docsJson')} ${logger.dim('........')} Also write a docs.json file to the given path
       ${logger.cyan('--log')} ${logger.dim('.............')} Write stencil-build.log file
       ${logger.cyan('--ci')} ${logger.dim('..............')} Run in CI mode (disables colors, version checks)
       ${logger.cyan('--debug')} ${logger.dim('...........')} Set the log level to debug
@@ -52,10 +52,11 @@ export const taskHelp = async (logger: d.Logger, sys: d.CompilerSystem): Promise
       ${logger.cyan('--open')} ${logger.dim('............')} Open the browser
 
 
-  ${logger.bold('Docs:')} ${logger.dim('Generate configured docs output targets.')}
+  ${logger.bold('Docs:')} ${logger.dim('Generate only the docs output targets (a production build already includes them).')}
 
-    ${prompt} ${logger.green('stencil docs [--docsJson]')}
+    ${prompt} ${logger.green('stencil docs [--watch] [--docsJson]')}
 
+      ${logger.cyan('--watch')} ${logger.dim('...........')} Regenerate when files update
       ${logger.cyan('--docsJson')} ${logger.dim('........')} Write a docs.json file to the given path
 
 
