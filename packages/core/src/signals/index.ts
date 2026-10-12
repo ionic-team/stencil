@@ -1,11 +1,11 @@
 import { BUILD } from 'virtual:app-data';
-import { consoleDevWarn, getHostRef } from 'virtual:platform';
+import { consoleDevWarn } from 'virtual:platform';
 
-import { MEMBER_FLAGS } from '../utils/constants';
+import { STENCIL_SIGNALS_SYMBOL } from '../runtime/signals';
 import type { ReadonlySignal } from '../runtime/signals-core';
 
 export { batch, computed, effect, signal, untracked } from '../runtime/signals-core';
-export { STENCIL_SIGNALS_SYMBOL } from '../runtime/signals';
+export { STENCIL_SIGNALS_SYMBOL };
 export type { ReadonlySignal, Signal } from '../runtime/signals-core';
 
 /**
@@ -26,8 +26,11 @@ export type { ReadonlySignal, Signal } from '../runtime/signals-core';
  * @returns the `ReadonlySignal` for the prop, or `null` if not found / not signal-backed
  */
 export const getSignal = <T = unknown>(elm: Element, prop: string): ReadonlySignal<T> | null => {
-  const hostRef = getHostRef(elm as any);
-  if (!hostRef?.$signalValues$) {
+  // Read the map the runtime publishes on the host, not the host ref: this module is bundled
+  // apart from the runtime, and a production build minifies the host ref's property names
+  // separately in each, so `hostRef.$signalValues$` isn't the same property here.
+  const signals: Map<string, ReadonlySignal<T>> | undefined = (elm as any)[STENCIL_SIGNALS_SYMBOL];
+  if (!signals) {
     if (BUILD.isDev) {
       consoleDevWarn(
         `getSignal('${prop}'): element <${elm.tagName.toLowerCase()}> is not signal-backed. ` +
@@ -36,9 +39,8 @@ export const getSignal = <T = unknown>(elm: Element, prop: string): ReadonlySign
     }
     return null;
   }
-  const memberFlags = hostRef.$cmpMeta$?.$members$?.[prop]?.[0] ?? 0;
-  if (!(memberFlags & MEMBER_FLAGS.Prop)) return null;
-  return (hostRef.$signalValues$.get(prop) as ReadonlySignal<T>) ?? null;
+  // The map only holds `@Prop` members
+  return signals.get(prop) ?? null;
 };
 
 /**

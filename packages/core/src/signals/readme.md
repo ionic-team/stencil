@@ -4,7 +4,7 @@ Public entry point for `@stencil/core/signals` - opt-in signal-backed reactivity
 
 ## Overview
 
-With `extras.signalBacking: true` in `stencil.config.ts`, `@Prop` and `@State` members are backed by signals internally - no API changes for component authors. This module exposes that mechanism to consumers for cross-component or cross-framework interop, without polling or custom events.
+With `signalBacking: true` in `stencil.config.ts`, `@Prop` and `@State` members are backed by signals internally - no API changes for component authors. This module exposes that mechanism to consumers for cross-component or cross-framework interop, without polling or custom events.
 
 ## Exports
 
