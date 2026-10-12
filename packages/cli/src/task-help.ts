@@ -32,10 +32,10 @@ export const taskHelp = async (logger: d.Logger, sys: d.CompilerSystem): Promise
       ${logger.cyan('--watch')} ${logger.dim('...........')} Rebuild when files update
       ${logger.cyan('--serve')} ${logger.dim('...........')} Start the dev-server (requires --watch)
       ${logger.cyan('--prerender')} ${logger.dim('.......')} Prerender the application
-      ${logger.cyan('--docs')} ${logger.dim('............')} Generate component readme.md docs
+      ${logger.cyan('--docs')} ${logger.dim('............')} Also generate docs output targets in a --dev build
       ${logger.cyan('--ssr')} ${logger.dim('.............')} Build a server-side-rendering bundle
       ${logger.cyan('--config')} ${logger.dim('..........')} Set stencil config file
-      ${logger.cyan('--maxWorkers')} ${logger.dim('......')} Max number of workers, e.g. --maxWorkers 4 or --maxWorkers 50%
+      ${logger.cyan('--maxWorkers')} ${logger.dim('......')} Max number of workers, e.g. --maxWorkers 4
       ${logger.cyan('--no-cache')} ${logger.dim('........')} Disable the build cache
       ${logger.cyan('--stats')} ${logger.dim('...........')} Write stats, optional file path (default: stencil-stats.json)
       ${logger.cyan('--log')} ${logger.dim('.............')} Write stencil-build.log file
@@ -45,10 +45,11 @@ export const taskHelp = async (logger: d.Logger, sys: d.CompilerSystem): Promise
 
   ${logger.bold('Serve:')} ${logger.dim('Start the dev-server without building or watching.')}
 
-    ${prompt} ${logger.green('stencil serve [--root] [--no-open]')}
+    ${prompt} ${logger.green('stencil serve [--root] [--port] [--open]')}
 
       ${logger.cyan('--root')} ${logger.dim('............')} Directory to serve (default: current directory)
-      ${logger.cyan('--no-open')} ${logger.dim('.........')} Don't open the browser automatically
+      ${logger.cyan('--port')} ${logger.dim('............')} Port to listen on
+      ${logger.cyan('--open')} ${logger.dim('............')} Open the browser
 
 
   ${logger.bold('Docs:')} ${logger.dim('Generate configured docs output targets.')}
@@ -58,9 +59,9 @@ export const taskHelp = async (logger: d.Logger, sys: d.CompilerSystem): Promise
       ${logger.cyan('--docsJson')} ${logger.dim('........')} Write a docs.json file to the given path
 
 
-  ${logger.bold('Prerender:')} ${logger.dim('Prerender a hydrate app script against the source index.html.')}
+  ${logger.bold('Prerender:')} ${logger.dim('Prerender with an already-built ssr script, against the source index.html.')}
 
-    ${prompt} ${logger.green('stencil prerender <hydrate-app-path>')}
+    ${prompt} ${logger.green('stencil prerender <ssr-script-path>')}
 
 
   ${logger.bold('Migrate:')} ${logger.dim('Codemod a project for the latest major version breaking changes.')}
