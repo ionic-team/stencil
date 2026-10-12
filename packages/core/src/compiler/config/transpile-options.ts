@@ -199,7 +199,7 @@ const getTranspileConfigOpt = (value: any, validValues: Set<string>, defaultValu
   if (value === null || value === 'null') {
     return null;
   }
-  value = isString(value) ? value.toLowerCase().trim() : null;
+  value = isString(value) ? value.toLowerCase().trim() : undefined;
   if (validValues.has(value)) {
     return value;
   }
@@ -207,9 +207,9 @@ const getTranspileConfigOpt = (value: any, validValues: Set<string>, defaultValu
 };
 
 const VALID_EXPORT = new Set(['customelement', 'module']);
-const VALID_METADATA = new Set(['compilerstatic', null]);
+const VALID_METADATA = new Set(['compilerstatic']);
 const VALID_MODULE = new Set(['cjs', 'esm']);
-const VALID_PROXY = new Set(['defineproperty', null]);
+const VALID_PROXY = new Set(['defineproperty']);
 const VALID_STYLE = new Set(['static']);
 const VALID_STYLE_IMPORT_DATA = new Set(['queryparams']);
 const VALID_TARGET = new Set([

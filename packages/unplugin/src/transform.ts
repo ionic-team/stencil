@@ -2,11 +2,12 @@
  * Component transpilation and base-class discovery.
  *
  * `transformStencil` is the main entry point: it calls `transpileSync` with
- * `componentExport: 'customelement'` so each component self-registers when
- * imported. Two code paths come out:
+ * `componentExport: 'customelement'` (unless overridden via `transpileOptions`)
+ * so each component self-registers when imported. Two code paths come out:
  *
  *  - **Component** (`@Component` present): full customelement output with
- *    `defineCustomElement`, optional HMR snippet appended in dev mode.
+ *    `defineCustomElement` (or, for `componentExport: 'module'`, just the
+ *    exported class), optional HMR snippet appended in dev mode.
  *  - **Decorated base class** (`@Prop`/`@State`/etc. but no `@Component`):
  *    returned as-is — the compiler's `isStencilBaseClass` check already injects
  *    `extends HTMLElement` via `updateNativeBaseClass`.
@@ -150,6 +151,7 @@ export async function transformStencil(
 
   const specPage = options.mode === 'spec-page';
   const jsxOpts = resolveJsxOpts(code, process.cwd());
+  const componentExport = options.transpileOptions?.componentExport ?? 'customelement';
   const result = transpileSync(code, {
     ...jsxOpts,
     ...options.transpileOptions,
@@ -163,7 +165,7 @@ export async function transformStencil(
           // behavioral and don't need real stylesheets. `null` skips the style assignment entirely.
           style: null,
         }
-      : { componentExport: 'customelement' as const }),
+      : { componentExport }),
     styleImportData: 'queryparams',
     resolveImport: makeResolver(onBaseClass),
     buildOverrides: {
@@ -199,11 +201,11 @@ export async function transformStencil(
   if (!specPage) {
     // customelement mode strips the export keyword, so re-export the class
     // ourselves — consumers import it by name, and
-    // hmrStandalone needs it in the re-imported module in dev mode
-    const namedExport = `\nexport{${className}};`;
-    out = dev
-      ? result.code + namedExport + buildHmrSnippet(tagName, className, framework)
-      : result.code + namedExport;
+    // hmrStandalone needs it in the re-imported module in dev mode.
+    // module mode keeps an authored export; only add one if it's missing.
+    const isExported = new RegExp(`^export\\s+const\\s+${className}\\b`, 'm').test(result.code);
+    out = isExported ? result.code : `${result.code}\nexport{${className}};`;
+    if (dev) out += buildHmrSnippet(tagName, className, framework);
   }
 
   if (options.docs) await collectStyleDocsForComponent(result.data[0], id);
@@ -233,7 +235,7 @@ export function transpileBaseClass(
   const result = transpileSync(rawCode, {
     ...options.transpileOptions,
     file: absPath,
-    componentExport: 'customelement',
+    componentExport: options.transpileOptions?.componentExport ?? 'customelement',
     styleImportData: 'queryparams',
     transformAsBaseClass: true,
   });
