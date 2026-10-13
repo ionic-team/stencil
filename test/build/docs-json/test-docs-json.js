@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const docsJsonOutputFilePath = path.join('.', 'docs.json');
 const docsDtsOutputFilePath = path.join('.', 'docs.d.ts');
@@ -62,3 +63,37 @@ for (const typeDef of requiredTypes) {
 }
 
 console.log('✅ docs.d.ts validation passed: file is self-contained with proper type definitions');
+
+// A `docs-custom-elements-manifest` output without a `file` is written to dist/
+const defaultManifestPath = path.join('.', 'dist', 'custom-elements.json');
+if (!fs.existsSync(defaultManifestPath)) {
+  console.error(`❌ ERROR: ${defaultManifestPath} was not generated`);
+  process.exit(1);
+}
+
+// package.json "customElements" points at the first configured manifest
+const { customElements } = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+if (customElements !== 'custom-elements-manifest.json') {
+  console.error(`❌ ERROR: package.json "customElements" is "${customElements}"`);
+  process.exit(1);
+}
+
+// every configured manifest gets the same content
+if (fs.readFileSync(defaultManifestPath, 'utf-8') !== fs.readFileSync(customElements, 'utf-8')) {
+  console.error(`❌ ERROR: ${defaultManifestPath} differs from ${customElements}`);
+  process.exit(1);
+}
+
+// the generated export map makes the manifest and package.json resolvable by specifier
+// (resolved through the package's own name, which only works via `exports`)
+const { name } = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
+const resolvesTo = { 'custom-elements.json': customElements, 'package.json': 'package.json' };
+for (const [subpath, expected] of Object.entries(resolvesTo)) {
+  const resolved = fileURLToPath(import.meta.resolve(`${name}/${subpath}`));
+  if (resolved !== path.resolve(expected)) {
+    console.error(`❌ ERROR: "${name}/${subpath}" resolved to ${resolved}, expected ${expected}`);
+    process.exit(1);
+  }
+}
+
+console.log('✅ custom elements manifest validation passed');

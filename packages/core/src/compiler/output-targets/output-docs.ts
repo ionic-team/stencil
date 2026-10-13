@@ -58,7 +58,7 @@ export const outputDocs = async (
     generateJsonDocs(config, compilerCtx, docsData, docsOutputTargets),
     generateVscodeDocs(compilerCtx, docsData, docsOutputTargets),
     generateCustomDocs(config, docsData, docsOutputTargets),
-    generateCustomElementsManifestDocs(compilerCtx, docsData, docsOutputTargets),
+    generateCustomElementsManifestDocs(config, compilerCtx, docsData, docsOutputTargets),
     generateAgentSkillDocs(compilerCtx, docsData, docsOutputTargets),
   ]);
 };

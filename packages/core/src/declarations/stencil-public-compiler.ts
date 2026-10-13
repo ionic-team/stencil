@@ -2390,9 +2390,11 @@ export interface OutputTargetDocsCustomElementsManifest extends OutputTargetBase
 
   /**
    * The file path where the custom-elements.json manifest will be written.
-   * Defaults to 'custom-elements.json' in the root directory.
+   * Defaults to 'dist/custom-elements.json'.
+   *
+   * The `customElements` field of the project's `package.json` is set to this path.
    */
-  file: string;
+  file?: string;
   strict?: boolean;
 }
 

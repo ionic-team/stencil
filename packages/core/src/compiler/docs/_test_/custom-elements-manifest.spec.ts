@@ -6,11 +6,13 @@ import { mockCompilerCtx } from '../../../testing/compiler';
 import { generateCustomElementsManifestDocs } from '../cem';
 
 describe('custom-elements-manifest', () => {
+  let config: d.ValidatedConfig;
   let compilerCtx: d.CompilerCtx;
   let writeFileSpy: MockInstance;
 
   beforeEach(() => {
-    const config = mockValidatedConfig();
+    config = mockValidatedConfig({ rootDir: '/' });
+    config.packageJsonFilePath = '/package.json';
     compilerCtx = mockCompilerCtx(config);
     writeFileSpy = vi.spyOn(compilerCtx.fs, 'writeFile');
   });
@@ -27,9 +29,67 @@ describe('custom-elements-manifest', () => {
       typeLibrary: {},
     };
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, []);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, []);
 
     expect(writeFileSpy).not.toHaveBeenCalled();
+  });
+
+  describe('package.json "customElements" field', () => {
+    const docsData: d.JsonDocs = {
+      timestamp: 'test',
+      compiler: { name: '@stencil/core', version: '1.0.0', typescriptVersion: '4.0.0' },
+      components: [],
+      typeLibrary: {},
+    };
+
+    const run = async (pkg: object, ...files: string[]) => {
+      await compilerCtx.fs.writeFile('/package.json', JSON.stringify(pkg, null, 2) + '\n');
+      writeFileSpy.mockClear();
+      await generateCustomElementsManifestDocs(
+        config,
+        compilerCtx,
+        docsData,
+        files.map((file) => ({ type: 'docs-custom-elements-manifest', file })),
+      );
+      return JSON.parse(await compilerCtx.fs.readFile('/package.json'));
+    };
+
+    it('points it at the manifest', async () => {
+      const pkg = await run({ name: 'my-lib', version: '1.0.0' }, '/dist/custom-elements.json');
+
+      expect(pkg).toEqual({
+        name: 'my-lib',
+        version: '1.0.0',
+        customElements: 'dist/custom-elements.json',
+      });
+    });
+
+    it('points it at the first manifest when there are several', async () => {
+      const pkg = await run({ name: 'my-lib' }, '/dist/a.json', '/dist/b.json');
+
+      expect(pkg.customElements).toBe('dist/a.json');
+    });
+
+    it('replaces a stale path', async () => {
+      const pkg = await run({ customElements: 'custom-elements.json' }, '/dist/cem.json');
+
+      expect(pkg.customElements).toBe('dist/cem.json');
+    });
+
+    it('does not rewrite package.json when it is already set', async () => {
+      await run({ customElements: 'dist/custom-elements.json' }, '/dist/custom-elements.json');
+
+      expect(writeFileSpy).toHaveBeenCalledTimes(1);
+      expect(writeFileSpy.mock.calls[0][0]).toBe('/dist/custom-elements.json');
+    });
+
+    it('leaves it alone when the manifest is outside the package', async () => {
+      config.rootDir = '/packages/my-lib';
+
+      const pkg = await run({ name: 'my-lib' }, '/docs/custom-elements.json');
+
+      expect(pkg.customElements).toBeUndefined();
+    });
   });
 
   it('generates manifest with correct schema version', async () => {
@@ -43,7 +103,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     expect(writeFileSpy).toHaveBeenCalledTimes(1);
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
@@ -67,7 +127,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     expect(writtenContent.modules).toHaveLength(1);
@@ -91,7 +151,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -116,7 +176,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -156,7 +216,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -202,7 +262,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -230,7 +290,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const field = writtenContent.modules[0].declarations[0].members.find(
@@ -257,7 +317,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const field = writtenContent.modules[0].declarations[0].members.find(
@@ -299,7 +359,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -399,7 +459,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -452,7 +512,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -484,7 +544,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -514,7 +574,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -546,7 +606,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -574,7 +634,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -610,7 +670,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -661,7 +721,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -694,7 +754,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -720,7 +780,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const declaration = writtenContent.modules[0].declarations[0];
@@ -743,7 +803,7 @@ describe('custom-elements-manifest', () => {
       { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
     ];
 
-    await generateCustomElementsManifestDocs(compilerCtx, docsData, outputTargets);
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
 
     const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
     const exports = writtenContent.modules[0].exports;

@@ -177,12 +177,14 @@ const validateAgentSkillOutputTarget = (
   return outputTarget;
 };
 
+const DEFAULT_CUSTOM_ELEMENTS_MANIFEST_FILE = 'dist/custom-elements.json';
+
 const validateCustomElementsManifestOutputTarget = (
   config: d.ValidatedConfig,
   outputTarget: d.OutputTargetDocsCustomElementsManifest,
 ) => {
   if (!isString(outputTarget.file)) {
-    outputTarget.file = 'custom-elements.json';
+    outputTarget.file = DEFAULT_CUSTOM_ELEMENTS_MANIFEST_FILE;
   }
   if (!isAbsolute(outputTarget.file)) {
     outputTarget.file = join(config.rootDir, outputTarget.file);

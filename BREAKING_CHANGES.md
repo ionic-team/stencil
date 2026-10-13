@@ -135,7 +135,7 @@ outputTargets: [
 
 #### ES5 Builds & Legacy Polyfills Removed
 
-All ES5/SystemJS output and the associated legacy browser polyfills/shims have been removed. Stencil now targets ES2017+ only; IE11 and Edge 18 and below are no longer supported.
+All ES5/SystemJS output and the associated legacy browser polyfills/shims have been removed. Stencil's runtime is now built for ES2022, so v5 supports browsers that implement it: Chrome and Edge 94+, Firefox 93+, and Safari 16.4+ (v4 supported Chrome and Edge 79+, Firefox 70+, and Safari 14+). IE11 and Edge 18 and below are no longer supported.
 
 To migrate:
 - Remove any imports of and calls to `applyPolyfills()` from your `loader-bundle` output.
@@ -405,6 +405,16 @@ To migrate, run `stencil migrate` to append `?stencil` to existing raw asset imp
 Previously, the `docs-readme` output target was implicitly added to every non-dev build (a behavior gap inherited from v4's `!config.devMode` check, and briefly made unconditional once `buildDist`/`buildDocs` were removed). It's now purely `outputTargets`-driven, consistent with every other docs target (`docs-json`, `docs-custom`, `docs-vscode`, `docs-custom-elements-manifest`, `docs-agent-skill`) - nothing generates unless `{ type: 'docs-readme' }` is explicitly declared in your config.
 
 To migrate, add `{ type: 'docs-readme' }` to `outputTargets` in `stencil.config.ts` if you were relying on it being generated implicitly. `stencil docs` remains a fast, docs-only rebuild and is unaffected.
+
+#### `docs-custom-elements-manifest` Defaults to `dist/` and Sets `customElements`
+
+`file` is now optional and defaults to `dist/custom-elements.json` (was `custom-elements.json` in the project root), in line with every other output target and with the usual `"files": ["dist"]` allowlist - a manifest in the project root was easy to leave out of the published package.
+
+The output target also sets the [`customElements`](https://github.com/webcomponents/custom-elements-manifest#referencing-manifests-from-npm-packages) field in `package.json` to the manifest's path (the first one, if several are configured), which is how tooling locates it. A build now warns if `package.json`'s `files` array doesn't cover the manifest.
+
+With `generateExportMaps` enabled, the manifest is also exported as `./custom-elements.json` (whatever its file name), alongside a `./package.json` export.
+
+To migrate, nothing is needed if you set `file` explicitly. If you relied on the default, either set `file: 'custom-elements.json'` to keep the old location, or delete the stale `custom-elements.json` from the project root and update anything that read it from there.
 
 #### `--docs` CLI Flag Removed
 

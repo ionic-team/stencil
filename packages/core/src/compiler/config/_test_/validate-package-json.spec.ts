@@ -607,6 +607,37 @@ describe('validateBuildPackageJson', () => {
       expect(filesWarning).toBeUndefined();
     });
 
+    it('should warn when "files" does not cover the Custom Elements Manifest', async () => {
+      compilerCtx.fs.access = async () => true;
+      config.outputTargets.push({
+        type: 'docs-custom-elements-manifest',
+        file: '/custom-elements.json',
+      });
+      buildCtx.packageJson.files = ['dist'];
+
+      await validateBuildPackageJson(config, compilerCtx, buildCtx);
+
+      const filesWarning = buildCtx.diagnostics.find((d) => d.messageText.includes('"files"'));
+      expect(filesWarning?.level).toBe('warn');
+      expect(filesWarning?.messageText).toContain(
+        'doesn\'t cover the Custom Elements Manifest "custom-elements.json"',
+      );
+    });
+
+    it('should not warn when "files" covers the Custom Elements Manifest', async () => {
+      compilerCtx.fs.access = async () => true;
+      config.outputTargets.push({
+        type: 'docs-custom-elements-manifest',
+        file: '/dist/custom-elements.json',
+      });
+      buildCtx.packageJson.files = ['dist'];
+
+      await validateBuildPackageJson(config, compilerCtx, buildCtx);
+
+      const filesWarning = buildCtx.diagnostics.find((d) => d.messageText.includes('"files"'));
+      expect(filesWarning).toBeUndefined();
+    });
+
     it('should warn even without a collection output target (loader-bundle only)', async () => {
       config.outputTargets = [
         {
