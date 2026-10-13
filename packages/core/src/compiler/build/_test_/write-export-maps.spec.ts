@@ -76,6 +76,7 @@ describe('writeExportMaps', () => {
       '.': loaderEntry,
       './loader': loaderEntry,
       './components': { types: './dist/types/components.d.ts' },
+      './package.json': './package.json',
     });
   });
 
@@ -103,6 +104,7 @@ describe('writeExportMaps', () => {
         import: './dist/components/index.js',
       },
       './components': { types: './dist/types/components.d.ts' },
+      './package.json': './package.json',
     });
   });
 
@@ -137,6 +139,7 @@ describe('writeExportMaps', () => {
         import: './dist/ssr/index.js',
         require: './dist/ssr/index.cjs',
       },
+      './package.json': './package.json',
     });
   });
 
@@ -336,7 +339,34 @@ describe('writeExportMaps', () => {
     });
   });
 
+  describe('custom elements manifest', () => {
+    it('should generate an export for the manifest, whatever its file name', async () => {
+      config.outputTargets = [
+        standaloneTarget,
+        { type: 'docs-custom-elements-manifest', file: '/dist/docs/cem.json' },
+      ];
+
+      expect((await run())['./custom-elements.json']).toBe('./dist/docs/cem.json');
+    });
+
+    it('should not generate it without a manifest output', async () => {
+      config.outputTargets = [standaloneTarget];
+
+      expect((await run())['./custom-elements.json']).toBeUndefined();
+    });
+  });
+
   describe('formatting', () => {
+    it('should not rewrite a package.json it has nothing to change in', async () => {
+      config.outputTargets = [{ type: 'ssr', dir: '/dist/ssr' } as d.OutputTargetSsr];
+      const source =
+        '{"name":"my-lib","exports":{"./ssr":{"types":"./dist/ssr/index.d.ts","import":"./dist/ssr/index.js"},"./package.json":"./package.json"}}';
+
+      await run(source);
+
+      expect(await readPackageJson()).toBe(source);
+    });
+
     beforeEach(() => {
       config.outputTargets = [loaderBundleTarget, typesTarget];
     });

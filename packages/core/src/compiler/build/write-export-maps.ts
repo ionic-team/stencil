@@ -2,6 +2,7 @@ import type * as d from '@stencil/core';
 
 import {
   isOutputTargetAssets,
+  isOutputTargetDocsCustomElementsManifest,
   isOutputTargetGlobalStyle,
   isOutputTargetLoaderBundle,
   isOutputTargetSsr,
@@ -10,19 +11,14 @@ import {
   isString,
   join,
   normalizePath,
-  parsePackageJson,
   relative,
 } from '../../utils';
+import { isJsonObject, type JsonObject, updatePackageJson } from './update-package-json';
 
 /** The conditions Stencil owns on the entries it generates, in the order they're written. */
 type ExportConditions = { types?: string; import?: string; require?: string };
 
-type JsonObject = Record<string, unknown>;
-
 const OWNED_CONDITIONS = ['types', 'import', 'require'];
-
-const isJsonObject = (v: unknown): v is JsonObject =>
-  typeof v === 'object' && v !== null && !Array.isArray(v);
 
 /**
  * Write the `exports` map entry points into the project's `package.json`.
@@ -31,6 +27,7 @@ const isJsonObject = (v: unknown): v is JsonObject =>
  *   (respects user customization), otherwise a default is set (loader-bundle > standalone)
  * - every other generated entry is owned by Stencil and rewritten on each build
  * - per-component entries whose component no longer exists are removed
+ * - `./custom-elements.json` points at the Custom Elements Manifest, if one is generated
  * - entries Stencil doesn't generate are left untouched
  *
  * @param config The validated Stencil config
@@ -51,58 +48,39 @@ export const writeExportMaps = async (
     return;
   }
 
-  const source = await readPackageJsonSource(config, compilerCtx);
-  const pkg: unknown = source ? parsePackageJson(source, config.packageJsonFilePath).data : null;
-  if (!source || !isJsonObject(pkg)) {
-    return;
-  }
-
-  let exportMap = toExportMap(pkg.exports);
-
-  if (loaderBundle || standalone) {
-    const root = getRootExport(
-      config,
-      compilerCtx,
-      exportMap['.'],
-      loaderBundle,
-      standalone,
-      types,
-    );
-    // a new root entry goes first, by convention
-    exportMap = '.' in exportMap ? { ...exportMap, '.': root } : { '.': root, ...exportMap };
-  }
-
   const generated = getGeneratedExports(config, buildCtx, loaderBundle, standalone, ssr, types);
 
-  if (standalone?.dir) {
-    removeStaleComponentExports(exportMap, generated, toRelativePath(config, standalone.dir));
-  }
+  await updatePackageJson(
+    config,
+    compilerCtx,
+    (pkg) => {
+      let exportMap = toExportMap(pkg.exports);
 
-  for (const [key, entry] of Object.entries(generated)) {
-    exportMap[key] = isString(entry) ? entry : mergeConditions(exportMap[key], entry);
-  }
+      if (loaderBundle || standalone) {
+        const root = getRootExport(
+          config,
+          compilerCtx,
+          exportMap['.'],
+          loaderBundle,
+          standalone,
+          types,
+        );
+        // a new root entry goes first, by convention
+        exportMap = '.' in exportMap ? { ...exportMap, '.': root } : { '.': root, ...exportMap };
+      }
 
-  pkg.exports = exportMap;
+      if (standalone?.dir) {
+        removeStaleComponentExports(exportMap, generated, toRelativePath(config, standalone.dir));
+      }
 
-  const eol = source.includes('\r\n') ? '\r\n' : '\n';
-  const indent = /^([ \t]+)"/m.exec(source)?.[1] ?? 2;
-  let output = JSON.stringify(pkg, null, indent);
-  if (/\n\s*$/.test(source)) {
-    output += '\n';
-  }
-  output = output.replace(/\n/g, eol);
+      for (const [key, entry] of Object.entries(generated)) {
+        exportMap[key] = isString(entry) ? entry : mergeConditions(exportMap[key], entry);
+      }
 
-  if (output !== source) {
-    await compilerCtx.fs.writeFile(config.packageJsonFilePath, output, { immediateWrite: true });
-  }
-};
-
-const readPackageJsonSource = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx) => {
-  try {
-    return await compilerCtx.fs.readFile(config.packageJsonFilePath);
-  } catch {
-    return undefined;
-  }
+      pkg.exports = exportMap;
+    },
+    true,
+  );
 };
 
 /**
@@ -297,6 +275,14 @@ const getGeneratedExports = (
       }
     }
   }
+
+  const manifest = config.outputTargets.find(isOutputTargetDocsCustomElementsManifest);
+  if (manifest?.file) {
+    generated['./custom-elements.json'] = toRelativePath(config, manifest.file);
+  }
+
+  // an `exports` map hides `package.json` itself from tools that resolve it to read its fields
+  generated['./package.json'] = './package.json';
 
   return generated;
 };

@@ -82,6 +82,25 @@ describe('validateDocs', () => {
     );
   });
 
+  describe('docs-custom-elements-manifest', () => {
+    const getManifestOutput = () => {
+      const { config } = validateConfig(userConfig, mockLoadConfigInit());
+      return config.outputTargets.find(
+        (o) => o.type === 'docs-custom-elements-manifest',
+      ) as d.OutputTargetDocsCustomElementsManifest;
+    };
+
+    it('defaults file to dist/custom-elements.json', () => {
+      userConfig.outputTargets = [{ type: 'docs-custom-elements-manifest' }];
+      expect(getManifestOutput().file).toMatch(/dist\/custom-elements\.json$/);
+    });
+
+    it('honors an explicit file', () => {
+      userConfig.outputTargets = [{ type: 'docs-custom-elements-manifest', file: 'docs/cem.json' }];
+      expect(getManifestOutput().file).toMatch(/docs\/cem\.json$/);
+    });
+  });
+
   describe('docs-agent-skill', () => {
     it('defaults dir to dist/skill', () => {
       userConfig.outputTargets = [{ type: 'docs-agent-skill' } as d.OutputTargetDocsAgentSkill];

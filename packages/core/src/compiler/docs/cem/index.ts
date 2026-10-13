@@ -1,17 +1,28 @@
 import type * as d from '@stencil/core';
 
-import { dashToPascalCase, isOutputTargetDocsCustomElementsManifest } from '../../../utils';
+import {
+  dashToPascalCase,
+  isOutputTargetDocsCustomElementsManifest,
+  normalizePath,
+  relative,
+} from '../../../utils';
+import { updatePackageJson } from '../../build/update-package-json';
 
 /**
  * Generate Custom Elements Manifest (custom-elements.json) output
  * conforming to the Custom Elements Manifest specification.
  * @see https://github.com/webcomponents/custom-elements-manifest
  *
+ * The `customElements` field of the project's `package.json` is pointed at the manifest
+ * (the first one, if several are configured), which is how tooling locates it.
+ *
+ * @param config the Stencil configuration associated with the project
  * @param compilerCtx the current compiler context
  * @param docsData the generated docs data from Stencil components
  * @param outputTargets the output targets configured for the build
  */
 export const generateCustomElementsManifestDocs = async (
+  config: d.ValidatedConfig,
   compilerCtx: d.CompilerCtx,
   docsData: d.JsonDocs,
   outputTargets: d.OutputTarget[],
@@ -30,6 +41,14 @@ export const generateCustomElementsManifestDocs = async (
       compilerCtx.fs.writeFile(outputTarget.file!, jsonContent),
     ),
   );
+
+  const manifestPath = normalizePath(relative(config.rootDir, cemOutputTargets[0].file!), false);
+  // a manifest outside the package can't be published with it
+  if (!manifestPath.startsWith('../')) {
+    await updatePackageJson(config, compilerCtx, (pkg) => {
+      pkg.customElements = manifestPath;
+    });
+  }
 };
 
 /**

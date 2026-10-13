@@ -7,6 +7,7 @@ import {
   GENERATED_DTS,
   isGlob,
   isOutputTargetAssets,
+  isOutputTargetDocsCustomElementsManifest,
   isOutputTargetLoaderBundle,
   isOutputTargetStandalone,
   isOutputTargetCollection,
@@ -498,13 +499,13 @@ const validateTypeField = (
 // ============================================================================
 
 /**
- * Check if a rootDir-relative directory is covered by a package.json `files` array,
+ * Check if a rootDir-relative directory or file is covered by a package.json `files` array,
  * either directly or via a parent directory entry (e.g. "dist/" covers "dist/types/").
  * @param files the package.json "files" array
- * @param dir the rootDir-relative directory to check for
+ * @param dir the rootDir-relative path to check for
  * @returns true if `dir` is covered by one of the `files` entries
  */
-const isDirCoveredByFiles = (files: string[], dir: string): boolean => {
+const isCoveredByFiles = (files: string[], dir: string): boolean => {
   const normalizedDir = dir.replace(/\/$/, '').replace(/^\.\//, '');
 
   return files.some((userPath) => {
@@ -553,7 +554,17 @@ const validateFilesField = async (
   }
 
   const files = buildCtx.packageJson.files;
-  const uncoveredDirs = distDirs.filter((dir) => !isDirCoveredByFiles(files, dir));
+
+  const manifest = config.outputTargets.find(isOutputTargetDocsCustomElementsManifest);
+  if (manifest?.file) {
+    const manifestPath = normalizePath(relative(config.rootDir, manifest.file), false);
+    if (!manifestPath.startsWith('../') && !isCoveredByFiles(files, manifestPath)) {
+      const msg = `package.json "files" array doesn't cover the Custom Elements Manifest "${manifestPath}", so it won't be published.`;
+      packageJsonWarn(config, compilerCtx, buildCtx, msg, `"files"`);
+    }
+  }
+
+  const uncoveredDirs = distDirs.filter((dir) => !isCoveredByFiles(files, dir));
 
   if (uncoveredDirs.length > 0) {
     const msg = `package.json "files" array must contain the distribution ${uncoveredDirs.length > 1 ? 'directories' : 'directory'} ${formatDirs(uncoveredDirs)} when generating a distribution.`;

@@ -37,10 +37,7 @@ export function generateStencilConfig(sel: ConfigSelections): string | null {
   if (sel.outputs.includes('ssr-wasm')) outputLines.push(`    { type: 'ssr-wasm' },`);
   if (sel.outputs.includes('www')) outputLines.push(`    { type: 'www' },`);
 
-  if (sel.docs.includes('cem'))
-    outputLines.push(
-      `    { type: 'docs-custom-elements-manifest', file: 'custom-elements.json' },`,
-    );
+  if (sel.docs.includes('cem')) outputLines.push(`    { type: 'docs-custom-elements-manifest' },`);
   if (sel.docs.includes('json'))
     outputLines.push(`    { type: 'docs-json', file: 'docs/api.json' },`);
   if (sel.docs.includes('skill')) outputLines.push(`    { type: 'docs-agent-skill' },`);
