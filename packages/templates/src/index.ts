@@ -1,4 +1,4 @@
-export type { StyleExtension } from './types.js';
+export type { ComponentEncapsulation, StyleExtension } from './types.js';
 export { getComponentBoilerplate, toPascalCase } from './generate/component.js';
 export { getCssOnlyComponentBoilerplate } from './generate/css-component.js';
 export { getStyleBoilerplate } from './generate/style.js';

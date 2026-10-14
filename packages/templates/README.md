@@ -10,23 +10,23 @@ npm install --save-dev @stencil/templates
 
 ## API
 
-### `getComponentBoilerplate(tagName, styleExtension?)` — component TSX
+### `getComponentBoilerplate(tagName, { styleExtension?, encapsulation? })` — component TSX
 
 Generates the `.tsx` file content for a new Stencil component:
 
 ```ts
 import { getComponentBoilerplate } from '@stencil/templates';
 
-// With a stylesheet
-const tsx = getComponentBoilerplate('my-button', 'css');
+// With a stylesheet and shadow DOM
+const tsx = getComponentBoilerplate('my-button', { styleExtension: 'css', encapsulation: 'shadow' });
 
-// Without (no styleUrl in @Component decorator)
+// Without (no styleUrl in @Component decorator, no encapsulation)
 const bare = getComponentBoilerplate('my-button');
 ```
 
-`styleExtension` accepts `'css'`, `'scss'`, `'sass'`, or `'less'`.
+`styleExtension` accepts `'css'`, `'scss'`, `'sass'`, or `'less'`. `encapsulation` accepts `'none'` (default), `'scoped'`, or `'shadow'`.
 
-Output for `getComponentBoilerplate('my-button', 'css')`:
+Output for `getComponentBoilerplate('my-button', { styleExtension: 'css', encapsulation: 'shadow' })`:
 
 ```tsx
 import { Component, Host } from '@stencil/core';
@@ -49,16 +49,16 @@ export class MyButton {
 
 ---
 
-### `getStyleBoilerplate(ext)` — stylesheet
+### `getStyleBoilerplate(tagName, ext, encapsulation?)` — stylesheet
 
-Generates the initial stylesheet content. Pass the file extension — not the tag name:
+Generates the initial stylesheet content. Shadow and scoped components target `:host`; components without encapsulation (the default) target the tag name:
 
 ```ts
 import { getStyleBoilerplate } from '@stencil/templates';
 
-const css  = getStyleBoilerplate('css');   // :host {\n  display: block;\n}
-const scss = getStyleBoilerplate('scss');  // same, brace syntax
-const sass = getStyleBoilerplate('sass'); // :host\n  display: block  (indented syntax)
+const css    = getStyleBoilerplate('my-button', 'css');            // my-button {\n  display: block;\n}
+const shadow = getStyleBoilerplate('my-button', 'css', 'shadow');  // :host {\n  display: block;\n}
+const sass   = getStyleBoilerplate('my-button', 'sass');           // my-button\n  display: block  (indented syntax)
 ```
 
 ---

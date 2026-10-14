@@ -12,6 +12,7 @@ import {
 } from '@stencil/templates';
 import * as nypm from 'nypm';
 import type { ValidatedConfig } from '@stencil/core/compiler';
+import type { ComponentEncapsulation } from '@stencil/templates';
 
 import { resolveEntryScriptSrc } from './resolve-entry-script.js';
 import { cancelIfAborted } from './wizard/clack.js';
@@ -92,6 +93,25 @@ export const taskGenerate = async (config: ValidatedConfig, flags: ConfigFlags):
       '`enableCssOnlyComponents` is disabled in your stencil.config - this component will not be discovered until it is re-enabled.',
       'Warning',
     );
+  }
+
+  let encapsulation: ComponentEncapsulation = 'none';
+  if (!isCssOnly) {
+    const encapsulationPick = await p.select<ComponentEncapsulation>({
+      message: 'Encapsulation:',
+      initialValue: 'none',
+      options: [
+        { value: 'none', label: 'None', hint: 'light DOM, global styles' },
+        {
+          value: 'scoped',
+          label: 'Scoped',
+          hint: 'light DOM, styles scoped via generated classes',
+        },
+        { value: 'shadow', label: 'Shadow', hint: 'shadow DOM' },
+      ],
+    });
+    cancelIfAborted(encapsulationPick);
+    encapsulation = encapsulationPick;
   }
 
   // style format: CSS always available; plugins can contribute additional extensions
@@ -183,13 +203,13 @@ export const taskGenerate = async (config: ValidatedConfig, flags: ConfigFlags):
   } else {
     filesToWrite.push({
       absPath: normalizePath(join(outDir, `${componentName}.tsx`)),
-      content: getComponentBoilerplate(componentName, styleExtension),
+      content: getComponentBoilerplate(componentName, { styleExtension, encapsulation }),
     });
 
     if (styleExtension) {
       filesToWrite.push({
         absPath: normalizePath(join(outDir, `${componentName}.${styleExtension}`)),
-        content: getStyleBoilerplate(styleExtension),
+        content: getStyleBoilerplate(componentName, styleExtension, encapsulation),
       });
     }
   }

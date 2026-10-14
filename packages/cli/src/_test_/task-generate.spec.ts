@@ -71,9 +71,10 @@ function withTagName(flags: ConfigFlags, name: string) {
   flags.unknownArgs = [name];
 }
 
-// Default prompt answers: standard component, CSS stylesheet, no plugin file templates
+// Default prompt answers: standard component, no encapsulation, CSS stylesheet, no plugin file templates
 function defaultPrompts() {
   mockSelect.mockResolvedValueOnce('component'); // component type
+  mockSelect.mockResolvedValueOnce('none'); // encapsulation
   mockSelect.mockResolvedValue('css'); // stylesheet format / demo fallback
   mockMultiselect.mockResolvedValue([]);
 }
@@ -148,11 +149,11 @@ describe('generate task', () => {
 
     expect(writeFileSpy).toHaveBeenCalledWith(
       `${SRC}/components/my-component/my-component.tsx`,
-      getComponentBoilerplate('my-component', 'css'),
+      getComponentBoilerplate('my-component', { styleExtension: 'css' }),
     );
     expect(writeFileSpy).toHaveBeenCalledWith(
       `${SRC}/components/my-component/my-component.css`,
-      getStyleBoilerplate('css'),
+      getStyleBoilerplate('my-component', 'css'),
     );
   });
 
@@ -166,9 +167,46 @@ describe('generate task', () => {
 
     expect(writeFileSpy).toHaveBeenCalledWith(
       `${SRC}/components/my-component/my-component.tsx`,
-      getComponentBoilerplate('my-component', undefined),
+      getComponentBoilerplate('my-component'),
     );
     expect(writeFileSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it.each(['none', 'scoped', 'shadow'] as const)(
+    'writes %s encapsulation to the component and stylesheet',
+    async (encapsulation) => {
+      const { config, flags } = setup();
+      withTagName(flags, 'my-component');
+      mockSelect.mockReset();
+      mockSelect
+        .mockResolvedValueOnce('component')
+        .mockResolvedValueOnce(encapsulation)
+        .mockResolvedValue('css');
+      const writeFileSpy = vi.spyOn(config.sys, 'writeFile');
+
+      await taskGenerate(config, flags);
+
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        `${SRC}/components/my-component/my-component.tsx`,
+        getComponentBoilerplate('my-component', { styleExtension: 'css', encapsulation }),
+      );
+      expect(writeFileSpy).toHaveBeenCalledWith(
+        `${SRC}/components/my-component/my-component.css`,
+        getStyleBoilerplate('my-component', 'css', encapsulation),
+      );
+    },
+  );
+
+  it('defaults the encapsulation prompt to none', async () => {
+    const { config, flags } = setup();
+    withTagName(flags, 'my-component');
+
+    await taskGenerate(config, flags);
+
+    expect(mockSelect.mock.calls[1][0]).toMatchObject({
+      message: 'Encapsulation:',
+      initialValue: 'none',
+    });
   });
 
   it('creates directories for all generated files', async () => {
@@ -332,14 +370,14 @@ describe('generate task', () => {
 
     await taskGenerate(config, flags);
 
-    const selectCall = mockSelect.mock.calls[1][0] as { options: { value: string }[] };
+    const selectCall = mockSelect.mock.calls[2][0] as { options: { value: string }[] };
     const values = selectCall.options.map((o) => o.value);
     expect(values).toContain('scss');
     expect(values).toContain('sass');
 
     expect(writeFileSpy).toHaveBeenCalledWith(
       `${SRC}/components/my-component/my-component.scss`,
-      getStyleBoilerplate('scss'),
+      getStyleBoilerplate('my-component', 'scss'),
     );
   });
 
@@ -453,6 +491,9 @@ describe('generate task', () => {
       await taskGenerate(config, flags);
 
       expect(mockSelect).toHaveBeenCalledTimes(3); // component type + stylesheet format + demo
+      expect(mockSelect).not.toHaveBeenCalledWith(
+        expect.objectContaining({ message: 'Encapsulation:' }),
+      );
       expect(mockMultiselect).toHaveBeenCalled();
       expect(writeFileSpy).toHaveBeenCalledWith(
         `${SRC}/components/my-component/my-component.e2e.ts`,
