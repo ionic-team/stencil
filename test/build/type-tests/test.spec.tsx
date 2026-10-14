@@ -16,6 +16,12 @@
 
 /// <reference path="src/components.d.ts" />
 
+import type { FunctionalComponent } from '@stencil/core';
+
+const Wrapper: FunctionalComponent<{ label: string }> = ({ label }, children) => (
+  <div aria-label={label}>{children}</div>
+);
+
 export function TypeTestComponent() {
   return (
     <>
@@ -116,6 +122,18 @@ export function TypeTestComponent() {
 
       {/* @ts-expect-error - dismissible should be boolean, not string */}
       <css-badge dismissible='true'></css-badge>
+
+      {/* ===== Functional Component Type Checks ===== */}
+
+      {/* Valid: children are passed as the 2nd argument, not via props */}
+      <Wrapper label='hi'>
+        <span>child</span>
+      </Wrapper>
+      <Wrapper label='hi' />
+      <Wrapper label='hi' key='a' />
+
+      {/* @ts-expect-error - label should be string, not number */}
+      <Wrapper label={1} />
     </>
   );
 }

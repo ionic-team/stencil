@@ -15,4 +15,10 @@ export namespace JSX {
   };
 
   export type Element = VNode;
+
+  // Functional components receive children as their 2nd argument, never via props
+  export interface IntrinsicAttributes {
+    key?: string | number;
+    children?: any;
+  }
 }
