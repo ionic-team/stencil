@@ -56,17 +56,17 @@
     "vitest": "catalog:"
   },
   "peerDependencies": {
-    "@rspack/core": "^2.0.0",
+    "@rspack/core": "*",
     "@stencil/core": "^5.0.0 || workspace:*",
-    "esbuild": ">=0.25.0",
+    "esbuild": "*",
     "less": "^4.0.0",
     "lightningcss": "^1.0.0",
     "postcss": "^8.0.0",
     "postcss-load-config": "^4.0.0 || ^5.0.0 || ^6.0.0",
-    "rollup": "^4.0.0",
+    "rollup": "*",
     "sass": "^1.0.0",
-    "vite": "^8.0.0",
-    "webpack": "^5.0.0"
+    "vite": "*",
+    "webpack": "*"
   },
   "peerDependenciesMeta": {
     "@rspack/core": {
