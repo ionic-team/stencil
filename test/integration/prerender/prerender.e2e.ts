@@ -86,6 +86,13 @@ CmpA server componentDidLoad`);
     expect(title).toContain('Url:');
   });
 
+  test('components carry client hydration annotations', async ({ page }) => {
+    await page.goto('/prerender/index.html');
+
+    await expect(page.locator('cmp-client-scoped')).toHaveAttribute('s-id', /.+/);
+    await expect(page.locator('cmp-client-scoped [c-id]').first()).toBeAttached();
+  });
+
   test('svg child is prerendered', async ({ page }) => {
     await page.goto('/prerender/index.html');
 
