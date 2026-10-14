@@ -1,3 +1,5 @@
+import type { ComponentEncapsulation } from '../types.js';
+
 /**
  * Returns the tag name converted to PascalCase for use as a class name.
  *
@@ -13,16 +15,24 @@ export function toPascalCase(str: string): string {
  * Uses the v5 `encapsulation` API.
  *
  * @param tagName - Dash-case custom element tag name.
- * @param styleExtension - Optional stylesheet extension (e.g. `'css'`, `'scss'`).
+ * @param options - Generation options.
+ * @param options.styleExtension - Optional stylesheet extension (e.g. `'css'`, `'scss'`).
+ * @param options.encapsulation - Component encapsulation type. Defaults to `'none'`.
  * @returns TSX source string for the new component file.
  */
-export function getComponentBoilerplate(tagName: string, styleExtension?: string): string {
+export function getComponentBoilerplate(
+  tagName: string,
+  {
+    styleExtension,
+    encapsulation = 'none',
+  }: { styleExtension?: string; encapsulation?: ComponentEncapsulation } = {},
+): string {
   const decorator = ['{'];
   decorator.push(`  tag: '${tagName}',`);
   if (styleExtension) {
     decorator.push(`  styleUrl: '${tagName}.${styleExtension}',`);
   }
-  decorator.push(`  encapsulation: { type: 'shadow' },`);
+  decorator.push(`  encapsulation: { type: '${encapsulation}' },`);
   decorator.push('}');
 
   return `import { Component, Host } from '@stencil/core';
