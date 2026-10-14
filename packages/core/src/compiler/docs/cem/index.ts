@@ -1,8 +1,10 @@
+import { dirname } from 'path';
 import type * as d from '@stencil/core';
 
 import {
   dashToPascalCase,
   isOutputTargetDocsCustomElementsManifest,
+  join,
   normalizePath,
   relative,
 } from '../../../utils';
@@ -169,6 +171,21 @@ const createType = (text: string, references?: d.ComponentCompilerTypeReferences
  * @param component the Stencil component docs data
  * @returns the Custom Element Declaration
  */
+/**
+ * The directory a component's usage examples are linked from, relative to the project like the
+ * module `path` - `usagesDir` is absolute, and a manifest is published with the package.
+ * @param component the component's docs data
+ * @returns the directory, with a trailing `/`, or `''` when the component has none
+ */
+const demosDir = (component: d.JsonDocsComponent): string => {
+  if (!component.usagesDir) return '';
+  const dir =
+    component.dirPath && component.filePath
+      ? join(dirname(component.filePath), relative(component.dirPath, component.usagesDir))
+      : component.usagesDir;
+  return `${normalizePath(dir, false)}/`;
+};
+
 const componentToDeclaration = (component: d.JsonDocsComponent): CustomElementDeclaration => {
   const className = dashToPascalCase(component.tag);
 
@@ -260,8 +277,7 @@ const componentToDeclaration = (component: d.JsonDocsComponent): CustomElementDe
 
   // Generate demos from usage examples
   const demos: Demo[] = Object.entries(component.usage || {}).map(([name, content]) => ({
-    // Create relative URL from usagesDir + filename
-    url: component.usagesDir ? `${component.usagesDir}/${name}.md` : `${name}.md`,
+    url: `${demosDir(component)}${name}.md`,
     ...(content && { description: content }),
   }));
 
