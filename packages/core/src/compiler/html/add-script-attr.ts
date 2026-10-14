@@ -9,19 +9,14 @@ export const addScriptDataAttribute = (
   outputTarget: d.OutputTargetWww,
 ) => {
   const resourcesUrl = getAbsoluteBuildDir(outputTarget);
-  const entryEsmFilename = `${config.fsNamespace}.js`;
-  const entryNoModuleFilename = `${config.fsNamespace}.js`;
-  const expectedEsmSrc = join(resourcesUrl, entryEsmFilename);
-  const expectedNoModuleSrc = join(resourcesUrl, entryNoModuleFilename);
+  // `.esm.js` is the backwards-compat shim re-exporting the `.js` entry
+  const expectedSrcs = [`${config.fsNamespace}.js`, `${config.fsNamespace}.esm.js`].map((f) =>
+    join(resourcesUrl, f),
+  );
 
-  const scripts = Array.from(doc.querySelectorAll('script'));
-  const scriptEsm = scripts.find((s) => s.getAttribute('src') === expectedEsmSrc);
-  const scriptNomodule = scripts.find((s) => s.getAttribute('src') === expectedNoModuleSrc);
-
-  if (scriptEsm) {
-    scriptEsm.setAttribute('data-stencil', '');
-  }
-  if (scriptNomodule) {
-    scriptNomodule.setAttribute('data-stencil', '');
-  }
+  doc.querySelectorAll('script').forEach((script) => {
+    if (expectedSrcs.includes(script.getAttribute('src'))) {
+      script.setAttribute('data-stencil', '');
+    }
+  });
 };
