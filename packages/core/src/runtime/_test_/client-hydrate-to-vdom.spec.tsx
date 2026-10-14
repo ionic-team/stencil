@@ -63,6 +63,45 @@ describe('initializeClientHydrate', () => {
     );
   });
 
+  it('gives childless hydrated elements null $children$', async () => {
+    @Component({ tag: 'cmp-a' })
+    class CmpA {
+      render() {
+        return (
+          <div>
+            <span></span>
+          </div>
+        );
+      }
+    }
+
+    const serverHydrated = await newSpecPage({
+      components: [CmpA],
+      html: `<cmp-a></cmp-a>`,
+      hydrateServerSide: true,
+      serializeShadowRoot: 'scoped',
+    });
+
+    const hostElm = document.createElement('cmp-a');
+    hostElm.innerHTML = serverHydrated.root.innerHTML;
+
+    const hostRef: d.HostRef = {
+      $flags$: 0,
+      $cmpMeta$: {
+        $tagName$: 'cmp-a',
+        $flags$: 0,
+      },
+      $hostElement$: hostElm,
+    };
+
+    initializeClientHydrate(hostElm, 'cmp-a', '1', hostRef);
+
+    const span = hostRef.$vnode$.$children$[0].$children$[0];
+    expect(span.$tag$).toBe('span');
+    // the vdom patch treats only `null` as "no children"
+    expect(span.$children$).toBeNull();
+  });
+
   it('text child', async () => {
     @Component({ tag: 'cmp-a' })
     class CmpA {

@@ -596,7 +596,7 @@ const initializeDocumentHydrate = (
  * @returns an complete vnode
  */
 const createSimpleVNode = (vnode: Partial<RenderNodeData>): RenderNodeData =>
-  ({ $flags$: 0, $index$: '0', ...vnode }) as RenderNodeData;
+  ({ $flags$: 0, $index$: '0', $children$: null, ...vnode }) as RenderNodeData;
 
 function addSlot(
   slotName: string,
