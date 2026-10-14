@@ -589,6 +589,34 @@ describe('custom-elements-manifest', () => {
     });
   });
 
+  it('links demos relative to the project when usagesDir is absolute', async () => {
+    const docsData: d.JsonDocs = {
+      timestamp: 'test',
+      compiler: { name: '@stencil/core', version: '1.0.0', typescriptVersion: '4.0.0' },
+      components: [
+        createMockComponent({
+          tag: 'my-component',
+          dirPath: '/home/user/project/src/components/my-component',
+          filePath: 'src/components/my-component/my-component.tsx',
+          usagesDir: '/home/user/project/src/components/my-component/usage',
+          usage: { basic: 'Example' },
+        }),
+      ],
+      typeLibrary: {},
+    };
+    const outputTargets: d.OutputTargetDocsCustomElementsManifest[] = [
+      { type: 'docs-custom-elements-manifest', file: '/output/custom-elements.json' },
+    ];
+
+    await generateCustomElementsManifestDocs(config, compilerCtx, docsData, outputTargets);
+
+    const writtenContent = JSON.parse(writeFileSpy.mock.calls[0][1]);
+    const declaration = writtenContent.modules[0].declarations[0];
+    expect(declaration.demos).toEqual([
+      { url: 'src/components/my-component/usage/basic.md', description: 'Example' },
+    ]);
+  });
+
   it('includes CSS parts', async () => {
     const docsData: d.JsonDocs = {
       timestamp: 'test',
