@@ -3,6 +3,7 @@ import { NODE_NAMES, NODE_TYPES } from './constants';
 import { createCSSStyleDeclaration, MockCSSStyleDeclaration } from './css-style-declaration';
 import { attributeChanged, checkAttributeChanged, connectNode, disconnectNode } from './custom-element-registry';
 import { dataset } from './dataset';
+import { MockElementInternals } from './element-internals';
 import {
   addEventListener,
   dispatchEvent,
@@ -239,8 +240,6 @@ export class MockNodeList {
   }
 }
 
-type MockElementInternals = Record<keyof ElementInternals, null>;
-
 export class MockElement extends MockNode {
   __namespaceURI: string | null;
   __attributeMap: MockAttributeMap | null | undefined;
@@ -248,19 +247,7 @@ export class MockElement extends MockNode {
   __style: MockCSSStyleDeclaration | null | undefined;
 
   attachInternals(): MockElementInternals {
-    return new Proxy({} as unknown as MockElementInternals, {
-      get: function (_target, prop, _receiver) {
-        /**
-         * only print warning when running in a test environment
-         */
-        if ('process' in globalThis && globalThis.process.env.__STENCIL_SPEC_TESTS__) {
-          console.error(
-            `NOTE: Property ${String(prop)} was accessed on ElementInternals, but this property is not implemented.
-  Testing components with ElementInternals is fully supported in e2e tests.`,
-          );
-        }
-      },
-    });
+    return new MockElementInternals(this);
   }
 
   constructor(ownerDocument: any, nodeName: string | null, namespaceURI: string | null = null) {
