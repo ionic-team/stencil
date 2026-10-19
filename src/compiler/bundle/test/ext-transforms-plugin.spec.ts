@@ -1,6 +1,9 @@
 import { mockBuildCtx, mockCompilerCtx, mockModule, mockValidatedConfig } from '@stencil/core/testing';
 import { normalizePath } from '@utils';
 
+import type * as d from '../../../declarations';
+import { getDocsStyles } from '../../docs/generate-doc-data';
+import { generateMarkdown } from '../../docs/readme/output-docs';
 import * as importPathLib from '../../transformers/stencil-import-path';
 import { stubComponentCompilerMeta } from '../../types/tests/ComponentCompilerMeta.stub';
 import { BundleOptions } from '../bundle-interface';
@@ -100,6 +103,95 @@ describe('extTransformsPlugin', () => {
       expect(normalizePath(path)).toBe('./dist/collectionDir/foo.css');
 
       expect(css).toBe(':host { text: pink; }');
+    });
+
+    it('should replay cached style docs after a TypeScript-only rebuild', async () => {
+      const { plugin, buildCtx, cssText, transformCssToEsmSpy } = setup();
+      const styleDocs = [
+        { name: '--background', docs: 'Background color', annotation: 'prop' as const, mode: '$' },
+        { name: '--color', docs: 'Text color', annotation: 'prop' as const, mode: '$' },
+      ];
+      transformCssToEsmSpy.mockResolvedValue({
+        styleText: cssText,
+        output: cssText,
+        map: null,
+        diagnostics: [],
+        imports: [],
+        defaultVarName: 'foo',
+        styleDocs,
+      });
+
+      // The initial build transforms CSS and records its documentation in Rollup's module cache.
+      const transformCssModule = plugin.transform as (code: string, id: string) => Promise<unknown>;
+      const transformResult = await transformCssModule('asdf', '/some/stubbed/path/foo.css?tag=my-component');
+      const cachedMetadata = (transformResult as { meta: { styleDocs: typeof styleDocs } }).meta;
+
+      // A TypeScript-only rebuild creates fresh component metadata before Rollup reuses the cached CSS module.
+      const rebuiltComponent = stubComponentCompilerMeta({
+        tagName: 'my-component',
+        componentClassName: 'MyComponent',
+        styleDocs: [],
+      });
+      buildCtx.components = [rebuiltComponent];
+
+      const shouldTransformCachedModule = plugin.shouldTransformCachedModule as (options: {
+        ast: unknown;
+        code: string;
+        id: string;
+        meta: typeof cachedMetadata;
+        moduleSideEffects: boolean;
+        resolvedSources: Record<string, unknown>;
+        syntheticNamedExports: boolean;
+      }) => boolean | null;
+      const shouldTransform = shouldTransformCachedModule({
+        ast: undefined,
+        code: cssText,
+        id: '/some/stubbed/path/foo.css?tag=my-component',
+        meta: cachedMetadata,
+        moduleSideEffects: false,
+        resolvedSources: {},
+        syntheticNamedExports: false,
+      });
+
+      expect(shouldTransform).toBeNull();
+      expect(rebuiltComponent.styleDocs).toEqual(styleDocs);
+
+      const docsStyles = getDocsStyles(rebuiltComponent);
+      expect(docsStyles).toEqual([
+        { name: '--background', docs: 'Background color', annotation: 'prop', mode: undefined },
+        { name: '--color', docs: 'Text color', annotation: 'prop', mode: undefined },
+      ]);
+
+      const docsComponent: d.JsonDocsComponent = {
+        tag: 'my-component',
+        filePath: 'src/my-component.tsx',
+        fileName: 'my-component.tsx',
+        dirPath: 'src',
+        readmePath: 'src/readme.md',
+        usagesDir: 'src/usage',
+        encapsulation: 'none',
+        docs: '',
+        docsTags: [],
+        usage: {},
+        props: [],
+        methods: [],
+        events: [],
+        listeners: [],
+        styles: docsStyles,
+        slots: [],
+        parts: [],
+        dependents: [],
+        dependencies: [],
+        dependencyGraph: {},
+        customStates: [],
+        readme: '',
+      };
+      const readme = generateMarkdown('', docsComponent, [], { type: 'docs-readme', footer: '' });
+
+      expect(readme).toContain('`--background`');
+      expect(readme).toContain('Background color');
+      expect(readme).toContain('`--color`');
+      expect(readme).toContain('Text color');
     });
   });
 });
