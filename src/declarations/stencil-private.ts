@@ -300,6 +300,7 @@ export interface BuildStyleUpdate {
   styleTag: string;
   styleText: string;
   styleMode: string;
+  styleSourceMap?: string | string[];
 }
 
 export type BuildTask = any;
@@ -969,6 +970,7 @@ export interface ComponentConstructor {
   events?: ComponentConstructorEvent[];
   listeners?: ComponentConstructorListener[];
   style?: string;
+  sourceMap?: string | { [modeName: string]: string };
   styleId?: string;
   encapsulation?: ComponentConstructorEncapsulation;
   observedAttributes?: string[];
@@ -1390,7 +1392,7 @@ export type PluginTransformResults = PluginTransformationDescriptor | string | n
 
 export interface PluginTransformationDescriptor {
   code?: string;
-  map?: string;
+  map?: string | SourceMap;
   id?: string;
   diagnostics?: Diagnostic[];
   dependencies?: string[];
@@ -2157,6 +2159,7 @@ export interface StyleCompiler {
   styleId: string;
   styleStr: string;
   styleIdentifier: string;
+  sourceMapIdentifiers?: string[];
   externalStyles: ExternalStyleCompiler[];
 }
 
@@ -2221,6 +2224,7 @@ export interface TransformCssToEsmInput {
    */
   mode?: string;
   sourceMap?: boolean;
+  map?: SourceMap | string;
   minify?: boolean;
   docs?: boolean;
   autoprefixer?: any;
@@ -2231,6 +2235,8 @@ export interface TransformCssToEsmOutput {
   styleText: string;
   output: string;
   map: any;
+  styleMap?: SourceMap;
+  styleSourceMap?: string;
   diagnostics: Diagnostic[];
   defaultVarName: string;
   styleDocs: StyleDoc[];

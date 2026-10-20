@@ -4,7 +4,7 @@ import ts from 'typescript';
 
 import type * as d from '../../../declarations';
 import { getScopeId } from '../../style/scope-css';
-import { createStyleIdentifier } from '../add-static-style';
+import { createStyleIdentifier, createStyleSourceMapLiteral } from '../add-static-style';
 import { addTagTransformToCssTsAST, createStaticGetter } from '../transform-utils';
 
 export const addNativeStaticStyle = (
@@ -64,6 +64,10 @@ const addMultipleModeStyleGetter = (
   const styleObj = ts.factory.createObjectLiteralExpression(styleModes, true);
 
   classMembers.push(createStaticGetter('style', styleObj));
+  const sourceMapLiteral = createStyleSourceMapLiteral(cmp, buildCtx);
+  if (sourceMapLiteral) {
+    classMembers.push(createStaticGetter('sourceMap', sourceMapLiteral));
+  }
 };
 
 const addSingleStyleGetter = (
@@ -83,6 +87,10 @@ const addSingleStyleGetter = (
     // static get style() { return "string"; }
     const styleLiteral = createStyleLiteral(cmp, style, buildCtx);
     classMembers.push(createStaticGetter('style', styleLiteral));
+    const sourceMapLiteral = createStyleSourceMapLiteral(cmp, buildCtx);
+    if (sourceMapLiteral) {
+      classMembers.push(createStaticGetter('sourceMap', sourceMapLiteral));
+    }
   } else if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
     // import generated from @Component() styleUrls option
     // import myTagStyle from './import-path.css';

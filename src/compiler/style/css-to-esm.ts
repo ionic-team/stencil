@@ -6,6 +6,7 @@ import path from 'path';
 import type * as d from '../../declarations';
 import { parseStyleDocs } from '../docs/style-docs';
 import { optimizeCss } from '../optimize/optimize-css';
+import { createCssSourceMap } from '../optimize/minify-css';
 import { serializeImportPath } from '../transformers/stencil-import-path';
 import { getScopeId } from './scope-css';
 import { stripCssComments } from './style-utils';
@@ -68,7 +69,8 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput): Promis
     autoprefixer: input.autoprefixer,
     input: results.styleText,
     filePath: input.file,
-    minify: true,
+    map: input.map,
+    minify: input.minify !== false,
     sourceMap: input.sourceMap,
   });
 
@@ -77,6 +79,7 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput): Promis
     return results;
   }
   results.styleText = optimizeResults.output;
+  results.styleMap = optimizeResults.map;
 
   return generateTransformCssToEsm(input, results);
 };
@@ -148,6 +151,10 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
     catchError(results.diagnostics, e);
   }
 
+  if (input.sourceMap) {
+    results.styleMap = createCssSourceMap(results.styleText, results.styleText, input.file || 'input.css');
+  }
+
   return results;
 };
 
@@ -164,6 +171,7 @@ const generateTransformCssToEsm = (
   results: d.TransformCssToEsmOutput,
 ): d.TransformCssToEsmOutput => {
   const s = new MagicString('');
+  results.styleSourceMap = results.styleMap ? sourceMapToDataUrl(results.styleMap) : undefined;
 
   // Escape backslashes first so the escape sequences added below are not
   // re-escaped afterwards. Escaping backslashes last would turn the
@@ -211,6 +219,9 @@ const generateTransformCssToEsm = (
 
     s.append(`\`${results.styleText}\`;\n`);
     s.append(`module.exports = ${results.defaultVarName};`);
+    if (input.sourceMap) {
+      s.append(`\nmodule.exports.sourceMap = ${JSON.stringify(results.styleSourceMap)};`);
+    }
   } else {
     // ESM
     if (input.addTagTransformers) {
@@ -228,11 +239,17 @@ const generateTransformCssToEsm = (
 
     s.append(`\`${results.styleText}\`;\n`);
     s.append(`export default ${results.defaultVarName};`);
+    if (input.sourceMap) {
+      s.append(`\nexport const sourceMap = ${JSON.stringify(results.styleSourceMap)};`);
+    }
   }
 
   results.output = s.toString();
   return results;
 };
+
+const sourceMapToDataUrl = (sourceMap: d.SourceMap) =>
+  `data:application/json;charset=utf-8;base64,${Buffer.from(JSON.stringify(sourceMap)).toString('base64')}`;
 
 /**
  * Get all of the CSS imports in a file

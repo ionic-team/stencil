@@ -116,6 +116,25 @@ describe('add-static-style', () => {
       expect(output).toContain('md: MyComponentMdStyle0');
     });
 
+    it('should expose a CSS source map getter for external style URLs', () => {
+      const classMembers: ts.ClassElement[] = [];
+      (buildCtx.config as any).sourceMapCss = true;
+      mockComponent.styles = [
+        {
+          modeName: 'md',
+          externalStyles: [{ absolutePath: '/path/to/style.css' }],
+        } as d.StyleCompiler,
+      ];
+
+      addStaticStyleGetterWithinClass(classMembers, mockComponent, buildCtx);
+
+      const output = classMembers
+        .map((member) => printer.printNode(ts.EmitHint.Unspecified, member, sourceFile))
+        .join('\n');
+      expect(output).toContain('static get sourceMap()');
+      expect(output).toContain('MyComponentMdStyleSourceMap0');
+    });
+
     it('should add static style getter for direct style identifier', () => {
       const classMembers: ts.ClassElement[] = [];
       mockComponent.styles = [

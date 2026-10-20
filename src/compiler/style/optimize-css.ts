@@ -11,6 +11,8 @@ export const optimizeCss = async (
   // TODO(STENCIL-1076): Investigate removing this parameter, which appears to be unused. This function is exported by
   // the compiler, making this a breaking change should we remove it.
   filePath: string,
+  returnMap = false,
+  map?: d.SourceMap | string,
 ) => {
   if (typeof styleText !== 'string' || !styleText.length) {
     //  don't bother with invalid data
@@ -31,6 +33,8 @@ export const optimizeCss = async (
     filePath: filePath,
     autoprefixer: config.autoprefixCss,
     minify: config.minifyCss,
+    map,
+    sourceMap: config.sourceMapCss,
   };
 
   const cacheKey = await compilerCtx.cache.createKey('optimizeCss', optimizeCssId, opts);
@@ -52,7 +56,7 @@ export const optimizeCss = async (
     // only cache if we got a cache key, if not it probably has an @import
     await compilerCtx.cache.put(cacheKey, minifyResults.output);
 
-    return minifyResults.output;
+    return returnMap ? minifyResults : minifyResults.output;
   }
 
   return styleText;

@@ -25,6 +25,10 @@ export const addStaticStyleGetterWithinClass = (
   const styleLiteral = getStyleLiteral(cmp, buildCtx);
   if (styleLiteral) {
     classMembers.push(createStaticGetter('style', styleLiteral));
+    const sourceMapLiteral = createStyleSourceMapLiteral(cmp, buildCtx);
+    if (sourceMapLiteral) {
+      classMembers.push(createStaticGetter('sourceMap', sourceMapLiteral));
+    }
   }
 };
 
@@ -53,7 +57,50 @@ export const addStaticStylePropertyToClass = (
       ),
     );
     styleStatements.push(statement);
+
+    const sourceMapLiteral = createStyleSourceMapLiteral(cmp, buildCtx);
+    if (sourceMapLiteral) {
+      styleStatements.push(
+        ts.factory.createExpressionStatement(
+          ts.factory.createAssignment(
+            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier(cmp.componentClassName), 'sourceMap'),
+            sourceMapLiteral,
+          ),
+        ),
+      );
+    }
   }
+};
+
+export const createStyleSourceMapLiteral = (cmp: d.ComponentCompilerMeta, buildCtx: d.BuildCtx) => {
+  if (!buildCtx.config.sourceMapCss) {
+    return null;
+  }
+
+  const sourceMapModes: ts.ObjectLiteralElementLike[] = [];
+  cmp.styles.forEach((style) => {
+    if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
+      if (typeof style.styleIdentifier !== 'string') {
+        createStyleIdentifier(cmp, style);
+      }
+      const identifiers = style.sourceMapIdentifiers || [];
+      const value =
+        identifiers.length === 1
+          ? ts.factory.createIdentifier(identifiers[0])
+          : ts.factory.createArrayLiteralExpression(
+              identifiers.map((identifier) => ts.factory.createIdentifier(identifier)),
+            );
+      sourceMapModes.push(ts.factory.createPropertyAssignment(style.modeName, value));
+    }
+  });
+
+  if (sourceMapModes.length === 0) {
+    return null;
+  }
+  if (sourceMapModes.length === 1 && cmp.styles.length === 1 && cmp.styles[0].modeName === DEFAULT_STYLE_MODE) {
+    return (sourceMapModes[0] as ts.PropertyAssignment).initializer;
+  }
+  return ts.factory.createObjectLiteralExpression(sourceMapModes, true);
 };
 
 const getStyleLiteral = (cmp: d.ComponentCompilerMeta, buildCtx: d.BuildCtx) => {
@@ -175,6 +222,9 @@ export const createStyleIdentifier = (cmp: d.ComponentCompilerMeta, style: d.Sty
     style.styleIdentifier += dashToPascalCase(style.modeName);
   }
   style.styleIdentifier += 'Style';
+  style.sourceMapIdentifiers = Object.keys(externalStyles).map(
+    (externalStyleId) => `${style.styleIdentifier}SourceMap${externalStyleId}`,
+  );
   return createIdentifierFromStyleIdentifier(style.styleIdentifier, Object.keys(externalStyles));
 };
 

@@ -28,7 +28,7 @@ export const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMa
  * @param cssText styles for the component of interest
  * @param allowCS whether or not to use a constructable stylesheet
  */
-export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean) => {
+export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean, sourceMap?: string | string[]) => {
   let style = styles.get(scopeId);
   if (supportsConstructableStylesheets && allowCS) {
     style = (style || new CSSStyleSheet()) as CSSStyleSheet;
@@ -38,9 +38,18 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
       style.replaceSync(cssText);
     }
   } else {
-    style = cssText;
+    style = appendStyleSourceMap(cssText, sourceMap);
   }
   styles.set(scopeId, style);
+};
+
+export const appendStyleSourceMap = (styleText: string, sourceMap?: string | string[]) => {
+  const withoutSourceMap = styleText.replace(/\s*\/\*[#@]\s*sourceMappingURL=[^*]*\*\/\s*$/i, '');
+  if (!sourceMap) {
+    return withoutSourceMap;
+  }
+  const sourceMaps = Array.isArray(sourceMap) ? sourceMap : [sourceMap];
+  return `${withoutSourceMap}${sourceMaps.map((map) => `\n/*# sourceMappingURL=${map} */`).join('')}`;
 };
 
 /**

@@ -43,6 +43,7 @@ const buildGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.Compi
     if (transformResults) {
       let cssCode: string;
       let dependencies: string[] | undefined;
+      let transformMap: d.SourceMap | string | undefined;
 
       if (typeof transformResults === 'string') {
         // Handle case where transformResults is a string (the CSS code directly)
@@ -52,13 +53,26 @@ const buildGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.Compi
         // Handle case where transformResults is a PluginTransformationDescriptor object
         cssCode = transformResults.code;
         dependencies = transformResults.dependencies;
+        transformMap = transformResults.map;
       } else {
         // Invalid transformResults
         compilerCtx.cachedGlobalStyle = null;
         return null;
       }
 
-      const optimizedCss = await optimizeCss(config, compilerCtx, buildCtx.diagnostics, cssCode, globalStylePath);
+      const optimizedResult = await optimizeCss(
+        config,
+        compilerCtx,
+        buildCtx.diagnostics,
+        cssCode,
+        globalStylePath,
+        true,
+        transformMap,
+      );
+      const optimizedCss =
+        typeof optimizedResult === 'string'
+          ? optimizedResult
+          : appendSourceMap(optimizedResult.output, optimizedResult.map);
       compilerCtx.cachedGlobalStyle = optimizedCss;
 
       if (Array.isArray(dependencies)) {
@@ -90,6 +104,14 @@ const buildGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.Compi
 
   compilerCtx.cachedGlobalStyle = null;
   return null;
+};
+
+const appendSourceMap = (css: string, sourceMap?: d.SourceMap) => {
+  if (!sourceMap) {
+    return css;
+  }
+  const sourceMapUrl = `data:application/json;charset=utf-8;base64,${Buffer.from(JSON.stringify(sourceMap)).toString('base64')}`;
+  return `${css}\n/*# sourceMappingURL=${sourceMapUrl} */`;
 };
 
 const canSkipGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {

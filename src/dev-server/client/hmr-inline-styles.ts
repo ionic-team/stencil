@@ -39,8 +39,17 @@ const hmrStyleElement = (elm: Element, versionId: string, stylesUpdated: HmrStyl
   if (styleId === stylesUpdated.styleId && stylesUpdated.styleText) {
     // if we made it this far then it's a match!
     // update the new style text
-    elm.innerHTML = stylesUpdated.styleText.replace(/\\n/g, '\n');
+    elm.innerHTML = appendStyleSourceMap(stylesUpdated.styleText.replace(/\\n/g, '\n'), stylesUpdated.styleSourceMap);
     // TODO(STENCIL-958): determine if we need to set this attribute
     elm.setAttribute('data-hmr', versionId);
   }
+};
+
+const appendStyleSourceMap = (styleText: string, sourceMap?: string | string[]) => {
+  const withoutSourceMap = styleText.replace(/\s*\/\*[#@]\s*sourceMappingURL=[^*]*\*\/\s*$/i, '');
+  if (!sourceMap) {
+    return withoutSourceMap;
+  }
+  const sourceMaps = Array.isArray(sourceMap) ? sourceMap : [sourceMap];
+  return `${withoutSourceMap}${sourceMaps.map((map) => `\n/*# sourceMappingURL=${map} */`).join('')}`;
 };

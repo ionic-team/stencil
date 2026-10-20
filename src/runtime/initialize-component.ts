@@ -139,6 +139,7 @@ export const initializeComponent = async (
          * this component has styles but we haven't registered them yet
          */
         let style: string | undefined;
+        let sourceMap: string | string[] | undefined;
 
         if (typeof Cstr.style === 'string') {
           /**
@@ -151,6 +152,7 @@ export const initializeComponent = async (
            * ```
            */
           style = Cstr.style;
+          sourceMap = typeof Cstr.sourceMap === 'string' || Array.isArray(Cstr.sourceMap) ? Cstr.sourceMap : undefined;
         } else if (BUILD.mode && typeof Cstr.style !== 'string') {
           /**
            * in case the component has a `styleUrl` object defined, e.g.
@@ -167,6 +169,8 @@ export const initializeComponent = async (
           hostRef.$modeName$ = computeMode(elm) as string | undefined;
           if (hostRef.$modeName$) {
             style = Cstr.style[hostRef.$modeName$];
+            sourceMap =
+              Cstr.sourceMap && typeof Cstr.sourceMap !== 'string' ? Cstr.sourceMap[hostRef.$modeName$] : undefined;
           }
 
           if (BUILD.hydrateServerSide && hostRef.$modeName$) {
@@ -185,7 +189,7 @@ export const initializeComponent = async (
               style = expandPartSelectors(style);
             }
           }
-          registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation));
+          registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation), sourceMap);
           endRegisterStyles();
         }
       }

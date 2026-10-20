@@ -331,8 +331,14 @@ describe('transformCssToEsm', () => {
 
       const result = await transformCssToEsm(mockInput);
 
-      // Source map handling is done in optimization phase
-      expect(result.map).toBeNull(); // Before optimization
+      expect(result.styleMap).toEqual(
+        expect.objectContaining({
+          version: 3,
+          sources: [mockInput.file],
+        }),
+      );
+      expect(result.output).toContain('sourceMap');
+      expect(result.output).not.toContain('/*# sourceMappingURL=');
     });
   });
 

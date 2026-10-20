@@ -101,5 +101,38 @@ describe('extTransformsPlugin', () => {
 
       expect(css).toBe(':host { text: pink; }');
     });
+
+    it('should pass the CSS source-map setting and plugin map to the CSS transform', async () => {
+      const { plugin, config, transformCssToEsmSpy } = setup();
+      const map = {
+        version: 3,
+        file: '/some/stubbed/path/foo.css',
+        names: [] as string[],
+        mappings: 'AAAA',
+        sources: ['/some/stubbed/path/foo.scss'],
+        sourcesContent: [':host { text: pink; }'],
+      };
+
+      config.sourceMap = { css: true, js: false } as any;
+      (config as any).sourceMapCss = true;
+      config.plugins = [
+        {
+          transform: () => ({
+            code: ':host { text: pink; }',
+            map: JSON.stringify(map),
+          }),
+        },
+      ];
+
+      // @ts-ignore the Rollup plugins expect to be called in a Rollup context
+      await plugin.transform('asdf', '/some/stubbed/path/foo.css?tag=my-component');
+
+      expect(transformCssToEsmSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          sourceMap: true,
+          map,
+        }),
+      );
+    });
   });
 });

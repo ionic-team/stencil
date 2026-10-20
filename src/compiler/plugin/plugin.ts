@@ -98,6 +98,7 @@ export const runPluginTransforms = async (
   const transformResults = {
     code: sourceText,
     id: id,
+    map: undefined as string | d.SourceMap | undefined,
     dependencies: [] as string[],
   } satisfies PluginTransformResults;
 
@@ -150,6 +151,12 @@ export const runPluginTransforms = async (
               }
               if (isString(pluginTransformResults.id)) {
                 transformResults.id = pluginTransformResults.id;
+              }
+              if (pluginTransformResults.map != null) {
+                transformResults.map =
+                  typeof pluginTransformResults.map === 'string'
+                    ? JSON.parse(pluginTransformResults.map)
+                    : pluginTransformResults.map;
               }
 
               /**
@@ -227,7 +234,7 @@ export const runPluginTransformsEsmImports = async (
   const transformResults = {
     code,
     id,
-    map: undefined as string | undefined,
+    map: undefined as string | d.SourceMap | undefined,
     diagnostics: [] as d.Diagnostic[],
     dependencies: [] as string[],
   } satisfies PluginTransformResults;
@@ -265,6 +272,12 @@ export const runPluginTransformsEsmImports = async (
               }
               if (isString(pluginTransformResults.id)) {
                 transformResults.id = pluginTransformResults.id;
+              }
+              if (pluginTransformResults.map != null) {
+                transformResults.map =
+                  typeof pluginTransformResults.map === 'string'
+                    ? JSON.parse(pluginTransformResults.map)
+                    : pluginTransformResults.map;
               }
               if (Array.isArray(pluginTransformResults.dependencies)) {
                 const imports = pluginTransformResults.dependencies.filter(

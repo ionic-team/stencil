@@ -16,7 +16,12 @@ let cssProcessor: CssProcessor;
  * @param opts an optional param with options for Autoprefixer
  * @returns a Promise wrapping some prefixed CSS as well as diagnostics
  */
-export const autoprefixCss = async (cssText: string, opts: boolean | null | d.AutoprefixerOptions) => {
+export const autoprefixCss = async (
+  cssText: string,
+  opts: boolean | null | d.AutoprefixerOptions,
+  sourceMap?: d.SourceMap | string,
+  filePath?: string,
+) => {
   const output: d.OptimizeCssOutput = {
     output: cssText,
     diagnostics: [],
@@ -26,7 +31,16 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
     const autoprefixerOpts = opts != null && typeof opts === 'object' ? opts : DEFAULT_AUTOPREFIX_OPTIONS;
 
     const processor = getProcessor(autoprefixerOpts);
-    const result = await processor.process(cssText, { map: null });
+    const result = await processor.process(cssText, {
+      from: filePath,
+      map: sourceMap
+        ? {
+            annotation: false,
+            inline: false,
+            prev: sourceMap,
+          }
+        : null,
+    });
 
     result.warnings().forEach((warning: any) => {
       output.diagnostics.push({
@@ -39,6 +53,9 @@ export const autoprefixCss = async (cssText: string, opts: boolean | null | d.Au
     });
 
     output.output = result.css;
+    if (result.map) {
+      output.map = result.map.toJSON();
+    }
   } catch (e: any) {
     const diagnostic: d.Diagnostic = {
       header: `Autoprefix CSS`,

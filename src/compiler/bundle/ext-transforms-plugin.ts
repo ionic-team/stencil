@@ -128,7 +128,8 @@ export const extTransformsPlugin = (
           addTagTransformers: !!buildCtx.config.extras.additionalTagTransformers,
           encapsulation: data.encapsulation,
           mode: data.mode,
-          sourceMap: config.sourceMap,
+          sourceMap: config.sourceMapCss,
+          map: pluginTransforms.map,
           minify: config.minifyCss,
           autoprefixer: config.autoprefixCss,
           docs: config.buildDocs,
@@ -199,6 +200,7 @@ export const extTransformsPlugin = (
             styleTag: data.tag,
             styleMode: data.mode,
             styleText,
+            styleSourceMap: cssTransformResults.styleSourceMap,
           });
         }
 

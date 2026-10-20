@@ -175,13 +175,25 @@ const createStyleImport = <ModuleType extends 'esm' | 'cjs'>(
      */
     const styleIdentifier = `${style.styleIdentifier}${i}`;
     const importIdentifier = ts.factory.createIdentifier(styleIdentifier);
+    const sourceMapIdentifier = `${style.styleIdentifier}SourceMap${i}`;
+    style.sourceMapIdentifiers ||= [];
+    style.sourceMapIdentifiers[Number(i)] = sourceMapIdentifier;
     const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, externalStyle);
 
     if (moduleType === 'esm') {
+      const namedBindings = transformOpts.sourceMapCss
+        ? ts.factory.createNamedImports([
+            ts.factory.createImportSpecifier(
+              false,
+              ts.factory.createIdentifier('sourceMap'),
+              ts.factory.createIdentifier(sourceMapIdentifier),
+            ),
+          ])
+        : undefined;
       imports.push(
         ts.factory.createImportDeclaration(
           undefined,
-          ts.factory.createImportClause(false, importIdentifier, undefined),
+          ts.factory.createImportClause(false, importIdentifier, namedBindings),
           ts.factory.createStringLiteral(importPath),
         ) as ImportDeclarationOrVariableStatementType,
       );
@@ -206,6 +218,24 @@ const createStyleImport = <ModuleType extends 'esm' | 'cjs'>(
           ),
         ) as ImportDeclarationOrVariableStatementType,
       );
+      if (transformOpts.sourceMapCss) {
+        imports.push(
+          ts.factory.createVariableStatement(
+            undefined,
+            ts.factory.createVariableDeclarationList(
+              [
+                ts.factory.createVariableDeclaration(
+                  ts.factory.createIdentifier(sourceMapIdentifier),
+                  undefined,
+                  undefined,
+                  ts.factory.createPropertyAccessExpression(importIdentifier, 'sourceMap'),
+                ),
+              ],
+              ts.NodeFlags.Const,
+            ),
+          ) as ImportDeclarationOrVariableStatementType,
+        );
+      }
     } else {
       throw new Error(`Invalid module type: ${moduleType}`);
     }
