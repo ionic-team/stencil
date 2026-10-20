@@ -29,4 +29,24 @@ describe('style source maps', () => {
       '.button{color:red}\n/*# sourceMappingURL=data:application/json;base64,BBBB */',
     );
   });
+
+  it('combines source maps for concatenated CSS styles into one index map', () => {
+    const firstMap = JSON.stringify({ version: 3, sources: ['first.scss'], names: [], mappings: 'AAAA' });
+    const secondMap = JSON.stringify({ version: 3, sources: ['second.scss'], names: [], mappings: 'AAAA' });
+    const firstMapUrl = `data:application/json;base64,${Buffer.from(firstMap).toString('base64')}`;
+    const secondMapUrl = `data:application/json;base64,${Buffer.from(secondMap).toString('base64')}`;
+
+    const output = appendStyleSourceMap('abcde', [
+      { map: firstMapUrl, length: 3 },
+      { map: secondMapUrl, length: 2 },
+    ]);
+    const sourceMapUrl = output.match(/sourceMappingURL=(.*?) \*\//)?.[1];
+
+    expect(sourceMapUrl).toContain('data:application/json,');
+    const sourceMap = JSON.parse(decodeURIComponent(sourceMapUrl!.split(',')[1]));
+    expect(sourceMap.sections).toEqual([
+      expect.objectContaining({ offset: { line: 0, column: 0 } }),
+      expect.objectContaining({ offset: { line: 0, column: 3 } }),
+    ]);
+  });
 });

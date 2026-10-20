@@ -29,7 +29,12 @@ export const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMa
  * @param allowCS whether or not to use a constructable stylesheet
  * @param sourceMap an optional CSS source map data URL
  */
-export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean, sourceMap?: string | string[]) => {
+export const registerStyle = (
+  scopeId: string,
+  cssText: string,
+  allowCS: boolean,
+  sourceMap?: d.StyleSourceMap | d.StyleSourceMap[],
+) => {
   let style = styles.get(scopeId);
   const styleText = appendStyleSourceMap(cssText, sourceMap);
   if (supportsConstructableStylesheets && allowCS) {
@@ -45,13 +50,52 @@ export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean
   styles.set(scopeId, style);
 };
 
-export const appendStyleSourceMap = (styleText: string, sourceMap?: string | string[]) => {
+export const appendStyleSourceMap = (styleText: string, sourceMap?: d.StyleSourceMap | d.StyleSourceMap[]) => {
   const withoutSourceMap = styleText.replace(/\s*\/\*[#@]\s*sourceMappingURL=[^*]*\*\/\s*$/i, '');
   if (!sourceMap) {
     return withoutSourceMap;
   }
   const sourceMaps = Array.isArray(sourceMap) ? sourceMap : [sourceMap];
-  return `${withoutSourceMap}${sourceMaps.map((map) => `\n/*# sourceMappingURL=${map} */`).join('')}`;
+  const indexMap = createStyleSourceMapIndex(sourceMaps);
+  if (indexMap) {
+    return `${withoutSourceMap}\n/*# sourceMappingURL=${indexMap} */`;
+  }
+  return `${withoutSourceMap}${sourceMaps
+    .map((map) => `\n/*# sourceMappingURL=${typeof map === 'string' ? map : map.map} */`)
+    .join('')}`;
+};
+
+const createStyleSourceMapIndex = (sourceMaps: d.StyleSourceMap[]) => {
+  if (sourceMaps.length < 2 || sourceMaps.some((sourceMap) => typeof sourceMap === 'string')) {
+    return null;
+  }
+
+  const sections = [];
+  let column = 0;
+  for (const sourceMap of sourceMaps) {
+    const map = decodeInlineSourceMap((sourceMap as d.StyleSourceMapSegment).map);
+    if (!map) {
+      return null;
+    }
+    sections.push({ offset: { line: 0, column }, map });
+    column += (sourceMap as d.StyleSourceMapSegment).length;
+  }
+
+  return `data:application/json,${encodeURIComponent(JSON.stringify({ version: 3, sections }))}`;
+};
+
+const decodeInlineSourceMap = (sourceMap: string) => {
+  const match = sourceMap.match(/^data:application\/json[^,]*,(.*)$/i);
+  if (!match) {
+    return null;
+  }
+  try {
+    const encoded = match[1];
+    const header = match[0].slice(0, match[0].indexOf(','));
+    return JSON.parse(/;base64/i.test(header) ? atob(encoded) : decodeURIComponent(encoded));
+  } catch (e) {
+    return null;
+  }
 };
 
 /**

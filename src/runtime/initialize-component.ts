@@ -139,7 +139,7 @@ export const initializeComponent = async (
          * this component has styles but we haven't registered them yet
          */
         let style: string | undefined;
-        let sourceMap: string | string[] | undefined;
+        let sourceMap: d.StyleSourceMap | d.StyleSourceMap[] | undefined;
 
         if (typeof Cstr.style === 'string') {
           /**
@@ -152,7 +152,13 @@ export const initializeComponent = async (
            * ```
            */
           style = Cstr.style;
-          sourceMap = typeof Cstr.sourceMap === 'string' || Array.isArray(Cstr.sourceMap) ? Cstr.sourceMap : undefined;
+          if (
+            typeof Cstr.sourceMap === 'string' ||
+            Array.isArray(Cstr.sourceMap) ||
+            (Cstr.sourceMap && typeof Cstr.sourceMap === 'object' && 'map' in Cstr.sourceMap)
+          ) {
+            sourceMap = Cstr.sourceMap as d.StyleSourceMap | d.StyleSourceMap[];
+          }
         } else if (BUILD.mode && typeof Cstr.style !== 'string') {
           /**
            * in case the component has a `styleUrl` object defined, e.g.
@@ -169,8 +175,14 @@ export const initializeComponent = async (
           hostRef.$modeName$ = computeMode(elm) as string | undefined;
           if (hostRef.$modeName$) {
             style = Cstr.style[hostRef.$modeName$];
+            const modeSourceMaps = Cstr.sourceMap;
             sourceMap =
-              Cstr.sourceMap && typeof Cstr.sourceMap !== 'string' ? Cstr.sourceMap[hostRef.$modeName$] : undefined;
+              modeSourceMaps &&
+              typeof modeSourceMaps === 'object' &&
+              !Array.isArray(modeSourceMaps) &&
+              !('map' in modeSourceMaps)
+                ? modeSourceMaps[hostRef.$modeName$]
+                : undefined;
           }
 
           if (BUILD.hydrateServerSide && hostRef.$modeName$) {

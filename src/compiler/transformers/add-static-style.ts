@@ -86,11 +86,24 @@ export const createStyleSourceMapLiteral = (cmp: d.ComponentCompilerMeta, buildC
         createStyleIdentifier(cmp, style);
       }
       const identifiers = style.sourceMapIdentifiers || [];
+      const externalStyleIds = Object.keys(getExternalStyles(style));
       const value =
         identifiers.length === 1
           ? ts.factory.createIdentifier(identifiers[0])
           : ts.factory.createArrayLiteralExpression(
-              identifiers.map((identifier) => ts.factory.createIdentifier(identifier)),
+              identifiers.map((identifier, index) =>
+                ts.factory.createObjectLiteralExpression([
+                  ts.factory.createPropertyAssignment('map', ts.factory.createIdentifier(identifier)),
+                  ts.factory.createPropertyAssignment(
+                    'length',
+                    ts.factory.createCallExpression(
+                      ts.factory.createIdentifier(`${style.styleIdentifier}${externalStyleIds[index]}`),
+                      undefined,
+                      [],
+                    ),
+                  ),
+                ]),
+              ),
             );
       sourceMapModes.push(ts.factory.createPropertyAssignment(style.modeName, value));
     } else if (typeof style.styleIdentifier === 'string') {

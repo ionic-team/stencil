@@ -970,7 +970,7 @@ export interface ComponentConstructor {
   events?: ComponentConstructorEvent[];
   listeners?: ComponentConstructorListener[];
   style?: string;
-  sourceMap?: string | { [modeName: string]: string };
+  sourceMap?: StyleSourceMap | StyleSourceMap[] | { [modeName: string]: StyleSourceMap | StyleSourceMap[] };
   styleId?: string;
   encapsulation?: ComponentConstructorEncapsulation;
   observedAttributes?: string[];
@@ -980,6 +980,13 @@ export interface ComponentConstructor {
   serializers?: ComponentConstructorChangeHandlers;
   deserializers?: ComponentConstructorChangeHandlers;
 }
+
+export interface StyleSourceMapSegment {
+  map: string;
+  length: number;
+}
+
+export type StyleSourceMap = string | StyleSourceMapSegment;
 
 /**
  * A mapping from class member names to a list of methods which are watching
