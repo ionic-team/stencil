@@ -135,4 +135,34 @@ describe('initializeClientHydrate', () => {
     const inner = wrapElm.querySelector('.inner');
     expect(inner?.hasAttribute('hidden')).toBe(false);
   });
+
+  it('does not collect a serialized slot fallback from a foreign host', () => {
+    const hostElm = document.createElement('cmp-host') as d.HostElement;
+    hostElm.innerHTML = `
+      <!--r.1-->
+      <!--s.1.0.0.0.named-->
+      <slot-fb c-id="2.0.0.0" s-sn="named"></slot-fb>
+    `;
+    const foreignFallback = hostElm.querySelector('slot-fb') as d.RenderNode;
+    const hostRef: d.HostRef = { $flags$: 0 };
+
+    initializeClientHydrate(hostElm, 'cmp-host', '1', hostRef);
+
+    expect(foreignFallback['s-sn']).toBeUndefined();
+  });
+
+  it('does not let a serialized slot name override an explicit slot attribute', () => {
+    const hostElm = document.createElement('cmp-host') as d.HostElement;
+    hostElm.innerHTML = `
+      <!--r.1-->
+      <!--s.1.0.0.0.named-->
+      <div c-id="2.0.0.0" s-sn="named" slot="explicit"></div>
+    `;
+    const explicitlySlotted = hostElm.querySelector('div') as d.RenderNode;
+    const hostRef: d.HostRef = { $flags$: 0 };
+
+    initializeClientHydrate(hostElm, 'cmp-host', '1', hostRef);
+
+    expect(explicitlySlotted['s-sn']).toBeUndefined();
+  });
 });
