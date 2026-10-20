@@ -1,6 +1,6 @@
+import { SourceMapGenerator } from '@jridgewell/source-map';
 import { hasError, isFunction, isString } from '@utils';
 import sourceMapMerge from 'merge-source-map';
-import { SourceMapGenerator } from '@jridgewell/source-map';
 
 import type * as d from '../../declarations';
 import { CssNode, CssNodeType } from '../style/css-parser/css-parse-declarations';
@@ -69,8 +69,9 @@ export const createCssSourceMap = (input: string, output: string, sourceFile = '
     const originalIndex = inputIndex === -1 ? Math.min(searchFrom, input.length - 1) : inputIndex;
     searchFrom = Math.max(searchFrom, originalIndex + token.length);
     const original = getLineAndColumn(input, originalIndex);
+    const generated = getLineAndColumn(output, match.index);
     generator.addMapping({
-      generated: { line: 1, column: match.index },
+      generated,
       original,
       source: sourceFile,
       name: '',

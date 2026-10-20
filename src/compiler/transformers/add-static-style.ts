@@ -16,6 +16,7 @@ import { addTagTransformToCssTsAST, createStaticGetter, getExternalStyles } from
  * @param classMembers a class to existing members of a class. **this parameter will be mutated** rather than returning
  * a cloned version
  * @param cmp the metadata associated with the component being evaluated
+ * @param buildCtx the current build context
  */
 export const addStaticStyleGetterWithinClass = (
   classMembers: ts.ClassElement[],
@@ -42,6 +43,7 @@ export const addStaticStyleGetterWithinClass = (
  *
  * @param styleStatements a list of statements containing style assignments to a class
  * @param cmp the metadata associated with the component being evaluated
+ * @param buildCtx the current build context
  */
 export const addStaticStylePropertyToClass = (
   styleStatements: ts.Statement[],
@@ -91,6 +93,12 @@ export const createStyleSourceMapLiteral = (cmp: d.ComponentCompilerMeta, buildC
               identifiers.map((identifier) => ts.factory.createIdentifier(identifier)),
             );
       sourceMapModes.push(ts.factory.createPropertyAssignment(style.modeName, value));
+    } else if (typeof style.styleIdentifier === 'string') {
+      const sourceMapIdentifier = `${style.styleIdentifier}SourceMap`;
+      style.sourceMapIdentifiers = [sourceMapIdentifier];
+      sourceMapModes.push(
+        ts.factory.createPropertyAssignment(style.modeName, ts.factory.createIdentifier(sourceMapIdentifier)),
+      );
     }
   });
 

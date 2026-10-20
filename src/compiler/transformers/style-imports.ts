@@ -108,11 +108,14 @@ const updateEsmStyleImportPath = (
       if (n.importClause.name && n.importClause.name.escapedText === style.styleIdentifier) {
         const orgImportPath = n.moduleSpecifier.text;
         const importPath = getStyleImportPath(transformOpts, tsSourceFile, cmp, style, orgImportPath);
+        const namedBindings = transformOpts.sourceMapCss
+          ? addStyleSourceMapImport(n.importClause.namedBindings, style)
+          : n.importClause.namedBindings;
 
         statements[i] = ts.factory.updateImportDeclaration(
           n,
           retrieveTsModifiers(n),
-          n.importClause,
+          ts.factory.updateImportClause(n.importClause, false, n.importClause.name, namedBindings),
           ts.factory.createStringLiteral(importPath),
           undefined,
         );
@@ -121,6 +124,21 @@ const updateEsmStyleImportPath = (
     }
   }
   return statements;
+};
+
+const addStyleSourceMapImport = (namedBindings: ts.NamedImportBindings | undefined, style: d.StyleCompiler) => {
+  const sourceMapIdentifier = `${style.styleIdentifier}SourceMap`;
+  style.sourceMapIdentifiers = [sourceMapIdentifier];
+  const sourceMapImport = ts.factory.createImportSpecifier(
+    false,
+    ts.factory.createIdentifier('sourceMap'),
+    ts.factory.createIdentifier(sourceMapIdentifier),
+  );
+
+  if (namedBindings && ts.isNamedImports(namedBindings)) {
+    return ts.factory.updateNamedImports(namedBindings, [...namedBindings.elements, sourceMapImport]);
+  }
+  return ts.factory.createNamedImports([sourceMapImport]);
 };
 
 /**

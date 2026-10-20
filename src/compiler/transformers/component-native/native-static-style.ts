@@ -97,12 +97,20 @@ const addSingleStyleGetter = (
     // static get style() { return myTagStyle; }
     const styleUrlIdentifier = createStyleIdentifier(cmp, style);
     classMembers.push(createStaticGetter('style', styleUrlIdentifier));
+    const sourceMapLiteral = createStyleSourceMapLiteral(cmp, buildCtx);
+    if (sourceMapLiteral) {
+      classMembers.push(createStaticGetter('sourceMap', sourceMapLiteral));
+    }
   } else if (typeof style.styleIdentifier === 'string') {
     // direct import already written in the source code
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
     const styleIdentifier = ts.factory.createIdentifier(style.styleIdentifier);
     classMembers.push(createStaticGetter('style', styleIdentifier));
+    const sourceMapLiteral = createStyleSourceMapLiteral(cmp, buildCtx);
+    if (sourceMapLiteral) {
+      classMembers.push(createStaticGetter('sourceMap', sourceMapLiteral));
+    }
   }
 };
 

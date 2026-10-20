@@ -19,7 +19,7 @@ export const optimizeCss = async (
     return styleText;
   }
 
-  if ((config.autoprefixCss === false || config.autoprefixCss === null) && !config.minifyCss) {
+  if ((config.autoprefixCss === false || config.autoprefixCss === null) && !config.minifyCss && !config.sourceMapCss) {
     // don't wanna autoprefix or minify, so just skip this
     return styleText;
   }
@@ -41,6 +41,14 @@ export const optimizeCss = async (
   const cachedContent = await compilerCtx.cache.get(cacheKey);
   if (cachedContent != null) {
     // let's use the cached data we already figured out
+    if (returnMap && config.sourceMapCss) {
+      const cachedMap = await compilerCtx.cache.get(cacheKey + 'Map');
+      return {
+        output: cachedContent,
+        diagnostics: [],
+        map: cachedMap ? JSON.parse(cachedMap) : undefined,
+      };
+    }
     return cachedContent;
   }
 
@@ -55,6 +63,9 @@ export const optimizeCss = async (
 
     // only cache if we got a cache key, if not it probably has an @import
     await compilerCtx.cache.put(cacheKey, minifyResults.output);
+    if (minifyResults.map) {
+      await compilerCtx.cache.put(cacheKey + 'Map', JSON.stringify(minifyResults.map));
+    }
 
     return returnMap ? minifyResults : minifyResults.output;
   }

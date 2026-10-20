@@ -91,7 +91,8 @@ const buildGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.Compi
         buildCtx.stylesUpdated.push({
           styleTag: 'global',
           styleMode: undefined,
-          styleText: optimizedCss,
+          styleText: typeof optimizedResult === 'string' ? optimizedResult : optimizedResult.output,
+          styleSourceMap: typeof optimizedResult === 'string' ? undefined : sourceMapToDataUrl(optimizedResult.map),
         });
       }
 
@@ -110,9 +111,14 @@ const appendSourceMap = (css: string, sourceMap?: d.SourceMap) => {
   if (!sourceMap) {
     return css;
   }
-  const sourceMapUrl = `data:application/json;charset=utf-8;base64,${Buffer.from(JSON.stringify(sourceMap)).toString('base64')}`;
+  const sourceMapUrl = sourceMapToDataUrl(sourceMap);
   return `${css}\n/*# sourceMappingURL=${sourceMapUrl} */`;
 };
+
+const sourceMapToDataUrl = (sourceMap?: d.SourceMap) =>
+  sourceMap
+    ? `data:application/json;charset=utf-8;base64,${Buffer.from(JSON.stringify(sourceMap)).toString('base64')}`
+    : undefined;
 
 const canSkipGlobalStyles = async (config: d.ValidatedConfig, compilerCtx: d.CompilerCtx, buildCtx: d.BuildCtx) => {
   if (!compilerCtx.cachedGlobalStyle) {

@@ -27,18 +27,20 @@ export const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMa
  * @param scopeId the scope ID for the component of interest
  * @param cssText styles for the component of interest
  * @param allowCS whether or not to use a constructable stylesheet
+ * @param sourceMap an optional CSS source map data URL
  */
 export const registerStyle = (scopeId: string, cssText: string, allowCS: boolean, sourceMap?: string | string[]) => {
   let style = styles.get(scopeId);
+  const styleText = appendStyleSourceMap(cssText, sourceMap);
   if (supportsConstructableStylesheets && allowCS) {
     style = (style || new CSSStyleSheet()) as CSSStyleSheet;
     if (typeof style === 'string') {
-      style = cssText;
+      style = styleText;
     } else {
-      style.replaceSync(cssText);
+      style.replaceSync(styleText);
     }
   } else {
-    style = appendStyleSourceMap(cssText, sourceMap);
+    style = styleText;
   }
   styles.set(scopeId, style);
 };

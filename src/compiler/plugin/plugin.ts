@@ -1,4 +1,5 @@
 import { buildError, catchError, isFunction, isOutputTargetDocs, isString, relative } from '@utils';
+import sourceMapMerge from 'merge-source-map';
 import { basename } from 'path';
 
 import type * as d from '../../declarations';
@@ -153,10 +154,7 @@ export const runPluginTransforms = async (
                 transformResults.id = pluginTransformResults.id;
               }
               if (pluginTransformResults.map != null) {
-                transformResults.map =
-                  typeof pluginTransformResults.map === 'string'
-                    ? JSON.parse(pluginTransformResults.map)
-                    : pluginTransformResults.map;
+                transformResults.map = mergePluginSourceMaps(transformResults.map, pluginTransformResults.map);
               }
 
               /**
@@ -274,10 +272,7 @@ export const runPluginTransformsEsmImports = async (
                 transformResults.id = pluginTransformResults.id;
               }
               if (pluginTransformResults.map != null) {
-                transformResults.map =
-                  typeof pluginTransformResults.map === 'string'
-                    ? JSON.parse(pluginTransformResults.map)
-                    : pluginTransformResults.map;
+                transformResults.map = mergePluginSourceMaps(transformResults.map, pluginTransformResults.map);
               }
               if (Array.isArray(pluginTransformResults.dependencies)) {
                 const imports = pluginTransformResults.dependencies.filter(
@@ -318,4 +313,26 @@ export const runPluginTransformsEsmImports = async (
   }
 
   return transformResults;
+};
+
+const mergePluginSourceMaps = (previousMap: string | d.SourceMap | undefined, nextMap: string | d.SourceMap) => {
+  const parsedNextMap = parsePluginSourceMap(nextMap);
+  if (!previousMap) {
+    return parsedNextMap;
+  }
+  return sourceMapMerge(parsePluginSourceMap(previousMap), parsedNextMap);
+};
+
+const parsePluginSourceMap = (map: string | d.SourceMap): d.SourceMap => {
+  if (typeof map !== 'string') {
+    return map;
+  }
+
+  const encodedMap = map.match(/^data:application\/json(?:;charset=[^;,]+)?(;base64)?,(.*)$/i);
+  if (encodedMap) {
+    const json = encodedMap[1] ? Buffer.from(encodedMap[2], 'base64').toString() : decodeURIComponent(encodedMap[2]);
+    return JSON.parse(json);
+  }
+
+  return JSON.parse(map);
 };
