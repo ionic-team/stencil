@@ -193,5 +193,25 @@ describe('extTransformsPlugin', () => {
       expect(readme).toContain('`--color`');
       expect(readme).toContain('Text color');
     });
+
+    it('retransforms cached CSS when an imported stylesheet changes', () => {
+      const { plugin, buildCtx } = setup();
+      buildCtx.filesChanged = ['/some/stubbed/path/_tokens.scss'];
+
+      const shouldTransformCachedModule = plugin.shouldTransformCachedModule as unknown as (options: {
+        id: string;
+        meta: { styleDocs: []; styleDependencies: string[] };
+      }) => boolean | null;
+
+      expect(
+        shouldTransformCachedModule({
+          id: '/some/stubbed/path/foo.css?tag=my-component',
+          meta: {
+            styleDocs: [],
+            styleDependencies: ['/some/stubbed/path/_tokens.scss'],
+          },
+        }),
+      ).toBe(true);
+    });
   });
 });

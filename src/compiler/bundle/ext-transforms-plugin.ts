@@ -43,6 +43,10 @@ export const extTransformsPlugin = (
     name: 'extTransformsPlugin',
 
     shouldTransformCachedModule({ id, meta }) {
+      const styleDependencies = meta?.styleDependencies as string[] | undefined;
+      if (styleDependencies?.some((dependency: string) => buildCtx.filesChanged.includes(dependency))) {
+        return true;
+      }
       replayCachedStyleDocs(buildCtx, id, meta?.styleDocs);
       return null;
     },
@@ -210,7 +214,10 @@ export const extTransformsPlugin = (
         return {
           code: cssTransformResults.output,
           map: cssTransformResults.map,
-          meta: { styleDocs: cssTransformResults.styleDocs },
+          meta: {
+            styleDocs: cssTransformResults.styleDocs,
+            styleDependencies: pluginTransforms.dependencies,
+          },
           moduleSideEffects: false,
         };
       }
