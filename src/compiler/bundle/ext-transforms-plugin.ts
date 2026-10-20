@@ -42,6 +42,15 @@ export const extTransformsPlugin = (
   return {
     name: 'extTransformsPlugin',
 
+    shouldTransformCachedModule({ id, meta }) {
+      const styleDependencies = meta?.styleDependencies as string[] | undefined;
+      if (styleDependencies?.some((dependency: string) => buildCtx.filesChanged.includes(dependency))) {
+        return true;
+      }
+      replayCachedStyleDocs(buildCtx, id, meta?.styleDocs);
+      return null;
+    },
+
     /**
      * A custom function targeting the `transform` build hook in Rollup. See here for details:
      * https://rollupjs.org/guide/en/#transform
@@ -205,6 +214,10 @@ export const extTransformsPlugin = (
         return {
           code: cssTransformResults.output,
           map: cssTransformResults.map,
+          meta: {
+            styleDocs: cssTransformResults.styleDocs,
+            styleDependencies: pluginTransforms.dependencies,
+          },
           moduleSideEffects: false,
         };
       }
@@ -212,4 +225,19 @@ export const extTransformsPlugin = (
       return null;
     },
   };
+};
+
+const replayCachedStyleDocs = (buildCtx: d.BuildCtx, id: string, styleDocs?: d.CompilerStyleDoc[]) => {
+  if (!styleDocs?.length) {
+    return;
+  }
+
+  const { data } = parseImportPath(id);
+  const cmp = data?.tag && buildCtx.components.find((component) => component.tagName === data.tag);
+  if (!cmp) {
+    return;
+  }
+
+  cmp.styleDocs ||= [];
+  mergeIntoWith(cmp.styleDocs, styleDocs, (docs) => `${docs.name},${docs.mode}`);
 };
