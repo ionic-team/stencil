@@ -1584,7 +1584,7 @@ export interface HotModuleReplacement {
 export interface HmrStyleUpdate {
   styleId: string;
   styleTag: string;
-  styleText: string;
+  styleText: string | string[];
   styleSourceMap?: string | string[];
 }
 

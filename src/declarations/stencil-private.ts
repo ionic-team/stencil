@@ -298,7 +298,7 @@ export interface BuildCtx {
 
 export interface BuildStyleUpdate {
   styleTag: string;
-  styleText: string;
+  styleText: string | string[];
   styleMode: string;
   styleSourceMap?: string | string[];
 }
@@ -969,8 +969,8 @@ export interface ComponentConstructor {
   watchers?: ComponentConstructorChangeHandlers;
   events?: ComponentConstructorEvent[];
   listeners?: ComponentConstructorListener[];
-  style?: string;
-  sourceMap?: StyleSourceMap | StyleSourceMap[] | { [modeName: string]: StyleSourceMap | StyleSourceMap[] };
+  style?: string | string[] | { [modeName: string]: string | string[] };
+  sourceMap?: StyleSourceMapValue | { [modeName: string]: StyleSourceMapValue };
   styleId?: string;
   encapsulation?: ComponentConstructorEncapsulation;
   observedAttributes?: string[];
@@ -987,6 +987,7 @@ export interface StyleSourceMapSegment {
 }
 
 export type StyleSourceMap = string | StyleSourceMapSegment;
+export type StyleSourceMapValue = StyleSourceMap | StyleSourceMapValue[];
 
 /**
  * A mapping from class member names to a list of methods which are watching
@@ -1941,7 +1942,7 @@ export interface PlatformRuntime {
   ce: (eventName: string, opts?: any) => CustomEvent;
 }
 
-export type StyleMap = Map<string, CSSStyleSheet | string>;
+export type StyleMap = Map<string, CSSStyleSheet | string | Array<CSSStyleSheet | string>>;
 
 export type RootAppliedStyleMap = WeakMap<Element, Set<string>>;
 

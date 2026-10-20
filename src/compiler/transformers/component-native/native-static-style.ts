@@ -48,7 +48,7 @@ const addMultipleModeStyleGetter = (
       // import generated from @Component() styleUrls option
       // import myTagIosStyle from './import-path.css';
       // static get style() { return { "ios": myTagIosStyle }; }
-      const styleUrlIdentifier = createStyleIdentifier(cmp, style);
+      const styleUrlIdentifier = createStyleIdentifier(cmp, style, { separateStyles: buildCtx.config.sourceMapCss });
       const propUrlIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleUrlIdentifier);
       styleModes.push(propUrlIdentifier);
     } else if (typeof style.styleIdentifier === 'string') {
@@ -95,7 +95,7 @@ const addSingleStyleGetter = (
     // import generated from @Component() styleUrls option
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
-    const styleUrlIdentifier = createStyleIdentifier(cmp, style);
+    const styleUrlIdentifier = createStyleIdentifier(cmp, style, { separateStyles: buildCtx.config.sourceMapCss });
     classMembers.push(createStaticGetter('style', styleUrlIdentifier));
     const sourceMapLiteral = createStyleSourceMapLiteral(cmp, buildCtx);
     if (sourceMapLiteral) {

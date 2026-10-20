@@ -16,6 +16,9 @@ import { createTime } from './profile';
 import { HYDRATED_STYLE_ID, NODE_TYPE, SLOT_FB_CSS } from './runtime-constants';
 
 export const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMap();
+const rootAppliedStyleSheets = /*@__PURE__*/ new WeakMap<object, Map<string, CSSStyleSheet[]>>();
+
+type StyleText = string | StyleText[];
 
 /**
  * Register the styles for a component by creating a stylesheet and then
@@ -27,35 +30,72 @@ export const rootAppliedStyles: d.RootAppliedStyleMap = /*@__PURE__*/ new WeakMa
  * @param scopeId the scope ID for the component of interest
  * @param cssText styles for the component of interest
  * @param allowCS whether or not to use a constructable stylesheet
- * @param sourceMap an optional CSS source map data URL
+ * @param sourceMap optional CSS source map URLs matching the style text entries
  */
 export const registerStyle = (
   scopeId: string,
-  cssText: string,
+  cssText: StyleText,
   allowCS: boolean,
-  sourceMap?: d.StyleSourceMap | d.StyleSourceMap[],
+  sourceMap?: d.StyleSourceMapValue,
 ) => {
   let style = styles.get(scopeId);
-  const styleText = appendStyleSourceMap(cssText, sourceMap);
+  const cssTexts = flattenStyleText(cssText);
+  const sourceMaps = Array.isArray(cssText) ? flattenStyleSourceMaps(sourceMap) : [sourceMap];
+  const styleTexts = cssTexts.map((text, index) => appendStyleSourceMap(text, sourceMaps[index]));
   if (supportsConstructableStylesheets && allowCS) {
-    style = (style || new CSSStyleSheet()) as CSSStyleSheet;
-    if (typeof style === 'string') {
-      style = styleText;
+    if (styleTexts.length === 1) {
+      const existingStyleSheet = Array.isArray(style)
+        ? style.find((entry): entry is CSSStyleSheet => typeof entry !== 'string')
+        : style && typeof style !== 'string'
+          ? style
+          : undefined;
+      style = existingStyleSheet || new CSSStyleSheet();
+      if (typeof style === 'string') {
+        style = styleTexts[0];
+      } else {
+        style.replaceSync(styleTexts[0]);
+      }
     } else {
-      style.replaceSync(styleText);
+      const existingStyleSheets = Array.isArray(style)
+        ? style.filter((entry): entry is CSSStyleSheet => typeof entry !== 'string')
+        : style && typeof style !== 'string'
+          ? [style]
+          : [];
+      style = styleTexts.map((text, index) => {
+        const stylesheet = existingStyleSheets[index] || new CSSStyleSheet();
+        stylesheet.replaceSync(text);
+        return stylesheet;
+      });
     }
   } else {
-    style = styleText;
+    style = styleTexts.length === 1 ? styleTexts[0] : styleTexts;
   }
   styles.set(scopeId, style);
 };
 
-export const appendStyleSourceMap = (styleText: string, sourceMap?: d.StyleSourceMap | d.StyleSourceMap[]) => {
-  const withoutSourceMap = styleText.replace(/\s*\/\*[#@]\s*sourceMappingURL=[^*]*\*\/\s*$/i, '');
-  if (!sourceMap) {
-    return withoutSourceMap;
+const flattenStyleText = (cssText: StyleText): string[] => {
+  if (Array.isArray(cssText)) {
+    return cssText.reduce<string[]>((styles, text) => styles.concat(flattenStyleText(text)), []);
   }
-  const sourceMaps = Array.isArray(sourceMap) ? sourceMap : [sourceMap];
+  return [cssText];
+};
+
+const flattenStyleSourceMaps = (sourceMap: unknown): d.StyleSourceMap[] => {
+  if (Array.isArray(sourceMap)) {
+    return sourceMap.reduce<d.StyleSourceMap[]>(
+      (sourceMaps, map) => sourceMaps.concat(flattenStyleSourceMaps(map)),
+      [],
+    );
+  }
+  return sourceMap ? [sourceMap as d.StyleSourceMap] : [];
+};
+
+export const appendStyleSourceMap = (styleText: string, sourceMap?: d.StyleSourceMapValue) => {
+  if (!sourceMap) {
+    return styleText;
+  }
+  const withoutSourceMap = styleText.replace(/\s*\/\*[#@]\s*sourceMappingURL=[^*]*\*\/\s*$/i, '');
+  const sourceMaps = flattenStyleSourceMaps(sourceMap);
   const indexMap = createStyleSourceMapIndex(sourceMaps);
   if (indexMap) {
     return `${withoutSourceMap}\n/*# sourceMappingURL=${indexMap} */`;
@@ -123,27 +163,48 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
   styleContainerNode = styleContainerNode.nodeType === NODE_TYPE.DocumentFragment ? styleContainerNode : win.document;
 
   if (style) {
-    if (typeof style === 'string') {
+    if (typeof style === 'string' || (Array.isArray(style) && typeof style[0] === 'string')) {
       styleContainerNode = styleContainerNode.head || (styleContainerNode as HTMLElement);
       let appliedStyles = rootAppliedStyles.get(styleContainerNode);
-      let styleElm;
       if (!appliedStyles) {
         rootAppliedStyles.set(styleContainerNode, (appliedStyles = new Set()));
       }
 
-      // Check if style element already exists (for HMR updates)
-      // For shadow DOM components, directly update their dedicated style element
-      // For scoped components, check if they have their own HMR-created style element
-      const existingStyleElm: HTMLStyleElement =
-        (BUILD.hydrateClientSide || BUILD.hotModuleReplacement) &&
-        styleContainerNode.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`);
+      const styleTexts = (Array.isArray(style) ? style : [style]) as string[];
+      const isStyleApplied = appliedStyles.has(scopeId);
+      const shadowStyleReference =
+        'host' in styleContainerNode && !supportsConstructableStylesheets
+          ? styleContainerNode.querySelector('style')
+          : null;
+      const headReferenceNode =
+        styleContainerNode.nodeName === 'HEAD'
+          ? (() => {
+              const preconnectLinks = styleContainerNode.querySelectorAll('link[rel=preconnect]');
+              return preconnectLinks.length > 0
+                ? preconnectLinks[preconnectLinks.length - 1].nextSibling
+                : styleContainerNode.querySelector('style');
+            })()
+          : null;
+      for (let styleIndex = 0; styleIndex < styleTexts.length; styleIndex++) {
+        const styleText = styleTexts[styleIndex];
+        // Check if style element already exists (for HMR updates)
+        // For shadow DOM components, directly update their dedicated style element
+        // For scoped components, check if they have their own HMR-created style element
+        const existingStyleElm: HTMLStyleElement =
+          (BUILD.hydrateClientSide || BUILD.hotModuleReplacement) &&
+          styleContainerNode.querySelectorAll(`[${HYDRATED_STYLE_ID}="${scopeId}"]`).item(styleIndex);
 
-      if (existingStyleElm) {
-        // Update existing style element (for hydration or HMR)
-        existingStyleElm.textContent = style;
-      } else if (!appliedStyles.has(scopeId)) {
-        styleElm = win.document.createElement('style');
-        styleElm.textContent = style;
+        let styleElm: HTMLStyleElement;
+        if (existingStyleElm) {
+          // Update existing style element (for hydration or HMR)
+          existingStyleElm.textContent = styleText;
+          continue;
+        } else if (isStyleApplied && !BUILD.hotModuleReplacement) {
+          continue;
+        } else {
+          styleElm = win.document.createElement('style');
+          styleElm.textContent = styleText;
+        }
 
         // Apply CSP nonce to the style tag if it exists
         const nonce = plt.$nonce$ ?? queryNonceMetaTagContent(win.document);
@@ -159,6 +220,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
         ) {
           styleElm.setAttribute(HYDRATED_STYLE_ID, scopeId);
         }
+        styleElm.setAttribute('data-style-index', `${styleIndex}`);
 
         /**
          * attach styles at the end of the head tag if we render scoped components
@@ -169,14 +231,9 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
              * if the page contains preconnect links, we want to insert the styles
              * after the last preconnect link to ensure the styles are preloaded
              */
-            const preconnectLinks = styleContainerNode.querySelectorAll('link[rel=preconnect]');
-            const referenceNode =
-              preconnectLinks.length > 0
-                ? preconnectLinks[preconnectLinks.length - 1].nextSibling
-                : styleContainerNode.querySelector('style');
             (styleContainerNode as HTMLElement).insertBefore(
               styleElm,
-              referenceNode?.parentNode === styleContainerNode ? referenceNode : null,
+              headReferenceNode?.parentNode === styleContainerNode ? headReferenceNode : null,
             );
           } else if ('host' in styleContainerNode) {
             if (supportsConstructableStylesheets) {
@@ -192,7 +249,7 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
                */
               const currentWindow = styleContainerNode.defaultView ?? styleContainerNode.ownerDocument.defaultView;
               const stylesheet = new currentWindow.CSSStyleSheet();
-              stylesheet.replaceSync(style);
+              stylesheet.replaceSync(styleText);
 
               /**
                * > If the array needs to be modified, use in-place mutations like push().
@@ -217,11 +274,14 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
                * During HMR, create separate style elements for scoped components so they can be
                * updated independently without affecting other components' styles.
                */
-              const existingStyleContainer: HTMLStyleElement = styleContainerNode.querySelector('style');
-              if (existingStyleContainer && !BUILD.hotModuleReplacement) {
-                existingStyleContainer.textContent = style + existingStyleContainer.textContent;
-              } else {
+              if (shadowStyleReference && !BUILD.hotModuleReplacement && styleTexts.length === 1) {
+                shadowStyleReference.textContent = styleText + shadowStyleReference.textContent;
+              } else if (shadowStyleReference) {
+                styleContainerNode.insertBefore(styleElm, shadowStyleReference);
+              } else if (styleTexts.length === 1) {
                 (styleContainerNode as HTMLElement).prepend(styleElm);
+              } else {
+                styleContainerNode.append(styleElm);
               }
             }
           } else {
@@ -240,49 +300,67 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
         if (cmpMeta.$flags$ & CMP_FLAGS.hasSlotRelocation) {
           styleElm.textContent += SLOT_FB_CSS;
         }
-
-        if (appliedStyles) {
-          appliedStyles.add(scopeId);
-        }
+      }
+      if (!isStyleApplied) {
+        appliedStyles.add(scopeId);
       }
     } else if (BUILD.constructableCSS) {
       let appliedStyles = rootAppliedStyles.get(styleContainerNode);
       if (!appliedStyles) {
         rootAppliedStyles.set(styleContainerNode, (appliedStyles = new Set()));
       }
-      if (!appliedStyles.has(scopeId)) {
+      let appliedStyleSheets = rootAppliedStyleSheets.get(styleContainerNode);
+      if (!appliedStyleSheets) {
+        rootAppliedStyleSheets.set(styleContainerNode, (appliedStyleSheets = new Map()));
+      }
+      const previousStyleSheets = appliedStyleSheets.get(scopeId);
+      if (!appliedStyles.has(scopeId) || (BUILD.hotModuleReplacement && previousStyleSheets)) {
         /**
          * Constructable stylesheets can't be shared between windows,
          * we need to create a new one for the current window if necessary
          */
         const currentWindow = styleContainerNode.defaultView ?? styleContainerNode.ownerDocument.defaultView;
-        let stylesheet: CSSStyleSheet;
-        if (style.constructor === currentWindow.CSSStyleSheet) {
-          stylesheet = style;
-        } else {
-          stylesheet = new currentWindow.CSSStyleSheet();
-          for (let i = 0; i < style.cssRules.length; i++) {
-            stylesheet.insertRule(style.cssRules[i].cssText, i);
+        const styleSheets = (Array.isArray(style) ? style : [style]) as CSSStyleSheet[];
+        const currentStyleSheets = styleSheets.map((styleSheet) => {
+          let stylesheet: CSSStyleSheet;
+          if (styleSheet.constructor === currentWindow.CSSStyleSheet) {
+            stylesheet = styleSheet;
+          } else {
+            stylesheet = new currentWindow.CSSStyleSheet();
+            for (let i = 0; i < styleSheet.cssRules.length; i++) {
+              stylesheet.insertRule(styleSheet.cssRules[i].cssText, i);
+            }
           }
-        }
+          return stylesheet;
+        });
+
+        const adoptedStyleSheets = previousStyleSheets
+          ? styleContainerNode.adoptedStyleSheets.filter(
+              (stylesheet: CSSStyleSheet) => !previousStyleSheets.includes(stylesheet),
+            )
+          : styleContainerNode.adoptedStyleSheets;
+        const nextAdoptedStyleSheets = [...adoptedStyleSheets, ...currentStyleSheets];
         /**
          * > If the array needs to be modified, use in-place mutations like push().
          * https://developer.mozilla.org/en-US/docs/Web/API/Document/adoptedStyleSheets
          */
-        if (supportsMutableAdoptedStyleSheets) {
-          styleContainerNode.adoptedStyleSheets.push(stylesheet);
+        if (previousStyleSheets || !supportsMutableAdoptedStyleSheets) {
+          styleContainerNode.adoptedStyleSheets = nextAdoptedStyleSheets;
         } else {
-          styleContainerNode.adoptedStyleSheets = [...styleContainerNode.adoptedStyleSheets, stylesheet];
+          if (supportsMutableAdoptedStyleSheets) {
+            styleContainerNode.adoptedStyleSheets.push(...currentStyleSheets);
+          }
         }
+        appliedStyleSheets.set(scopeId, currentStyleSheets);
 
         appliedStyles.add(scopeId);
 
         // Remove SSR style element from shadow root now that adoptedStyleSheets is in use
         // Only remove from shadow roots, not from document head (for scoped components)
         if (BUILD.hydrateClientSide && 'host' in styleContainerNode) {
-          const ssrStyleElm = styleContainerNode.querySelector(`[${HYDRATED_STYLE_ID}="${scopeId}"]`);
-          if (ssrStyleElm) {
-            writeTask(() => ssrStyleElm.remove());
+          const ssrStyleElms = styleContainerNode.querySelectorAll(`[${HYDRATED_STYLE_ID}="${scopeId}"]`);
+          if (ssrStyleElms.length > 0) {
+            writeTask(() => ssrStyleElms.forEach((ssrStyleElm: Element) => ssrStyleElm.remove()));
           }
         }
       }
@@ -370,10 +448,18 @@ export const hydrateScopedToShadow = () => {
   }
 
   const styles = win.document.querySelectorAll(`[${HYDRATED_STYLE_ID}]`);
-  let i = 0;
-  for (; i < styles.length; i++) {
-    registerStyle(styles[i].getAttribute(HYDRATED_STYLE_ID), convertScopedToShadow(styles[i].innerHTML), true);
+  const stylesByScope = new Map<string, string[]>();
+  for (let i = 0; i < styles.length; i++) {
+    const scopeId = styles[i].getAttribute(HYDRATED_STYLE_ID);
+    if (scopeId) {
+      const scopeStyles = stylesByScope.get(scopeId) || [];
+      scopeStyles.push(convertScopedToShadow(styles[i].innerHTML));
+      stylesByScope.set(scopeId, scopeStyles);
+    }
   }
+  stylesByScope.forEach((scopeStyles, scopeId) => {
+    registerStyle(scopeId, scopeStyles, true);
+  });
 };
 
 declare global {

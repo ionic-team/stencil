@@ -71,6 +71,7 @@ describe('extTransformsPlugin', () => {
       writeFileSpy,
       transformCssToEsmSpy,
       cssText,
+      compilerComponentMeta,
     };
   }
 
@@ -81,10 +82,10 @@ describe('extTransformsPlugin', () => {
 
     it('should return early if no data can be gleaned from the id', async () => {
       const { plugin } = setup();
-      // @ts-ignore we're testing something which shouldn't normally happen,
+      // @ts-expect-error we're testing something which shouldn't normally happen,
       // but might if an argument of the wrong type were passed as `id`
       const parseSpy = jest.spyOn(importPathLib, 'parseImportPath').mockReturnValue({ data: null });
-      // @ts-ignore the Rollup plugins expect to be called in a Rollup context
+      // @ts-expect-error the Rollup plugins expect to be called in a Rollup context
       expect(await plugin.transform('asdf', 'foo.css')).toBe(null);
       parseSpy.mockRestore();
     });
@@ -113,8 +114,8 @@ describe('extTransformsPlugin', () => {
         sourcesContent: [':host { text: pink; }'],
       };
 
-      config.sourceMap = { css: true, js: false } as any;
-      (config as any).sourceMapCss = true;
+      config.sourceMap = { css: true, js: false };
+      config.sourceMapCss = true;
       config.plugins = [
         {
           transform: () => ({
@@ -124,7 +125,7 @@ describe('extTransformsPlugin', () => {
         },
       ];
 
-      // @ts-ignore the Rollup plugins expect to be called in a Rollup context
+      // @ts-expect-error the Rollup plugins expect to be called in a Rollup context
       await plugin.transform('asdf', '/some/stubbed/path/foo.css?tag=my-component');
 
       expect(transformCssToEsmSpy).toHaveBeenCalledWith(
@@ -133,6 +134,43 @@ describe('extTransformsPlugin', () => {
           map,
         }),
       );
+    });
+
+    it('should keep source-mapped external styles in styleUrl order', async () => {
+      const { plugin, config, buildCtx, compilerComponentMeta, transformCssToEsmSpy } = setup();
+      const firstStylePath = '/some/stubbed/path/first.css';
+      const secondStylePath = '/some/stubbed/path/second.css';
+      compilerComponentMeta.styles = [
+        {
+          modeName: 'default',
+          externalStyles: [
+            { absolutePath: firstStylePath, originalComponentPath: firstStylePath },
+            { absolutePath: secondStylePath, originalComponentPath: secondStylePath },
+          ],
+        },
+      ] as any;
+      config.sourceMap = { css: true, js: false };
+      config.sourceMapCss = true;
+      transformCssToEsmSpy.mockImplementation(async ({ file }) => ({
+        styleText: file === firstStylePath ? 'FIRST' : 'SECOND',
+        styleSourceMap: file === firstStylePath ? 'FIRST_MAP' : 'SECOND_MAP',
+        output: '',
+        map: null,
+        diagnostics: [],
+        imports: [],
+        defaultVarName: 'foo',
+        styleDocs: [],
+      }));
+
+      // Process the second style first to prove HMR updates do not use transform completion order.
+      // @ts-expect-error the Rollup plugins expect to be called in a Rollup context
+      await plugin.transform('asdf', `${secondStylePath}?tag=my-component`);
+      // @ts-expect-error the Rollup plugins expect to be called in a Rollup context
+      await plugin.transform('asdf', `${firstStylePath}?tag=my-component`);
+
+      const latestUpdate = buildCtx.stylesUpdated[buildCtx.stylesUpdated.length - 1];
+      expect(latestUpdate.styleText).toEqual(['FIRST', 'SECOND']);
+      expect(latestUpdate.styleSourceMap).toEqual(['FIRST_MAP', 'SECOND_MAP']);
     });
   });
 });

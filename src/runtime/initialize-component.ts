@@ -138,10 +138,10 @@ export const initializeComponent = async (
         /**
          * this component has styles but we haven't registered them yet
          */
-        let style: string | undefined;
-        let sourceMap: d.StyleSourceMap | d.StyleSourceMap[] | undefined;
+        let style: string | string[] | undefined;
+        let sourceMap: d.StyleSourceMapValue | undefined;
 
-        if (typeof Cstr.style === 'string') {
+        if (typeof Cstr.style === 'string' || Array.isArray(Cstr.style)) {
           /**
            * in case the component has a `styleUrl` defined, e.g.
            * ```ts
@@ -157,7 +157,7 @@ export const initializeComponent = async (
             Array.isArray(Cstr.sourceMap) ||
             (Cstr.sourceMap && typeof Cstr.sourceMap === 'object' && 'map' in Cstr.sourceMap)
           ) {
-            sourceMap = Cstr.sourceMap as d.StyleSourceMap | d.StyleSourceMap[];
+            sourceMap = Cstr.sourceMap as d.StyleSourceMapValue;
           }
         } else if (BUILD.mode && typeof Cstr.style !== 'string') {
           /**
@@ -196,9 +196,11 @@ export const initializeComponent = async (
 
           if (BUILD.hydrateServerSide && BUILD.shadowDom) {
             if (cmpMeta.$flags$ & CMP_FLAGS.shadowNeedsScopedCss) {
-              style = scopeCss(style, scopeId, true);
+              style = Array.isArray(style)
+                ? style.map((styleText) => scopeCss(styleText, scopeId, true))
+                : scopeCss(style, scopeId, true);
             } else if (needsScopedSSR()) {
-              style = expandPartSelectors(style);
+              style = Array.isArray(style) ? style.map(expandPartSelectors) : expandPartSelectors(style);
             }
           }
           registerStyle(scopeId, style, !!(cmpMeta.$flags$ & CMP_FLAGS.shadowDomEncapsulation), sourceMap);

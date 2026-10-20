@@ -6,6 +6,10 @@ import type * as d from '../../declarations';
 import { getScopeId } from '../style/scope-css';
 import { addTagTransformToCssTsAST, createStaticGetter, getExternalStyles } from './transform-utils';
 
+interface StyleIdentifierOptions {
+  separateStyles?: boolean;
+}
+
 /**
  * Adds static "style" getter within the class
  * ```typescript
@@ -83,27 +87,14 @@ export const createStyleSourceMapLiteral = (cmp: d.ComponentCompilerMeta, buildC
   cmp.styles.forEach((style) => {
     if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
       if (typeof style.styleIdentifier !== 'string') {
-        createStyleIdentifier(cmp, style);
+        createStyleIdentifier(cmp, style, { separateStyles: true });
       }
       const identifiers = style.sourceMapIdentifiers || [];
-      const externalStyleIds = Object.keys(getExternalStyles(style));
       const value =
         identifiers.length === 1
           ? ts.factory.createIdentifier(identifiers[0])
           : ts.factory.createArrayLiteralExpression(
-              identifiers.map((identifier, index) =>
-                ts.factory.createObjectLiteralExpression([
-                  ts.factory.createPropertyAssignment('map', ts.factory.createIdentifier(identifier)),
-                  ts.factory.createPropertyAssignment(
-                    'length',
-                    ts.factory.createCallExpression(
-                      ts.factory.createIdentifier(`${style.styleIdentifier}${externalStyleIds[index]}`),
-                      undefined,
-                      [],
-                    ),
-                  ),
-                ]),
-              ),
+              identifiers.map((identifier) => ts.factory.createIdentifier(identifier)),
             );
       sourceMapModes.push(ts.factory.createPropertyAssignment(style.modeName, value));
     } else if (typeof style.styleIdentifier === 'string') {
@@ -157,7 +148,7 @@ const getMultipleModeStyle = (cmp: d.ComponentCompilerMeta, styles: d.StyleCompi
       // import generated from @Component() styleUrls option
       // import myTagIosStyle from './import-path.css';
       // static get style() { return { ios: myTagIosStyle }; }
-      const styleUrlIdentifier = createStyleIdentifier(cmp, style);
+      const styleUrlIdentifier = createStyleIdentifier(cmp, style, { separateStyles: buildCtx.config.sourceMapCss });
       const propUrlIdentifier = ts.factory.createPropertyAssignment(style.modeName, styleUrlIdentifier);
       styleModes.push(propUrlIdentifier);
     } else if (typeof style.styleIdentifier === 'string') {
@@ -190,7 +181,7 @@ const getSingleStyle = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler, bu
     // import generated from @Component() styleUrls option
     // import myTagStyle from './import-path.css';
     // static get style() { return myTagStyle; }
-    return createStyleIdentifier(cmp, style);
+    return createStyleIdentifier(cmp, style, { separateStyles: buildCtx.config.sourceMapCss });
   }
 
   if (typeof style.styleIdentifier === 'string') {
@@ -228,9 +219,15 @@ const createStyleLiteral = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler
  *
  * @param cmp the metadata associated with the component being evaluated
  * @param style style meta data
- * @returns an assignment expression to be applied to the `style` property of a component class (e.g. `_myComponentCssStyle + _myComponentIosCssStyle` based on the example)
+ * @param options controls whether each external style remains a separate runtime entry
+ * @returns an expression to be applied to the `style` property of a component class
  */
-export const createStyleIdentifier = (cmp: d.ComponentCompilerMeta, style: d.StyleCompiler) => {
+export const createStyleIdentifier = (
+  cmp: d.ComponentCompilerMeta,
+  style: d.StyleCompiler,
+  options: StyleIdentifierOptions = {},
+) => {
+  const separateStyles = options.separateStyles === true;
   const externalStyles = getExternalStyles(style);
   /**
    * Set a styleIdentifier which will be propagated to the component and
@@ -243,10 +240,12 @@ export const createStyleIdentifier = (cmp: d.ComponentCompilerMeta, style: d.Sty
     style.styleIdentifier += dashToPascalCase(style.modeName);
   }
   style.styleIdentifier += 'Style';
-  style.sourceMapIdentifiers = Object.keys(externalStyles).map(
-    (externalStyleId) => `${style.styleIdentifier}SourceMap${externalStyleId}`,
-  );
-  return createIdentifierFromStyleIdentifier(style.styleIdentifier, Object.keys(externalStyles));
+  if (separateStyles) {
+    style.sourceMapIdentifiers = Object.keys(externalStyles).map(
+      (externalStyleId) => `${style.styleIdentifier}SourceMap${externalStyleId}`,
+    );
+  }
+  return createIdentifierFromStyleIdentifier(style.styleIdentifier, Object.keys(externalStyles), options);
 };
 
 /**
@@ -271,28 +270,39 @@ export const createStyleIdentifier = (cmp: d.ComponentCompilerMeta, style: d.Sty
  * export class MyComponent {
  *   // ...
  * }
- * MyComponent.style = MyComponentStyle0 + MyComponentStyle1;
+ * MyComponent.style = [MyComponentStyle0(), MyComponentStyle1()];
  * ```
  *
  * Note: style imports are made in [`createEsmStyleImport`](src/compiler/transformers/style-imports.ts).
  *
  * @param styleIdentifier identifier to be used for the style
  * @param externalStyleIds numeric ids of the external styles
- * @returns an assignment expression to be applied to the `style` property of a component class (e.g. `_myComponentCssStyle + _myComponentIosCssStyle` based on the example)
+ * @param options controls whether each external style remains a separate runtime entry
+ * @returns an expression to be assigned to the `style` property of a component class
  */
 const createIdentifierFromStyleIdentifier = (
   styleIdentifier: string,
   externalStyleIds: string[],
-): ts.CallExpression | ts.BinaryExpression => {
+  options: StyleIdentifierOptions = {},
+): ts.CallExpression | ts.ArrayLiteralExpression | ts.BinaryExpression => {
+  const separateStyles = options.separateStyles === true;
   const id = externalStyleIds[0];
 
   if (externalStyleIds.length === 1) {
     return ts.factory.createCallExpression(ts.factory.createIdentifier(styleIdentifier + id), undefined, []);
   }
 
-  return ts.factory.createBinaryExpression(
-    createIdentifierFromStyleIdentifier(styleIdentifier, [id]),
-    ts.SyntaxKind.PlusToken,
-    createIdentifierFromStyleIdentifier(styleIdentifier, externalStyleIds.slice(1)),
+  if (!separateStyles) {
+    return ts.factory.createBinaryExpression(
+      createIdentifierFromStyleIdentifier(styleIdentifier, [id]),
+      ts.SyntaxKind.PlusToken,
+      createIdentifierFromStyleIdentifier(styleIdentifier, externalStyleIds.slice(1)),
+    );
+  }
+
+  return ts.factory.createArrayLiteralExpression(
+    externalStyleIds.map((externalStyleId) =>
+      ts.factory.createCallExpression(ts.factory.createIdentifier(styleIdentifier + externalStyleId), undefined, []),
+    ),
   );
 };

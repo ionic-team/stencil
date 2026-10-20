@@ -4,15 +4,15 @@ import MagicString from 'magic-string';
 import path from 'path';
 
 import type * as d from '../../declarations';
+import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 import { parseStyleDocs } from '../docs/style-docs';
-import { optimizeCss } from '../optimize/optimize-css';
 import { createCssSourceMap } from '../optimize/minify-css';
+import { optimizeCss } from '../optimize/optimize-css';
+import { TRANSFORM_TAG } from '../transformers/core-runtime-apis';
 import { serializeImportPath } from '../transformers/stencil-import-path';
+import { addTagTransformToCssString } from '../transformers/transform-utils';
 import { getScopeId } from './scope-css';
 import { stripCssComments } from './style-utils';
-import { addTagTransformToCssString } from '../transformers/transform-utils';
-import { TRANSFORM_TAG } from '../transformers/core-runtime-apis';
-import { STENCIL_CORE_ID } from '../bundle/entry-alias-ids';
 
 /**
  * A regular expression for matching CSS import statements
@@ -183,9 +183,9 @@ const generateTransformCssToEsm = (
   // inside a template literal (backticks and dollar-brace).
   results.styleText = results.styleText
     .replace(/\\/g, '\\\\')
-    .replace(/\n/g, ' ')
-    .replace(/\r/g, ' ')
-    .replace(/\t/g, ' ')
+    .replace(/\n/g, input.sourceMap ? '\n' : ' ')
+    .replace(/\r/g, input.sourceMap ? '\r' : ' ')
+    .replace(/\t/g, input.sourceMap ? '\t' : ' ')
     .replace(/\u000c/g, '\\\\f')
     .replace(/\u0008/g, '\\\\b')
     .replace(/\u000b/g, '\\\\v')
@@ -197,10 +197,12 @@ const generateTransformCssToEsm = (
     results.styleText = addTagTransformToCssString(results.styleText, input.tags);
   }
 
-  // Strip CSS comments before embedding in template literal
-  // This includes /** */ and /*! */ comments (Sass loud comments)
-  // Note: Style docs have already been parsed in transformCssToEsmModule
-  results.styleText = stripCssComments(results.styleText);
+  if (!input.sourceMap) {
+    // Strip CSS comments before embedding in template literal
+    // This includes /** */ and /*! */ comments (Sass loud comments)
+    // Note: Style docs have already been parsed in transformCssToEsmModule
+    results.styleText = stripCssComments(results.styleText);
+  }
 
   if (input.module === 'cjs') {
     // CommonJS
@@ -209,18 +211,15 @@ const generateTransformCssToEsm = (
     }
     results.imports.forEach((cssImport) => {
       s.append(`const ${cssImport.varName} = require('${cssImport.importPath}');\n`);
+      if (input.sourceMap) {
+        s.append(`const ${cssImport.varName}SourceMap = ${cssImport.varName}.sourceMap;\n`);
+      }
     });
 
-    s.append(`const ${results.defaultVarName} = () => `);
-
-    results.imports.forEach((cssImport) => {
-      s.append(`${cssImport.varName} + `);
-    });
-
-    s.append(`\`${results.styleText}\`;\n`);
+    appendStyleFactory(s, input, results);
     s.append(`module.exports = ${results.defaultVarName};`);
     if (input.sourceMap) {
-      s.append(`\nmodule.exports.sourceMap = ${JSON.stringify(results.styleSourceMap)};`);
+      s.append(`\nmodule.exports.sourceMap = ${createStyleSourceMapExpression(input, results)};`);
     }
   } else {
     // ESM
@@ -229,23 +228,45 @@ const generateTransformCssToEsm = (
     }
     results.imports.forEach((cssImport) => {
       s.append(`import ${cssImport.varName} from '${cssImport.importPath}';\n`);
+      if (input.sourceMap) {
+        s.append(`import { sourceMap as ${cssImport.varName}SourceMap } from '${cssImport.importPath}';\n`);
+      }
     });
 
-    s.append(`const ${results.defaultVarName} = () => `);
-
-    results.imports.forEach((cssImport) => {
-      s.append(`${cssImport.varName} + `);
-    });
-
-    s.append(`\`${results.styleText}\`;\n`);
+    appendStyleFactory(s, input, results);
     s.append(`export default ${results.defaultVarName};`);
     if (input.sourceMap) {
-      s.append(`\nexport const sourceMap = ${JSON.stringify(results.styleSourceMap)};`);
+      s.append(`\nexport const sourceMap = ${createStyleSourceMapExpression(input, results)};`);
     }
   }
 
   results.output = s.toString();
   return results;
+};
+
+const appendStyleFactory = (
+  output: MagicString,
+  input: d.TransformCssToEsmInput,
+  results: d.TransformCssToEsmOutput,
+) => {
+  output.append(`const ${results.defaultVarName} = () => `);
+  if (input.sourceMap && results.imports.length > 0) {
+    output.append(`[].concat(${results.imports.map((cssImport) => `${cssImport.varName}()`).join(', ')}, `);
+    output.append(`\`${results.styleText}\`);\n`);
+  } else {
+    results.imports.forEach((cssImport) => {
+      output.append(`${cssImport.varName} + `);
+    });
+    output.append(`\`${results.styleText}\`;\n`);
+  }
+};
+
+const createStyleSourceMapExpression = (input: d.TransformCssToEsmInput, results: d.TransformCssToEsmOutput) => {
+  const parentSourceMap = JSON.stringify(results.styleSourceMap) ?? 'undefined';
+  if (input.sourceMap && results.imports.length > 0) {
+    return `[].concat(${results.imports.map((cssImport) => `${cssImport.varName}SourceMap`).join(', ')}, ${parentSourceMap})`;
+  }
+  return parentSourceMap;
 };
 
 const sourceMapToDataUrl = (sourceMap: d.SourceMap) =>

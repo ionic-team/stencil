@@ -276,18 +276,52 @@ const updateCjsStyleRequires = (
   moduleFile: d.Module,
 ) => {
   const styleRequires: ts.Statement[] = [];
+  const styleSourceMapRequires: ts.Statement[] = [];
 
   moduleFile.cmps.forEach((cmp) => {
     cmp.styles.forEach((style) => {
-      if (typeof style.styleIdentifier === 'string' && style.externalStyles.length > 0) {
-        // add style imports built from @Component() styleUrl option
-        styleRequires.push(...createStyleImport(transformOpts, tsSourceFile, cmp, style));
+      if (typeof style.styleIdentifier === 'string') {
+        if (style.externalStyles.length > 0) {
+          // add style imports built from @Component() styleUrl option
+          styleRequires.push(...createStyleImport(transformOpts, tsSourceFile, cmp, style));
+        } else if (transformOpts.sourceMapCss) {
+          const sourceMapIdentifier = `${style.styleIdentifier}SourceMap`;
+          style.sourceMapIdentifiers = [sourceMapIdentifier];
+          styleSourceMapRequires.push(
+            ts.factory.createVariableStatement(
+              undefined,
+              ts.factory.createVariableDeclarationList(
+                [
+                  ts.factory.createVariableDeclaration(
+                    ts.factory.createIdentifier(sourceMapIdentifier),
+                    undefined,
+                    undefined,
+                    ts.factory.createPropertyAccessExpression(
+                      ts.factory.createIdentifier(style.styleIdentifier),
+                      'sourceMap',
+                    ),
+                  ),
+                ],
+                ts.NodeFlags.Const,
+              ),
+            ),
+          );
+        }
       }
     });
   });
 
-  if (styleRequires.length > 0) {
-    return ts.factory.updateSourceFile(tsSourceFile, [...styleRequires, ...tsSourceFile.statements]);
+  if (styleRequires.length > 0 || styleSourceMapRequires.length > 0) {
+    const firstNonImportIndex = tsSourceFile.statements.findIndex((statement) => !ts.isImportDeclaration(statement));
+    const importStatements =
+      firstNonImportIndex === -1 ? tsSourceFile.statements : tsSourceFile.statements.slice(0, firstNonImportIndex);
+    const nonImportStatements = firstNonImportIndex === -1 ? [] : tsSourceFile.statements.slice(firstNonImportIndex);
+    return ts.factory.updateSourceFile(tsSourceFile, [
+      ...styleRequires,
+      ...importStatements,
+      ...styleSourceMapRequires,
+      ...nonImportStatements,
+    ]);
   }
 
   return tsSourceFile;
