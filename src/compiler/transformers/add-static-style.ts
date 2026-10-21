@@ -86,10 +86,10 @@ export const createStyleSourceMapLiteral = (cmp: d.ComponentCompilerMeta, buildC
   const sourceMapModes: ts.ObjectLiteralElementLike[] = [];
   cmp.styles.forEach((style) => {
     if (Array.isArray(style.externalStyles) && style.externalStyles.length > 0) {
-      if (typeof style.styleIdentifier !== 'string') {
-        createStyleIdentifier(cmp, style, { separateStyles: true });
-      }
       const identifiers = style.sourceMapIdentifiers || [];
+      if (identifiers.length === 0) {
+        return;
+      }
       const value =
         identifiers.length === 1
           ? ts.factory.createIdentifier(identifiers[0])

@@ -24,5 +24,11 @@ describe('native static style', () => {
     addNativeStaticStyle(classMembers, component, buildCtx);
 
     expect(classMembers).toHaveLength(2);
+    expect(ts.isGetAccessor(classMembers[0])).toBe(true);
+    expect(ts.isIdentifier((classMembers[0] as ts.GetAccessorDeclaration).name)).toBe(true);
+    expect(((classMembers[0] as ts.GetAccessorDeclaration).name as ts.Identifier).text).toBe('style');
+    expect(ts.isGetAccessor(classMembers[1])).toBe(true);
+    expect(ts.isIdentifier((classMembers[1] as ts.GetAccessorDeclaration).name)).toBe(true);
+    expect(((classMembers[1] as ts.GetAccessorDeclaration).name as ts.Identifier).text).toBe('sourceMap');
   });
 });

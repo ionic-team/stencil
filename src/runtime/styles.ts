@@ -74,6 +74,7 @@ export const registerStyle = (
 };
 
 const flattenStyleText = (cssText: StyleText): string[] => {
+  // Keep this recursive to support the optional ES5 runtime without requiring Array.prototype.flat.
   if (Array.isArray(cssText)) {
     return cssText.reduce<string[]>((styles, text) => styles.concat(flattenStyleText(text)), []);
   }
@@ -321,17 +322,17 @@ export const addStyle = (styleContainerNode: any, cmpMeta: d.ComponentRuntimeMet
          */
         const currentWindow = styleContainerNode.defaultView ?? styleContainerNode.ownerDocument.defaultView;
         const styleSheets = (Array.isArray(style) ? style : [style]) as CSSStyleSheet[];
-        const currentStyleSheets = styleSheets.map((styleSheet) => {
-          let stylesheet: CSSStyleSheet;
-          if (styleSheet.constructor === currentWindow.CSSStyleSheet) {
-            stylesheet = styleSheet;
+        const currentStyleSheets = styleSheets.map((sourceStyleSheet) => {
+          let currentStyleSheet: CSSStyleSheet;
+          if (sourceStyleSheet.constructor === currentWindow.CSSStyleSheet) {
+            currentStyleSheet = sourceStyleSheet;
           } else {
-            stylesheet = new currentWindow.CSSStyleSheet();
-            for (let i = 0; i < styleSheet.cssRules.length; i++) {
-              stylesheet.insertRule(styleSheet.cssRules[i].cssText, i);
+            currentStyleSheet = new currentWindow.CSSStyleSheet();
+            for (let i = 0; i < sourceStyleSheet.cssRules.length; i++) {
+              currentStyleSheet.insertRule(sourceStyleSheet.cssRules[i].cssText, i);
             }
           }
-          return stylesheet;
+          return currentStyleSheet;
         });
 
         const adoptedStyleSheets = previousStyleSheets

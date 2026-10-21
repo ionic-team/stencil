@@ -1,6 +1,7 @@
 import { catchError, createJsVarName, DEFAULT_STYLE_MODE, hasError, isString, normalizePath, resolve } from '@utils';
 import { scopeCss } from '@utils/shadow-css';
 import MagicString from 'magic-string';
+import sourceMapMerge from 'merge-source-map';
 import path from 'path';
 
 import type * as d from '../../declarations';
@@ -69,7 +70,7 @@ export const transformCssToEsm = async (input: d.TransformCssToEsmInput): Promis
     autoprefixer: input.autoprefixer,
     input: results.styleText,
     filePath: input.file,
-    map: input.map,
+    map: results.styleMap,
     minify: input.minify !== false,
     sourceMap: input.sourceMap,
   });
@@ -124,6 +125,7 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
       results.styleText = scopeCss(results.styleText, scopeId, false);
     }
 
+    // Production bundle transforms resolve CSS imports before this function. Keep this fallback for the public transpile API.
     const cssImports = getCssToEsmImports(varNames, results.styleText, input.file, input.mode);
     cssImports.forEach((cssImport) => {
       // remove the original css @imports
@@ -152,7 +154,11 @@ const transformCssToEsmModule = (input: d.TransformCssToEsmInput): d.TransformCs
   }
 
   if (input.sourceMap) {
-    results.styleMap = createCssSourceMap(results.styleText, results.styleText, input.file || 'input.css');
+    results.styleMap = createCssSourceMap(input.input, results.styleText, input.file || 'input.css');
+    const previousMap = parseSourceMap(input.map);
+    if (previousMap) {
+      results.styleMap = mergeSourceMaps(previousMap, results.styleMap);
+    }
   }
 
   return results;
@@ -211,15 +217,12 @@ const generateTransformCssToEsm = (
     }
     results.imports.forEach((cssImport) => {
       s.append(`const ${cssImport.varName} = require('${cssImport.importPath}');\n`);
-      if (input.sourceMap) {
-        s.append(`const ${cssImport.varName}SourceMap = ${cssImport.varName}.sourceMap;\n`);
-      }
     });
 
-    appendStyleFactory(s, input, results);
+    appendStyleFactory(s, results);
     s.append(`module.exports = ${results.defaultVarName};`);
     if (input.sourceMap) {
-      s.append(`\nmodule.exports.sourceMap = ${createStyleSourceMapExpression(input, results)};`);
+      s.append(`\nmodule.exports.sourceMap = ${JSON.stringify(results.styleSourceMap) ?? 'undefined'};`);
     }
   } else {
     // ESM
@@ -228,15 +231,12 @@ const generateTransformCssToEsm = (
     }
     results.imports.forEach((cssImport) => {
       s.append(`import ${cssImport.varName} from '${cssImport.importPath}';\n`);
-      if (input.sourceMap) {
-        s.append(`import { sourceMap as ${cssImport.varName}SourceMap } from '${cssImport.importPath}';\n`);
-      }
     });
 
-    appendStyleFactory(s, input, results);
+    appendStyleFactory(s, results);
     s.append(`export default ${results.defaultVarName};`);
     if (input.sourceMap) {
-      s.append(`\nexport const sourceMap = ${createStyleSourceMapExpression(input, results)};`);
+      s.append(`\nexport const sourceMap = ${JSON.stringify(results.styleSourceMap) ?? 'undefined'};`);
     }
   }
 
@@ -244,33 +244,32 @@ const generateTransformCssToEsm = (
   return results;
 };
 
-const appendStyleFactory = (
-  output: MagicString,
-  input: d.TransformCssToEsmInput,
-  results: d.TransformCssToEsmOutput,
-) => {
+const appendStyleFactory = (output: MagicString, results: d.TransformCssToEsmOutput) => {
   output.append(`const ${results.defaultVarName} = () => `);
-  if (input.sourceMap && results.imports.length > 0) {
-    output.append(`[].concat(${results.imports.map((cssImport) => `${cssImport.varName}()`).join(', ')}, `);
-    output.append(`\`${results.styleText}\`);\n`);
-  } else {
-    results.imports.forEach((cssImport) => {
-      output.append(`${cssImport.varName} + `);
-    });
-    output.append(`\`${results.styleText}\`;\n`);
-  }
-};
-
-const createStyleSourceMapExpression = (input: d.TransformCssToEsmInput, results: d.TransformCssToEsmOutput) => {
-  const parentSourceMap = JSON.stringify(results.styleSourceMap) ?? 'undefined';
-  if (input.sourceMap && results.imports.length > 0) {
-    return `[].concat(${results.imports.map((cssImport) => `${cssImport.varName}SourceMap`).join(', ')}, ${parentSourceMap})`;
-  }
-  return parentSourceMap;
+  results.imports.forEach((cssImport) => {
+    output.append(`${cssImport.varName} + `);
+  });
+  output.append(`\`${results.styleText}\`;\n`);
 };
 
 const sourceMapToDataUrl = (sourceMap: d.SourceMap) =>
   `data:application/json;charset=utf-8;base64,${Buffer.from(JSON.stringify(sourceMap)).toString('base64')}`;
+
+const parseSourceMap = (map?: d.SourceMap | string) => {
+  if (typeof map === 'string') {
+    try {
+      return JSON.parse(map) as d.SourceMap;
+    } catch (e) {
+      return undefined;
+    }
+  }
+  return map;
+};
+
+const mergeSourceMaps = (previousMap: d.SourceMap, nextMap: d.SourceMap) => {
+  // The package maps generated positions in `nextMap` through the original positions in `previousMap`.
+  return sourceMapMerge(previousMap, nextMap) as d.SourceMap;
+};
 
 /**
  * Get all of the CSS imports in a file

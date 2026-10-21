@@ -52,11 +52,10 @@ const hmrStyleElement = (elm: Element, versionId: string, stylesUpdated: HmrStyl
   }
 };
 
-const appendStyleSourceMap = (styleText: string, sourceMap?: string | string[]) => {
+const appendStyleSourceMap = (styleText: string, sourceMap?: string) => {
   const withoutSourceMap = styleText.replace(/\s*\/\*[#@]\s*sourceMappingURL=[^*]*\*\/\s*$/i, '');
   if (!sourceMap) {
     return withoutSourceMap;
   }
-  const sourceMaps = Array.isArray(sourceMap) ? sourceMap : [sourceMap];
-  return `${withoutSourceMap}${sourceMaps.map((map) => `\n/*# sourceMappingURL=${map} */`).join('')}`;
+  return `${withoutSourceMap}\n/*# sourceMappingURL=${sourceMap} */`;
 };

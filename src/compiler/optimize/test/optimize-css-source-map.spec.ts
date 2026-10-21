@@ -1,3 +1,4 @@
+// The compiler build emits this external bundle at `sys/node/autoprefixer.js`; unit tests run before that build step.
 jest.mock(
   '../../sys/node/autoprefixer.js',
   () => ({

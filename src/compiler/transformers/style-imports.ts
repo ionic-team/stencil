@@ -312,6 +312,7 @@ const updateCjsStyleRequires = (
   });
 
   if (styleRequires.length > 0 || styleSourceMapRequires.length > 0) {
+    // Keep imports at the top so generated source-map declarations execute after their required style bindings.
     const firstNonImportIndex = tsSourceFile.statements.findIndex((statement) => !ts.isImportDeclaration(statement));
     const importStatements =
       firstNonImportIndex === -1 ? tsSourceFile.statements : tsSourceFile.statements.slice(0, firstNonImportIndex);

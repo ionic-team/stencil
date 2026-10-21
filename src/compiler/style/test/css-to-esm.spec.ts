@@ -110,7 +110,7 @@ describe('transformCssToEsm', () => {
       expect(result.styleText).not.toContain('@import');
     });
 
-    it('should keep imported styles and source maps as separate runtime entries', async () => {
+    it('should keep imported styles as concatenated runtime entries', async () => {
       mockInput.input = `
         @import './variables.css';
         .my-class { color: red; }
@@ -119,9 +119,9 @@ describe('transformCssToEsm', () => {
 
       const result = await transformCssToEsm(mockInput);
 
-      expect(result.output).toContain('import { sourceMap as mdVariablesCssSourceMap }');
-      expect(result.output).toContain('() => [].concat(mdVariablesCss(), `');
-      expect(result.output).toContain('sourceMap = [].concat(mdVariablesCssSourceMap,');
+      expect(result.output).toContain("import mdVariablesCss from './variables.css'");
+      expect(result.output).toContain('mdVariablesCss + `');
+      expect(result.output).not.toContain('sourceMap as mdVariablesCssSourceMap');
     });
 
     it('should handle multiple CSS imports', async () => {
@@ -364,6 +364,24 @@ describe('transformCssToEsm', () => {
 
       expect(result.styleText).toContain('\n');
       expect(result.output).toContain('/* keep positions */\n.my-class');
+    });
+
+    it('includes scoped selector changes in the composed source map', async () => {
+      mockInput.encapsulation = 'scoped';
+      mockInput.sourceMap = true;
+      mockInput.map = {
+        version: 3,
+        file: mockInput.file,
+        names: [],
+        mappings: 'AAAA',
+        sources: ['/src/components/my-component/my-component.scss'],
+        sourcesContent: ['.my-class { color: red; }'],
+      };
+
+      const result = await transformCssToEsm(mockInput);
+
+      expect(result.styleText).toContain('.sc-my-component');
+      expect(result.styleMap?.sources).toContain('/src/components/my-component/my-component.scss');
     });
   });
 

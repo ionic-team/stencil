@@ -61,6 +61,8 @@ export const createCssSourceMap = (input: string, output: string, sourceFile = '
   generator.setSourceContent(sourceFile, input);
 
   const tokenRe = /[^\s{};,:]+|[{};,:]/g;
+  const inputLineStarts = getLineStarts(input);
+  const outputLineStarts = getLineStarts(output);
   let match: RegExpExecArray | null;
   let searchFrom = 0;
   while ((match = tokenRe.exec(output))) {
@@ -68,8 +70,8 @@ export const createCssSourceMap = (input: string, output: string, sourceFile = '
     const inputIndex = input.indexOf(token, searchFrom);
     const originalIndex = inputIndex === -1 ? Math.min(searchFrom, input.length - 1) : inputIndex;
     searchFrom = Math.max(searchFrom, originalIndex + token.length);
-    const original = getLineAndColumn(input, originalIndex);
-    const generated = getLineAndColumn(output, match.index);
+    const original = getLineAndColumn(inputLineStarts, originalIndex);
+    const generated = getLineAndColumn(outputLineStarts, match.index);
     generator.addMapping({
       generated,
       original,
@@ -81,11 +83,29 @@ export const createCssSourceMap = (input: string, output: string, sourceFile = '
   return generator.toJSON() as d.SourceMap;
 };
 
-const getLineAndColumn = (text: string, index: number) => {
-  const before = text.slice(0, Math.max(0, index));
-  const line = (before.match(/\n/g) || []).length + 1;
-  const lastNewline = before.lastIndexOf('\n');
-  return { line, column: index - lastNewline - 1 };
+const getLineStarts = (text: string) => {
+  const lineStarts = [0];
+  for (let index = 0; index < text.length; index++) {
+    if (text[index] === '\n') {
+      lineStarts.push(index + 1);
+    }
+  }
+  return lineStarts;
+};
+
+const getLineAndColumn = (lineStarts: number[], index: number) => {
+  let low = 0;
+  let high = lineStarts.length - 1;
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    if (lineStarts[middle] <= index) {
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
+  }
+  const lineIndex = Math.max(0, high);
+  return { line: lineIndex + 1, column: index - lineStarts[lineIndex] };
 };
 
 const resolveStylesheetUrl = async (

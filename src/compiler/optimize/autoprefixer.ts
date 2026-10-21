@@ -14,6 +14,8 @@ let cssProcessor: CssProcessor;
  *
  * @param cssText the text to be prefixed
  * @param opts an optional param with options for Autoprefixer
+ * @param sourceMap an optional source map from the previous CSS transform
+ * @param filePath the path of the CSS file being transformed
  * @returns a Promise wrapping some prefixed CSS as well as diagnostics
  */
 export const autoprefixCss = async (
