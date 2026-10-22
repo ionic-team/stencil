@@ -161,12 +161,14 @@ export const bundleCustomElements = async (
             minify,
             sourceMap,
           });
+
           buildCtx.diagnostics.push(...optimizeResults.diagnostics);
           if (!hasError(optimizeResults.diagnostics) && typeof optimizeResults.output === 'string') {
             code = optimizeResults.output;
           }
           if (optimizeResults.sourceMap) {
             sourceMap = optimizeResults.sourceMap;
+            // adding the source map is needed because optimizeModule will remove the existing one
             code = code + getSourceMappingUrlForEndOfFile(bundle.fileName);
             await compilerCtx.fs.writeFile(join(outputTargetDir, bundle.fileName + '.map'), JSON.stringify(sourceMap), {
               outputTargetType: outputTarget.type,

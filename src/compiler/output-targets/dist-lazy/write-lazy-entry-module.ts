@@ -8,14 +8,16 @@ export const writeLazyModule = async (
   destinations: string[],
   code: string,
   sourceMap: d.SourceMap,
-  rollupResult?: d.RollupChunkResult,
+  rollupResult: d.RollupChunkResult,
+  shouldMinify: boolean
 ): Promise<d.BundleModuleOutput> => {
   // code = replaceStylePlaceholders(entryModule.cmps, modeName, code);
 
   const fileName = rollupResult.fileName;
   const bundleId = fileName.replace('.entry.js', '');
 
-  if (sourceMap) {
+  if (sourceMap && shouldMinify) {
+    // remove old source map here?
     code = code + getSourceMappingUrlForEndOfFile(fileName);
   }
 

@@ -203,7 +203,7 @@ const generateLazyEntryModule = async (
     rollupResult.map,
   );
 
-  const output = await writeLazyModule(compilerCtx, outputTargetType, destinations, code, sourceMap, rollupResult);
+  const output = await writeLazyModule(compilerCtx, outputTargetType, destinations, code, sourceMap, rollupResult, shouldMinify);
 
   return {
     rollupResult,
@@ -242,7 +242,9 @@ const writeLazyChunk = async (
       let fileCode = code;
       const writes: Promise<any>[] = [];
       if (sourceMap) {
-        fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
+        if (shouldMinify) {
+          fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
+        }
         writes.push(compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType }));
       }
       writes.push(compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType }));
@@ -285,7 +287,10 @@ const writeLazyEntry = async (
       let fileCode = code;
       const writes: Promise<any>[] = [];
       if (sourceMap) {
-        fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
+        if (shouldMinify) {
+          console.log(code, '\n\n')
+          fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
+        }
         writes.push(compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType }));
       }
       writes.push(compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType }));
