@@ -23,7 +23,7 @@ export const generateEsm = async (
     ...esmOutputs.map(async (esmOutput) => {
       const esmOpts: OutputOptions = {
         banner: generatePreamble(config),
-        format: 'esm',
+        format: 'es',
         entryFileNames: '[name].js',
         assetFileNames: '[name]-[hash][extname]',
         sourcemap: config.sourceMap,
