@@ -15,6 +15,7 @@ export const writeLazyModule = async (
   const bundleId = fileName.replace('.entry.js', '');
 
   if (sourceMap && shouldMinify) {
+    // adding the source map is needed because optimizeModule will remove the existing one
     code = code + getSourceMappingUrlForEndOfFile(fileName);
   }
 

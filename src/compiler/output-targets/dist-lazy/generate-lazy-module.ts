@@ -234,6 +234,7 @@ const writeLazyChunk = async (
   const writes: Promise<any>[] = [];
   if (sourceMap) {
     if (shouldMinify) {
+      // adding the source map is needed because optimizeModule will remove the existing one
       fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
     }
     writes.push(compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType }));
@@ -275,7 +276,7 @@ const writeLazyEntry = async (
   const writes: Promise<any>[] = [];
   if (sourceMap) {
     if (shouldMinify) {
-      console.log(code, '\n\n')
+      // adding the source map is needed because optimizeModule will remove the existing one
       fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
     }
     writes.push(compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType }));
