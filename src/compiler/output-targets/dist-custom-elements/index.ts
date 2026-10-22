@@ -131,6 +131,7 @@ export const bundleCustomElements = async (
         sourcemap: config.sourceMap,
         chunkFileNames: outputTarget.externalRuntime || !config.hashFileNames ? '[name].js' : 'p-[hash].js',
         entryFileNames: '[name].js',
+        dir: outputTarget.dir,
         hoistTransitiveImports: false,
       });
 
