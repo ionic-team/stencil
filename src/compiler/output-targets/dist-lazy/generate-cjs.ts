@@ -12,18 +12,17 @@ export const generateCjs = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[],
-): Promise<d.UpdatedLazyBuildCtx> => {
-  const cjsOutputs = outputTargets.filter((o) => !!o.cjsDir);
+): Promise<d.UpdatedLazyBuildCtx[]> => {
+  const cjsOutputs = outputTargets.filter((o) => !!o.cjsDir && typeof o.cjsDir === 'string');
 
-  if (cjsOutputs.length > 0) {
-    const outputTargetType = cjsOutputs[0].type;
+  return Promise.all(cjsOutputs.map(async (cjsOutput) => {
     const esmOpts: OutputOptions = {
       banner: generatePreamble(config),
       format: 'cjs',
       entryFileNames: '[name].cjs.js',
       assetFileNames: '[name]-[hash][extname]',
       sourcemap: config.sourceMap,
-      dir: cjsOutputs[0].cjsDir,
+      dir: cjsOutput.cjsDir,
       plugins: [lazyBundleIdPlugin(buildCtx, config, false, '.cjs')],
     };
 
@@ -33,27 +32,26 @@ export const generateCjs = async (
     }
 
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
-    if (results != null) {
-      const destinations = cjsOutputs
-        .map((o) => o.cjsDir)
-        .filter((cjsDir): cjsDir is string => typeof cjsDir === 'string');
 
+    if (results != null) {
       buildCtx.commonJsComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
-        outputTargetType,
-        destinations,
+        cjsOutput.type,
+        cjsOutput.cjsDir,
         results,
         'es2017',
         false,
       );
 
       await generateShortcuts(compilerCtx, results, cjsOutputs);
-    }
-  }
 
-  return { name: 'cjs', buildCtx };
+      return { name: 'cjs', buildCtx };
+    }
+
+    return null;
+  }));
 };
 
 const generateShortcuts = (

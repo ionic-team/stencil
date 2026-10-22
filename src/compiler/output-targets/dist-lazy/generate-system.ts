@@ -13,10 +13,10 @@ export const generateSystem = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[],
-): Promise<d.UpdatedLazyBuildCtx> => {
-  const systemOutputs = outputTargets.filter((o) => !!o.systemDir);
+): Promise<d.UpdatedLazyBuildCtx[]> => {
+  const systemOutputs = outputTargets.filter((o) => !!o.systemDir && typeof o.systemDir === 'string');
 
-  if (systemOutputs.length > 0) {
+  return Promise.all(systemOutputs.map(async (systemOutput) => {
     const esmOpts: OutputOptions = {
       banner: generatePreamble(config),
       format: 'system',
@@ -24,29 +24,32 @@ export const generateSystem = async (
       chunkFileNames: config.hashFileNames ? 'p-[hash].system.js' : '[name]-[hash].system.js',
       assetFileNames: config.hashFileNames ? 'p-[hash][extname]' : '[name]-[hash][extname]',
       sourcemap: config.sourceMap,
+      dir: systemOutput.systemDir,
       plugins: [lazyBundleIdPlugin(buildCtx, config, config.hashFileNames, '.system', true)],
     };
+
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
+
     if (results != null) {
-      const destinations = systemOutputs
-        .map((o) => o.esmDir)
-        .filter((esmDir): esmDir is string => typeof esmDir === 'string');
       buildCtx.systemComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
-        outputTargets[0].type,
-        destinations,
+        systemOutput.type,
+        systemOutput.systemDir,
         results,
         'es5',
         true,
       );
 
       await generateSystemLoaders(config, compilerCtx, results, systemOutputs);
-    }
-  }
 
-  return { name: 'system', buildCtx };
+      return { name: 'system', buildCtx };
+    }
+
+    return null;
+  }));
+
 };
 
 const generateSystemLoaders = (

@@ -12,10 +12,10 @@ export const generateEsmBrowser = async (
   buildCtx: d.BuildCtx,
   rollupBuild: RollupBuild,
   outputTargets: d.OutputTargetDistLazy[],
-): Promise<d.UpdatedLazyBuildCtx> => {
-  const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !!o.isBrowserBuild);
-  if (esmOutputs.length) {
-    const outputTargetType = esmOutputs[0].type;
+): Promise<d.UpdatedLazyBuildCtx[]> => {
+  const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !!o.isBrowserBuild && typeof o.esmDir === 'string');
+
+  return Promise.all(esmOutputs.map(async (esmOutput) => {
     const esmOpts: OutputOptions = {
       banner: generatePreamble(config),
       format: 'es',
@@ -23,27 +23,28 @@ export const generateEsmBrowser = async (
       chunkFileNames: config.hashFileNames ? 'p-[hash].js' : '[name]-[hash].js',
       assetFileNames: config.hashFileNames ? 'p-[hash][extname]' : '[name]-[hash][extname]',
       sourcemap: config.sourceMap,
+      dir: esmOutput.esmDir,
       plugins: [lazyBundleIdPlugin(buildCtx, config, config.hashFileNames, '', true)],
     };
 
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
 
     if (output != null) {
-      const es2017destinations = esmOutputs
-        .map((o) => o.esmDir)
-        .filter((esmDir): esmDir is string => typeof esmDir === 'string');
       buildCtx.esmBrowserComponentBundle = await generateLazyModules(
         config,
         compilerCtx,
         buildCtx,
-        outputTargetType,
-        es2017destinations,
+        esmOutput.type,
+        esmOutput.esmDir,
         output,
         'es2017',
         true,
       );
-    }
-  }
 
-  return { name: 'esm-browser', buildCtx };
+
+      return { name: 'esm-browser', buildCtx };
+    }
+
+    return null;
+  }));
 };
