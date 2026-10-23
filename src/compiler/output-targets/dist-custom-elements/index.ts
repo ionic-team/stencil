@@ -2,7 +2,6 @@ import {
   catchError,
   dashToPascalCase,
   generatePreamble,
-  getSourceMappingUrlForEndOfFile,
   hasError,
   isBoolean,
   isOutputTargetDistCustomElements,
@@ -169,8 +168,7 @@ export const bundleCustomElements = async (
           }
           if (optimizeResults.sourceMap) {
             sourceMap = optimizeResults.sourceMap;
-            // adding the source map is needed because optimizeModule will remove the existing one
-            code = code + getSourceMappingUrlForEndOfFile(bundle.fileName);
+
             await compilerCtx.fs.writeFile(join(outputTargetDir, bundle.fileName + '.map'), JSON.stringify(sourceMap), {
               outputTargetType: outputTarget.type,
             });

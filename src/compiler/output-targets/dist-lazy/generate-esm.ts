@@ -15,7 +15,7 @@ export const generateEsm = async (
   outputTargets: d.OutputTargetDistLazy[],
 ): Promise<d.UpdatedLazyBuildCtx[]> => {
   const esmEs5Outputs = config.buildEs5
-    ? outputTargets.filter((o) => !!o.esmEs5Dir && !o.isBrowserBuild && typeof o.esmDir === 'string')
+    ? outputTargets.filter((o) => !!o.esmEs5Dir && !o.isBrowserBuild && typeof o.esmEs5Dir === 'string')
     : [];
   const esmOutputs = outputTargets.filter((o) => !!o.esmDir && !o.isBrowserBuild && typeof o.esmDir === 'string');
 
@@ -59,7 +59,7 @@ export const generateEsm = async (
         entryFileNames: '[name].js',
         assetFileNames: '[name]-[hash][extname]',
         sourcemap: config.sourceMap,
-        dir: esmEs5Output.esmDir,
+        dir: esmEs5Output.esmEs5Dir,
         plugins: [lazyBundleIdPlugin(buildCtx, config, false, '')],
       };
 
@@ -71,7 +71,7 @@ export const generateEsm = async (
           compilerCtx,
           buildCtx,
           esmEs5Output.type,
-          esmEs5Output.esmDir,
+          esmEs5Output.esmEs5Dir,
           output,
           'es5',
           false,

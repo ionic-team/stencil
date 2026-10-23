@@ -1,4 +1,4 @@
-import { getSourceMappingUrlForEndOfFile, join } from '@utils';
+import { join } from '@utils';
 
 import type * as d from '../../../declarations';
 
@@ -8,16 +8,10 @@ export const writeLazyModule = async (
   destination: string,
   code: string,
   sourceMap: d.SourceMap,
-  rollupResult: d.RollupChunkResult,
-  shouldMinify: boolean
+  rollupResult: d.RollupChunkResult
 ): Promise<d.BundleModuleOutput> => {
   const fileName = rollupResult.fileName;
   const bundleId = fileName.replace('.entry.js', '');
-
-  if (sourceMap && shouldMinify) {
-    // adding the source map is needed because optimizeModule will remove the existing one
-    code = code + getSourceMappingUrlForEndOfFile(fileName);
-  }
 
   const jsPath = join(destination, fileName);
   const mapPath = jsPath + '.map';

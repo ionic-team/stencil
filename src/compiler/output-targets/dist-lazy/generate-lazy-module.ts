@@ -1,6 +1,5 @@
 import {
   formatComponentRuntimeMeta,
-  getSourceMappingUrlForEndOfFile,
   hasDependency,
   join,
   rollupToStencilSourceMap,
@@ -196,7 +195,7 @@ const generateLazyEntryModule = async (
     rollupResult.map,
   );
 
-  const output = await writeLazyModule(compilerCtx, outputTargetType, destination, code, sourceMap, rollupResult, shouldMinify);
+  const output = await writeLazyModule(compilerCtx, outputTargetType, destination, code, sourceMap, rollupResult);
 
   return {
     rollupResult,
@@ -230,16 +229,12 @@ const writeLazyChunk = async (
   );
 
   const filePath = join(destination, rollupResult.fileName);
-  let fileCode = code;
+console.log('chunk', filePath);
   const writes: Promise<any>[] = [];
   if (sourceMap) {
-    if (shouldMinify) {
-      // adding the source map is needed because optimizeModule will remove the existing one
-      fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
-    }
     writes.push(compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType }));
   }
-  writes.push(compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType }));
+  writes.push(compilerCtx.fs.writeFile(filePath, code, { outputTargetType }));
   await Promise.all(writes);
 };
 
@@ -272,16 +267,12 @@ const writeLazyEntry = async (
   );
 
   const filePath = join(destination, rollupResult.fileName);
-  let fileCode = code;
+
   const writes: Promise<any>[] = [];
   if (sourceMap) {
-    if (shouldMinify) {
-      // adding the source map is needed because optimizeModule will remove the existing one
-      fileCode = code + getSourceMappingUrlForEndOfFile(rollupResult.fileName);
-    }
     writes.push(compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType }));
   }
-  writes.push(compilerCtx.fs.writeFile(filePath, fileCode, { outputTargetType }));
+  writes.push(compilerCtx.fs.writeFile(filePath, code, { outputTargetType }));
   await Promise.all(writes);
 };
 
@@ -413,7 +404,7 @@ const convertChunk = async (
   isCore: boolean,
   isBrowserBuild: boolean,
   code: string,
-  rollupSrcMap: RollupSourceMap,
+  rollupSrcMap: RollupSourceMap
 ) => {
   let sourceMap = rollupToStencilSourceMap(rollupSrcMap);
   const inlineHelpers = isBrowserBuild || !hasDependency(buildCtx, 'tslib');
