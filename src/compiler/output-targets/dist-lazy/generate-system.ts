@@ -25,7 +25,7 @@ export const generateSystem = async (
       assetFileNames: config.hashFileNames ? 'p-[hash][extname]' : '[name]-[hash][extname]',
       sourcemap: config.sourceMap,
       dir: systemOutput.systemDir,
-      plugins: [lazyBundleIdPlugin(buildCtx, config, config.hashFileNames, '.system', true)],
+      plugins: [lazyBundleIdPlugin(config, true)],
     };
 
     const results = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);

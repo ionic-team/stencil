@@ -24,7 +24,7 @@ export const generateEsmBrowser = async (
       assetFileNames: config.hashFileNames ? 'p-[hash][extname]' : '[name]-[hash][extname]',
       sourcemap: config.sourceMap,
       dir: esmOutput.esmDir,
-      plugins: [lazyBundleIdPlugin(buildCtx, config, config.hashFileNames, '', true)],
+      plugins: [lazyBundleIdPlugin(config, true)],
     };
 
     const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);

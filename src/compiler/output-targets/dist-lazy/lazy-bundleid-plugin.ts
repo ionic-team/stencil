@@ -5,18 +5,12 @@ import type * as d from '../../../declarations';
 
 /**
  * A Rollup plugin to generate unique bundle IDs for lazy-loaded modules.
- * @param _buildCtx The build context
  * @param config The validated configuration
- * @param _shouldHash Whether to hash the bundle ID
- * @param _suffix The suffix to append to the bundle ID
  * @param isBrowserBuild Whether this is a browser build
  * @returns A Rollup plugin
  */
 export const lazyBundleIdPlugin = (
-  _buildCtx: d.BuildCtx,
   config: d.ValidatedConfig,
-  _shouldHash: boolean,
-  _suffix: string,
   isBrowserBuild?: boolean,
 ): Plugin => {
   return {
@@ -46,7 +40,7 @@ export const lazyBundleIdPlugin = (
 
       if (!map.size) return;
 
-      for (const [_key, file] of files) {
+      for (const [, file] of files) {
         if (!file.isEntry) continue;
 
         const newFileName = map.get(file.fileName);

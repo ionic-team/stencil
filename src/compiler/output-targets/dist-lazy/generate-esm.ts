@@ -28,7 +28,7 @@ export const generateEsm = async (
         assetFileNames: '[name]-[hash][extname]',
         sourcemap: config.sourceMap,
         dir: esmOutput.esmDir,
-        plugins: [lazyBundleIdPlugin(buildCtx, config, false, '')],
+        plugins: [lazyBundleIdPlugin(config)],
       };
 
       const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);
@@ -60,7 +60,7 @@ export const generateEsm = async (
         assetFileNames: '[name]-[hash][extname]',
         sourcemap: config.sourceMap,
         dir: esmEs5Output.esmEs5Dir,
-        plugins: [lazyBundleIdPlugin(buildCtx, config, false, '')],
+        plugins: [lazyBundleIdPlugin(config)],
       };
 
       const output = await generateRollupOutput(rollupBuild, esmOpts, config, buildCtx.entryModules);

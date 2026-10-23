@@ -23,7 +23,7 @@ export const generateCjs = async (
       assetFileNames: '[name]-[hash][extname]',
       sourcemap: config.sourceMap,
       dir: cjsOutput.cjsDir,
-      plugins: [lazyBundleIdPlugin(buildCtx, config, false, '.cjs')],
+      plugins: [lazyBundleIdPlugin(config)],
     };
 
     if (!!config.extras.experimentalImportInjection || !!config.extras.enableImportInjection) {
