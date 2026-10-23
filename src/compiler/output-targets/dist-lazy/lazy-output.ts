@@ -66,21 +66,22 @@ export const outputLazy = async (
 
     const rollupBuild = await bundleOutput(config, compilerCtx, buildCtx, bundleOpts);
     if (rollupBuild != null) {
-      const results: d.UpdatedLazyBuildCtx[] = await Promise.all([
+      const results: d.UpdatedLazyBuildCtx[][] = await Promise.all([
         generateEsmBrowser(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
         generateEsm(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
         generateSystem(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
         generateCjs(config, compilerCtx, buildCtx, rollupBuild, outputTargets),
       ]);
 
-      results.forEach((result) => {
+      results.flat().filter(Boolean).forEach((result) => {
         if (result.name === 'cjs') {
           buildCtx.commonJsComponentBundle = result.buildCtx.commonJsComponentBundle;
         } else if (result.name === 'system') {
           buildCtx.systemComponentBundle = result.buildCtx.systemComponentBundle;
+        } else if (result.name === 'es5') {
+          buildCtx.es5ComponentBundle = result.buildCtx.es5ComponentBundle;
         } else if (result.name === 'esm') {
           buildCtx.esmComponentBundle = result.buildCtx.esmComponentBundle;
-          buildCtx.es5ComponentBundle = result.buildCtx.es5ComponentBundle;
         } else if (result.name === 'esm-browser') {
           buildCtx.esmBrowserComponentBundle = result.buildCtx.esmBrowserComponentBundle;
           buildCtx.buildResults = result.buildCtx.buildResults;
