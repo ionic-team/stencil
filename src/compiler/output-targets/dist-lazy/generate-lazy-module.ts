@@ -229,7 +229,7 @@ const writeLazyChunk = async (
   );
 
   const filePath = join(destination, rollupResult.fileName);
-console.log('chunk', filePath);
+
   const writes: Promise<any>[] = [];
   if (sourceMap) {
     writes.push(compilerCtx.fs.writeFile(filePath + '.map', JSON.stringify(sourceMap), { outputTargetType }));
